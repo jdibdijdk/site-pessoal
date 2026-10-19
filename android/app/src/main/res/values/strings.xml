@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Rotina Widgets</string>
+    <string name="w_hoje">Rotina · Hoje</string>
+    <string name="w_semana">Rotina · Semana</string>
+    <string name="w_tarefas">Rotina · Tarefas</string>
+    <string name="w_habitos">Rotina · Hábitos</string>
+    <string name="w_notas">Rotina · Notas</string>
+    <string name="w_fin">Rotina · Finanças</string>
+    <string name="d_hoje">Próximos compromissos e progresso do dia</string>
+    <string name="d_semana">Eventos de hoje e amanhã</string>
+    <string name="d_tarefas">Tarefas pendentes por prazo</string>
+    <string name="d_habitos">Hábitos de hoje</string>
+    <string name="d_notas">Notas recentes</string>
+    <string name="d_fin">Contas que vencem em breve</string>
+    <string name="carregando">Carregando…</string>
+</resources>

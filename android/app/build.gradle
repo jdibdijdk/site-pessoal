@@ -1,0 +1,41 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Assinatura: o GitHub Actions passa a chave pelos segredos do repositório (ROTINA_KEYSTORE_B64 etc.).
+// Sem eles, usa a chave de depuração guardada em cache no Actions.
+def ks = System.getenv('ROTINA_KEYSTORE')
+
+android {
+    namespace 'br.rotina.widgets'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'br.rotina.widgets'
+        minSdk 26
+        targetSdk 35
+        versionCode((System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger())
+        versionName '1.' + (System.getenv('GITHUB_RUN_NUMBER') ?: '0')
+    }
+
+    signingConfigs {
+        if (ks) {
+            rotina {
+                storeFile file(ks)
+                storePassword System.getenv('ROTINA_KEYSTORE_PASS')
+                keyAlias System.getenv('ROTINA_KEY_ALIAS')
+                keyPassword System.getenv('ROTINA_KEY_PASS')
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig ks ? signingConfigs.rotina : signingConfigs.debug
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
