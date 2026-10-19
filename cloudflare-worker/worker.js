@@ -47,7 +47,7 @@ export async function run(env = {}, now = Date.now()) {
       Object.keys(sent).forEach((k) => { if (now - sent[k] > 4 * 864e5) delete sent[k]; });
       const due = (c.items || []).filter((it) => it.a <= now && now - it.a <= WINDOW_MS && !sent[it.k]);
       if (!due.length) continue;
-      due.forEach((it) => { sent[it.k] = now; pend.push({ k: it.k, t: it.t, b: it.b }); });
+      due.forEach((it) => { sent[it.k] = now; pend.push({ k: it.k, t: it.t, b: it.b, u: it.u || '' }); });
       await patch(name, { pending: JSON.stringify(pend.slice(-30)), sent: JSON.stringify(sent) });
       const r = await fetch(c.sub.endpoint, { method: 'POST', headers: { Authorization: await vapidHeader(c.sub.endpoint, cfg), TTL: '3600', Urgency: 'high', 'Content-Length': '0' } });
       log.push(id + ': ' + due.length + ' aviso(s), HTTP ' + r.status);
