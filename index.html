@@ -290,8 +290,9 @@ main{max-width:1240px;margin:0 auto;padding:22px 26px 80px}
 .fxt{white-space:pre-wrap;overflow-wrap:anywhere;outline:0;min-width:16px;max-width:100%}
 .fxt:empty::before{content:'';}
 .fxt[contenteditable=true]{background:rgba(37,71,208,.10);border-radius:5px;cursor:text;user-select:text;-webkit-user-select:text;padding:1px 4px}
-.fxi{max-width:100%;flex:1 1 auto;min-height:0;object-fit:contain;border-radius:6px;pointer-events:none}
-.fxi.ph{display:grid;place-items:center;color:var(--mut);font-size:12px;border:1px dashed var(--line3);width:100%;height:70%;flex:none}
+.fxim{display:block;width:100%;max-width:100%;flex:1 1 auto;min-height:0;height:100%;object-fit:contain;border-radius:6px;pointer-events:none}
+.fxwrap:not(.edit) .fxim{pointer-events:auto;cursor:zoom-in}
+.fxim.ph{display:grid;place-items:center;color:var(--mut);font-size:12px;border:1px dashed var(--line3);width:100%;height:70%;flex:none}
 .k-img .fxin{padding:6px}
 .fxn.sel{outline:2px solid var(--acc);outline-offset:3px}
 .fxn.linking{outline:2px dashed var(--acc);outline-offset:3px}
@@ -1717,6 +1718,32 @@ details.bagmore[open]>summary{margin-bottom:8px}
 .obj>div:not(.obj-h)::before,.ned .obj>div:not(.obj-h)::before{content:counter(ob) '\00a0\00a0';color:var(--mut2);font-weight:500}
 .ncobj{background:none;border-left:2px solid var(--line3);border-radius:0}
 @media print{.ntoc,.objsum-nav,.objck{display:none!important}.nwrap.hasnav{display:block}}
+.fxlight{position:fixed;inset:0;z-index:200;background:rgba(10,12,16,.88);display:grid;place-items:center;padding:24px;cursor:zoom-out}
+.fxlight img{max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;background:#fff}
+.fxlight .icon-btn{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:14px;color:#fff}
+
+/* computador: grade da semana mais compacta */
+@media (min-width:761px){
+  .ev.ev2{padding:2px 6px 2px 7px;font-size:11px;line-height:14.5px;border-radius:8px;border-left-width:3px}
+  .ev.ev2 .el{min-height:14.5px}
+  .ev.ev2 .el-tm,.ev.ev2 .el-ar,.ev.ev2 .el-pl,.ev.ev2 .el-pr,.ev.ev2 .el-bg,.ev.ev2 .el-tk,.ev.ev2 .el-fd,.ev.ev2 .el-dw{font-size:10.5px}
+  .ev.ev2 .el-tt{font-size:11.5px}
+  .ev.ev2 .el .ic{width:10px;height:10px}
+  .ev.ev2.nar2{line-height:13.5px}.ev.ev2.nar2 .el{min-height:13.5px;font-size:10px}.ev.ev2.nar2 .el-tt{font-size:10.5px}
+  .ev.ev2.nar3{line-height:12.5px}.ev.ev2.nar3 .el{min-height:12.5px;font-size:9.5px}.ev.ev2.nar3 .el-tt{font-size:10px}
+  .gh{padding-top:6px;padding-bottom:6px}
+}
+
+/* aba Questões: banco MedFisher embutido */
+.qhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.qhead .vt{margin:0 8px 0 0}
+.qtip{margin:4px 0 10px}
+.qslot{height:0}
+.qframe{position:absolute;z-index:4;border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:var(--sh)}
+body.qtab #toast{z-index:90}
+.mfprev{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;background:var(--soft)}
+.mfprev p{margin:4px 0 0;font-size:14px;color:var(--mut)}
+@media (max-width:760px){.qframe{border-radius:10px}.qtip{display:none}}
 </style>
 </head>
 <body>
@@ -2945,7 +2972,7 @@ function badgesHTML(a,date){
 }
 const hoursStr=list=>{const m=list.reduce((s,o)=>s+tmin(o.end)-tmin(o.start),0);return (Math.round(m/6)/10).toString().replace('.',',')+'h';};
 // Grade: das 06:00 às 23:00 (as demais horas ficam recolhidas e se abrem pelas faixas); a altura de cada evento é a duração real
-const GPX=100;
+const GRID_DESK=window.innerWidth>760,GPX=GRID_DESK?76:96; // computador: grade mais compacta
 const GRID_LO=360,GRID_HI=1380;
 function gridEvHTML(ev,lo,hi,span,print,pxh){
   const o=ev.o,a=o.act,col=catColor(a.catId),w=100/ev.n,dur=ev.e-ev.s,s0=Math.max(ev.s,lo),e0=Math.min(ev.e,hi),hpx=(e0-s0)*pxh/60,qk=!print&&quickOf(a);
@@ -2989,7 +3016,7 @@ function gridEvHTML(ev,lo,hi,span,print,pxh){
 // Bloco da grade na tela: uma informação por linha (horário, título, categoria, local, professor, o que levar, tarefas…),
 // cada uma em uma única linha; entram por ordem de importância até ocupar a altura real do evento.
 function gridEvCard(ev,o,a,pt,pos,act,tip,hpx){
-  const nar=ev.n>1?Math.min(ev.n,3):1,lh=nar===1?17:nar===2?15.5:14.5,L=Math.max(1,Math.floor((hpx-8)/lh));
+  const nar=ev.n>1?Math.min(ev.n,3):1,lh=GRID_DESK?(nar===1?14.5:nar===2?13.5:12.5):(nar===1?17:nar===2?15.5:14.5),L=Math.max(1,Math.floor((hpx-(GRID_DESK?5:8))/lh));
   const bg=bagOf(a,o.date),ni=bg.itemIds.filter(i=>!bg.stow[i]).length+bg.extras.length,nt=S.tasks.filter(t=>!t.done&&t.activityIds.includes(a.id)).length;
   const kits=bg.itemIds.map(itemById).filter(i=>i&&i.container).map(i=>i.name);
   const title=[pt.tipo,pt.theme].filter(Boolean).join(' | ')||aT(a),area=[pt.disc,pt.eixo].filter(Boolean).join(' · ');
@@ -3582,7 +3609,7 @@ function renderAjustes(){
 /* ==========================================================================
    17. RENDERIZAÇÃO GERAL
    ========================================================================== */
-const TABS=[['painel','Painel','home'],['semana','Semana','calendar'],['tarefas','Tarefas','tasks'],['habitos','Hábitos','sprout'],['docs','Documentos','file'],['notas','Notas','note'],['metas','Objetivos','target'],['datas','Datas','clock'],['links','Links','link'],['saude','Saúde','pulse'],['cul','Culinária','chef'],['fin','Finanças','wallet'],['ajustes','Ajustes','settings']];
+const TABS=[['painel','Painel','home'],['semana','Semana','calendar'],['tarefas','Tarefas','tasks'],['habitos','Hábitos','sprout'],['docs','Documentos','file'],['notas','Notas','note'],['questoes','Questões','cap'],['metas','Objetivos','target'],['datas','Datas','clock'],['links','Links','link'],['saude','Saúde','pulse'],['cul','Culinária','chef'],['fin','Finanças','wallet'],['ajustes','Ajustes','settings']];
 // Transição suave ao trocar de aba (o conteúdo entra deslizando de leve; sem movimento se o aparelho pedir)
 function tabAnim(dir){
   const m=$('#main');if(!m||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))return;
@@ -3705,15 +3732,16 @@ function applyLook(){
 function renderMain(){
   applyLook();
   const mn=$('#main');if(mn)mn.classList.toggle('wide',UI.tab==='semana'&&UI.view==='grade');
-  const map={painel:renderPainel,semana:renderSemana,tarefas:renderTarefas,habitos:renderHabitos,docs:renderDocs,notas:renderNotas,metas:renderMetas,datas:renderDatas,links:renderLinks,saude:renderSaude,cul:renderCul,fin:renderFin,ajustes:renderAjustes};
+  const map={painel:renderPainel,semana:renderSemana,tarefas:renderTarefas,habitos:renderHabitos,docs:renderDocs,notas:renderNotas,questoes:renderQuestoes,metas:renderMetas,datas:renderDatas,links:renderLinks,saude:renderSaude,cul:renderCul,fin:renderFin,ajustes:renderAjustes};
   computeAttention();
-  $('#main').innerHTML=(UI.tab==='notas'&&(UI.nview||UI.study)?'':attnHTML())+map[UI.tab]();
+  $('#main').innerHTML=((UI.tab==='notas'&&(UI.nview||UI.study))||UI.tab==='questoes'?'':attnHTML())+map[UI.tab]();
   updateBadge();afterRender();
 }
 function afterRender(){
   if(UI.tab==='habitos')hbAfter();
   if(UI.tab==='semana')fixGridScroll();
   if(UI.tab==='notas')notasAfterRender();
+  QF.sync();
 }
 // Atualiza a tela sem destruir o que está sendo editado (nota aberta, PDF aberto)
 function rerender(){
@@ -5302,7 +5330,7 @@ function fxNodeHTML(n,x,edit){
   const fg=x.fg||(x.bg?'#16181D':'');
   const st='left:'+x.x+'px;top:'+x.y+'px;width:'+x.w+'px;height:'+x.h+'px;font-size:'+x.fs+'px;'+(x.bg?'--fb:'+x.bg+';':'')+(fg?'--ff:'+fg+';':'');
   const refs=x.refs.map(r=>{const l=refInfo(r.k,r.id);return l==null?'<span class="ref gone">removido</span>':refPill(r.k,r.id,l);}).join('');
-  const img=x.kind==='img'?(x.img?'<img class="fxi" alt="" src="'+esc(x.img)+'" draggable="false">':'<div class="fxi ph">Sem imagem</div>'):'';
+  const img=x.kind==='img'?(x.img?'<img class="fxim" alt="" src="'+esc(x.img)+'" draggable="false"'+(edit?'':' data-a="fx-zoomimg" data-nid="'+x.id+'" title="Ampliar imagem"')+'>':'<div class="fxim ph">Sem imagem</div>'):'';
   const sel=edit&&UI.fxsel&&UI.fxsel.t==='node'&&UI.fxsel.id===x.id;
   return '<div class="fxn fx-'+x.shape+' k-'+x.kind+(sel?' sel':'')+(UI.fxlink===x.id?' linking':'')+'" data-nid="'+x.id+'" style="'+st+'">'+
     (x.shape==='diamond'?'<svg class="fxdia" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="50,1 99,50 50,99 1,50" vector-effect="non-scaling-stroke"/></svg>':'')+
@@ -5407,7 +5435,7 @@ function fxReadImage(file){
   return new Promise((res,rej)=>{
     const fr=new FileReader();
     fr.onload=()=>{const im=new Image();
-      im.onload=()=>{const M=720,w=im.naturalWidth,h=im.naturalHeight,k=Math.min(1,M/Math.max(w,h)),cv=document.createElement('canvas');cv.width=Math.max(1,Math.round(w*k));cv.height=Math.max(1,Math.round(h*k));
+      im.onload=()=>{const M=1600,w=im.naturalWidth,h=im.naturalHeight,k=Math.min(1,M/Math.max(w,h)),cv=document.createElement('canvas');cv.width=Math.max(1,Math.round(w*k));cv.height=Math.max(1,Math.round(h*k));
         cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);const png=/png|gif|webp/.test(file.type);let src=cv.toDataURL(png?'image/png':'image/jpeg',.85);if(png&&src.length>350000)src=cv.toDataURL('image/jpeg',.82);res({src:src,w:cv.width,h:cv.height});};
       im.onerror=()=>rej(new Error('Imagem inválida'));im.src=fr.result;};
     fr.onerror=()=>rej(fr.error);fr.readAsDataURL(file);
@@ -5418,7 +5446,7 @@ function fxSetImage(src,w,h,nid){
   fxMut(m=>{
     let x=nid&&fxById(m,nid);
     if(!x){x=fxNewNode('img');m.fx.nodes.push(x);UI.fxsel={t:'node',id:x.id};}
-    x.img=src;const k=Math.min(1,260/(w||260));x.w=Math.max(100,Math.round((w||200)*k));x.h=Math.max(70,Math.round((h||150)*k)+(x.text?34:20));
+    x.img=src;const k=Math.min(1,420/(w||420),320/(h||320));x.w=Math.max(140,Math.round((w||300)*k)+12);x.h=Math.max(100,Math.round((h||220)*k)+(x.text?34:12));
   });
 }
 function fxRefListHTML(q){
@@ -5514,7 +5542,15 @@ $('#fxFile').addEventListener('change',async e=>{
   const f=e.target.files[0];e.target.value='';if(!f)return;const nid=UI.fxImgFor;UI.fxImgFor=null;
   try{const r=await fxReadImage(f);fxSetImage(r.src,r.w,r.h,nid);}catch(x){toast('Não consegui ler essa imagem.');}
 });
+// Visualização: tocar numa imagem do fluxograma abre em tela cheia, legível
+function fxZoomImg(src){
+  const o=document.createElement('div');o.className='fxlight';o.setAttribute('role','dialog');o.setAttribute('aria-label','Imagem ampliada');
+  o.innerHTML='<img alt="" src="'+esc(src)+'"><button class="icon-btn" aria-label="Fechar">'+ic('x',22)+'</button>';
+  const close=()=>{o.remove();document.removeEventListener('keydown',k);},k=e=>{if(e.key==='Escape')close();};
+  o.addEventListener('click',close);document.addEventListener('keydown',k);document.body.appendChild(o);
+}
 Object.assign(ACT,{
+  'fx-zoomimg'(el){const n=fxNote(),x=n&&fxById(n,el.dataset.nid);if(x&&x.img)fxZoomImg(x.img);},
   'n-new-fluxo'(){
     const n=normNote({id:uid(),type:'fluxo',title:'',html:'',folderId:(UI.nf&&UI.nf!=='__none')?UI.nf:'',catId:'',cd:null,created:Date.now(),updated:Date.now(),fx:{nodes:[{id:uid(),kind:'box',shape:'pill',x:60,y:50,w:150,h:56,text:'Início',bg:'#E4F5EC'}],edges:[]}});
     S.notes.push(n);save();UI.fxsel=null;UI.fxlink=null;UI.fz=1;UI.nview={type:'note',id:n.id,edit:true,focusTitle:true};renderMain();window.scrollTo(0,0);
@@ -7718,7 +7754,7 @@ function printFallback(){
   w.document.close();
 }
 /* ----- imprimir a aba (ou subaba) que está na tela ----- */
-const TAB_LABEL={painel:'Painel',semana:'Semana',tarefas:'Tarefas',habitos:'Hábitos',docs:'Documentos',notas:'Notas',metas:'Objetivos',datas:'Datas',links:'Links',saude:'Saúde',cul:'Culinária',fin:'Finanças',ajustes:'Ajustes'};
+const TAB_LABEL={painel:'Painel',semana:'Semana',tarefas:'Tarefas',habitos:'Hábitos',docs:'Documentos',notas:'Notas',questoes:'Questões',metas:'Objetivos',datas:'Datas',links:'Links',saude:'Saúde',cul:'Culinária',fin:'Finanças',ajustes:'Ajustes'};
 function printContext(){
   if(UI.tab==='semana'){printWeek();return;}
   if(UI.tab==='notas'&&UI.nview&&UI.nview.id&&noteById(UI.nview.id)){printNote(UI.nview.id);return;}
@@ -10476,6 +10512,97 @@ function appHTML(){
     '<div class="wglist">'+WG_FRONTS.map(f=>'<a class="wgi" href="'+esc(base+'w/'+f[0]+'/')+'" target="_blank" rel="noopener">'+ic(f[2],20)+'<span><b>'+f[1]+'</b><small>'+f[3]+'</small></span>'+ic('external',15)+'</a>').join('')+'</div>'+
     '<p class="muted small">No Windows 11, os widgets Hoje, Tarefas e Hábitos aparecem no painel de widgets depois de instalar o app pelo Edge.</p></div>';
 }
+
+
+/* ==========================================================================
+   34c. QUESTÕES: banco MedFisher embutido; "Enviar para Notas" vira Questão ou Caso clínico
+   ========================================================================== */
+const MF_ORIGIN='https://medfisher.netlify.app';
+const mfUser=()=>/^(0[1-9]|10)$/.test(S.prefs.mfUser||'')?S.prefs.mfUser:'02';
+const mfUrl=()=>MF_ORIGIN+'/?u='+mfUser()+'#/questoes';
+// O banco fica num quadro que nunca é recriado: trocar de aba e voltar mantém a questão onde estava
+const QF={
+  el:null,user:'',
+  sync(){
+    const on=UI.tab==='questoes',slot=$('#qslot');
+    if(!on||!slot){if(this.el)this.el.hidden=true;document.body.classList.remove('qtab');return;}
+    if(!this.el||this.user!==mfUser()){
+      if(this.el)this.el.remove();
+      const f=document.createElement('iframe');f.id='qframe';f.className='qframe';f.title='Banco de questões MedFisher';f.src=mfUrl();
+      f.setAttribute('allow','clipboard-write; fullscreen');document.body.appendChild(f);this.el=f;this.user=mfUser();
+    }
+    document.body.classList.add('qtab');this.el.hidden=false;this.place();
+  },
+  place(){
+    const slot=$('#qslot');if(!slot||!this.el||this.el.hidden)return;
+    const r=slot.getBoundingClientRect(),top=r.top+window.scrollY,bar=$('#tabs'),bb=bar&&getComputedStyle(bar).position==='fixed'?bar.offsetHeight:0;
+    Object.assign(this.el.style,{top:top+'px',left:r.left+'px',width:r.width+'px',height:Math.max(360,window.innerHeight-r.top-bb-8)+'px'});
+  },
+  reload(){if(this.el){this.el.src=mfUrl();}}
+};
+window.addEventListener('resize',()=>QF.place());
+function renderQuestoes(){
+  const n=S.notes.filter(x=>x.mfId).length;
+  return '<div class="qhead"><h2 class="vt">Questões</h2><span class="muted small">MedFisher · usuário '+mfUser()+(n?' · '+n+(n===1?' enviada para Notas':' enviadas para Notas'):'')+'</span><span class="sp"></span>'+
+    '<button class="btn sm ghost" data-a="mf-user" title="Trocar o usuário do MedFisher">'+ic('user',14)+' '+mfUser()+'</button>'+
+    '<button class="btn sm ghost" data-a="mf-reload" title="Voltar para a lista de questões">'+ic('repeat',14)+' Recarregar</button>'+
+    '<a class="btn sm ghost" href="'+esc(mfUrl())+'" target="_blank" rel="noopener">'+ic('external',14)+' Abrir em nova aba</a></div>'+
+    '<p class="muted small qtip">Abra uma questão e toque em <b>Enviar para Notas</b> para guardá-la como Questão ou Caso clínico.</p><div id="qslot" class="qslot"></div>';
+}
+// texto puro do banco → HTML seguro das notas
+const mfTxt=t=>String(t||'').split(/\n+/).map(l=>l.trim()).filter(Boolean).map(l=>'<div>'+esc(l)+'</div>').join('');
+const mfImgs=l=>(l||[]).filter(s=>typeof s==='string'&&IMG_SRC.test(s)).slice(0,8).map(s=>'<img src="'+s+'" style="width:480px"><br>').join('');
+function mfClean(q){
+  const str=(v,m)=>String(v==null?'':v).slice(0,m||20000);
+  return {id:str(q.id,200),numero:str(q.numero,10),instituicao:str(q.instituicao,200),ano:str(q.ano,4),area:str(q.area,200),subarea:str(q.subarea,200),foco:str(q.foco,200),
+    enunciado:str(q.enunciado),gabarito:str(q.gabarito,2).toUpperCase(),anulada:!!q.anulada,comentario:str(q.comentario),
+    alternativas:(Array.isArray(q.alternativas)?q.alternativas:[]).slice(0,8).map(a=>({letra:str(a&&a.letra,2).toUpperCase(),texto:str(a&&a.texto,6000),comentario:str(a&&a.comentario,6000)})),
+    imagens:(Array.isArray(q.imagens)?q.imagens:[]).filter(s=>typeof s==='string'&&s.length<6e6)};
+}
+function mfNote(q,kind,folderId,catId){
+  const alt=a=>'<div><b>'+esc(a.letra)+')</b> '+esc(a.texto)+'</div>',ok=q.alternativas.find(a=>a.letra===q.gabarito);
+  const base={id:uid(),folderId:folderId,catId:catId,cd:null,created:Date.now(),updated:Date.now(),mfId:q.id};
+  const enun=mfTxt(q.enunciado)+mfImgs(q.imagens);
+  if(kind==='caso'){
+    return normNote(Object.assign(base,{type:'caso',title:q.foco||('Caso · '+q.instituicao+' '+q.ano),
+      html:enun+'<h3>Alternativas</h3>'+q.alternativas.map(alt).join('')+'<h3>Gabarito: '+esc(q.gabarito||'—')+(q.anulada?' (anulada)':'')+'</h3>'+mfTxt(q.comentario)+
+        '<div style="margin-top:12px"><small>'+esc([q.instituicao+' '+q.ano,'Questão '+q.numero].join(' · '))+'</small></div>',
+      hyp:ok?[ok.texto]:[],est:[[q.area,q.subarea,q.foco].filter(Boolean).join(' › ')].filter(Boolean)}));
+  }
+  return normNote(Object.assign(base,{type:'questao',title:'Q'+q.numero+' · '+q.instituicao+' '+q.ano,
+    html:enun+q.alternativas.map(alt).join(''),
+    wrong:q.alternativas.filter(a=>a.letra!==q.gabarito&&a.comentario).map(a=>'<div><b>'+esc(a.letra)+')</b> '+esc(a.texto)+'</div>'+mfTxt(a.comentario)).join(''),
+    right:ok?'<div><b>'+esc(ok.letra)+')</b> '+esc(ok.texto)+'</div>'+mfTxt(ok.comentario):'<div>Gabarito: '+esc(q.gabarito||'—')+'</div>',
+    just:mfTxt(q.comentario)+(q.anulada?'<div><b>Questão anulada.</b></div>':''),
+    prova:q.instituicao,ano:/^\d{4}$/.test(q.ano)?q.ano:'',nivel:'R1',qgroup:q.foco||q.subarea||'',qs:{n:0,ok:0,last:0,lastOk:false}}));
+}
+function openMfImport(q){
+  const dup=S.notes.find(n=>n.mfId===q.id),last=S.prefs.mfLast||{};
+  openModal('<form id="fMf" class="form"><div class="fh"><h2>Enviar para Notas</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
+    '<div class="mfprev"><b>Questão '+esc(q.numero)+' · '+esc(q.instituicao)+' '+esc(q.ano)+'</b><span class="muted small">'+esc([q.area,q.subarea,q.foco].filter(Boolean).join(' › '))+'</span><p>'+esc(clip(q.enunciado,240))+'</p></div>'+
+    (dup?'<div class="warn">Esta questão já está nas Notas ("'+esc(dup.title)+'"). Salvar de novo cria outra cópia.</div>':'')+
+    '<div class="f"><span>Salvar como</span><div class="seg" id="mfKind">'+[['questao','Questão'],['caso','Caso clínico']].map(k=>'<button type="button" class="'+((last.kind||'questao')===k[0]?'on':'')+'" data-a="mf-kind" data-v="'+k[0]+'">'+k[1]+'</button>').join('')+'</div></div>'+
+    '<div class="fgrid"><label class="f">Pasta<select name="folder">'+folderOptions(last.folder||'')+'</select></label><div class="f"><span>Categoria</span>'+catPickHTML('mfcat',last.cat||'')+'</div></div>'+
+    '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button type="submit" class="btn" name="go" value="0">Salvar</button><button type="submit" class="btn primary" name="go" value="1">Salvar e abrir</button></div></form>');
+  const f=$('#fMf');mountCatPicks(f);
+  f.addEventListener('submit',ev=>{
+    ev.preventDefault();const kind=($('#mfKind button.on',f)||{}).dataset.v||'questao',folder=f.elements.folder.value,cat=$('[data-catpick="mfcat"]',f).dataset.value||'';
+    const n=mfNote(q,kind,folder,cat);S.notes.push(n);S.prefs.mfLast={kind:kind,folder:folder,cat:cat};save();closeModal();
+    const go=ev.submitter&&ev.submitter.value==='1';
+    if(go){flushNote();UI.tab='notas';UI.nview={type:'note',id:n.id,edit:false};renderTabs();renderMain();ROUTE.write();window.scrollTo(0,0);}
+    else{toast((kind==='caso'?'Caso clínico':'Questão')+' salva em Notas.');if(UI.tab==='questoes')renderMain();}
+  });
+}
+window.addEventListener('message',e=>{
+  if(e.origin!==MF_ORIGIN)return;const d=e.data;
+  if(!d||d.tipo!=='medfisher:questao'||!d.questao||typeof d.questao!=='object')return;
+  openMfImport(mfClean(d.questao));
+});
+Object.assign(ACT,{
+  'mf-kind'(el){$$('#mfKind button').forEach(b=>b.classList.toggle('on',b===el));},
+  'mf-reload'(){QF.reload();},
+  'mf-user'(){askText('Usuário do MedFisher (01 a 10)',mfUser(),v=>{v=String(v).trim().padStart(2,'0');if(!/^(0[1-9]|10)$/.test(v)){toast('Use um código entre 01 e 10.');return;}S.prefs.mfUser=v;save();renderMain();});}
+});
 
 /* ==========================================================================
    35. INICIALIZAÇÃO
