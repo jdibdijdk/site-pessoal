@@ -1,1 +1,34 @@
-{"name":"Rotina de Estudos","short_name":"Rotina","start_url":"./","display":"standalone","background_color":"#16181D","theme_color":"#16181D","icons":[{"src":"favicon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]}
+{
+  "id": "./",
+  "name": "Rotina de Estudos",
+  "short_name": "Rotina",
+  "description": "Agenda, tarefas, hábitos, notas e finanças em um só lugar.",
+  "lang": "pt-BR",
+  "start_url": "./?src=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "any",
+  "launch_handler": { "client_mode": ["navigate-existing", "auto"] },
+  "background_color": "#16181D",
+  "theme_color": "#16181D",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Painel", "short_name": "Painel", "url": "./?tab=painel", "icons": [{ "src": "icons/w-painel-192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "Semana", "short_name": "Semana", "url": "./?tab=semana", "icons": [{ "src": "icons/w-semana-192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "Tarefas", "short_name": "Tarefas", "url": "./?tab=tarefas", "icons": [{ "src": "icons/w-tarefas-192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "Hábitos", "short_name": "Hábitos", "url": "./?tab=habitos", "icons": [{ "src": "icons/w-habitos-192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "Notas", "short_name": "Notas", "url": "./?tab=notas", "icons": [{ "src": "icons/w-notas-192.png", "sizes": "192x192", "type": "image/png" }] }
+  ],
+  "widgets": [
+    { "name": "Hoje", "short_name": "Hoje", "description": "Próximos compromissos do dia", "tag": "painel", "ms_ac_template": "w/card.json", "data": "w/data/painel.json", "type": "application/json", "screenshots": [{ "src": "icons/icon-512.png", "sizes": "512x512", "label": "Hoje" }], "icons": [{ "src": "icons/w-painel-192.png", "sizes": "192x192" }], "auth": false, "update": 900 },
+    { "name": "Tarefas", "short_name": "Tarefas", "description": "Tarefas pendentes", "tag": "tarefas", "ms_ac_template": "w/card.json", "data": "w/data/tarefas.json", "type": "application/json", "screenshots": [{ "src": "icons/icon-512.png", "sizes": "512x512", "label": "Tarefas" }], "icons": [{ "src": "icons/w-tarefas-192.png", "sizes": "192x192" }], "auth": false, "update": 900 },
+    { "name": "Hábitos", "short_name": "Hábitos", "description": "Hábitos de hoje", "tag": "habitos", "ms_ac_template": "w/card.json", "data": "w/data/habitos.json", "type": "application/json", "screenshots": [{ "src": "icons/icon-512.png", "sizes": "512x512", "label": "Hábitos" }], "icons": [{ "src": "icons/w-habitos-192.png", "sizes": "192x192" }], "auth": false, "update": 900 }
+  ]
+}
