@@ -10477,9 +10477,20 @@ var WG={
     const notes=S.notes.slice().sort((a,b)=>(b.updated||0)-(a.updated||0)).slice(0,8).map(n=>({id:n.id,t:n.title||'Sem título',u:n.updated||0}));
     const bills=[];S.fin.bills.forEach(b=>recDates(b,T,addISO(T,20)).forEach(d=>{if(!S.fin.paid['bill|'+b.id+'|'+d])bills.push({d:d,t:b.name,v:money(b.amount)});}));
     bills.sort((a,b)=>a.d<b.d?-1:1);
-    return {at:Date.now(),ev:ev,tasks:tasks,habits:habits,notes:notes,bills:bills.slice(0,10)};
+    let url='';try{url=location.protocol.indexOf('http')===0?location.origin+location.pathname.replace(/[^/]*$/,''):'';}catch(e){}
+    return {at:Date.now(),url:url,ev:ev,tasks:tasks,habits:habits,notes:notes,bills:bills.slice(0,10)};
   },
-  write(){try{const j=JSON.stringify(this.snap());LS.set(this.KEY,j);this.post(j);}catch(e){}},
+  write(){try{const j=JSON.stringify(this.snap());LS.set(this.KEY,j);this.post(j);this.cloud(j);}catch(e){}},
+  // o app Android de widgets lê este resumo no Firestore (documento rotina/<chave>_widgets)
+  last:'',lastAt:0,
+  cloud(j){
+    try{
+      if(!FB.active())return;const body=j.replace(/"at":\d+,/,'');
+      if(body===this.last&&Date.now()-this.lastAt<30*60000)return;
+      this.last=body;this.lastAt=Date.now();
+      FB.sdk.setDoc(FB.sdk.doc(FB.db,'rotina',FB_KEY+'_widgets'),{json:j,updated:Date.now()}).catch(()=>{this.last='';});
+    }catch(e){}
+  },
   post(j){try{const c=navigator.serviceWorker&&navigator.serviceWorker.controller;if(c)c.postMessage({type:'widgets',data:j||LS.get(this.KEY)||''});}catch(e){}},
   soon(){clearTimeout(this.t);this.t=setTimeout(()=>this.write(),1500);},
   // marcações feitas direto no widget (tarefa concluída, hábito feito) entram aqui ao abrir o app
@@ -10508,6 +10519,9 @@ function appHTML(){
     '<div class="addrow" style="margin-top:10px">'+(inst?'':'<button class="btn primary" data-a="pwa-install">'+ic('download',15)+' Instalar o app</button>')+(perm!=='granted'?'<button class="btn" data-a="nc-enable">'+ic('bell',15)+' Ativar avisos</button>':'')+'<button class="btn" data-a="nc-open">'+ic('bell',15)+' Central de avisos</button></div>'+
     (PWA.isIOS()&&!inst?'<p class="muted small">No iPhone: abra no Safari, toque em <b>Compartilhar</b> e depois em <b>Adicionar à Tela de Início</b>. Os avisos com o app fechado só funcionam depois disso.</p>':'')+
     '<p class="muted small">Segure o ícone do app na tela inicial para ver os atalhos: Painel, Semana, Tarefas, Hábitos e Notas.</p></div>'+
+    '<div class="card sec"><h3>Widgets nativos no Android</h3><p>Instale o app <b>Rotina Widgets</b> para ter widgets de verdade na tela inicial (Hoje, Semana, Tarefas, Hábitos, Notas e Finanças). Ele lê o resumo que este site grava no Firebase, então mantenha o Firebase conectado em Ajustes › Dados.</p>'+
+    '<div class="addrow"><a class="btn primary" href="https://github.com/jdibdijdk/site-pessoal/releases/latest/download/rotina-widgets.apk">'+ic('download',15)+' Baixar o app (APK)</a></div>'+
+    '<p class="muted small">No celular, permita instalar apps desta fonte quando o Android pedir. Depois segure um espaço vazio da tela inicial › Widgets › Rotina Widgets.</p></div>'+
     '<div class="card sec"><h3>Widgets da tela inicial</h3><p>Cada frente tem um mini-app minimalista que pode ficar na tela inicial do celular como um ícone próprio. Abra o widget e escolha <b>Instalar</b> (Android) ou <b>Adicionar à Tela de Início</b> (iPhone). Ele mostra o resumo salvo neste aparelho e se atualiza sempre que o app é aberto.</p>'+
     '<div class="wglist">'+WG_FRONTS.map(f=>'<a class="wgi" href="'+esc(base+'w/'+f[0]+'/')+'" target="_blank" rel="noopener">'+ic(f[2],20)+'<span><b>'+f[1]+'</b><small>'+f[3]+'</small></span>'+ic('external',15)+'</a>').join('')+'</div>'+
     '<p class="muted small">No Windows 11, os widgets Hoje, Tarefas e Hábitos aparecem no painel de widgets depois de instalar o app pelo Edge.</p></div>';

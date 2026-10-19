@@ -1,0 +1,71 @@
+# Compila o app Android "Rotina Widgets" e publica o APK em Releases (no main).
+name: App de widgets (Android)
+
+on:
+  push:
+    paths:
+      - 'android/**'
+      - '.github/workflows/android-widgets.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      # Sem segredos de assinatura, a chave de depuração fica guardada em cache para as atualizações instalarem por cima
+      - name: Chave de depuração em cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: rotina-widgets-debug-keystore
+
+      - name: Chave de assinatura (segredos do repositório)
+        env:
+          KS_B64: ${{ secrets.ROTINA_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/rotina.jks"
+            echo "ROTINA_KEYSTORE=$RUNNER_TEMP/rotina.jks" >> "$GITHUB_ENV"
+          fi
+
+      - name: Compilar APK
+        working-directory: android
+        env:
+          ROTINA_KEYSTORE_PASS: ${{ secrets.ROTINA_KEYSTORE_PASS }}
+          ROTINA_KEY_ALIAS: ${{ secrets.ROTINA_KEY_ALIAS }}
+          ROTINA_KEY_PASS: ${{ secrets.ROTINA_KEY_PASS }}
+        run: gradle assembleRelease --no-daemon --stacktrace
+
+      - name: Renomear
+        run: cp android/app/build/outputs/apk/release/app-release.apk rotina-widgets.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rotina-widgets
+          path: rotina-widgets.apk
+
+      - name: Publicar em Releases
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: widgets-v${{ github.run_number }}
+          name: Rotina Widgets ${{ github.run_number }}
+          body: |
+            App Android com os widgets da Rotina (Hoje, Semana, Tarefas, Hábitos, Notas e Finanças).
+            Baixe o rotina-widgets.apk no celular e instale. Depois segure a tela inicial › Widgets › Rotina Widgets.
+          files: rotina-widgets.apk
+          make_latest: true
