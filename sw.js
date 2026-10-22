@@ -5,11 +5,11 @@ const API_KEY = 'AIzaSyBU4owCJwloUlcfTP-cOeHjEo5hyzMH2tU';
 const FB_KEY = 'hRM2z3YEF6yPtTwKQyFMIAQs551d6Jwh';
 const BASE = 'https://firestore.googleapis.com/v1/projects/' + PROJECT + '/databases/(default)/documents/rotina/';
 
-const VERSION = 'v4';
+const VERSION = 'v5';
 const CACHE = 'rotina-app-' + VERSION;
 const META = 'rotina-meta'; // dados dos widgets e avisos recebidos com o app fechado
 const FRONTS = ['painel', 'semana', 'tarefas', 'habitos', 'notas', 'fin'];
-const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'favicon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png', 'icons/badge-96.png',
+const SHELL = ['./', 'index.html', 'slides.js', 'manifest.webmanifest', 'favicon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png', 'icons/badge-96.png',
   'w/widget.css', 'w/widget.js', 'w/card.json'].concat(FRONTS.map((f) => 'w/' + f + '/'));
 
 self.addEventListener('install', (e) => e.waitUntil((async () => {
@@ -54,7 +54,7 @@ self.addEventListener('fetch', (e) => {
     return;
   }
   // fontes do Google: guardadas para funcionar sem internet; Firestore, Apps Script e Drive nunca entram no cache
-  if (u.hostname === 'fonts.googleapis.com' || u.hostname === 'fonts.gstatic.com') e.respondWith(cacheFirst(req));
+  if (u.hostname === 'fonts.googleapis.com' || u.hostname === 'fonts.gstatic.com' || (u.hostname === 'cdnjs.cloudflare.com' && u.pathname.indexOf('/jszip/') >= 0)) e.respondWith(cacheFirst(req));
 });
 
 /* ----- mensagens do app ----- */
