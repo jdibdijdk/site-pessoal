@@ -785,7 +785,7 @@ a.ref[data-k=note],a.ref[data-k=pdf]{background:#E1F3F6;color:#1F7A8C}
 .qsec h5{margin:0 0 6px;font-size:13px;font-weight:600;color:var(--qc,var(--mut))}
 .qsec .ned{min-height:50px;padding:2px 0}
 .qsec .ned.editing{min-height:90px}
-.q-main{--qc:#2547D0}.q-wrong{--qc:#C62F2F;background:#FFF9F9}.q-right{--qc:#2F8F63;background:#F6FCF8}.q-just{--qc:#7A4CC2;background:#FAF7FE}
+.q-main{--qc:var(--line)}.q-wrong{--qc:#E5484D}.q-right{--qc:#12B5A0}.q-just{--qc:var(--line)}
 .qreveal{margin:6px 0 14px}.qans{animation:rise .25s}
 a.ref[data-k=deck]{background:#E1F3F6;color:#1F7A8C}
 .ncard.deck{border-top-color:var(--acc)}
@@ -1057,7 +1057,7 @@ html[data-theme="dark"] .acard{border-color:#6B5230}
 html[data-theme="dark"] .dbars span i{background:#4A78A8}
 html[data-theme="dark"] .ned mark{background:#5E5420;color:inherit}
 html[data-theme="dark"] .pdfscroll{background:#2A2E39}
-html[data-theme="dark"] .q-wrong{background:#2A1B1D}html[data-theme="dark"] .q-right{background:#14261D}html[data-theme="dark"] .q-just{background:#221D33}
+html[data-theme="dark"] .q-wrong{--qc:#C9474B}html[data-theme="dark"] .q-right{--qc:#1E9C8B}
 html[data-theme="dark"] .rate.r1{border-color:#6B3A3D}html[data-theme="dark"] .rate.r1:hover{background:#3A1E21}
 html[data-theme="dark"] .rate.r2{border-color:#6B5230}html[data-theme="dark"] .rate.r2:hover{background:#3A2E19}
 html[data-theme="dark"] .rate.r3{border-color:#3C4E8A}html[data-theme="dark"] .rate.r3:hover{background:#232C52}
@@ -1276,7 +1276,7 @@ html[data-theme="dark"] .stg.s1{background:#1E3329}html[data-theme="dark"] .stg.
 .qopt{display:flex;gap:12px;align-items:flex-start;text-align:left;border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:12px 14px;cursor:pointer;color:inherit;font:inherit}
 .qopt:hover:not(:disabled){border-color:var(--acc)}.qopt b{flex:none;width:24px;height:24px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-size:13px}
 .qopt-b{flex:1}.qopt-m{font-size:12px;font-weight:600}
-.qopt.right{border-color:#2F8F63;background:rgba(47,143,99,.16)}.qopt.wrong{border-color:#C62F2F;background:rgba(198,47,47,.14)}.qopt.dim{opacity:.55}
+.qopt.right{border-color:#12B5A0;background:var(--card)}.qopt.wrong{border-color:#E5484D;background:var(--card)}.qopt.dim{opacity:.55}.qopt.right b{background:#12B5A0;color:#fff}.qopt.wrong b{background:#E5484D;color:#fff}.qopt.right .qopt-m{color:#0E8C7C}.qopt.wrong .qopt-m{color:#C62F2F}
 .qfb{border-radius:12px;padding:10px 14px;margin:8px 0}.qfb.ok{background:rgba(47,143,99,.14)}.qfb.bad{background:rgba(198,47,47,.12)}
 .qstem.ned{min-height:0}.painel .cprev{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}.fh .muted.small{margin-left:10px}
 .imp-list{display:grid;gap:6px;max-height:44vh;overflow:auto;margin:6px 0}
@@ -1764,7 +1764,8 @@ body.qtab #toast{z-index:90}
 .daysec h4 .ddb{margin-left:auto;font-weight:500}
 .ddb.on{color:var(--okd,#1E8F58)}
 .daybar{display:flex;justify-content:flex-end;margin:-4px 0 8px}
-#toast .tundo{background:none;border:0;color:#9DB4FF;font:inherit;font-weight:600;cursor:pointer;margin-left:6px;padding:0}
+#toast .tundo{background:none;border:0;color:#9DB4FF;font:inherit;font-weight:600;cursor:pointer;margin-left:6px;padding:4px 6px;pointer-events:auto}
+#toast.show:has(.tundo){pointer-events:auto}
 
 /* tabelas: menu Célula e coluna redimensionável */
 .tblops{display:inline-flex;align-items:center;gap:2px;flex-wrap:wrap}
@@ -1787,7 +1788,7 @@ body.qtab #toast{z-index:90}
 .ntmi small{display:block;font-size:11.5px;color:var(--mut);white-space:normal}
 .nfbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:4px 0 14px}
 .nfsel{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--mut)}
-.nfsel select{padding:6px 28px 6px 10px;border:1px solid var(--line);border-radius:10px;background-color:var(--card);font-size:13.5px;color:var(--tx);max-width:220px}
+.nfsel select{padding:6px 28px 6px 10px;border:1px solid var(--line);border-radius:10px;background-color:var(--card);font-size:13.5px;color:var(--tx);max-width:190px}
 .icseg button{padding:6px 9px;display:inline-grid;place-items:center}
 @media (max-width:760px){.nfbar{gap:6px}.nfsel{flex:1 1 45%}.nfsel span{display:none}.nfsel select{width:100%;max-width:none}}
 
@@ -1876,6 +1877,36 @@ body.qtab #toast{z-index:90}
 @keyframes slTWipeD{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0)}}
 @keyframes slTSplit{from{clip-path:inset(0 50% 0 50%)}to{clip-path:inset(0)}}
 @keyframes slTZoom{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+
+/* questões: só contorno, letra em círculo e selos discretos */
+.qsec.qq{border:1px solid var(--qc,var(--line));border-left-width:1px;border-radius:14px;background:var(--card);padding:16px 20px}
+.qsec.qq h5{display:flex;align-items:center;gap:7px;color:var(--mut);font-size:13px;font-weight:600;margin:0 0 10px}
+.qsec.qq h5 small{margin-left:auto;font-weight:500;color:var(--mut2)}
+.qbadge{display:inline-flex;align-items:center;gap:5px;border-radius:7px;padding:3px 9px;font-size:12.5px;font-weight:600}
+.qbadge.bad{color:#C62F2F;background:#FDEDEE}.qbadge.ok{color:#0E8C7C;background:#E6F7F4}
+html[data-theme="dark"] .qbadge.bad{color:#FF8A8F;background:rgba(229,72,77,.14)}html[data-theme="dark"] .qbadge.ok{color:#4FD1BE;background:rgba(18,181,160,.14)}
+.qalt{display:flex;gap:16px;align-items:flex-start;margin:6px 0 10px}
+.qlet{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:14px;color:#fff;background:var(--qc)}
+.q-main .qlet{background:transparent;color:var(--tx);border:1px solid var(--line3);width:34px;height:34px;font-size:13px}
+.q-main .qalt{align-items:center;margin:4px 0}
+.qtx{flex:1;min-width:0;padding-top:8px}
+.q-main .qtx{padding-top:0}
+.qat{font-weight:600}
+.q-main .qat{font-weight:400}
+.qtx>*:not(.qat){margin-top:8px;color:var(--tx)}
+
+/* seleção de várias notas */
+#ncards.selmode [data-a="n-open"]{position:relative;cursor:pointer;user-select:none;-webkit-user-select:none}
+#ncards.selmode .ncard::before,#ncards.selmode .nrow::before{content:'';position:absolute;top:-7px;left:-7px;width:20px;height:20px;border-radius:6px;border:1.5px solid var(--line3);background:var(--card);z-index:2}
+#ncards.selmode .nrow::before{top:50%;right:auto;left:-28px;transform:translateY(-50%)}
+#ncards.selmode .llist{padding-left:30px}
+#ncards.selmode .picked{outline:2px solid var(--acc);outline-offset:1px}
+#ncards.selmode .picked::before{background:var(--acc) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E") center/14px no-repeat;border-color:var(--acc)}
+.nselbar .btn{white-space:nowrap}
+.nselbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:50;display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh2);padding:8px 10px;max-width:calc(100vw - 20px)}
+.nselbar b{font-size:14px;margin:0 6px}
+.nselsep{width:1px;height:22px;background:var(--line);margin:0 4px}
+@media (max-width:760px){.nselbar{bottom:calc(76px + env(safe-area-inset-bottom,0px));width:calc(100vw - 20px)}}
 </style>
 </head>
 <body>
@@ -3880,6 +3911,7 @@ function afterRender(){
   if(UI.tab==='habitos')hbAfter();
   if(UI.tab==='semana')fixGridScroll();
   if(UI.tab==='notas')notasAfterRender();
+  nselPaint();
   QF.sync();
 }
 // Atualiza a tela sem destruir o que está sendo editado (nota aberta, PDF aberto)
@@ -4580,14 +4612,14 @@ function notaItems(){
   if(UI.nf==='__none')items=items.filter(i=>!i.o.folderId);
   else if(UI.nf){const ids=flatOn('notes')&&!UI.nq?[UI.nf]:folderDesc(UI.nf);items=items.filter(i=>ids.indexOf(i.o.folderId)>=0);}
   else if(flatOn('notes')&&!UI.nq&&!UI.ncat&&!UI.ntype)items=items.filter(i=>!i.o.folderId||!folderById(i.o.folderId));
-  if(UI.ncat)items=items.filter(i=>{const r=catRoot(i.o.catId);return r&&r.id===UI.ncat;});
+  if(UI.ncat){const cs=catDesc(UI.ncat);items=items.filter(i=>cs.indexOf(i.o.catId)>=0);}
   if(UI.qgrp)items=items.filter(i=>i.k==='questao'&&(UI.qgrp==='__none'?!i.o.qgroup:i.o.qgroup===UI.qgrp));
   if(UI.nq){
     const qn=norm(UI.nq.trim());
     if(qn.charAt(0)==='#'&&qn.length>1){const tg=qn.slice(1);items=items.filter(i=>isNoteK(i.k)&&noteTags(i.o).some(x=>x.indexOf(tg)===0));}
     else items=items.filter(i=>norm((ttl(i)||'')+' '+(isNoteK(i.k)?noteText(i.o)+' '+noteFieldsText(i.o)+' '+(i.k==='questao'?qOrigin(i.o)+' '+i.o.qgroup:''):'')).includes(qn));
   }
-  return items.sort((a,b)=>(b.o.updated||0)-(a.o.updated||0));
+  return nSortItems(items,ttl);
 }
 const isNoteK=k=>k==='note'||k==='questao'||k==='caso'||k==='fluxo'||k==='bula';
 function noteFieldsText(n){
@@ -4667,15 +4699,42 @@ function nCreateHTML(){
     hd('Importar')+mi('pdf-open-file','file','PDF do computador')+mi('pdf-open-drive','cloud','PDF do Drive')+mi('sl-import','monitor','Apresentação (.pptx)','Apresente com caneta e anotações')+
     '</div></div></div>'+(UI.ntype==='questao'?'<button class="btn" data-a="qt-open">'+ic('play',15)+' Treinar questões</button>':'')+'</div>';
 }
+
+/* ----- ordenação da lista de Notas ----- */
+const N_SORTS=[['upd','Editadas recentemente'],['old','Editadas há mais tempo'],['new','Criadas recentemente'],['az','A–Z'],['za','Z–A'],['type','Por tipo']];
+const N_SORTS_Q=[['wrong','Mais erradas no treino'],['prova','Prova e ano']];
+const nSort=()=>{const v=S.prefs.nsort||'upd';return N_SORTS.concat(N_SORTS_Q).some(x=>x[0]===v)?v:'upd';};
+function nSortItems(items,ttl){
+  const v=nSort(),T=i=>String(ttl(i)||'').trim(),up=i=>i.o.updated||0;
+  const cmpT=(a,b)=>T(a).localeCompare(T(b),'pt-BR',{sensitivity:'base',numeric:true});
+  const TYPE_ORD=['note','questao','caso','bula','fluxo','deck','pdf','slides'];
+  const rate=i=>{const q=i.o.qs;return i.k==='questao'&&q&&q.n?q.ok/q.n:2;};
+  const f={
+    upd:(a,b)=>up(b)-up(a), old:(a,b)=>up(a)-up(b), new:(a,b)=>(b.o.created||0)-(a.o.created||0),
+    az:cmpT, za:(a,b)=>cmpT(b,a), type:(a,b)=>TYPE_ORD.indexOf(a.k)-TYPE_ORD.indexOf(b.k)||cmpT(a,b),
+    wrong:(a,b)=>rate(a)-rate(b)||((b.o.qs&&b.o.qs.n)||0)-((a.o.qs&&a.o.qs.n)||0),
+    prova:(a,b)=>String(a.o.prova||'~').localeCompare(String(b.o.prova||'~'),'pt-BR')||String(b.o.ano||'').localeCompare(String(a.o.ano||''))||cmpT(a,b)
+  }[v];
+  return items.sort(f);
+}
+// categorias em árvore para a lista de seleção (com contagem de itens de cada uma, incluindo as subcategorias)
+function catTreeOpts(sel,countFn){
+  const out=[],walk=(pid,d)=>S.cats.filter(c=>(c.parentId||null)===pid).forEach(c=>{
+    const n=countFn?countFn(c.id):null;
+    out.push('<option value="'+c.id+'" '+(sel===c.id?'selected':'')+(d?'':' style="color:'+esc(c.color||'inherit')+'"')+'>'+(d?'   '.repeat(d)+'› ':'● ')+esc(c.name)+(n!=null?' ('+n+')':'')+'</option>');
+    walk(c.id,d+1);});
+  walk(null,0);return out.join('');
+}
 function nFiltersHTML(tf,roots){
   const all=notaItemsAll(),cnt=k=>k?all.filter(i=>i.k===k).length:all.length;
   const sel=(id,lab,opts)=>'<label class="nfsel"><span>'+lab+'</span><select id="'+id+'">'+opts+'</select></label>';
   const ts=allTags().slice(0,40),cur=norm(UI.nq||'').charAt(0)==='#'?norm(UI.nq).slice(1):'';
   return '<div class="nfbar">'+
     sel('ntypeSel','Tipo',tf.map(x=>'<option value="'+x[0]+'" '+(UI.ntype===x[0]?'selected':'')+'>'+x[1]+' ('+cnt(x[0])+')</option>').join(''))+
-    sel('ncatSel','Categoria','<option value="">Todas</option>'+roots.map(c=>'<option value="'+c.id+'" style="color:'+esc(c.color||'inherit')+'" '+(UI.ncat===c.id?'selected':'')+'>● '+esc(c.name)+'</option>').join(''))+
+    sel('ncatSel','Categoria','<option value="">Todas</option>'+catTreeOpts(UI.ncat,id=>{const cs=catDesc(id);return all.filter(i=>cs.indexOf(i.o.catId)>=0).length;}))+
+    sel('nsortSel','Ordenar',N_SORTS.concat(UI.ntype==='questao'?N_SORTS_Q:[]).map(x=>'<option value="'+x[0]+'" '+(nSort()===x[0]?'selected':'')+'>'+x[1]+'</option>').join(''))+
     (ts.length?sel('ntagSel','Marcador','<option value="">Todos</option>'+ts.map(x=>'<option value="'+esc(x.t)+'" '+(cur===x.t?'selected':'')+'>#'+esc(x.t)+' ('+x.n+')</option>').join('')):'')+
-    '<span class="sp"></span>'+flatBtn('notes')+
+    '<span class="sp"></span>'+'<button class="icon-btn '+(UI.nselOn?'on':'')+'" data-a="nsel-toggle" title="Selecionar várias" aria-pressed="'+!!UI.nselOn+'">'+ic('tasks',17)+'</button>'+flatBtn('notes')+
     '<button class="icon-btn '+(UI.ftoff.notes?'':'on')+'" data-a="ft-toggle" data-k="notes" title="'+(UI.ftoff.notes?'Mostrar':'Esconder')+' a barra de pastas" aria-pressed="'+(!UI.ftoff.notes)+'">'+ic('sidebar',17)+'</button>'+
     '<div class="seg vseg icseg" aria-label="Modo de exibição">'+[['cartoes','Cartões','grid'],['lista','Lista','list']].map(v=>'<button class="'+(nview()===v[0]?'on':'')+'" data-a="nview" data-v="'+v[0]+'" title="'+v[1]+'" aria-label="'+v[1]+'">'+ic(v[2],16)+'</button>').join('')+'</div></div>';
 }
@@ -4683,6 +4742,7 @@ document.addEventListener('change',e=>{
   const t=e.target;if(!t||!t.id)return;
   if(t.id==='ntypeSel'){UI.ntype=t.value;UI.qgrp='';renderMain();}
   else if(t.id==='ncatSel'){UI.ncat=t.value;renderMain();}
+  else if(t.id==='nsortSel'){S.prefs.nsort=t.value;save();renderMain();}
   else if(t.id==='ntagSel'){UI.nq=t.value?'#'+t.value:'';renderMain();}
 });
 function renderNotas(){
@@ -4789,10 +4849,27 @@ function noteViewHTML(n){
   if(isB)return h+bulaBodyHTML(n,edit,ed)+noteDecksHTML(n)+(edit?'':noteLinksHTML(n));
   if(isC)return h+(edit||UI.prOpt&&UI.prOpt.obj===false?'':objSumHTML(n))+casoBodyHTML(n,edit,ed)+noteDecksHTML(n)+(edit?'':noteLinksHTML(n));
   if(!isQ){const nav=edit?'':noteNavHTML(n);return h+'<div class="nwrap'+(nav?' hasnav':'')+'"><div class="nmain">'+(edit||UI.prOpt&&UI.prOpt.obj===false?'':objSumHTML(n))+ed('html','ned','Escreva aqui. Use o estilo Título 1, 2 e 3 para montar o sumário; selecione um trecho e use Ctrl+K para ligá-lo a outra nota.')+noteDecksHTML(n)+(edit?'':noteLinksHTML(n))+'</div>'+nav+'</div>';}
-  const sec=(cls,title,f,id,ph)=>'<section class="qsec '+cls+'"><h5>'+title+'</h5>'+ed(f,id,ph)+'</section>';
+  // seções com contorno e ícones; na leitura, "A) texto" vira a letra num círculo (como no MedFisher)
+  const QH={'q-main':ic('help',15)+'Questão','q-wrong':'<span class="qbadge bad">'+ic('xCircle',14)+'Incorreta</span>','q-right':'<span class="qbadge ok">'+ic('checkCircle',14)+'Correta</span>','q-just':ic('msg',15)+'Resolução'};
+  const sec=(cls,title,f,id,ph)=>{let body=ed(f,id,ph);if(!edit&&cls!=='q-just')body=qAltDecorate(body,cls);return '<section class="qsec qq '+cls+'"><h5>'+(QH[cls]||title)+(edit?'<small>'+title+'</small>':'')+'</h5>'+body+'</section>';};
   if(edit)return h+sec('q-main','Questão','html','ned','Escreva o enunciado da questão…')+sec('q-wrong','Questão errada','wrong','ned_wrong','A alternativa incorreta, ou o erro que costuma enganar…')+sec('q-right','Questão certa','right','ned_right','A alternativa correta…')+sec('q-just','Justificativa','just','ned_just','Por que a certa está certa e a errada está errada…')+noteDecksHTML(n);
   const ans=(has('wrong')?sec('q-wrong','Questão errada','wrong','','')+'':'')+(has('right')?sec('q-right','Questão certa','right','','')+'':'')+(has('just')?sec('q-just','Justificativa','just','','')+'':'');
-  return h+sec('q-main','Questão','html','ned','')+(ans?'<div class="qreveal"><button class="btn primary" data-a="q-reveal">'+ic('eye',15)+' Mostrar resposta</button></div><div class="qans" id="qans" hidden>'+ans+'</div>':'')+noteDecksHTML(n)+noteLinksHTML(n);
+  return h+sec('q-main','Questão','html','ned','')+(ans?'<div class="qreveal"><button class="btn ghost" data-a="q-reveal">'+ic('eye',15)+' Mostrar resposta</button></div><div class="qans" id="qans" hidden>'+ans+'</div>':'')+noteDecksHTML(n)+noteLinksHTML(n);
+}
+// "<div><b>X)</b> texto</div>" + comentário seguinte → letra em círculo, texto em negrito e o comentário abaixo
+function qAltDecorate(html,cls){
+  const t=document.createElement('div');t.innerHTML=html;const ned=t.querySelector('.ned')||t;
+  const isAlt=el=>el&&el.nodeType===1&&el.tagName==='DIV'&&/^\s*<b>\s*[A-Ea-e]\s*\)\s*<\/b>/.test(el.innerHTML);
+  const kids=Array.from(ned.children);let cur=null;
+  kids.forEach(el=>{
+    if(isAlt(el)){
+      const m=el.innerHTML.match(/^\s*<b>\s*([A-Ea-e])\s*\)\s*<\/b>\s*([\s\S]*)$/);
+      const box=document.createElement('div');box.className='qalt';
+      box.innerHTML='<span class="qlet">'+m[1].toUpperCase()+'</span><div class="qtx"><div class="qat">'+m[2]+'</div></div>';
+      ned.replaceChild(box,el);cur=cls==='q-main'?null:box.querySelector('.qtx');
+    }else if(cur&&el.tagName!=='TABLE'&&!el.classList.contains('fnsec')){cur.appendChild(el);}
+  });
+  return t.innerHTML;
 }
 /* ----- Bulário: classes e medicamentos ----- */
 function bulaSnippet(o){
@@ -5033,6 +5110,8 @@ Object.assign(ICONS,{
  redo:'<path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0115-6.7L21 13"/>',
  columns:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/>',
  film:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4"/>',
+ xCircle:'<circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/>',
+ checkCircle:'<circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/>',
  chevU:'<path d="M18 15l-6-6-6 6"/>',
  level1:'<path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><path d="M8 13h8"/>',
  sidebar:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/>',
@@ -11154,6 +11233,70 @@ Object.assign(ACT,{
     askConfirm('Excluir a apresentação "'+x.title+'"?','Os desenhos feitos nela também serão apagados.',()=>{S.slides=S.slides.filter(y=>y!==x);if(!S.slides.some(y=>y.fileId===x.fileId))SLF.del(x.fileId);save();UI.nview=null;closeModal();renderMain();});
   }
 });
+
+
+/* ----- selecionar várias notas: mover, categoria, treinar e excluir em lote ----- */
+UI.nsel=new Set();
+const NSEL_COL={pdf:'pdfs',deck:'decks',slides:'slides'};
+const nselKey=el=>el.dataset.k+':'+el.dataset.id;
+function nselObj(key){const i=key.indexOf(':'),k=key.slice(0,i),id=key.slice(i+1),col=NSEL_COL[k]||'notes';const o=(S[col]||[]).find(x=>x.id===id);return o?{k:k,o:o,col:col}:null;}
+function nselPaint(){
+  const on=UI.nselOn&&UI.tab==='notas'&&!UI.nview,box=$('#ncards');
+  if(box){box.classList.toggle('selmode',!!on);$$('[data-a="n-open"]',box).forEach(el=>el.classList.toggle('picked',UI.nsel.has(nselKey(el))));}
+  let bar=$('#nselbar');
+  if(!on){if(bar)bar.remove();return;}
+  if(!bar){bar=document.createElement('div');bar.id='nselbar';bar.className='nselbar';document.body.appendChild(bar);}
+  const n=UI.nsel.size,hasQ=[...UI.nsel].some(k=>k.indexOf('questao:')===0);
+  bar.innerHTML='<b>'+n+(n===1?' selecionada':' selecionadas')+'</b><button class="btn sm ghost" data-a="nsel-all">Selecionar tudo</button>'+(n?'<button class="btn sm ghost" data-a="nsel-clear">Limpar</button><i class="nselsep"></i>'+
+    '<button class="btn sm" data-a="nsel-move">'+ic('folder',14)+' Mover</button><button class="btn sm" data-a="nsel-cat">'+ic('tag',14)+' Categoria</button>'+(hasQ?'<button class="btn sm" data-a="nsel-train">'+ic('play',14)+' Treinar</button>':'')+
+    '<button class="btn sm danger" data-a="nsel-del">'+ic('trash',14)+' Excluir</button>':'<span class="muted small">Toque nos itens para selecionar</span>')+'<span class="sp"></span><button class="icon-btn sm" data-a="nsel-toggle" aria-label="Sair da seleção">'+ic('x',16)+'</button>';
+}
+function nselPick(el,e){
+  const box=$('#ncards'),all=box?$$('[data-a="n-open"]',box).map(nselKey):[],k=nselKey(el);
+  UI.nselOn=true;
+  if(e&&e.shiftKey&&UI.nselLast&&all.indexOf(UI.nselLast)>=0){const a=all.indexOf(UI.nselLast),b=all.indexOf(k);all.slice(Math.min(a,b),Math.max(a,b)+1).forEach(x=>UI.nsel.add(x));}
+  else if(UI.nsel.has(k))UI.nsel.delete(k);else UI.nsel.add(k);
+  UI.nselLast=k;
+  if(!$('#ncards').classList.contains('selmode'))renderMain();else nselPaint();
+}
+function nselDone(msg){UI.nsel.clear();UI.nselOn=false;save();renderMain();if(msg)toast(msg);}
+function qtStartIds(ids){
+  let list=ids.map(noteById).filter(q=>q&&q.type==='questao'&&qReady(q));
+  if(!list.length){toast('Nenhuma das selecionadas tem a alternativa certa e a errada preenchidas.');return;}
+  list=list.map(q=>({q:q,k:(q.qs.n?q.qs.ok/q.qs.n:-1)+Math.random()*0.01})).sort((a,b)=>a.k-b.k).map(x=>x.q);
+  UI.qt={ids:list.map(q=>q.id),i:0,pick:null,res:[],flip:{}};list.forEach(q=>{UI.qt.flip[q.id]=Math.random()<0.5;});qtShow();
+}
+(function(){const open0=ACT['n-open'];ACT['n-open']=function(el,e){
+  if(el.closest&&el.closest('#ncards')&&(UI.nselOn||(e&&(e.ctrlKey||e.metaKey)))){if(e)e.preventDefault();nselPick(el,e);return;}
+  return open0.call(this,el,e);};})();
+Object.assign(ACT,{
+  'nsel-toggle'(){UI.nselOn=!UI.nselOn;if(!UI.nselOn)UI.nsel.clear();renderMain();},
+  'nsel-all'(){$$('#ncards [data-a="n-open"]').forEach(el=>UI.nsel.add(nselKey(el)));nselPaint();},
+  'nsel-clear'(){UI.nsel.clear();nselPaint();},
+  'nsel-move'(){
+    openModal('<form id="fNsm" class="form"><div class="fh"><h2>Mover '+UI.nsel.size+' itens</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div><label class="f">Pasta<select name="f">'+folderOptions('')+'</select></label><div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Mover</button></div></form>');
+    $('#fNsm').addEventListener('submit',ev=>{ev.preventDefault();const f=ev.target.elements.f.value,now=Date.now();[...UI.nsel].map(nselObj).filter(Boolean).forEach(x=>{x.o.folderId=f;x.o.updated=now;});closeModal();nselDone('Itens movidos.');});
+  },
+  'nsel-cat'(){
+    openModal('<form id="fNsc" class="form"><div class="fh"><h2>Categoria de '+UI.nsel.size+' itens</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div><label class="f">Categoria<select name="c"><option value="">Sem categoria</option>'+catTreeOpts('')+'</select></label><div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Aplicar</button></div></form>');
+    $('#fNsc').addEventListener('submit',ev=>{ev.preventDefault();const c=ev.target.elements.c.value,now=Date.now();[...UI.nsel].map(nselObj).filter(Boolean).forEach(x=>{x.o.catId=c;x.o.updated=now;});closeModal();nselDone('Categoria aplicada.');});
+  },
+  'nsel-train'(){const ids=[...UI.nsel].filter(k=>k.indexOf('questao:')===0).map(k=>k.slice(8));qtStartIds(ids);},
+  'nsel-del'(){
+    const items=[...UI.nsel].map(nselObj).filter(Boolean);if(!items.length)return;
+    askConfirm('Excluir '+items.length+(items.length===1?' item?':' itens?'),'Você poderá desfazer logo em seguida.',()=>{
+      const removed=items.map(x=>({col:x.col,o:x.o,i:S[x.col].indexOf(x.o),cards:x.k==='deck'?S.cards.filter(c=>c.deckId===x.o.id):[]}));
+      removed.forEach(r=>{S[r.col]=S[r.col].filter(y=>y!==r.o);if(r.cards.length)S.cards=S.cards.filter(c=>c.deckId!==r.o.id);});
+      closeModal();nselDone();
+      // arquivos grandes (PDF e .pptx) só são apagados do aparelho se não houver Desfazer
+      const purge=setTimeout(()=>removed.forEach(r=>{if(r.col==='pdfs'){try{PdfDB.del(r.o.id);delete PdfMem[r.o.id];}catch(e){}}if(r.col==='slides'&&!S.slides.some(y=>y.fileId===r.o.fileId))SLF.del(r.o.fileId);}),8000);
+      toastUndo(removed.length+(removed.length===1?' item excluído.':' itens excluídos.'),()=>{
+        clearTimeout(purge);removed.slice().sort((a,b)=>a.i-b.i).forEach(r=>{S[r.col].splice(Math.min(r.i,S[r.col].length),0,r.o);if(r.cards.length)S.cards=S.cards.concat(r.cards);});save();renderMain();
+      });
+    },'Excluir');
+  }
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.nselOn&&$('#modal').hidden){UI.nselOn=false;UI.nsel.clear();renderMain();}});
 
 /* ==========================================================================
    35. INICIALIZAÇÃO
