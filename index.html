@@ -1958,6 +1958,26 @@ html[data-theme="dark"] .fico{color:hsl(var(--fh,215) var(--fs,10%) 72%)}
 .lkcols input[type=color]{width:30px;height:30px;padding:1px;border:1px solid var(--line3);border-radius:8px;background:var(--card);cursor:pointer}
 #lkCol.off{opacity:.4;pointer-events:none}
 .ftile.pst .fti svg{width:22px;height:22px}
+
+/* o cabeçalho nunca passa da largura da janela; sem espaço, as abas mostram só o nome da aba ativa */
+.top{min-width:0}
+.brand{flex:none}.actions{flex:none}
+@media (min-width:761px){
+  #tabs{min-width:0;flex:1 1 auto;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;margin-right:0}
+  #tabs::-webkit-scrollbar{display:none}
+  .tab{flex:none}
+  body.tabs-compact .tab .lbl{display:none}
+  body.tabs-compact .tab.on .lbl{display:inline}
+}
+html,body{overflow-x:clip}
+main{min-width:0}
+
+/* textos entre S–O, O–A, A–P e após o P: sem a barra lateral, como um comentário solto entre os blocos */
+.qsec.soapgapsec{border:0;border-left:0;padding:0;margin:14px 0}
+.qsec.soapgapsec h5.soapfree{display:flex;align-items:center;gap:6px;margin:0 0 4px;font-size:12px;font-weight:600;letter-spacing:.03em;color:var(--mut)}
+.qsec.soapgapsec h5.soapfree .ic{flex:none;opacity:.8}
+.qsec.soapgapsec .ned{font-size:15px;color:var(--tx);opacity:.9;padding:2px 0}
+.qsec.soapgapsec .ned.editing{padding:12px 14px}
 </style>
 </head>
 <body>
@@ -3928,8 +3948,22 @@ function renderTabs(){
     else if(c)c.remove();
   });
   const pb=$('[data-a="print"]');if(pb){const tl=(TABS.find(x=>x[0]===UI.tab)||[])[1]||'esta página';pb.title=UI.tab==='semana'?'Imprimir a semana em grade (1 página)':'Imprimir: '+tl;pb.setAttribute('aria-label',pb.title);}
-  moveTabInd();centerTab();
+  moveTabInd();centerTab();fitTabs();
 }
+// Cabeçalho que cabe na tela: se as abas com nome não cabem, mostra só o nome da aba ativa (os ícones continuam)
+function fitTabs(){
+  const bar=$('#tabs');if(!bar)return;
+  const phone=window.innerWidth<=760;
+  document.body.classList.remove('tabs-compact');
+  if(!phone&&bar.scrollWidth>bar.clientWidth+1)document.body.classList.add('tabs-compact');
+  moveTabInd();
+}
+(function(){
+  let raf=0;const go=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(fitTabs);};
+  window.addEventListener('resize',go);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(go);
+  if(window.ResizeObserver){const t=$('.top');if(t)new ResizeObserver(go).observe(t);}
+})();
 function moveTabInd(){
   const bar=$('#tabs'),ind=bar&&$('#tabInd'),on=bar&&$('.tab.on',bar);if(!ind||!on)return;
   const ph=isPhone(),x=on.offsetLeft+(ph?0:12),w=ph?on.offsetWidth:Math.max(8,on.offsetWidth-24);
@@ -5115,6 +5149,7 @@ function objListHTML(n,key,title,ph,edit){
 }
 const SOAP_ICO={s:'msg',o:'pulse',a:'help',p:'check',e:'clock'};
 const GAPS={s:['g1','S','O'],o:['g2','O','A'],a:['g3','A','P'],p:['g4','P','Evolução']};
+const gapLbl=g=>g[0]==='g4'?'Após o P':'Entre '+g[1]+' e '+g[2];
 function casoBodyHTML(n,edit,ed){
   const has=f=>!!(n[f]&&noteText({html:n[f]}));
   const free=(lbl)=>(edit||has('html')||!n.soapOn)?(n.soapOn&&lbl?'<h5 class="soapfree">'+lbl+'</h5>':'')+ed('html','ned',n.soapOn?'Anotações livres sobre o caso…':'Escreva aqui. Use o botão Modo SOAP para organizar o caso em S, O, A e P. Selecione um trecho e use Ctrl+K para ligá-lo a outra nota ou a um documento.'):'';
@@ -5122,10 +5157,10 @@ function casoBodyHTML(n,edit,ed){
   let h='';
   const gap=k=>{
     const g=GAPS[k],f=g[0];
-    if(edit&&!n.gon[f])return '<div class="soapgap"><button type="button" class="btn sm ghost" data-a="gap-on" data-f="'+f+'">'+ic('plus',13)+' Texto entre '+g[1]+' e '+g[2]+'</button></div>';
+    if(edit&&!n.gon[f])return '<div class="soapgap"><button type="button" class="btn sm ghost" data-a="gap-on" data-f="'+f+'">'+ic('plus',13)+' '+(g[0]==='g4'?'Texto após o P':'Texto entre '+g[1]+' e '+g[2])+'</button></div>';
     if(n.gon[f]||has(f)){
       if(!edit&&!has(f))return '';
-      return '<section class="qsec soapgapsec" data-sec="'+f+'"><h5 class="soapfree">Entre '+g[1]+' e '+g[2]+(edit?'<button type="button" class="icon-btn sm" data-a="gap-off" data-f="'+f+'" aria-label="Remover este texto" style="margin-left:6px">'+ic('x',13)+'</button>':'')+'</h5>'+ed(f,'ned_'+f,'Texto livre entre '+g[1]+' e '+g[2]+'…')+'</section>';
+      return '<section class="qsec soapgapsec" data-sec="'+f+'"><h5 class="soapfree">'+ic('msg',13)+gapLbl(g)+(edit?'<button type="button" class="icon-btn sm" data-a="gap-off" data-f="'+f+'" aria-label="Remover este texto" style="margin-left:6px">'+ic('x',13)+'</button>':'')+'</h5>'+ed(f,'ned_'+f,'Texto livre entre '+g[1]+' e '+g[2]+'…')+'</section>';
     }
     return '';
   };
