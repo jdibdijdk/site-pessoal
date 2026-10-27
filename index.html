@@ -241,6 +241,8 @@ main{max-width:1240px;margin:0 auto;padding:22px 26px 80px}
 .fx-xls{--fx:#1E8F58;--fxs:#E4F5EC}
 .fx-ppt{--fx:#E3732A;--fxs:#FDEFE2}
 .fx-oth{--fx:#8A92A1;--fxs:#F3F4F7}
+.fx-sn{--fx:#6D5BD0;--fxs:#EEEBFB}
+.fx-img{--fx:#12A39A;--fxs:#E3F6F4}
 .fxtag{display:inline-flex;align-items:center;font-size:11.5px;font-weight:600;letter-spacing:.2px;line-height:1;padding:4px 9px;border-radius:999px;color:var(--fx);background:var(--fxs)}
 .dtt{display:flex;align-items:center;gap:10px}.dtt span:last-child{min-width:0;overflow-wrap:anywhere}
 .dxrow{display:flex;align-items:center;gap:10px}.dxrow select{flex:1;min-width:0}
@@ -1062,7 +1064,7 @@ html[data-theme="dark"] .rate.r1{border-color:#6B3A3D}html[data-theme="dark"] .r
 html[data-theme="dark"] .rate.r2{border-color:#6B5230}html[data-theme="dark"] .rate.r2:hover{background:#3A2E19}
 html[data-theme="dark"] .rate.r3{border-color:#3C4E8A}html[data-theme="dark"] .rate.r3:hover{background:#232C52}
 html[data-theme="dark"] .rate.r4{border-color:#2D6A4C}html[data-theme="dark"] .rate.r4:hover{background:#173326}
-html[data-theme="dark"] .fx-pdf{--fxs:#3A1F1D}html[data-theme="dark"] .fx-doc{--fxs:#1D2A45}html[data-theme="dark"] .fx-xls{--fxs:#173326}html[data-theme="dark"] .fx-ppt{--fxs:#3F2A1A}html[data-theme="dark"] .fx-oth{--fxs:#262A34}
+html[data-theme="dark"] .fx-pdf{--fxs:#3A1F1D}html[data-theme="dark"] .fx-doc{--fxs:#1D2A45}html[data-theme="dark"] .fx-xls{--fxs:#173326}html[data-theme="dark"] .fx-ppt{--fxs:#3F2A1A}html[data-theme="dark"] .fx-oth{--fxs:#262A34}html[data-theme="dark"] .fx-sn{--fxs:#262248}html[data-theme="dark"] .fx-img{--fxs:#12302D}
 html[data-theme="dark"] .obj>div:not(.obj-h)::before,html[data-theme="dark"] .obj .obj-h,html[data-theme="dark"] .ned .obj .obj-h,html[data-theme="dark"] .soapfree,html[data-theme="dark"] .gt{color:var(--mut)}
 html[data-theme="dark"] .pillx{color:var(--tx)}
 html[data-theme="dark"] .gs-i mark{background:#5E5420;color:#fff}
@@ -1907,6 +1909,55 @@ html[data-theme="dark"] .qbadge.bad{color:#FF8A8F;background:rgba(229,72,77,.14)
 .nselbar b{font-size:14px;margin:0 6px}
 .nselsep{width:1px;height:22px;background:var(--line);margin:0 4px}
 @media (max-width:760px){.nselbar{bottom:calc(76px + env(safe-area-inset-bottom,0px));width:calc(100vw - 20px)}}
+
+/* lista de Notas: linha compacta com três blocos fixos */
+.llist .nrow{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:12px;padding:6px 12px;min-height:52px;border-bottom:1px solid var(--line2);border-left:3px solid var(--c,transparent);cursor:pointer;background:transparent}
+.llist .nrow:last-child{border-bottom:0}
+.llist .nrow:hover{background:var(--soft)}
+.nrl{width:40px;height:40px;border-radius:8px;overflow:hidden;display:grid;place-items:center;color:var(--mut);background:var(--soft);flex:none}
+.nrl img{width:100%;height:100%;object-fit:cover;display:block}
+.nrt{display:flex;flex-direction:column;min-width:0;gap:1px}
+.nrt b{font-size:14.5px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nrt small{font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nrm{display:flex;align-items:center;gap:4px 8px;justify-content:flex-end;min-width:0;font-size:12px;color:var(--mut);flex-wrap:wrap}
+.nrm time{color:var(--mut2);font-variant-numeric:tabular-nums;min-width:42px;text-align:right}
+.nrm .lpath{display:inline-flex;gap:4px;align-items:center;max-width:160px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+@media (max-width:760px){
+  .llist .nrow{grid-template-columns:40px minmax(0,1fr);gap:2px 10px;padding:7px 10px}
+  .nrm{grid-column:2;justify-content:flex-start;flex-wrap:nowrap;overflow:hidden}
+  .nrm .lpath,.nrm .cdchip{display:none}
+  .nrm time{margin-left:auto}
+}
+#ncards.selmode .llist .nrow::before{left:-26px}
+.gic{position:relative;width:100%}.gthumb{position:absolute;left:50%;top:0;transform:translateX(-50%);width:100%;max-width:120px;height:62px;object-fit:cover;border-radius:8px;border:1px solid var(--line);background:var(--card)}
+
+.pdfsync{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--mut)}
+.pdfsync.ok{color:#12A39A}.pdfsync.fail{color:#C62F2F}.pdfsync.sending .ic{animation:spin 1.2s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* pastas: tom pastel (matiz e saturação vêm da pasta) e ícone fino, no estilo MedWay */
+.ftile.pst{background:hsl(var(--fh) var(--fs) 95%);border:1px solid hsl(var(--fh) var(--fs) 86%);box-shadow:none}
+.ftile.pst:hover{background:hsl(var(--fh) var(--fs) 92%);transform:translateY(-1px)}
+.ftile.pst .fti{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:hsl(var(--fh) var(--fs) 88%);color:hsl(var(--fh) calc(var(--fs) + 10%) 32%);margin-bottom:8px}
+.ftile.pst:hover .fti{color:hsl(var(--fh) calc(var(--fs) + 10%) 26%)}
+.ftile.pst .ftn{color:hsl(var(--fh) calc(var(--fs) + 6%) 22%)}
+.ftile.pst .ftc{color:hsl(var(--fh) calc(var(--fs) * .5) 42%)}
+.fico{display:inline-grid;place-items:center;color:hsl(var(--fh,215) calc(var(--fs,10%) + 10%) 38%)}
+html[data-theme="dark"] .ftile.pst{background:hsl(var(--fh) calc(var(--fs) * .55) 17%);border-color:hsl(var(--fh) calc(var(--fs) * .55) 26%)}
+html[data-theme="dark"] .ftile.pst:hover{background:hsl(var(--fh) calc(var(--fs) * .55) 21%)}
+html[data-theme="dark"] .ftile.pst .fti{background:hsl(var(--fh) calc(var(--fs) * .55) 26%);color:hsl(var(--fh) var(--fs) 78%)}
+html[data-theme="dark"] .ftile.pst .ftn{color:hsl(var(--fh) var(--fs) 88%)}
+html[data-theme="dark"] .ftile.pst .ftc{color:hsl(var(--fh) calc(var(--fs) * .5) 68%)}
+html[data-theme="dark"] .fico{color:hsl(var(--fh,215) var(--fs,10%) 72%)}
+.fprev{display:inline-flex;align-items:center;gap:12px;padding:12px 16px;border-radius:14px;cursor:default}
+.fprev .fti{margin-bottom:0}
+.lkcols{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.lkc{width:28px;height:28px;border-radius:50%;border:2px solid var(--card);box-shadow:0 0 0 1px var(--line3);cursor:pointer;padding:0}
+.lkc.on{box-shadow:0 0 0 2px var(--ink)}
+.lkc.none{background:repeating-linear-gradient(45deg,var(--card) 0 4px,var(--line3) 4px 5px)}
+.lkcols input[type=color]{width:30px;height:30px;padding:1px;border:1px solid var(--line3);border-radius:8px;background:var(--card);cursor:pointer}
+#lkCol.off{opacity:.4;pointer-events:none}
+.ftile.pst .fti svg{width:22px;height:22px}
 </style>
 </head>
 <body>
@@ -3407,7 +3458,9 @@ const FX={
   xlsx:{fam:'xls',lbl:'.xlsx',nome:'Excel (.xlsx)'},
   gsheet:{fam:'xls',lbl:'Planilhas',nome:'Google Planilhas'},
   pptx:{fam:'ppt',lbl:'.pptx',nome:'PowerPoint (.pptx)'},
-  gslide:{fam:'ppt',lbl:'Slides',nome:'Google Slides'}
+  gslide:{fam:'ppt',lbl:'Slides',nome:'Google Slides'},
+  starnote:{fam:'sn',lbl:'StarNote',nome:'StarNote'},
+  img:{fam:'img',lbl:'Imagem',nome:'Imagem (png, jpg…)'}
 };
 // Descobre o tipo pelo endereço (Google Docs/Planilhas/Slides, OneDrive, extensão do arquivo) ou pelo nome
 function detectExt(text){
@@ -3419,14 +3472,20 @@ function detectExt(text){
   if(/\.docx?(?=$|[?#\s])/.test(t)||/:w:\/|1drv\.ms\/w\//.test(t))return 'docx';
   if(/\.(xlsx?|xlsm|csv)(?=$|[?#\s])/.test(t)||/:x:\/|1drv\.ms\/x\//.test(t))return 'xlsx';
   if(/\.(pptx?|ppsx)(?=$|[?#\s])/.test(t)||/:p:\/|1drv\.ms\/p\//.test(t))return 'pptx';
+  if(/\.starnote(?=$|[?#\s])/.test(t)||/starnote/.test(t))return 'starnote';
+  if(/\.(png|jpe?g|gif|webp|heic|heif|bmp|svg|avif)(?=$|[?#\s])/.test(t)||/photos\.google\.com|photos\.app\.goo\.gl|lh\d\.googleusercontent\.com/.test(t))return 'img';
   return '';
 }
-const docExt=d=>FX[d.ext]?d.ext:(detectExt(d.link)||detectExt(d.title));
+const docExt=d=>FX[d.ext]?d.ext:(detectExt(d.link)||detectExt(d.title)||(d.starnote?'starnote':''));
+// miniatura: só quando o link do documento do tipo Imagem é uma imagem direta (https)
+const docThumb=d=>docExt(d)==='img'&&/^https:\/\/\S+\.(png|jpe?g|gif|webp|avif|bmp)(\?\S*)?$/i.test(d.link||'')?d.link:'';
 const FXI={
   pdf:'<text x="11.5" y="16.8" text-anchor="middle" font-size="6.4" font-weight="700" fill="currentColor" stroke="none" font-family="Poppins,system-ui,sans-serif">PDF</text>',
   doc:'<path d="M8 12.5h7M8 15.5h7M8 18.5h4.5"/>',
   xls:'<rect x="8" y="11.5" width="7.5" height="7" rx="1"/><path d="M8 15h7.5M11.75 11.5v7"/>',
   ppt:'<rect x="8" y="11.5" width="7.5" height="5.5" rx="1"/><path d="M11.75 17v2M9.75 19h4"/>',
+  sn:'<path d="M8 12.5h4.2M8 15.5h3M8 18.5h2.4"/><path d="M18.2 10.4l1.4 1.4-6 6-2.1.7.7-2.1z"/><path d="M16.9 11.7l1.4 1.4"/>',
+  img:'<circle cx="9.2" cy="12.4" r="1.1"/><path d="M6.8 19l3.6-3.8 2.2 2.2 2.1-2.5 2.5 4.1"/>',
   oth:'<path d="M8 13h7M8 16h4.5"/>'
 };
 // Ícone minimalista: folha com a ponta dobrada, na cor do tipo e com um desenho que lembra o formato
@@ -3455,8 +3514,8 @@ function dfolderCount(id){
 }
 function dfolderTreeHTML(pid,depth){
   return S.dfolders.filter(f=>(f.parentId||'')===pid).sort(byName).map(f=>{const hk=S.dfolders.some(x=>x.parentId===f.id),cl=!!UI.fclosed['d'+f.id];return (
-    '<div class="fo '+(UI.df===f.id?'on':'')+'" style="--d:'+depth+'" data-a="df-folder" data-id="'+f.id+'" role="button" tabindex="0">'+foFx(hk,'d'+f.id,cl)+'<span class="fnm">'+ic('folder',16)+esc(f.name)+'</span><span class="count">'+dfolderCount(f.id)+'</span>'+
-    '<span class="gact"><button class="icon-btn sm" data-a="df-sub" data-id="'+f.id+'" title="Nova subpasta" aria-label="Nova subpasta">'+ic('folderPlus',15)+'</button><button class="icon-btn sm" data-a="df-ren" data-id="'+f.id+'" title="Renomear" aria-label="Renomear">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="df-del" data-id="'+f.id+'" title="Excluir pasta" aria-label="Excluir pasta">'+ic('trash',14)+'</button></span></div>'+(cl?'':dfolderTreeHTML(f.id,depth+1)));}).join('');
+    '<div class="fo '+(UI.df===f.id?'on':'')+'" style="--d:'+depth+'" data-a="df-folder" data-id="'+f.id+'" role="button" tabindex="0">'+foFx(hk,'d'+f.id,cl)+'<span class="fnm">'+folderIcon(f,16)+esc(f.name)+'</span><span class="count">'+dfolderCount(f.id)+'</span>'+
+    '<span class="gact"><button class="icon-btn sm" data-a="folder-look" data-k="d" data-id="'+f.id+'" title="Ícone e cor" aria-label="Ícone e cor da pasta">'+ic('palette',14)+'</button><button class="icon-btn sm" data-a="df-sub" data-id="'+f.id+'" title="Nova subpasta" aria-label="Nova subpasta">'+ic('folderPlus',15)+'</button><button class="icon-btn sm" data-a="df-ren" data-id="'+f.id+'" title="Renomear" aria-label="Renomear">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="df-del" data-id="'+f.id+'" title="Excluir pasta" aria-label="Excluir pasta">'+ic('trash',14)+'</button></span></div>'+(cl?'':dfolderTreeHTML(f.id,depth+1)));}).join('');
 }
 
 /* ==========================================================================
@@ -3478,11 +3537,55 @@ function docRow(d){
     '<span class="lmeta">'+docStatusPill(d)+(d.catId?tagHTML(d.catId):'')+(fp?'<span class="lpath">'+ic('folder',12)+esc(fp)+'</span>':'')+(pend?'<span class="lpend" title="'+pend+' ação(ões) pendente(s)">'+pend+' a fazer</span>':'')+'</span>'+
     '<span class="lact">'+(d.link?linkHTML(d.link,'Abrir'):'')+'<button class="icon-btn sm" data-a="doc-move" data-id="'+d.id+'" title="Mover para uma pasta" aria-label="Mover para uma pasta">'+ic('folder',14)+'</button><button class="icon-btn sm" data-a="edit-doc" data-id="'+d.id+'" title="Editar" aria-label="Editar">'+ic('edit',14)+'</button></span></div>';
 }
+/* ----- aparência das pastas: ícone e cor pastel (estilo MedWay), à escolha ou seguindo um eixo (categoria) ----- */
+const FOLDER_ICONS=['folder','book','heart','pulse','steth','lungs','thyroid','uterus','pregnant','pill','clinic','microscope','flask','cap','star','users','home','briefcase','sun','dumbbell','cards','note','file','target'];
+const FOLDER_PASTEL=['#F2A7A7','#F6C28B','#F3DE8A','#A9DDB0','#8FD6CC','#9CCBF2','#B6B4F2','#D8B4F0','#F2B0D2','#C9CED6'];
+function hexHS(hex){ // matiz e saturação (0–100) de uma cor
+  const n=parseInt(String(hex||'#C9CED6').replace('#','').padEnd(6,'0').slice(0,6),16),r=((n>>16)&255)/255,g=((n>>8)&255)/255,b=(n&255)/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn,l=(mx+mn)/2;
+  let h=0;if(d){h=mx===r?((g-b)/d+(g<b?6:0)):mx===g?((b-r)/d+2):((r-g)/d+4);h*=60;}
+  const sat=d?d/(1-Math.abs(2*l-1)):0;return [Math.round(h),Math.round(sat*100)];
+}
+const folderObj=(k,id)=>(k==='d'?S.dfolders:S.folders).find(f=>f.id===id);
+function folderLook(f){
+  const ax=f.axis&&catById(f.axis)?f.axis:'',col=ax?catColor(ax):(f.color||''),icon=f.icon||(ax?catIcon(ax):'folder');
+  const hs=col?hexHS(col):[215,10],sat=col?Math.max(28,Math.min(58,hs[1])):8; // sempre pastel: saturação contida
+  return {icon:icon,style:'--fh:'+hs[0]+';--fs:'+sat+'%',axis:ax,col:col};
+}
+const folderIcon=(f,size)=>{const L=folderLook(f);return '<span class="fico" style="'+L.style+'">'+ic(L.icon,size||16)+'</span>';};
+function folderTileHTML(f,k,act,sub,acts){
+  const L=folderLook(f);
+  return '<div class="ftile pst" style="'+L.style+'" data-a="'+act+'" data-id="'+f.id+'" role="button" tabindex="0" title="'+esc(f.name)+'"><span class="fti">'+ic(L.icon,22)+'</span><span class="ftn">'+esc(f.name)+'</span><span class="ftc">'+esc(sub)+'</span>'+
+    '<span class="ftact">'+acts+'<button class="icon-btn sm" data-a="folder-look" data-k="'+k+'" data-id="'+f.id+'" title="Ícone e cor" aria-label="Ícone e cor da pasta">'+ic('palette',14)+'</button></span></div>';
+}
+function openFolderLook(k,id){
+  const f=folderObj(k,id);if(!f)return;
+  const st={color:f.color||'',icon:f.icon||'',axis:f.axis&&catById(f.axis)?f.axis:''};
+  const hasSubs=(k==='d'?S.dfolders:S.folders).some(x=>x.parentId===f.id);
+  const prev=()=>{const L=folderLook(Object.assign({},f,st));return '<span class="ftile pst fprev" style="'+L.style+'"><span class="fti">'+ic(L.icon,22)+'</span><span class="ftn">'+esc(f.name)+'</span></span>';};
+  openModal('<form id="fLook" class="form"><div class="fh"><h2>Aparência da pasta</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
+    '<div id="lkPrev">'+prev()+'</div>'+
+    '<label class="f"><span>Seguir um eixo <small>usa a cor e o ícone da categoria e muda junto com ela</small></span><select name="axis"><option value="">Nenhum: escolho a cor e o ícone</option>'+catTreeOpts(st.axis)+'</select></label>'+
+    '<div class="f" id="lkCol"><span>Cor <small>sempre em tom pastel</small></span><div class="lkcols"><button type="button" class="lkc none'+(st.color?'':' on')+'" data-c="" aria-label="Padrão"></button>'+FOLDER_PASTEL.map(c=>'<button type="button" class="lkc'+(st.color===c?' on':'')+'" data-c="'+c+'" style="background:'+c+'" aria-label="Cor '+c+'"></button>').join('')+'<input type="color" name="pick" value="'+(st.color||'#9CCBF2')+'" aria-label="Outra cor"></div></div>'+
+    '<div class="f"><span>Ícone</span><div class="icons">'+FOLDER_ICONS.map(n=>'<button type="button" class="ibtn lki'+((st.icon||'folder')===n?' on':'')+'" data-i="'+n+'" aria-label="Ícone '+n+'">'+ic(n,18)+'</button>').join('')+'</div></div>'+
+    (hasSubs?'<label class="chip cb" style="align-self:flex-start"><input type="checkbox" name="subs" checked><span>Aplicar também às subpastas</span></label>':'')+
+    '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
+  const form=$('#fLook'),paint=()=>{$('#lkPrev').innerHTML=prev();$$('.lkc',form).forEach(b=>b.classList.toggle('on',b.dataset.c===st.color));$$('.lki',form).forEach(b=>b.classList.toggle('on',b.dataset.i===(st.icon||'folder')));$('#lkCol').classList.toggle('off',!!st.axis);};
+  form.addEventListener('click',e=>{const c=e.target.closest('.lkc'),i=e.target.closest('.lki');if(c){st.color=c.dataset.c;paint();}else if(i){st.icon=i.dataset.i==='folder'?'':i.dataset.i;paint();}});
+  form.elements.axis.addEventListener('change',e=>{st.axis=e.target.value;paint();});
+  form.elements.pick.addEventListener('input',e=>{st.color=e.target.value;paint();});
+  paint();
+  form.addEventListener('submit',ev=>{
+    ev.preventDefault();const ids=[f.id];
+    if(form.elements.subs&&form.elements.subs.checked)(k==='d'?dfolderDesc(f.id):folderDesc(f.id)).forEach(x=>{if(ids.indexOf(x)<0)ids.push(x);});
+    ids.forEach(x=>{const o=folderObj(k,x);if(!o)return;['color','icon','axis'].forEach(p=>{if(st[p])o[p]=st[p];else delete o[p];});});
+    save();closeModal();renderMain();toast('Pasta atualizada.');
+  });
+}
+Object.assign(ACT,{'folder-look'(el,e){if(e)e.stopPropagation();openFolderLook(el.dataset.k,el.dataset.id);}});
 function folderTile(f){
-  const nd=S.docs.filter(d=>d.folderId===f.id).length,ns=S.dfolders.filter(x=>x.parentId===f.id).length,tot=dfolderCount(f.id);
+  const ns=S.dfolders.filter(x=>x.parentId===f.id).length,tot=dfolderCount(f.id);
   const sub=[tot+(tot===1?' Documento':' Documentos')];if(ns)sub.push(ns+(ns===1?' Subpasta':' Subpastas'));
-  return '<div class="ftile" data-a="df-folder" data-id="'+f.id+'" role="button" tabindex="0" title="'+esc(f.name)+'"><span class="fti">'+FOLDER_SVG+'</span><span class="ftn">'+esc(f.name)+'</span><span class="ftc">'+esc(sub.join(' · '))+'</span>'+
-    '<span class="ftact"><button class="icon-btn sm" data-a="df-sub" data-id="'+f.id+'" title="Nova subpasta" aria-label="Nova subpasta">'+ic('folderPlus',15)+'</button><button class="icon-btn sm" data-a="df-ren" data-id="'+f.id+'" title="Renomear" aria-label="Renomear">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="df-del" data-id="'+f.id+'" title="Excluir pasta" aria-label="Excluir pasta">'+ic('trash',14)+'</button></span></div>';
+  return folderTileHTML(f,'d','df-folder',sub.join(' · '),'<button class="icon-btn sm" data-a="df-sub" data-id="'+f.id+'" title="Nova subpasta" aria-label="Nova subpasta">'+ic('folderPlus',15)+'</button><button class="icon-btn sm" data-a="df-ren" data-id="'+f.id+'" title="Renomear" aria-label="Renomear">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="df-del" data-id="'+f.id+'" title="Excluir pasta" aria-label="Excluir pasta">'+ic('trash',14)+'</button>');
 }
 const DST=[['iniciar','Iniciar'],['andamento','Em andamento'],['finalizado','Finalizado']];
 const dstLabel=s=>(DST.find(x=>x[0]===s)||['',''])[1];
@@ -3507,7 +3610,7 @@ function docTile(d,showPath){
   return '<div class="gtile" style="--c:'+col+'" data-a="view-doc" data-id="'+d.id+'" role="button" tabindex="0" title="'+esc(d.title)+'">'+
     '<span class="gtact"><button class="icon-btn sm" data-a="doc-move" data-id="'+d.id+'" title="Mover para uma pasta" aria-label="Mover para uma pasta">'+ic('folder',14)+'</button><button class="icon-btn sm" data-a="edit-doc" data-id="'+d.id+'" title="Editar" aria-label="Editar">'+ic('edit',14)+'</button></span>'+
     (pend?'<span class="gbadge" title="'+pend+' pendente(s)">'+pend+'</span>':'')+
-    '<span class="gic">'+fileIcon(ext,58)+'</span><span class="gtt">'+esc(d.title)+'</span>'+
+    '<span class="gic">'+fileIcon(ext,58)+(docThumb(d)?'<img class="gthumb" src="'+esc(docThumb(d))+'" alt="" loading="lazy" onerror="this.remove()">':'')+'</span><span class="gtt">'+esc(d.title)+'</span>'+
     '<span class="gmeta">'+fxTag(ext)+docStatusPill(d)+(d.link?linkHTML(d.link,'Abrir'):'')+'</span>'+(fp?'<span class="gpath">'+esc(fp)+'</span>':'')+'</div>';
 }
 function docCard(d){
@@ -3541,9 +3644,8 @@ function renderDocs(){
     '<button class="btn sm ghost" data-a="df-new" style="margin-top:8px;width:100%;justify-content:center">'+ic('folderPlus',15)+' Nova pasta</button></aside>';
   const main='<div class="toolbar"><div class="seg">'+[['todo','A fazer ('+pend.length+')'],['ok','Em dia ('+ok.length+')'],['all','Todos']].map(v=>'<button class="'+(UI.docTab===v[0]?'on':'')+'" data-a="set" data-k="docTab" data-v="'+v[0]+'">'+v[1]+'</button>').join('')+'</div>'+
     '<span class="sp"></span>'+flatBtn('docs')+treeBtn('docs')+'<div class="seg vseg" aria-label="Modo de exibição">'+[['grade','Grade'],['cartoes','Cartões'],['lista','Lista']].map(v=>'<button class="'+(dv===v[0]?'on':'')+'" data-a="dview" data-v="'+v[0]+'" title="'+v[1]+'">'+v[1]+'</button>').join('')+'</div>'+
-    '<button class="btn" data-a="drive-sync" title="Busca na pasta Resumos_StarNote do Drive os resumos que você salvou">'+ic('cloud',15)+' Sincronizar Drive</button>'+
     '<button class="btn primary" data-a="new-doc">'+ic('plus',15)+' Novo documento</button></div>'+
-    '<div class="frow" style="margin-bottom:10px"><span class="fl" style="min-width:auto">Status</span><button class="chip '+(!UI.dstat?'on':'')+'" data-a="set" data-k="dstat" data-v="">Todos</button>'+DST.map(x=>'<button class="chip '+(UI.dstat===x[0]?'on':'')+'" data-a="set" data-k="dstat" data-v="'+x[0]+'">'+x[1]+' ('+S.docs.filter(d=>d.status===x[0]).length+')</button>').join('')+(UI.drvAt?'<span class="muted small">Drive conferido às '+hhmm(UI.drvAt)+'</span>':'')+'</div>'+tplBarHTML()+crumbs+subRow+
+    '<div class="frow" style="margin-bottom:10px"><span class="fl" style="min-width:auto">Status</span><button class="chip '+(!UI.dstat?'on':'')+'" data-a="set" data-k="dstat" data-v="">Todos</button>'+DST.map(x=>'<button class="chip '+(UI.dstat===x[0]?'on':'')+'" data-a="set" data-k="dstat" data-v="'+x[0]+'">'+x[1]+' ('+S.docs.filter(d=>d.status===x[0]).length+')</button>').join('')+'</div>'+tplBarHTML()+crumbs+subRow+
     (list.length?(dv==='grade'?'<div class="gtiles">'+list.map(d=>docTile(d,showPath)).join('')+'</div>':dv==='lista'?'<div class="llist">'+list.map(docRow).join('')+'</div>':'<div class="dgrid">'+list.map(docCard).join('')+'</div>'):'<div class="empty">'+(cur?'Nenhum documento nesta pasta.':'Nenhum documento aqui.')+'<br><button class="btn primary" data-a="new-doc">'+ic('plus',15)+' Adicionar documento</button></div>');
   return '<div class="nlay'+(UI.ftoff.docs?' nofo':'')+'">'+tree+'<section>'+main+'</section></div>';
 }
@@ -4585,8 +4687,8 @@ function folderCount(id){
 }
 function folderTreeHTML(pid,depth){
   return S.folders.filter(f=>(f.parentId||'')===pid).sort((a,b)=>a.name.localeCompare(b.name)).map(f=>{const hk=S.folders.some(x=>x.parentId===f.id),cl=!!UI.fclosed['n'+f.id];return (
-    '<div class="fo '+(UI.nf===f.id?'on':'')+'" style="--d:'+depth+'" data-a="n-folder" data-id="'+f.id+'" role="button" tabindex="0">'+foFx(hk,'n'+f.id,cl)+'<span class="fnm">'+ic('folder',16)+esc(f.name)+'</span><span class="count">'+folderCount(f.id)+'</span>'+
-    '<span class="gact"><button class="icon-btn sm" data-a="n-folder-sub" data-id="'+f.id+'" title="Nova subpasta" aria-label="Nova subpasta">'+ic('folderPlus',15)+'</button><button class="icon-btn sm" data-a="n-folder-ren" data-id="'+f.id+'" title="Renomear" aria-label="Renomear">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="n-folder-del" data-id="'+f.id+'" title="Excluir pasta" aria-label="Excluir pasta">'+ic('trash',14)+'</button></span></div>'+(cl?'':folderTreeHTML(f.id,depth+1)));}).join('');
+    '<div class="fo '+(UI.nf===f.id?'on':'')+'" style="--d:'+depth+'" data-a="n-folder" data-id="'+f.id+'" role="button" tabindex="0">'+foFx(hk,'n'+f.id,cl)+'<span class="fnm">'+folderIcon(f,16)+esc(f.name)+'</span><span class="count">'+folderCount(f.id)+'</span>'+
+    '<span class="gact"><button class="icon-btn sm" data-a="folder-look" data-k="n" data-id="'+f.id+'" title="Ícone e cor" aria-label="Ícone e cor da pasta">'+ic('palette',14)+'</button><button class="icon-btn sm" data-a="n-folder-sub" data-id="'+f.id+'" title="Nova subpasta" aria-label="Nova subpasta">'+ic('folderPlus',15)+'</button><button class="icon-btn sm" data-a="n-folder-ren" data-id="'+f.id+'" title="Renomear" aria-label="Renomear">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="n-folder-del" data-id="'+f.id+'" title="Excluir pasta" aria-label="Excluir pasta">'+ic('trash',14)+'</button></span></div>'+(cl?'':folderTreeHTML(f.id,depth+1)));}).join('');
 }
 /* ----- #marcadores nas notas: escreva #diabetes e procure por ele na lupa ou nas notas ----- */
 const TAG_RE=/(^|[\s(\[,;:.>!?])#([\p{L}\p{N}_-]{2,40})/gu;
@@ -4659,8 +4761,7 @@ function nCardHTML(it){
 function nFolderTile(f){
   const ns=S.folders.filter(x=>x.parentId===f.id).length,tot=folderCount(f.id);
   const sub=[tot+(tot===1?' item':' itens')];if(ns)sub.push(ns+(ns===1?' Subpasta':' Subpastas'));
-  return '<div class="ftile" data-a="n-folder" data-id="'+f.id+'" role="button" tabindex="0" title="'+esc(f.name)+'"><span class="fti">'+FOLDER_SVG+'</span><span class="ftn">'+esc(f.name)+'</span><span class="ftc">'+esc(sub.join(' · '))+'</span>'+
-    '<span class="ftact"><button class="icon-btn sm" data-a="n-folder-sub" data-id="'+f.id+'" title="Nova subpasta" aria-label="Nova subpasta">'+ic('folderPlus',15)+'</button><button class="icon-btn sm" data-a="n-folder-ren" data-id="'+f.id+'" title="Renomear" aria-label="Renomear">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="n-folder-del" data-id="'+f.id+'" title="Excluir pasta" aria-label="Excluir pasta">'+ic('trash',14)+'</button></span></div>';
+  return folderTileHTML(f,'n','n-folder',sub.join(' · '),'<button class="icon-btn sm" data-a="n-folder-sub" data-id="'+f.id+'" title="Nova subpasta" aria-label="Nova subpasta">'+ic('folderPlus',15)+'</button><button class="icon-btn sm" data-a="n-folder-ren" data-id="'+f.id+'" title="Renomear" aria-label="Renomear">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="n-folder-del" data-id="'+f.id+'" title="Excluir pasta" aria-label="Excluir pasta">'+ic('trash',14)+'</button>');
 }
 function nFolderBar(){
   if(UI.nf==='__none'||UI.nq)return '';
@@ -4677,10 +4778,12 @@ function nRowHTML(it){
   const ttl=(it.k==='deck'?o.name:o.title)||(it.k==='deck'?'Baralho':'Sem título'),ico=it.k==='deck'?'cards':it.k==='slides'?'monitor':it.k==='pdf'?'file':it.k==='questao'?'help':it.k==='caso'?'pulse':it.k==='bula'?'pill':it.k==='fluxo'?'grid':'note';
   const snip=it.k==='note'?noteText(o).replace(/\s+/g,' ').slice(0,110):'';
   const upd=o.updated?fmtDM(toISO(new Date(o.updated))):'';
-  return '<div class="lrow nrow" style="--c:'+col+'" data-a="n-open" data-k="'+it.k+'" data-id="'+o.id+'" role="button" tabindex="0" title="'+esc(ttl)+'"><span class="lic">'+ic(ico,17)+'</span>'+
-    (isNoteK(it.k)&&it.k!=='fluxo'&&noteImgs(o,1).length?'<img class="nrimg" src="'+esc(noteImgs(o,1)[0])+'" alt="" loading="lazy">':'')+'<span class="lt">'+esc(ttl)+(snip?'<small>'+esc(snip)+'</small>':'')+'</span>'+
-    '<span class="lmeta"><span class="tag outline">'+kind+'</span>'+(it.k==='questao'?qMetaChips(o):'')+(o.catId?tagHTML(o.catId):'')+(isNoteK(it.k)?cdChipHTML(o.cd):'')+(fp?'<span class="lpath">'+ic('folder',12)+esc(fp)+'</span>':'')+'</span>'+
-    '<span class="lact"><span class="muted small">'+esc(upd)+'</span></span></div>';
+  const img=isNoteK(it.k)&&it.k!=='fluxo'?noteImgs(o,1)[0]:'';
+  // três blocos fixos (miniatura/ícone, texto, meta): ter ou não imagem não muda o resto da linha
+  return '<div class="nrow" style="--c:'+col+'" data-a="n-open" data-k="'+it.k+'" data-id="'+o.id+'" role="button" tabindex="0" title="'+esc(ttl)+'">'+
+    '<span class="nrl">'+(img?'<img src="'+esc(img)+'" alt="" loading="lazy">':ic(ico,17))+'</span>'+
+    '<span class="nrt"><b>'+esc(ttl)+'</b>'+(snip?'<small>'+esc(snip)+'</small>':'')+'</span>'+
+    '<span class="nrm"><span class="tag outline">'+kind+'</span>'+(it.k==='questao'?qMetaChips(o):'')+(o.catId?tagHTML(o.catId):'')+(isNoteK(it.k)?cdChipHTML(o.cd):'')+(fp?'<span class="lpath">'+ic('folder',12)+esc(fp)+'</span>':'')+'<time>'+esc(upd)+'</time></span></div>';
 }
 function nCardsHTML(){
   const items=notaItems();
@@ -5112,6 +5215,7 @@ Object.assign(ICONS,{
  film:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4"/>',
  xCircle:'<circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/>',
  checkCircle:'<circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/>',
+ palette:'<path d="M12 3a9 9 0 100 18c1.1 0 1.8-.8 1.8-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.8-1.7 1.7-1.7H17a4 4 0 004-4c0-4.4-4-8.2-9-8.2z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7" r="1"/>',
  chevU:'<path d="M18 15l-6-6-6 6"/>',
  level1:'<path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><path d="M8 13h8"/>',
  sidebar:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/>',
@@ -6449,8 +6553,62 @@ async function pdfBytes(p){
   if(PdfMem[p.id])return PdfMem[p.id];
   let b=await PdfDB.get(p.id);if(b){PdfMem[p.id]=b;return b;}
   if(p.driveId){b=await fetchDriveBytes(p.driveId);PdfMem[p.id]=b;PdfDB.put(p.id,b.slice(0));return b;}
+  if(p.mid){b=await pdfPull(p);if(b){PdfMem[p.id]=b;PdfDB.put(p.id,b.slice(0));return b;}}
   return null;
 }
+/* ----- PDFs enviados em Notas em todos os aparelhos: o arquivo vai ao Drive pelo mesmo caminho das imagens (Media) ----- */
+const PDF_SYNC_MAX=40*1048576; // acima disso o PDF fica só neste aparelho
+const pdfWatch={};
+async function pdfPull(p){ // baixa o PDF que outro aparelho enviou
+  if(!WEB_APP_URL||(navigator.onLine===false))return null;
+  try{
+    let d=Media.cache[p.mid];
+    if(!d){const r=await fetch(WEB_APP_URL+'?action=getmedia&name='+encodeURIComponent(p.mid)+'&t='+Date.now()),j=await r.json();d=j&&j.ok&&j.d;}
+    const i=d?d.indexOf('base64,'):-1;
+    return i>=0?b64ToBuf(d.slice(i+7)):null;
+  }catch(e){return null;}
+}
+function pdfSyncState(p){
+  if(!WEB_APP_URL)return 'off';
+  if(p.syncBig)return 'big';
+  if(p.mid)return 'ok'; // confirmado pelo Drive (neste ou em outro aparelho)
+  const w=pdfWatch[p.id];if(w&&w.fail)return 'fail';
+  return w?'sending':'local';
+}
+function pdfPush(p,buf){ // coloca o PDF na fila de envio; p.mid só é gravado quando o Drive confirma
+  if(!WEB_APP_URL||!buf)return;
+  if(buf.byteLength>PDF_SYNC_MAX){p.syncBig=true;save();pdfSyncPaint(p);return;}
+  p.syncBig=false;
+  const url='data:application/pdf;base64,'+bufToB64(buf),id=Media.hash(url);
+  if(p.mid===id)return;
+  if(Media.up[id]){p.mid=id;save();pdfSyncPaint(p);return;}
+  Media.cache[id]=url;Media.tries[id]=0;Media.upq[id]=url;
+  pdfWatch[p.id]={id:id,t:Date.now(),fail:false};pdfSyncPaint(p);Media.pump();
+  const w=pdfWatch[p.id],iv=setInterval(()=>{
+    if(pdfWatch[p.id]!==w){clearInterval(iv);return;}
+    if(Media.up[id]){clearInterval(iv);p.mid=id;p.synced=Date.now();delete pdfWatch[p.id];delete Media.cache[id];save();pdfSyncPaint(p);return;}
+    if(!Media.pumping&&(Media.tries[id]||0)>=4||Date.now()-w.t>10*60e3){clearInterval(iv);w.fail=true;pdfSyncPaint(p);}
+  },2500);
+}
+function pdfSyncPaint(p){
+  const el=$('#pdfSync');if(!el||!UI.nview||UI.nview.id!==p.id)return;
+  const st=pdfSyncState(p),T={ok:[ 'cloud','Em todos os aparelhos'],sending:['repeat','Enviando para os outros aparelhos…'],local:['cloud','Só neste aparelho'],fail:['x','Não consegui enviar'],big:['file','Grande demais para sincronizar (acima de 40 MB)'],off:['cloud','Sem sincronização']}[st];
+  el.className='pdfsync '+st;el.innerHTML=ic(T[0],13)+'<span>'+T[1]+'</span>'+(st==='fail'||st==='local'?'<button class="btn sm ghost" data-a="pdf-sync-retry">'+(st==='fail'?'Tentar de novo':'Enviar')+'</button>':'');
+}
+// PDFs que já estavam só neste aparelho sobem sozinhos, um de cada vez
+function pdfBackfill(){
+  if(!WEB_APP_URL||pdfBackfill.on)return;pdfBackfill.on=true;
+  (async()=>{
+    for(const p of S.pdfs.slice()){
+      if(p.mid||p.syncBig||pdfWatch[p.id]||!S.pdfs.includes(p))continue;
+      const b=PdfMem[p.id]||await PdfDB.get(p.id);if(!b)continue;
+      pdfPush(p,b);
+      await new Promise(r=>{const t=setInterval(()=>{if(!pdfWatch[p.id]||pdfWatch[p.id].fail){clearInterval(t);r();}},3000);setTimeout(()=>{clearInterval(t);r();},4*60e3);});
+    }
+    pdfBackfill.on=false;
+  })();
+}
+setTimeout(()=>{try{pdfBackfill();}catch(e){}},12000);
 const PDF_COLORS=['#FFE066','#9BE59B','#8FD3FF','#FFB3C7','#FFC48A','#D3B8FF','#7FE5D6','#D4E26B'];
 const PEN_COLORS=['#16181D','#E5383B','#2547D0','#1F9D55','#F08C00','#7A4CC2','#0AA3B5','#8A92A1'];
 const INK_TOOLS={pen:1,fhl:1};
@@ -6458,7 +6616,7 @@ const PEN_W=[['Fina',1.4],['Média',2.6],['Grossa',5]];
 function pdfViewHTML(p){
   const gas=!!(window.google&&window.google.script&&window.google.script.run);
   const tool=(t,i,l)=>'<button class="icon-btn" data-a="pdf-tool" data-t="'+t+'" title="'+l+'" aria-label="'+l+'">'+ic(i,17)+'</button>';
-  return '<div class="nhead"><button class="btn sm ghost" data-a="n-back">'+ic('chevL',14)+' Notas</button><span class="sp"></span>'+
+  return '<div class="nhead"><button class="btn sm ghost" data-a="n-back">'+ic('chevL',14)+' Notas</button><span class="sp"></span><span id="pdfSync" class="pdfsync"></span>'+
     (gas&&p.src==='local'?'<button class="btn sm" data-a="pdf-todrive" title="Guardar uma cópia no Drive para abrir em qualquer aparelho">'+ic('cloud',14)+' Salvar no Drive</button>':'')+
     '<button class="icon-btn" data-a="pdf-info" title="Nome, pasta e categoria" aria-label="Editar informações">'+ic('edit',19)+'</button><button class="icon-btn" data-a="n-del" title="Excluir" aria-label="Excluir">'+ic('trash',18)+'</button></div>'+
     '<h2 class="vt" id="pdfTitle" style="margin:0 0 6px">'+esc(p.title)+'</h2><div class="muted small" id="pdfStatus" style="margin-bottom:8px">Carregando…</div>'+
@@ -6495,7 +6653,10 @@ async function pdfMount(p){
   const st=$('#pdfStatus');if(!st)return;
   const kp=PV&&PV.p.id===p.id?PV:null,keepTool=kp?kp.tool:'select',keepColor=kp?kp.color:PDF_COLORS[0];
   try{
+    if(p.mid&&!PdfMem[p.id]&&!(await PdfDB.get(p.id)))st.textContent='Baixando o PDF dos outros aparelhos…';
     const lib=await loadPdfLib(),buf=await pdfBytes(p);
+    if(buf&&!p.mid&&!pdfWatch[p.id])pdfPush(p,buf);
+    pdfSyncPaint(p);
     if(!buf){
       st.innerHTML='Este PDF foi aberto em outro aparelho e não está aqui. Seus grifos e comentários estão guardados. <button class="btn sm" data-a="pdf-reattach">Selecionar o arquivo novamente</button>';
       return;
@@ -6732,11 +6893,12 @@ function onPdfFile(file){
     let p;
     if(UI.pdfAttach){p=pdfById(UI.pdfAttach);UI.pdfAttach=null;}
     if(!p){p={id:uid(),title:file.name.replace(/\.pdf$/i,''),folderId:(UI.nf&&UI.nf!=='__none')?UI.nf:'',catId:'',src:'local',driveId:'',name:file.name,annots:[],created:Date.now(),updated:Date.now()};S.pdfs.push(p);save();}
-    PdfMem[p.id]=buf;await PdfDB.put(p.id,buf.slice(0));
+    PdfMem[p.id]=buf;await PdfDB.put(p.id,buf.slice(0));pdfPush(p,buf);
     UI.tab='notas';UI.nview={type:'pdf',id:p.id,edit:false};renderTabs();renderMain();window.scrollTo(0,0);
   }).catch(()=>toast('Não foi possível ler o arquivo.'));
 }
 Object.assign(ACT,{
+  'pdf-sync-retry'(){const p=pdfById(UI.nview&&UI.nview.id);if(!p)return;delete pdfWatch[p.id];p.syncBig=false;pdfBytes(p).then(b=>{if(b)pdfPush(p,b);else toast('Abra o arquivo neste aparelho primeiro.');});},
   'pdf-open-file'(){UI.pdfAttach=null;const f=$('#pdfFile');f.value='';f.click();},
   'pdf-reattach'(){UI.pdfAttach=UI.nview&&UI.nview.id;const f=$('#pdfFile');f.value='';f.click();},
   'pdf-open-drive'(){
@@ -6746,7 +6908,7 @@ Object.assign(ACT,{
       try{
         const buf=await fetchDriveBytes(m[0]);
         const p={id:uid(),title:'PDF do Drive',folderId:(UI.nf&&UI.nf!=='__none')?UI.nf:'',catId:'',src:'drive',driveId:m[0],name:'',annots:[],created:Date.now(),updated:Date.now()};
-        S.pdfs.push(p);PdfMem[p.id]=buf;PdfDB.put(p.id,buf.slice(0));save();
+        S.pdfs.push(p);PdfMem[p.id]=buf;PdfDB.put(p.id,buf.slice(0));save();pdfPush(p,buf);
         UI.nview={type:'pdf',id:p.id,edit:false};renderMain();window.scrollTo(0,0);
         askText('Nome do PDF',p.title,nm=>{p.title=nm;save();const h=$('#pdfTitle');if(h)h.textContent=nm;});
       }catch(e){toast(e.message||'Não foi possível abrir do Drive.');}
@@ -8143,7 +8305,6 @@ Object.assign(ACT,{
   tab(el){
     flushNote();pdfLeave();studyStop();const old=TABS.findIndex(t=>t[0]===UI.tab),nw=TABS.findIndex(t=>t[0]===el.dataset.v),chg=UI.tab!==el.dataset.v;
     UI.tab=el.dataset.v;closeModal();renderTabs();renderMain();window.scrollTo(0,0);if(chg)tabAnim(nw>=old?1:-1);
-    if(chg&&UI.tab==='docs')driveAuto();
   },
   set(el){UI[el.dataset.k]=el.dataset.v;renderMain();},
   view(el){UI.view=el.dataset.v;S.prefs.view=UI.view;save();renderMain();},
@@ -8259,7 +8420,6 @@ Object.assign(ACT,{
   'new-doc'(){openDocForm(UI.tab==='docs'&&UI.df&&UI.df!=='__none'&&dfolderById(UI.df)?{prefill:{folderId:UI.df}}:undefined);},
   'view-doc'(el){openDocView(el.dataset.id);},
   'doc-status'(el){const d=docById(el.dataset.id);if(d){docSetStatus(d,el.dataset.v);}},
-  'drive-sync'(){driveSync(true);},
   'edit-doc'(el){openDocForm({id:el.dataset.id});},
   'doc-move'(el){
     const d=docById(el.dataset.id);if(!d)return;
@@ -10203,53 +10363,6 @@ Object.assign(ACT,{
   'imp-copy-fmt'(){impCopy(iaFormatPrompt(),'Formato copiado. Cole na IA junto com o seu pedido.');},
   'imp-all'(el){if(!IMP)return;const on=!!el.dataset.on;IMP.items.forEach(i=>{if(!i.bad)i.off=!on;});$('#impPrev').innerHTML=impPreviewHTML();const n=IMP.items.filter(i=>!i.bad&&!i.off).length;$('#impGo').textContent=n?'Criar '+n+(n===1?' item':' itens'):'Criar selecionados';}
 });
-
-/* ==========================================================================
-   39. PONTE COM O DRIVE: pasta Resumos_StarNote vira documentos finalizados
-   ========================================================================== */
-const stripExt=n=>String(n||'').replace(/\.[a-z0-9]{1,5}$/i,'').trim();
-function driveFolder(){
-  let f=S.dfolders.find(x=>!x.parentId&&norm(x.name)==='resumos starnote');
-  if(!f){f={id:uid(),name:'Resumos StarNote',parentId:''};S.dfolders.push(f);}
-  return f;
-}
-// Junta a lista do Drive com os documentos; devolve {added,updated}
-function driveMerge(res){
-  const files=(res&&res.arquivos)||[];let added=0,updated=0;
-  files.forEach(fl=>{
-    const title=stripExt(fl.nome)||fl.nome;
-    let d=S.docs.find(x=>x.driveId===fl.id);
-    if(!d)d=S.docs.find(x=>!x.driveId&&norm(x.title)===norm(title));
-    if(!d){
-      const fo=driveFolder();
-      S.docs.push({id:uid(),createdAt:Date.now(),title:title,catId:'',link:fl.url,notes:'',todo:[],goalIds:[],linkIds:[],noteIds:[],folderId:fo.id,ext:detectExt(fl.nome)||'',status:'finalizado',source:'',srcLink:'',starnote:true,driveId:fl.id,driveMod:fl.mod||0});
-      added++;return;
-    }
-    let ch=false;
-    if(d.driveId!==fl.id){d.driveId=fl.id;ch=true;}
-    if(fl.url&&d.link!==fl.url){d.link=fl.url;ch=true;}
-    if((fl.mod||0)!==(d.driveMod||0)){d.driveMod=fl.mod||0;ch=true;}
-    if(d.status!=='finalizado'){d.status='finalizado';d.todo.forEach(x=>{if(x.label==='Concluir')x.done=true;});ch=true;}
-    if(ch)updated++;
-  });
-  if(added||updated){save();}
-  return {added:added,updated:updated,total:files.length};
-}
-async function driveSync(manual){
-  if(UI.drvBusy)return;
-  if(!Cloud.on()){if(manual)toast('A ponte com o Drive só funciona com o site aberto pelo Apps Script (link /exec ou Google Sites).');return;}
-  UI.drvBusy=true;if(manual)toast('Procurando na pasta Resumos_StarNote…');
-  try{
-    const r=await Cloud.call('resumos');
-    if(!r||r.ok===false)throw new Error((r&&r.erro)||'resposta vazia');
-    const m=driveMerge(r);UI.drvAt=Date.now();
-    if(UI.tab==='docs')rerender();
-    if(manual||m.added||m.updated)toast(m.added||m.updated?(m.added+' novo(s), '+m.updated+' atualizado(s) a partir do Drive.'):'Drive conferido: '+m.total+' arquivo(s), nada novo.');
-  }catch(e){
-    if(manual)toast(/is not a function|api_resumos|página em vez/i.test(String(e.message))?'O Code.gs precisa ser atualizado e publicado numa nova versão (função api_resumos).':'Não consegui ler o Drive: '+e.message);
-  }finally{UI.drvBusy=false;}
-}
-function driveAuto(){if(Cloud.ready&&(!UI.drvAt||Date.now()-UI.drvAt>30*60e3))driveSync(false);}
 
 /* ==========================================================================
    38. PAINEL DIÁRIO: só o que pede ação agora

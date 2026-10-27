@@ -5,7 +5,7 @@ const API_KEY = 'AIzaSyBU4owCJwloUlcfTP-cOeHjEo5hyzMH2tU';
 const FB_KEY = 'hRM2z3YEF6yPtTwKQyFMIAQs551d6Jwh';
 const BASE = 'https://firestore.googleapis.com/v1/projects/' + PROJECT + '/databases/(default)/documents/rotina/';
 
-const VERSION = 'v6';
+const VERSION = 'v7';
 const CACHE = 'rotina-app-' + VERSION;
 const META = 'rotina-meta'; // dados dos widgets e avisos recebidos com o app fechado
 const FRONTS = ['painel', 'semana', 'tarefas', 'habitos', 'notas', 'fin'];
