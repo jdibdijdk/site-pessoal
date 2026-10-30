@@ -6706,11 +6706,23 @@ async function fetchDriveBytes(id){
   if(!j||!j.ok)throw new Error((j&&j.error)||'Não foi possível ler o arquivo do Drive.');
   return b64ToBuf(j.b64);
 }
+// qual versão enviada ao Drive (mid) a cópia deste aparelho tem; só vale neste aparelho, por isso fica fora dos dados sincronizados
+const LMID={m:(function(){try{return JSON.parse(localStorage.getItem('rotina_lmid')||'{}');}catch(e){return {};}})(),
+  get(k){return this.m[k]||'';},set(k,v){this.m[k]=v;try{localStorage.setItem('rotina_lmid',JSON.stringify(this.m));}catch(e){}}};
 async function pdfBytes(p){
-  if(PdfMem[p.id])return PdfMem[p.id];
-  let b=await PdfDB.get(p.id);if(b){PdfMem[p.id]=b;return b;}
+  let b=PdfMem[p.id]||await PdfDB.get(p.id);
+  if(b){
+    if(p.mid&&!LMID.get(p.id))LMID.set(p.id,p.mid); // cópia antiga, sem registro: vale como atual
+    // outro aparelho salvou uma versão mais nova: baixa antes de abrir (a menos que este tenha envio pendente)
+    if(p.mid&&LMID.get(p.id)!==p.mid&&!pdfWatch[p.id]){
+      const n=await pdfPull(p);
+      if(n){PdfMem[p.id]=n;await PdfDB.put(p.id,n.slice(0));LMID.set(p.id,p.mid);toast('Abri a versão mais nova, salva em outro aparelho.');return n;}
+      toast('Pode haver uma versão mais nova em outro aparelho. Conecte-se e abra de novo.');
+    }
+    PdfMem[p.id]=b;return b;
+  }
   if(p.driveId){b=await fetchDriveBytes(p.driveId);PdfMem[p.id]=b;PdfDB.put(p.id,b.slice(0));return b;}
-  if(p.mid){b=await pdfPull(p);if(b){PdfMem[p.id]=b;PdfDB.put(p.id,b.slice(0));return b;}}
+  if(p.mid){b=await pdfPull(p);if(b){PdfMem[p.id]=b;PdfDB.put(p.id,b.slice(0));LMID.set(p.id,p.mid);return b;}}
   return null;
 }
 /* ----- PDFs enviados em Notas em todos os aparelhos: o arquivo vai ao Drive pelo mesmo caminho das imagens (Media) ----- */
@@ -6732,18 +6744,18 @@ function pdfSyncState(p){
   const w=pdfWatch[p.id];if(w&&w.fail)return 'fail';
   return w?'sending':'local';
 }
-function pdfPush(p,buf){ // coloca o PDF na fila de envio; p.mid só é gravado quando o Drive confirma
+function pdfPush(p,buf,mime){ // coloca o PDF na fila de envio; p.mid só é gravado quando o Drive confirma
   if(!WEB_APP_URL||!buf)return;
   if(buf.byteLength>PDF_SYNC_MAX){p.syncBig=true;save();pdfSyncPaint(p);return;}
   p.syncBig=false;
-  const url='data:application/pdf;base64,'+bufToB64(buf),id=Media.hash(url);
+  const url='data:'+(mime||'application/pdf')+';base64,'+bufToB64(buf),id=Media.hash(url);
   if(p.mid===id)return;
-  if(Media.up[id]){p.mid=id;save();pdfSyncPaint(p);return;}
+  if(Media.up[id]){p.mid=id;LMID.set(p.id,id);save();pdfSyncPaint(p);return;}
   Media.cache[id]=url;Media.tries[id]=0;Media.upq[id]=url;
   pdfWatch[p.id]={id:id,t:Date.now(),fail:false};pdfSyncPaint(p);Media.pump();
   const w=pdfWatch[p.id],iv=setInterval(()=>{
     if(pdfWatch[p.id]!==w){clearInterval(iv);return;}
-    if(Media.up[id]){clearInterval(iv);p.mid=id;p.synced=Date.now();delete pdfWatch[p.id];delete Media.cache[id];save();pdfSyncPaint(p);return;}
+    if(Media.up[id]){clearInterval(iv);p.mid=id;LMID.set(p.id,id);p.synced=Date.now();delete pdfWatch[p.id];delete Media.cache[id];save();pdfSyncPaint(p);return;}
     if(!Media.pumping&&(Media.tries[id]||0)>=4||Date.now()-w.t>10*60e3){clearInterval(iv);w.fail=true;pdfSyncPaint(p);}
   },2500);
 }
@@ -6821,7 +6833,7 @@ window.addEventListener('message',async e=>{
       const buf=d.bytes;PdfMem[p.id]=buf;PV.buf=buf;p.updated=Date.now();
       await PdfDB.put(p.id,buf.slice(0));pdfPush(p,buf);save();
       if(d.saveAs)downloadBuf(buf,(d.name||p.title+'.pdf'),'application/pdf');
-      PV.dirty=false;toast('PDF salvo.');hostStatus('Tudo salvo.');
+      PV.dirty=false;toast('PDF salvo.');hostStatus(WEB_APP_URL?'Salvo. Enviando para os outros aparelhos…':'Salvo neste aparelho (sincronização desligada).');
     }else if(d.type==='pdfcraft:failed'){
       const s=$('#pdfStatus');if(s)s.innerHTML='O PdfCraft não conseguiu iniciar'+(d.error?' ('+esc(String(d.error).slice(0,120))+')':'')+'. <button class="btn sm" data-a="pdf-download">Baixar o PDF</button>';
     }
@@ -6839,7 +6851,11 @@ function onPdfFile(file){
   }).catch(()=>toast('Não foi possível ler o arquivo.'));
 }
 Object.assign(ACT,{
-  'pdf-sync-retry'(){const p=pdfById(UI.nview&&UI.nview.id);if(!p)return;delete pdfWatch[p.id];p.syncBig=false;pdfBytes(p).then(b=>{if(b)pdfPush(p,b);else toast('Abra o arquivo neste aparelho primeiro.');});},
+  'pdf-sync-retry'(){
+    const v=UI.nview,x=v&&(v.type==='slides'?slideById(v.id):pdfById(v.id));if(!x)return;delete pdfWatch[x.id];x.syncBig=false;
+    if(v.type==='slides'){SLF.get(x.fileId).then(b=>{if(b)pdfPush(x,b,PPTX_MIME);else toast('Abra o arquivo neste aparelho primeiro.');});return;}
+    pdfBytes(x).then(b=>{if(b)pdfPush(x,b);else toast('Abra o arquivo neste aparelho primeiro.');});
+  },
   'pdf-open-file'(){UI.pdfAttach=null;const f=$('#pdfFile');f.value='';f.click();},
   'pdf-reattach'(){UI.pdfAttach=UI.nview&&UI.nview.id;const f=$('#pdfFile');f.value='';f.click();},
   'pdf-open-drive'(){
@@ -11229,6 +11245,7 @@ function pptxSlideCount(buf){
   const m=t.match(/ppt\/slides\/slide\d+\.xml/g);return m?new Set(m).size:0;
 }
 const DECKCRAFT_URL='deckcraft/index.html';
+const PPTX_MIME='application/vnd.openxmlformats-officedocument.presentationml.presentation';
 let SL=null; // apresentação aberta no DeckCraft: {x,frame,ready,dirty}
 async function slImportFile(file,into){
   if(!file)return;
@@ -11239,7 +11256,7 @@ async function slImportFile(file,into){
     let x=into;
     if(x){if(x.fileId&&x.fileId!==id&&!S.slides.some(y=>y!==x&&y.fileId===x.fileId))SLF.del(x.fileId);Object.assign(x,{fileId:id,fileName:file.name,n:n,updated:Date.now()});}
     else{x={id:uid(),title:file.name.replace(/\.pptx$/i,''),folderId:(UI.nf&&UI.nf!=='__none')?UI.nf:'',catId:'',fileId:id,fileName:file.name,n:n,ratio:16/9,annots:{},created:Date.now(),updated:Date.now()};S.slides.push(x);}
-    save();UI.tab='notas';UI.nview={type:'slides',id:x.id};renderTabs();renderMain();window.scrollTo(0,0);
+    x.mid='';delete pdfWatch[x.id];save();pdfPush(x,buf,PPTX_MIME);UI.tab='notas';UI.nview={type:'slides',id:x.id};renderTabs();renderMain();window.scrollTo(0,0);
   }catch(e){toast(e.message||'Não consegui ler esse arquivo.');}
 }
 function slNew(){
@@ -11249,7 +11266,7 @@ function slNew(){
 let SL_INTO=null;
 $('#pptxFile').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';const into=SL_INTO?slideById(SL_INTO):null;SL_INTO=null;slImportFile(f,into);});
 function slViewHTML(x){
-  return '<div class="nhead"><button class="btn sm ghost" data-a="sl-back">'+ic('chevL',14)+' Notas</button><span class="sp"></span>'+
+  return '<div class="nhead"><button class="btn sm ghost" data-a="sl-back">'+ic('chevL',14)+' Notas</button><span class="sp"></span><span id="pdfSync" class="pdfsync"></span>'+
     '<button class="btn sm" data-a="sl-download" title="Baixar o arquivo .pptx">'+ic('download',14)+' .pptx</button>'+
     '<button class="icon-btn" data-a="sl-rename" title="Renomear, pasta e categoria" aria-label="Editar informações">'+ic('edit',18)+'</button><button class="icon-btn" data-a="sl-del" title="Excluir" aria-label="Excluir">'+ic('trash',18)+'</button></div>'+
     '<h2 class="vt" style="margin:0 0 6px">'+esc(x.title||'Apresentação')+'</h2><div class="muted small" id="slStatus" style="margin-bottom:8px">Carregando o DeckCraft…</div><div class="hostbox" id="slHost"></div>';
@@ -11259,8 +11276,16 @@ async function slMount(x){
   const box=$('#slHost');if(!box)return;
   let buf=null;
   try{buf=x.fileId?await SLF.get(x.fileId):null;}catch(e){}
+  // salva em outro aparelho: o arquivo (identificado pelo hash) ainda não está aqui, mas já foi enviado ao Drive
+  if(x.fileId&&!buf&&x.mid){
+    $('#slStatus').textContent='Baixando a apresentação dos outros aparelhos…';
+    const n=await pdfPull(x);
+    if(n){await SLF.put(x.fileId,n);buf=n;}
+  }
   if(!$('#slHost'))return;
-  if(x.fileId&&!buf){$('#slStatus').innerHTML='O arquivo desta apresentação não está neste aparelho. <button class="btn sm primary" data-a="sl-file">'+ic('upload',14)+' Escolher o .pptx</button>';return;}
+  if(x.fileId&&!buf){$('#slStatus').innerHTML=(WEB_APP_URL&&!x.mid?'O outro aparelho ainda está enviando esta apresentação. <button class="btn sm" data-a="sl-retry">Tentar de novo</button> ':'O arquivo desta apresentação não está neste aparelho. ')+'<button class="btn sm primary" data-a="sl-file">'+ic('upload',14)+' Escolher o .pptx</button>';return;}
+  if(buf&&x.fileId&&!x.mid&&!pdfWatch[x.id])pdfPush(x,buf,PPTX_MIME);
+  pdfSyncPaint(x);
   slLeave();
   SL={x:x,buf:buf,ready:false,dirty:false,frame:null};
   SL.frame=hostFrame(box,DECKCRAFT_URL+'?host=parent','DeckCraft');
@@ -11279,13 +11304,14 @@ async function slHostMessage(d){
     const buf=d.bytes,id=await SLF.hash(buf),old=x.fileId;
     await SLF.put(id,buf);
     if(old&&old!==id&&!S.slides.some(y=>y!==x&&y.fileId===old))SLF.del(old);
-    x.fileId=id;SL.buf=buf;x.n=pptxSlideCount(buf)||x.n;x.updated=Date.now();x.thumb='';save();
-    SL.dirty=false;toast('Apresentação salva.');hostStatus('Tudo salvo.');
+    x.fileId=id;SL.buf=buf;x.n=pptxSlideCount(buf)||x.n;x.updated=Date.now();x.thumb='';x.mid='';delete pdfWatch[x.id];save();pdfPush(x,buf,PPTX_MIME);
+    SL.dirty=false;toast('Apresentação salva.');hostStatus(WEB_APP_URL?'Salva. Enviando para os outros aparelhos…':'Salva neste aparelho (sincronização desligada).');
   }
 }
 Object.assign(ACT,{
   'sl-import'(){SL_INTO=null;$('#pptxFile').click();},
   'sl-new'(){slNew();},
+  'sl-retry'(){const x=slideById(UI.nview&&UI.nview.id);if(x)slMount(x);},
   'sl-back'(){
     const go=()=>{slLeave();UI.nview=null;renderMain();};
     if(SL&&SL.dirty)askConfirm('Sair sem salvar?','Há alterações que ainda não foram salvas (Ctrl+S dentro do DeckCraft).',go,'Sair');else go();
