@@ -73,6 +73,7 @@ jobs:
               [ -f "$RUNNER_TEMP/$app/$f" ] && cp "$RUNNER_TEMP/$app/$f" "$app/$f"
             done
           done
+          for app in pdfcraft deckcraft; do python3 apps-patches/split-wasm.py "$app"; done
           echo "pdfcraft $PDFCRAFT_REF" > pdfcraft/VERSION
           echo "deckcraft $DECKCRAFT_REF (com apps-patches/deckcraft-host.patch)" > deckcraft/VERSION
           # a Cloudflare aceita até 25 MiB por arquivo

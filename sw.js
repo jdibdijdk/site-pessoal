@@ -37,7 +37,7 @@ async function networkFirst(req) {
 async function cacheFirst(req) {
   const c = await caches.open(CACHE), hit = await c.match(req);
   // os apps compilados (pdfcraft/, deckcraft/) têm o hash no nome do arquivo: o que está no cache não muda, então não baixa de novo
-  if (hit && /\/(pdfcraft|deckcraft)\/.+-[0-9a-f]{8,}\./.test(req.url)) return hit;
+  if (hit && /\/(pdfcraft|deckcraft)\/.+-[0-9a-f]{8,}[._]/.test(req.url)) return hit;
   if (hit) { fetch(req).then((r) => { if (r && r.ok) c.put(req, r); }).catch(() => {}); return hit; }
   const r = await fetch(req);
   if (r && (r.ok || r.type === 'opaque')) c.put(req, r.clone());
