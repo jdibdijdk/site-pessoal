@@ -373,6 +373,9 @@ body.nserif .olt,body.nserif .exres,body.nserif .exresv{font-size:19px}
 .tblops[hidden]{display:none}
 .ned table{border-collapse:collapse;width:100%;table-layout:fixed;margin:10px 0;font-size:.96em}
 .ned td,.ned th{border:1px solid var(--line3);padding:7px 10px;vertical-align:top;overflow-wrap:anywhere;min-width:36px;line-height:1.5}
+.ned tr:last-child td,.ned tr:last-child th{border-bottom-width:1.5px}
+.ned td:last-child,.ned th:last-child{border-right-width:1.5px}
+@media (max-resolution:1.49dppx){.ned tr:last-child td,.ned tr:last-child th{border-bottom-width:2px}.ned td:last-child,.ned th:last-child{border-right-width:2px}} /* telas comuns não desenham 1,5px: arredondam para 2px */
 .ned th{background:var(--soft);font-weight:600;text-align:left}
 .ned.editing td:focus-within,.ned.editing th:focus-within{background:#F4F7FF}
 @media (max-width:600px){
@@ -704,6 +707,21 @@ body.nserif .olt,body.nserif .exres,body.nserif .exresv{font-size:19px}
 .nhead{display:flex;align-items:center;gap:6px;margin-bottom:14px;flex-wrap:wrap}
 .ntitle{font:inherit;font-size:24px;font-weight:600;border:0;border-bottom:2px solid var(--line);width:100%;padding:6px 0;outline:0;background:transparent}
 .ntitle:focus{border-bottom-color:var(--acc)}
+.nkb{display:inline-flex;align-items:center;justify-content:center;color:var(--acc);margin-right:6px;vertical-align:-2px;flex:none}
+.tsubchip{border:0;background:none;color:inherit;font:inherit;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:4px}.tsubchip.add{opacity:.6}
+.tsubs{margin:8px 0 2px;padding:8px 10px;background:var(--soft);border-radius:10px}
+.tsbar{height:4px;border-radius:2px;background:var(--line);margin-bottom:6px;overflow:hidden}.tsbar i{display:block;height:100%;background:var(--acc)}
+.tsub{display:flex;align-items:center;gap:8px;padding:3px 0}.tsub span{flex:1}.tsub.done span{text-decoration:line-through;opacity:.6}
+.tgh{cursor:pointer;display:flex;align-items:center;gap:6px}
+.rvsum{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}.rvsum>div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}.rvsum b{font-size:20px}.rvsum span{font-size:12.5px;color:var(--mut)}
+.rvi{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto auto auto;align-items:center;gap:10px;padding:10px 12px;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px}
+.rvi.done{opacity:.6}.rvi.late{border-left:3px solid #C62F2F}.rvn{font-size:12px;font-weight:700;background:var(--soft);border-radius:999px;padding:3px 10px;white-space:nowrap}.rvn.org{background:rgba(224,160,48,.18)}
+.rvm{display:flex;flex-direction:column;min-width:0}.rvm b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rvcat{max-width:150px;font-size:12.5px}
+.rvmin{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.rvmin b{min-width:52px;text-align:center;font-size:13px}.rvact{display:inline-flex;gap:6px}
+.rvset{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+@media(max-width:760px){.rvsum{grid-template-columns:1fr 1fr 1fr}.rvsum b{font-size:16px}.rvi{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"c m n" "x x x" "a a a"}.rvi>.chk{grid-area:c}.rvi>.rvm{grid-area:m}.rvi>.rvn{grid-area:n}.rvi>.rvcat{grid-area:x;max-width:none}.rvi>.rvmin{grid-column:1/3}.rvi>.rvact{grid-column:3}}
+.nkrow{display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px solid var(--line)}
+.nkpick{display:grid;grid-template-columns:repeat(auto-fill,44px);gap:8px;margin-top:12px}
 .nmeta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0 4px}
 .ntb{display:flex;gap:4px;flex-wrap:wrap;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--soft);margin:14px 0 8px;position:sticky;top:66px;z-index:5}
 .ntb .sepv{width:1px;background:var(--line3);margin:2px 4px}
@@ -775,6 +793,12 @@ a.ref[data-k=note],a.ref[data-k=pdf]{background:#E1F3F6;color:#1F7A8C}
 .ntb input[type=color]{width:30px;height:30px;padding:1px;border:1px solid var(--line3);border-radius:8px;background:var(--card);align-self:center;cursor:pointer}
 .ned img{max-width:100%;height:auto;border-radius:8px;margin:6px 0;display:inline-block;vertical-align:bottom}
 .ned.editing img{cursor:pointer}
+.ned img.imgL{float:left;margin:4px 14px 8px 0;display:block}
+.ned img.imgR{float:right;margin:4px 0 8px 14px;display:block}
+.ned img.imgC{float:none;display:block;margin:10px auto}
+.ned img.imgF{float:none;display:block;margin:10px 0;width:100%!important}
+.ned h1,.ned h2,.ned h3,.ned table{clear:both}
+@media(max-width:560px){.ned img.imgL,.ned img.imgR{float:none;display:block;margin:10px auto;max-width:100%}}
 .ned img.sel{outline:2px solid var(--acc);outline-offset:2px}
 #imgbar{position:fixed;z-index:70;display:flex;gap:2px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:var(--sh2);padding:4px;animation:rise .12s}
 #imgbar button{border:0;background:none;padding:5px 9px;border-radius:7px;font-size:13px;font-weight:500;color:var(--tx)}
@@ -1552,7 +1576,7 @@ html[data-theme="dark"] .tr-soil{fill:#2A2D36}html[data-theme="dark"] .tr-leaf{f
 /* margens: o conteúdo ocupa a tela sem sobras, no computador e no celular */
 main{max-width:1360px;padding:clamp(14px,2vw,26px) clamp(14px,2.4vw,32px) 80px}
 .painel{max-width:none}
-main.wide{padding-left:clamp(10px,1.4vw,20px);padding-right:clamp(10px,1.4vw,20px)}
+main.wide{padding:clamp(22px,2.4vw,34px) clamp(22px,3vw,48px) 80px}
 @media (max-width:760px){
   main{padding:12px 12px calc(92px + env(safe-area-inset-bottom,0px))}
   main.wide{padding-left:8px;padding-right:8px}
@@ -1735,13 +1759,13 @@ details.bagmore[open]>summary{margin-bottom:8px}
 
 /* computador: grade da semana mais compacta */
 @media (min-width:761px){
-  .ev.ev2{padding:2px 6px 2px 7px;font-size:11px;line-height:14.5px;border-radius:8px;border-left-width:3px}
-  .ev.ev2 .el{min-height:14.5px}
-  .ev.ev2 .el-tm,.ev.ev2 .el-ar,.ev.ev2 .el-pl,.ev.ev2 .el-pr,.ev.ev2 .el-bg,.ev.ev2 .el-tk,.ev.ev2 .el-fd,.ev.ev2 .el-dw{font-size:10.5px}
-  .ev.ev2 .el-tt{font-size:11.5px}
-  .ev.ev2 .el .ic{width:10px;height:10px}
-  .ev.ev2.nar2{line-height:13.5px}.ev.ev2.nar2 .el{min-height:13.5px;font-size:10px}.ev.ev2.nar2 .el-tt{font-size:10.5px}
-  .ev.ev2.nar3{line-height:12.5px}.ev.ev2.nar3 .el{min-height:12.5px;font-size:9.5px}.ev.ev2.nar3 .el-tt{font-size:10px}
+  .ev.ev2{padding:5px 10px 5px 11px;font-size:12px;line-height:17px;border-radius:9px;border-left-width:3px}
+  .ev.ev2 .el{min-height:17px}
+  .ev.ev2 .el-tm,.ev.ev2 .el-ar,.ev.ev2 .el-pl,.ev.ev2 .el-pr,.ev.ev2 .el-bg,.ev.ev2 .el-tk,.ev.ev2 .el-fd,.ev.ev2 .el-dw{font-size:12px}
+  .ev.ev2 .el-tt{font-size:14px;font-weight:700;line-height:18px}
+  .ev.ev2 .el .ic{width:11px;height:11px}
+  .ev.ev2.nar2{line-height:15.5px;padding:4px 6px 4px 8px}.ev.ev2.nar2 .el{min-height:15.5px;font-size:11.5px}.ev.ev2.nar2 .el-tt{font-size:12.5px}
+  .ev.ev2.nar3{line-height:14.5px;padding:3px 5px 3px 6px}.ev.ev2.nar3 .el{min-height:14.5px;font-size:11px}.ev.ev2.nar3 .el-tt{font-size:11.5px}
   .gh{padding-top:6px;padding-bottom:6px}
 }
 
@@ -2197,6 +2221,8 @@ function seedItems(){
 }
 // Kits prontos (mochila e pasta) com o conteúdo de sempre: no evento basta marcar o kit
 const KIT_SEED=[['Mochila',['notebook','mouse','extensao','tab s9','buds']],['Pasta',['caderno','cracha']]];
+ // tipos de nota (diferenciados por ícone): lista editável em Ajustes
+function seedNk(){return [['pat','Patologia','microscope'],['fis','Fisiologia','pulse'],['img','Imagem','image'],['lab','Laboratório','flask'],['sem','Semiologia','steth'],['top','Tópico','list'],['org','Organização','layers'],['pes','Pesquisa','search']].map(x=>({id:'nk_'+x[0],name:x[1],icon:x[2]}));}
 function seedKits(items){
   KIT_SEED.forEach(k=>{
     if(items.some(i=>norm(i.name)===norm(k[0])))return;
@@ -2328,7 +2354,7 @@ function normalize(o){
     linkCats:(Array.isArray(o.linkCats)&&o.linkCats.length)?o.linkCats:LINKCATS.slice(),
     packed:o.packed||{},health:arr('health'),hprefs:Object.assign({weeklyMin:150,sleepH:7,heightCm:''},o.hprefs||{}),fin:normFin(o.fin),
     acts:arr('acts').map(a=>{const x=Object.assign({title:'',kind:'Atividade',tipoAtv:'',blockType:'estudo',catId:'',teacher:'',place:'',link:'',doWhat:'',where:'',plan:{},bring:'',slots:[],done:{},goalIds:[],docIds:[],relId:'',itemIds:[],linkIds:[],stow:{},extras:[],moneys:[],noArea:false,themeNA:false},a);if(x.theme==null)x.theme=x.title;return x;}),
-    tasks:arr('tasks').map(t=>Object.assign({title:'',notes:'',deadline:'',catId:'',docId:'',link:'',done:false,activityIds:[],goalIds:[],linkIds:[],itemIds:[],where:'',plan:{},deadlineTime:'',dateIds:[],moneys:[]},t)),
+    tasks:arr('tasks').map(t=>Object.assign({title:'',notes:'',deadline:'',catId:'',docId:'',link:'',done:false,activityIds:[],goalIds:[],linkIds:[],itemIds:[],where:'',plan:{},deadlineTime:'',dateIds:[],moneys:[],group:'',subs:[]},t)),
     docs:arr('docs').map(d=>Object.assign({title:'',catId:'',link:'',notes:'',todo:[],goalIds:[],linkIds:[],noteIds:[],folderId:'',ext:'',status:'',source:'',srcLink:'',starnote:false,driveId:'',driveMod:0},d)),
     goals:arr('goals').map(g=>Object.assign({title:'',horizon:'curto',parentId:'',done:false,linkIds:[]},g,{deadline:'',firm:false})),
     dates:arr('dates').map(d=>{const x=Object.assign({title:'',date:'',time:'',cat:'Prazo',notes:'',catId:'',deckIds:[],qtd:0,qlabel:''},d);x.deckIds=Array.isArray(x.deckIds)?x.deckIds:[];x.qtd=Math.max(0,Number(x.qtd)||0);return x;}),
@@ -2342,6 +2368,8 @@ function normalize(o){
     recipes:arr('recipes').map(r=>Object.assign({title:'',photo:'',momento:'',area:'',servings:2,ings:[],steps:'',created:0,updated:0},r)),
     meals:arr('meals').map(m=>Object.assign({date:'',slot:'almoco',kind:'recipe',recipeId:'',servings:1,st:'',actId:'',amount:0,done:false,used:[],created:0},m)),
     folders:arr('folders'),dfolders:arr('dfolders'),
+    rv:(o.rv&&typeof o.rv==='object'&&!Array.isArray(o.rv))?o.rv:{},
+    nkinds:Array.isArray(o.nkinds)?o.nkinds.filter(k=>k&&k.id).map(k=>({id:String(k.id),name:String(k.name||''),icon:ICONS[k.icon]?k.icon:'tag'})):seedNk(),
     slides:arr('slides').map(x=>Object.assign({title:'',folderId:'',catId:'',fileId:'',fileName:'',n:0,ratio:16/9,annots:{},created:0,updated:0},x)),
     docTpls:arr('docTpls').map(x=>Object.assign({name:'',catId:'',url:'',folderId:'',pinned:true},x)),
     pdfs:arr('pdfs').map(p=>Object.assign({title:'',folderId:'',catId:'',src:'local',driveId:'',annots:[],vp:null,created:0,updated:0},p)),
@@ -2350,6 +2378,9 @@ function normalize(o){
     prefs:Object.assign({radarOpen:true,view:'',dview:''},o.prefs||{}),savedAt:o.savedAt||0};
   st.prefs.title=Object.assign({tipo:true,area:true},st.prefs.title);
   if(ver<10&&Array.isArray(o.items))seedKits(st.items);
+  st.tasks.forEach(t=>{t.group=String(t.group||'');t.subs=(Array.isArray(t.subs)?t.subs:[]).filter(x=>x&&x.t).map(x=>({id:x.id||uid(),t:String(x.t),done:!!x.done,doneAt:x.doneAt||0}));});
+  const pmx=st.prefs.pomo; // subtarefas do Pomodoro de uma tarefa passam a ser as da própria tarefa
+  if(pmx&&pmx.subs&&typeof pmx.subs==='object')Object.keys(pmx.subs).forEach(k=>{const t=st.tasks.find(x=>x.id===k);if(t&&Array.isArray(pmx.subs[k])){pmx.subs[k].forEach(x=>{if(x&&x.t&&!t.subs.some(y=>y.id===x.id))t.subs.push({id:x.id||uid(),t:String(x.t),done:!!x.done,doneAt:x.doneAt||0});});delete pmx.subs[k];}});
   return st;
 }
 
@@ -2826,7 +2857,7 @@ window.addEventListener('pagehide',()=>{if(Cloud.dirty&&Cloud.ready)Cloud.push()
    ========================================================================== */
 const UI={tab:'painel',view:S.prefs.view||(window.innerWidth<760?'lista':'grade'),weekStart:mondayOf(todayISO()),day:todayISO(),
   filters:{q:'',roots:[],blocks:[],kinds:[],status:'all'},fopen:false,focusOpen:false,
-  taskTab:'todo',docTab:'todo',goalTab:'hier',dateTab:'prox',catOpen:{},newColor:PAL[7],openOcc:null,openTask:null,back:null,confirmCb:null,
+  rvTab:'hoje',rvF:'',rvCat:'',taskTab:'todo',tsubOpen:{},tgFold:{},tcat:'',nnk:'',docTab:'todo',goalTab:'hier',dateTab:'prox',catOpen:{},newColor:PAL[7],openOcc:null,openTask:null,back:null,confirmCb:null,
   notified:{},fold:{},hr:{range:'week',from:'',to:''},hTab:'resumo',fTab:'resumo',ajTab:'horas',itOpen:{},
   nf:'',df:'',dcat:'',exOpen:{},fxsel:null,fxlink:null,fz:1,fxImgFor:null,nview:null,nq:'',ncat:'',ntype:'',nsub:'notas',csub:'estoque',cq:'',cmo:'',car:'',crec:'',crsv:0,cwk:'',study:null,edEl:null,gscroll:null,range:null};
 const catById=id=>S.cats.find(c=>c.id===id);
@@ -3209,11 +3240,11 @@ function badgesHTML(a,date){
 }
 const hoursStr=list=>{const m=list.reduce((s,o)=>s+tmin(o.end)-tmin(o.start),0);return (Math.round(m/6)/10).toString().replace('.',',')+'h';};
 // Grade: das 06:00 às 23:00 (as demais horas ficam recolhidas e se abrem pelas faixas); a altura de cada evento é a duração real
-const GRID_DESK=window.innerWidth>760,GPX=GRID_DESK?76:96; // computador: grade mais compacta
+const GRID_DESK=window.innerWidth>760,GPX=GRID_DESK?64:96; // computador: grade mais compacta
 const GRID_LO=360,GRID_HI=1380;
 function gridEvHTML(ev,lo,hi,span,print,pxh){
   const o=ev.o,a=o.act,col=catColor(a.catId),w=100/ev.n,dur=ev.e-ev.s,s0=Math.max(ev.s,lo),e0=Math.min(ev.e,hi),hpx=(e0-s0)*pxh/60,qk=!print&&quickOf(a);
-  const pos='top:'+((s0-lo)/span*100)+'%;height:'+((e0-s0)/span*100)+'%;left:calc('+(ev.lane*w)+'% + 1px);width:calc('+w+'% - 3px);--c:'+col+';--ct:'+inkG(col)+';--cb:'+shade(col,.55);
+  const pos='top:'+((s0-lo)/span*100)+'%;height:'+((e0-s0)/span*100)+'%;left:calc('+(ev.lane*w)+'% + '+(GRID_DESK&&!print?3:1)+'px);width:calc('+w+'% - '+(GRID_DESK&&!print?7:3)+'px);--c:'+col+';--ct:'+inkG(col)+';--cb:'+shade(col,.55);
   const act=print?'':' data-a="open-occ" data-aid="'+a.id+'" data-key="'+esc(o.key)+'" role="button" tabindex="0"';
   const pt=actParts(a),where=[a.place,a.teacher].filter(Boolean).join(' · ');
   const tip=[aT(a),o.start+'–'+o.end,where].filter(Boolean).join(' · ');
@@ -3253,7 +3284,7 @@ function gridEvHTML(ev,lo,hi,span,print,pxh){
 // Bloco da grade na tela: uma informação por linha (horário, título, categoria, local, professor, o que levar, tarefas…),
 // cada uma em uma única linha; entram por ordem de importância até ocupar a altura real do evento.
 function gridEvCard(ev,o,a,pt,pos,act,tip,hpx){
-  const nar=ev.n>1?Math.min(ev.n,3):1,lh=GRID_DESK?(nar===1?14.5:nar===2?13.5:12.5):(nar===1?17:nar===2?15.5:14.5),L=Math.max(1,Math.floor((hpx-(GRID_DESK?5:8))/lh));
+  const nar=ev.n>1?Math.min(ev.n,3):1,lh=GRID_DESK?(nar===1?17:nar===2?15.5:14.5):(nar===1?17:nar===2?15.5:14.5),L=Math.max(1,Math.floor((hpx-(GRID_DESK?12:8))/lh));
   const bg=bagOf(a,o.date),ni=bg.itemIds.filter(i=>!bg.stow[i]).length+bg.extras.length,nt=S.tasks.filter(t=>!t.done&&t.activityIds.includes(a.id)).length;
   const kits=bg.itemIds.map(itemById).filter(i=>i&&i.container).map(i=>i.name);
   const title=[pt.tipo,pt.theme].filter(Boolean).join(' | ')||aT(a),area=[pt.disc,pt.eixo].filter(Boolean).join(' · ');
@@ -3270,7 +3301,7 @@ function gridEvCard(ev,o,a,pt,pos,act,tip,hpx){
   ].filter(x=>x[2]);
   let rows=L2;
   if(L<rows.length){rows=[L2[1]];if(L>=2)rows.unshift(L2[0]);rows=rows.concat(L2.slice(2,2+Math.max(0,L-rows.length)));}
-  const tt2=L>=rows.length+1&&title.length>(nar===1?24:12); // sobra espaço: o título usa duas linhas
+  const tt2=L>=rows.length+1&&title.length>(nar===1?20:10); // sobra espaço: o título usa duas linhas
   const h=rows.map(x=>'<span class="el el-'+x[0]+'"'+(x[0]==='tt'&&tt2?' style="-webkit-line-clamp:2;white-space:normal"':'')+'>'+(x[1]&&nar===1?ic(x[1],11):'')+esc(x[2])+'</span>').join('');
   return '<div class="ev ev2 '+(nar>1?'nar'+nar+' ':'')+(o.done?'done':'')+'" style="'+pos+'"'+act+' title="'+esc(tip)+'">'+h+'</div>';
 }
@@ -3380,21 +3411,80 @@ function focusHTML(occ){
   return '<details class="focus" '+(UI.focusOpen?'open':'')+'><summary>'+ic('target',16)+'Objetivos de curto prazo <span class="count">'+shorts.length+'</span>'+ic('chevD',14)+'</summary>'+rows+
     '<button class="btn sm ghost" data-a="tab" data-v="metas">Ver todos os objetivos</button></details>';
 }
-/* Revisão espaçada: cada aula, tutoria ou plantão gera sugestões de revisão em 1, 7 e 30 dias */
+/* Revisão espaçada: só vira revisão o evento marcado com "Gera revisão"; D1, D7, D30 e posteriores, com minutos por intervalo */
 const RV_TIPO=/aula|tutoria|plant[aã]o/i;
-const rvCfg=()=>Object.assign({on:true,days:[1,7,30]},S.prefs.rv||{});
-function reviewList(from,to){
-  const c=rvCfg();if(!c.on)return [];
-  const done=S.prefs.rvDone||{},out=[],mx=Math.max.apply(null,c.days);
-  occurrences(addISO(from,-mx),to).forEach(o=>{
-    const a=o.act,pt=actParts(a);if(!RV_TIPO.test(norm((pt.tipo||'')+' '+(a.kind||''))))return;
-    c.days.forEach(n=>{const rd=addISO(o.date,n);if(rd<from||rd>to)return;const key='rv|'+a.id+'|'+o.date+'|'+n;
-      out.push({key:key,date:rd,n:n,act:a,src:o.date,theme:pt.theme||aT(a),done:!!done[key]});});
-  });
-  return out.sort((x,y)=>x.date<y.date?-1:x.date>y.date?1:x.n-y.n);
+const RV_DEF=[{n:1,min:15},{n:7,min:20},{n:30,min:30},{n:60,min:30}];
+function rvCfg(){
+  const u=S.prefs.rv||{};let days=(Array.isArray(u.days)&&u.days.length)?u.days:RV_DEF;
+  days=days.map(d=>typeof d==='number'?{n:d,min:(RV_DEF.find(x=>x.n===d)||{min:20}).min}:{n:Math.round(Number(d&&d.n))||0,min:Math.round(Number(d&&d.min))||20}).filter(d=>d.n>0).sort((a,b)=>a.n-b.n);
+  return {on:u.on!==false,days:days,prep:u.prep==null?2:Math.max(0,Math.min(14,Number(u.prep)||0)),prepMin:Math.round(Number(u.prepMin))||10};
 }
-const rvLabel=r=>'Revisar '+r.theme+' · D+'+r.n;
-function rvRow(r){return '<div class="lrow rvrow '+(r.done?'done':'')+'"><button class="chk sm '+(r.done?'on':'')+'" data-a="rv-done" data-k="'+esc(r.key)+'" aria-label="Marcar revisão">'+ic('check',12)+'</button><div class="lt">D+'+r.n+'</div><div class="lm"><b>'+esc('Revisar: '+r.theme)+'</b><div class="small muted">'+esc(actParts(r.act).tipo||'')+' de '+fmtDM(r.src)+'</div></div></div>';}
+const rvSt=k=>(S.rv=S.rv||{})[k]||((S.rv[k]={}));
+function reviewList(from,to){
+  const c=rvCfg();if(!c.on||!c.days.length)return [];
+  const done=S.prefs.rvDone||{},st=S.rv||{},out=[],mx=c.days[c.days.length-1].n;
+  occurrences(addISO(from,-(mx+30)),to).forEach(o=>{
+    const a=o.act;if(!a.rev)return;const pt=actParts(a);
+    c.days.forEach(d=>{
+      const key='rv|'+a.id+'|'+o.date+'|'+d.n,s=st[key]||{},orig=addISO(o.date,d.n),rd=s.to||orig;
+      const base={act:a,src:o.date,theme:pt.theme||aT(a),n:d.n,catId:s.cat||a.catId||'',orig:orig};
+      if(rd>=from&&rd<=to)out.push(Object.assign({key:key,kind:'rv',date:rd,min:s.min!=null?s.min:d.min,done:!!(done[key]||s.done),moved:rd!==orig},base));
+      if(c.prep>0){const pk='rp|'+a.id+'|'+o.date+'|'+d.n,ps=st[pk]||{},pd=addISO(rd,-c.prep);
+        if(pd>o.date&&pd>=from&&pd<=to)out.push(Object.assign({key:pk,kind:'rp',date:pd,min:ps.min!=null?ps.min:c.prepMin,done:!!(done[pk]||ps.done),moved:false},base));}
+    });
+  });
+  return out.sort((x,y)=>x.date<y.date?-1:x.date>y.date?1:(x.kind===y.kind?x.n-y.n:x.kind==='rp'?-1:1));
+}
+const rvDayTxt=r=>fmtDM(addISO(r.date,rvCfg().prep));
+const rvLabel=r=>(r.kind==='rp'?'Organizar revisão: ':'Revisar ')+r.theme+(r.kind==='rp'?'':' · D+'+r.n);
+function rvRow(r){return '<div class="lrow rvrow '+(r.done?'done':'')+'"><button class="chk sm '+(r.done?'on':'')+'" data-a="rv-done" data-k="'+esc(r.key)+'" aria-label="Marcar revisão">'+ic('check',12)+'</button><div class="lt">'+(r.kind==='rp'?'Org.':'D+'+r.n)+'</div><div class="lm"><b>'+esc((r.kind==='rp'?'Organizar revisão: ':'Revisar: ')+r.theme)+'</b><div class="small muted">'+esc(actParts(r.act).tipo||'')+' de '+fmtDM(r.src)+' · '+r.min+' min</div></div></div>';}
+/* aba Revisões */
+const RV_FILTERS=[['','Todas'],['1','D1'],['7','D7'],['30','D30'],['p','Posteriores'],['rp','Organizar']];
+function rvPass(r){
+  if(UI.rvCat&&catDesc(UI.rvCat).indexOf(r.catId)<0)return false;
+  const f=UI.rvF;if(!f)return true;if(f==='rp')return r.kind==='rp';if(r.kind==='rp')return false;
+  return f==='p'?r.n>30:String(r.n)===f;
+}
+function rvItem(r){
+  const T=todayISO(),late=!r.done&&r.date<T;
+  return '<div class="rvi '+(r.done?'done':'')+(late?' late':'')+'"><button class="chk '+(r.done?'on':'')+'" data-a="rv-done" data-k="'+esc(r.key)+'" aria-label="Marcar como feita">'+ic('check',15)+'</button>'+
+    '<span class="rvn '+(r.kind==='rp'?'org':'')+'">'+(r.kind==='rp'?'Organizar':'D+'+r.n)+'</span>'+
+    '<div class="rvm"><b>'+esc(r.theme)+'</b><span class="muted small">'+esc(actParts(r.act).tipo||r.act.kind||'Evento')+' de '+fmtDM(r.src)+(r.moved?' · adiada':'')+(late?' · atrasada':'')+'</span></div>'+
+    '<select class="rvcat" data-k="'+esc(r.key)+'" aria-label="Categoria"><option value="">Sem categoria</option>'+catTreeOpts(r.catId)+'</select>'+
+    '<span class="rvmin"><button class="icon-btn sm" data-a="rv-min" data-k="'+esc(r.key)+'" data-d="-5" aria-label="Menos 5 minutos">−</button><b>'+r.min+' min</b><button class="icon-btn sm" data-a="rv-min" data-k="'+esc(r.key)+'" data-d="5" aria-label="Mais 5 minutos">+</button></span>'+
+    '<span class="rvact">'+(r.kind==='rv'&&!r.done?'<button class="btn sm ghost" data-a="rv-snz" data-k="'+esc(r.key)+'">Adiar</button>':'')+(r.done?'':'<button class="btn sm" data-a="rv-sched" data-k="'+esc(r.key)+'">'+ic('calendar',13)+' Agendar</button>')+'</span></div>';
+}
+function rvDays(list){
+  const m={},ord=[];list.forEach(r=>{if(!m[r.date]){m[r.date]=[];ord.push(r.date);}m[r.date].push(r);});
+  return ord.map(d=>{const dt=parseISO(d),T=todayISO();return '<div class="sechead '+(d<T?'late':'')+'">'+(d===T?'Hoje':d===addISO(T,1)?'Amanhã':WDL[dt.getDay()]+' '+fmtDM(d))+' <span class="count">'+m[d].length+'</span><span class="muted small" style="margin-left:auto">'+m[d].reduce((a,r)=>a+r.min,0)+' min</span></div>'+m[d].map(rvItem).join('');}).join('');
+}
+function rvSettingsHTML(){
+  const c=rvCfg(),old=S.acts.filter(a=>!a.rev&&RV_TIPO.test(norm((actParts(a).tipo||'')+' '+(a.kind||'')))).length;
+  return '<div class="card sec"><h3>Intervalos de revisão</h3><label class="sw" style="margin-bottom:10px"><input type="checkbox" data-a="rv-on" '+(c.on?'checked':'')+'> <b>Revisões ligadas</b></label>'+
+    '<p class="muted small">Cada evento marcado com “Gera revisão” ganha uma revisão em cada intervalo. D1, D7 e D30 são os principais; os maiores são as revisões posteriores.</p>'+
+    c.days.map(d=>'<div class="rvset"><b>D+'+d.n+'</b><span class="muted small">'+(d.n<=30?'Principal':'Posterior')+'</span><span class="sp"></span><span class="rvmin"><button class="icon-btn sm" data-a="rv-cfgmin" data-n="'+d.n+'" data-d="-5">−</button><b>'+d.min+' min</b><button class="icon-btn sm" data-a="rv-cfgmin" data-n="'+d.n+'" data-d="5">+</button></span><button class="icon-btn sm" data-a="rv-int-del" data-n="'+d.n+'" aria-label="Remover intervalo">'+ic('trash',14)+'</button></div>').join('')+
+    '<div class="addrow"><input type="number" min="1" max="365" id="rvNewN" placeholder="Novo intervalo (dias)"><button class="btn primary sm" data-a="rv-int-add">Adicionar</button></div></div>'+
+    '<div class="card sec"><h3>Organizar revisão</h3><p class="muted small">Um lembrete antes de cada revisão, para separar o material.</p>'+
+    '<div class="rvset"><b>Antecedência</b><span class="sp"></span><span class="rvmin"><button class="icon-btn sm" data-a="rv-prep" data-d="-1">−</button><b>'+(c.prep?c.prep+(c.prep===1?' dia':' dias'):'Desligado')+'</b><button class="icon-btn sm" data-a="rv-prep" data-d="1">+</button></span></div>'+
+    '<div class="rvset"><b>Tempo para organizar</b><span class="sp"></span><span class="rvmin"><button class="icon-btn sm" data-a="rv-prepmin" data-d="-5">−</button><b>'+c.prepMin+' min</b><button class="icon-btn sm" data-a="rv-prepmin" data-d="5">+</button></span></div></div>'+
+    '<div class="card sec"><h3>Eventos que geram revisão</h3><p class="muted small">Marque “Gera revisão” ao criar ou editar um evento. '+(old?'Há '+old+' evento(s) de Aula, Tutoria ou Plantão ainda sem a marca.':'Nenhum evento de Aula, Tutoria ou Plantão está sem a marca.')+'</p>'+
+    (old?'<button class="btn" data-a="rv-mark-old">Marcar Aula, Tutoria e Plantão como revisáveis</button>':'')+'<div class="muted small" style="margin-top:8px">Hoje '+S.acts.filter(a=>a.rev).length+' evento(s) geram revisão.</div></div>';
+}
+function renderRevisoes(){
+  const T=todayISO(),c=rvCfg(),tab=UI.rvTab||'hoje';
+  const all=reviewList(addISO(T,-45),addISO(T,60)).filter(rvPass);
+  const dueNow=all.filter(r=>!r.done&&r.date<=T),next=all.filter(r=>!r.done&&r.date>T),dn=all.filter(r=>r.done).reverse();
+  const wkEnd=addISO(T,6),sum=a=>a.reduce((x,r)=>x+r.min,0),wk=all.filter(r=>!r.done&&r.date<=wkEnd);
+  let h='<h2 class="vt" style="margin:0 0 4px">Revisões</h2><p class="muted small" style="margin:0 0 12px">'+(c.on?'D'+c.days.map(d=>d.n).join(' · D')+'. Só entram eventos marcados com “Gera revisão”.':'As revisões estão desligadas (aba Ajustes).')+'</p>'+
+    '<div class="rvsum"><div><b>'+dueNow.length+'</b><span>pendentes agora</span></div><div><b>'+sum(dueNow)+' min</b><span>previstos hoje</span></div><div><b>'+sum(wk)+' min</b><span>nos próximos 7 dias</span></div></div>'+
+    '<div class="toolbar"><div class="seg">'+[['hoje','Hoje e atrasadas ('+dueNow.length+')'],['prox','Próximas ('+next.length+')'],['feitas','Concluídas ('+dn.length+')'],['cfg','Ajustes']].map(v=>'<button class="'+(tab===v[0]?'on':'')+'" data-a="rv-tab" data-v="'+v[0]+'">'+v[1]+'</button>').join('')+'</div></div>';
+  if(tab==='cfg')return h+rvSettingsHTML();
+  h+='<div class="nfbar tfbar"><label class="nfsel"><span>Categoria</span><select id="rvcatSel"><option value="">Todas</option>'+catTreeOpts(UI.rvCat)+'</select></label>'+
+    '<div class="frow">'+RV_FILTERS.map(f=>'<button class="chip '+((UI.rvF||'')===f[0]?'on':'')+'" data-a="rv-f" data-v="'+f[0]+'">'+f[1]+'</button>').join('')+'</div></div>';
+  const list=tab==='hoje'?dueNow:tab==='prox'?next:dn;
+  h+=list.length?rvDays(list):'<div class="empty">'+(tab==='hoje'?'Nenhuma revisão pendente.':tab==='prox'?'Nenhuma revisão agendada pelos intervalos.':'Nada concluído ainda.')+(S.acts.some(a=>a.rev)?'':'<br>Marque “Gera revisão” em um evento para começar.')+'</div>';
+  return h;
+}
 function weekData(){
   const ws=UI.weekStart,we=addISO(ws,6);
   return {ws:ws,we:we,occ:occurrences(ws,we).filter(passOcc).sort(cmpOcc),
@@ -3432,32 +3522,54 @@ function fixGridScroll(){
 /* ==========================================================================
    11. TAREFAS
    ========================================================================== */
+const tSubsDone=t=>(t.subs||[]).filter(x=>x.done).length;
+function tSubsChip(t){const n=(t.subs||[]).length;return n?'<button class="mi tsubchip" data-a="tsub-open" data-id="'+t.id+'" aria-expanded="'+!!UI.tsubOpen[t.id]+'">'+ic('tasks',13)+tSubsDone(t)+'/'+n+' subtarefas</button>':'<button class="mi tsubchip add" data-a="tsub-open" data-id="'+t.id+'">'+ic('plus',12)+'subtarefa</button>';}
+function tSubsBox(t){
+  if(!UI.tsubOpen[t.id])return '';const n=(t.subs||[]).length,d=tSubsDone(t);
+  return '<div class="tsubs">'+(n?'<div class="tsbar"><i style="width:'+Math.round(d/n*100)+'%"></i></div>':'')+(t.subs||[]).map(x=>'<div class="tsub '+(x.done?'done':'')+'"><button class="chk sm '+(x.done?'on':'')+'" data-a="tsub-chk" data-id="'+t.id+'" data-sid="'+x.id+'" aria-label="Concluir subtarefa">'+ic('check',12)+'</button><span>'+esc(x.t)+'</span><button class="icon-btn sm" data-a="tsub-del" data-id="'+t.id+'" data-sid="'+x.id+'" aria-label="Remover subtarefa">'+ic('x',12)+'</button></div>').join('')+
+    '<div class="addrow"><input type="text" id="tsn_'+t.id+'" class="tsnew" data-tid="'+t.id+'" placeholder="Nova subtarefa" autocomplete="off"><button class="btn sm primary" data-a="tsub-add" data-id="'+t.id+'">'+ic('plus',14)+'</button></div></div>';
+}
 function taskRow(t){
   const doc=t.docId&&docById(t.docId),acts=S.acts.filter(a=>t.activityIds.includes(a.id)),gs=S.goals.filter(g=>t.goalIds.includes(g.id)),dts=(t.dateIds||[]).map(dateById).filter(Boolean);
   return '<div class="trow '+(t.done?'done':'')+(ATTMAP[t.id]&&!t.done?' hot':'')+'"><button class="chk '+(t.done?'on':'')+'" data-a="toggle-task" data-id="'+t.id+'" aria-label="Concluir tarefa">'+ic('check',16)+'</button>'+
     '<div class="trb"><div class="tt1"><span class="ttl" data-a="view-task" data-id="'+t.id+'">'+esc(t.title)+'</span>'+dueChip(t)+(ATTMAP[t.id]&&!t.done?'<span class="due late">'+ic('bell',12)+'Em destaque</span>':'')+'</div>'+
     '<div class="tmeta">'+tagHTML(t.catId)+(doc?'<span class="mi">'+ic('file',13)+esc(doc.title)+'</span>':'')+acts.map(a=>'<span class="mi">'+ic('calendar',13)+esc(aT(a))+'</span>').join('')+
       dts.map(d=>'<span class="mi">'+ic('clock',13)+esc(d.title)+'</span>').join('')+
-      gs.map(g=>'<span class="mi">'+ic('target',13)+esc(g.title)+'</span>').join('')+((t.itemIds||[]).length?'<span class="mi">'+ic('bag',13)+t.itemIds.length+' objeto(s)</span>':'')+((t.moneys||[]).length?'<span class="mi">'+ic('dollar',13)+t.moneys.length+'</span>':'')+(t.link?linkHTML(t.link):'')+savedLinksHTML(t.linkIds)+'</div>'+
+      gs.map(g=>'<span class="mi">'+ic('target',13)+esc(g.title)+'</span>').join('')+((t.itemIds||[]).length?'<span class="mi">'+ic('bag',13)+t.itemIds.length+' objeto(s)</span>':'')+((t.moneys||[]).length?'<span class="mi">'+ic('dollar',13)+t.moneys.length+'</span>':'')+(t.link?linkHTML(t.link):'')+savedLinksHTML(t.linkIds)+(t.group?'<span class="mi">'+ic('layers',13)+esc(t.group)+'</span>':'')+tSubsChip(t)+'</div>'+tSubsBox(t)+
     (t.notes?'<div class="tnote">'+esc(t.notes)+'</div>':'')+(t.where?'<div class="tnote">'+ic('pin',12)+' '+esc(t.where)+'</div>':'')+planLines(t)+'</div>'+
     '<div class="tact"><button class="icon-btn" data-a="sched-task" data-id="'+t.id+'" title="Agendar em um horário" aria-label="Agendar">'+ic('calendar',17)+'</button>'+
     '<button class="icon-btn" data-a="edit-task" data-id="'+t.id+'" title="Editar" aria-label="Editar">'+ic('edit',17)+'</button>'+
     '<button class="icon-btn" data-a="del-task" data-id="'+t.id+'" title="Excluir" aria-label="Excluir">'+ic('trash',17)+'</button></div></div>';
 }
 const docPending=d=>d.todo.filter(x=>!x.done).length;
+const T_GRPS=[['prazo','Prazo'],['cat','Categoria'],['grupo','Grupo'],['ativ','Atividade']];
+const tGrp=()=>T_GRPS.some(x=>x[0]===S.prefs.tgrp)?S.prefs.tgrp:'prazo';
+function taskGroupKey(t,mode){
+  if(mode==='cat'){const c=catById(t.catId);return c?catPath(c.id).map(x=>x.name).join(' › '):'Sem categoria';}
+  if(mode==='grupo')return t.group||'Sem grupo';
+  const a=S.acts.find(x=>t.activityIds.includes(x.id));return a?aT(a):'Sem atividade';
+}
 function renderTarefas(){
-  const list=S.tasks.filter(passTask),pend=list.filter(t=>!t.done),done=list.filter(t=>t.done),today=todayISO();
+  const cs=UI.tcat?catDesc(UI.tcat):null,tcat=t=>!cs||cs.indexOf(t.catId)>=0;
+  const list=S.tasks.filter(passTask).filter(tcat),pend=list.filter(t=>!t.done),done=list.filter(t=>t.done),today=todayISO(),mode=tGrp();
   const cmp=(a,b)=>(tDue(a)||'9999')<(tDue(b)||'9999')?-1:(tDue(a)||'9999')>(tDue(b)||'9999')?1:0;
+  const allT=S.tasks.filter(passTask);
   let h='<div class="toolbar"><div class="seg">'+[['todo','A fazer ('+pend.length+')'],['done','Concluídas ('+done.length+')'],['all','Todas']].map(v=>'<button class="'+(UI.taskTab===v[0]?'on':'')+'" data-a="set" data-k="taskTab" data-v="'+v[0]+'">'+v[1]+'</button>').join('')+'</div>'+
-    '<button class="btn primary" data-a="new-task">'+ic('plus',15)+' Nova tarefa</button></div>';
+    '<button class="btn primary" data-a="new-task">'+ic('plus',15)+' Nova tarefa</button></div>'+
+    '<div class="nfbar tfbar"><label class="nfsel"><span>Categoria</span><select id="tcatSel"><option value="">Todas</option>'+catTreeOpts(UI.tcat,id=>{const c=catDesc(id);return allT.filter(t=>!t.done&&c.indexOf(t.catId)>=0).length;})+'</select></label>'+
+    '<label class="nfsel"><span>Agrupar por</span><select id="tgrpSel">'+T_GRPS.map(x=>'<option value="'+x[0]+'" '+(mode===x[0]?'selected':'')+'>'+x[1]+'</option>').join('')+'</select></label></div>';
+  const fold=(key,label,items,cls)=>{const op=!UI.tgFold[key];return '<div class="sechead tgh '+(cls||'')+'" data-a="tg-fold" data-k="'+esc(key)+'" role="button" tabindex="0" aria-expanded="'+op+'">'+ic(op?'chevD':'chevR',14)+esc(label)+' <span class="count">'+items.length+'</span></div>'+(op?items.map(taskRow).join(''):'');};
+  const byGroup=items=>{const m={},ord=[];items.forEach(t=>{const k=taskGroupKey(t,mode);if(!m[k]){m[k]=[];ord.push(k);}m[k].push(t);});ord.sort((a,b)=>a.indexOf('Sem ')===0?1:b.indexOf('Sem ')===0?-1:a.localeCompare(b));return ord.map(k=>fold(mode+'|'+k,k,m[k])).join('');};
   if(UI.taskTab==='todo'){
-    const g={late:[],today:[],week:[],later:[],none:[]};
-    pend.sort(cmp).forEach(t=>{const du=tDue(t);if(!du)g.none.push(t);else{const d=diffDays(du,today);(d<0?g.late:d===0?g.today:d<=7?g.week:g.later).push(t);}});
-    const secs=[['late','Atrasadas'],['today','Hoje'],['week','Próximos 7 dias'],['later','Depois'],['none','Sem prazo']];
     let any=false;
-    secs.forEach(s=>{if(g[s[0]].length){any=true;h+='<div class="sechead '+(s[0]==='late'?'late':'')+'">'+s[1]+' <span class="count">'+g[s[0]].length+'</span></div>'+g[s[0]].map(taskRow).join('');}});
+    if(mode==='prazo'){
+      const g={late:[],today:[],week:[],later:[],none:[]};
+      pend.sort(cmp).forEach(t=>{const du=tDue(t);if(!du)g.none.push(t);else{const d=diffDays(du,today);(d<0?g.late:d===0?g.today:d<=7?g.week:g.later).push(t);}});
+      const secs=[['late','Atrasadas'],['today','Hoje'],['week','Próximos 7 dias'],['later','Depois'],['none','Sem prazo']];
+      secs.forEach(s=>{if(g[s[0]].length){any=true;h+=fold('prazo|'+s[0],s[1],g[s[0]],s[0]==='late'?'late':'');}});
+    }else if(pend.length){any=true;h+=byGroup(pend.slice().sort(cmp));}
     if(!any)h+='<div class="empty">Nenhuma tarefa pendente.<br><button class="btn primary" data-a="new-task">'+ic('plus',15)+' Criar tarefa</button></div>';
-    const docs=S.docs.filter(d=>passDoc(d)&&docPending(d)>0);
+    const docs=S.docs.filter(d=>passDoc(d)&&docPending(d)>0&&(!cs||cs.indexOf(d.catId)>=0));
     if(docs.length){
       const hid=!!S.prefs.hideDocTodo;
       h+='<div class="sechead">Documentos para terminar <span class="count">'+docs.length+'</span><button class="btn sm ghost" style="margin-left:auto" data-a="doc-todo-toggle">'+ic(hid?'eye':'eyeOff',14)+(hid?'Mostrar':'Ocultar')+'</button></div>';
@@ -3465,7 +3577,7 @@ function renderTarefas(){
     }
   }else{
     const l=(UI.taskTab==='done'?done:list).slice().sort((a,b)=>(a.done-b.done)||cmp(a,b));
-    h+=l.length?l.map(taskRow).join(''):'<div class="empty">Nada por aqui ainda.</div>';
+    h+=l.length?(mode==='prazo'?l.map(taskRow).join(''):byGroup(l)):'<div class="empty">Nada por aqui ainda.</div>';
   }
   return h;
 }
@@ -3891,17 +4003,21 @@ function renderAjustes(){
   SEC.titulo+='<div class="card sec"><h3>Categorias de links</h3><p>Agrupam a aba Links (por exemplo Uso, Fontes e Cursos).</p><div class="addrow"><input type="text" id="newLinkCat" placeholder="Nova categoria de link" autocomplete="off"><button class="btn primary sm" data-a="linkcat-add">Adicionar</button></div>'+
     '<div class="kinds">'+S.linkCats.map((k,i)=>'<span class="chip">'+esc(k)+'<button data-a="linkcat-del" data-i="'+i+'" aria-label="Remover '+esc(k)+'">'+ic('x',13)+'</button></span>').join('')+'</div></div>';
   SEC.dados='<div class="card sec"><h3>Dados</h3><div id="syncInfo">'+syncInfoHTML()+'</div><div id="fbBox"></div>'+(Store.fail?'<div class="warn">O navegador bloqueou o armazenamento local. Use Exportar para guardar seus dados.</div>':'')+
-    '<div class="addrow"><button class="btn" data-a="notif">'+ic('bell',15)+' Receber notificações</button><button class="btn" data-a="export">'+ic('download',15)+' Exportar backup</button><button class="btn" data-a="import">'+ic('upload',15)+' Importar backup</button><button class="btn danger" data-a="reset">'+ic('trash',15)+' Apagar tudo</button></div></div>';
+    '<div class="addrow"><button class="btn" data-a="notif">'+ic('bell',15)+' Receber notificações</button><button class="btn" data-a="export">'+ic('download',15)+' Exportar backup</button><button class="btn" data-a="import">'+ic('upload',15)+' Importar backup</button><button class="btn danger" data-a="reset">'+ic('trash',15)+' Apagar tudo</button></div>'+
+    (orphanCards().length?'<div class="addrow" style="margin-top:10px"><button class="btn" data-a="cards-orph">'+ic('trash',15)+' Limpar cards sem baralho ('+orphanCards().length+')</button><span class="muted small">Cards de baralhos que já foram excluídos.</span></div>':'')+'</div>';
+  SEC.nk='<div class="card sec"><h3>Tipos de nota</h3><p>Diferencie as notas de uma mesma pasta ou disciplina por um ícone (Patologia, Fisiologia, Imagem…). Escolha o tipo ao editar a nota e filtre pela lista “Natureza”.</p>'+
+    (S.nkinds||[]).map(k=>'<div class="nkrow"><span class="nkb">'+ic(k.icon,18)+'</span><b>'+esc(k.name)+'</b><span class="sp"></span><button class="icon-btn sm" data-a="nk-icon" data-id="'+k.id+'" title="Trocar ícone">'+ic('image',14)+'</button><button class="icon-btn sm" data-a="nk-ren" data-id="'+k.id+'" title="Renomear">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="nk-del" data-id="'+k.id+'" title="Excluir">'+ic('trash',14)+'</button></div>').join('')+
+    '<div class="addrow"><input type="text" id="nkNew" placeholder="Novo tipo de nota" autocomplete="off"><button class="btn primary sm" data-a="nk-add">Adicionar</button></div></div>';
   SEC.notif=notifHTML();
   SEC.app=appHTML();
-  const tabs=[['horas','Horas'],['cats','Categorias'],['objs','Objetos'],['titulo','Título e Listas'],['notif','Notificações'],['app','App e Widgets'],['dados','Dados']];
+  const tabs=[['horas','Horas'],['cats','Categorias'],['objs','Objetos'],['titulo','Título e Listas'],['nk','Tipos de nota'],['notif','Notificações'],['app','App e Widgets'],['dados','Dados']];
   return '<div class="toolbar"><div class="seg">'+tabs.map(t=>'<button class="'+(UI.ajTab===t[0]?'on':'')+'" data-a="aj-tab" data-v="'+t[0]+'">'+t[1]+'</button>').join('')+'</div></div>'+(UI.ajTab==='horas'?hoursHTML():(SEC[UI.ajTab]||SEC.cats));
 }
 
 /* ==========================================================================
    17. RENDERIZAÇÃO GERAL
    ========================================================================== */
-const TABS=[['painel','Painel','home'],['semana','Semana','calendar'],['tarefas','Tarefas','tasks'],['habitos','Hábitos','sprout'],['docs','Documentos','file'],['notas','Notas','note'],['questoes','Questões','cap'],['metas','Objetivos','target'],['datas','Datas','clock'],['links','Links','link'],['saude','Saúde','pulse'],['cul','Culinária','chef'],['fin','Finanças','wallet'],['ajustes','Ajustes','settings']];
+const TABS=[['painel','Painel','home'],['semana','Semana','calendar'],['tarefas','Tarefas','tasks'],['revisoes','Revisões','repeat'],['habitos','Hábitos','sprout'],['docs','Documentos','file'],['notas','Notas','note'],['questoes','Questões','cap'],['metas','Objetivos','target'],['datas','Datas','clock'],['links','Links','link'],['saude','Saúde','pulse'],['cul','Culinária','chef'],['fin','Finanças','wallet'],['ajustes','Ajustes','settings']];
 // Transição suave ao trocar de aba (o conteúdo entra deslizando de leve; sem movimento se o aparelho pedir)
 function tabAnim(dir){
   const m=$('#main');if(!m||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))return;
@@ -3935,7 +4051,7 @@ applyAppMode();
   },{passive:true});
 })();
 function renderTabs(){
-  const bar=$('#tabs'),due=dueCardCount();if(!bar)return;
+  const bar=$('#tabs'),due=S.prefs.hideDueBadge?0:dueCardCount();if(!bar)return;
   if(bar.dataset.built!=='1'||$$('.tab',bar).length!==TABS.length){
     bar.innerHTML='<span class="tabind" id="tabInd" aria-hidden="true"></span>'+TABS.map(t=>'<button class="tab" data-a="tab" data-v="'+t[0]+'">'+ic(t[2],18)+'<span class="lbl">'+t[1]+'</span></button>').join('');
     bar.dataset.built='1';
@@ -4038,7 +4154,7 @@ function applyLook(){
 function renderMain(){
   applyLook();
   const mn=$('#main');if(mn)mn.classList.toggle('wide',UI.tab==='semana'&&UI.view==='grade');
-  const map={painel:renderPainel,semana:renderSemana,tarefas:renderTarefas,habitos:renderHabitos,docs:renderDocs,notas:renderNotas,questoes:renderQuestoes,metas:renderMetas,datas:renderDatas,links:renderLinks,saude:renderSaude,cul:renderCul,fin:renderFin,ajustes:renderAjustes};
+  const map={painel:renderPainel,semana:renderSemana,tarefas:renderTarefas,revisoes:renderRevisoes,habitos:renderHabitos,docs:renderDocs,notas:renderNotas,questoes:renderQuestoes,metas:renderMetas,datas:renderDatas,links:renderLinks,saude:renderSaude,cul:renderCul,fin:renderFin,ajustes:renderAjustes};
   computeAttention();
   $('#main').innerHTML=((UI.tab==='notas'&&(UI.nview||UI.study))||UI.tab==='questoes'?'':attnHTML())+map[UI.tab]();
   updateBadge();afterRender();
@@ -4158,6 +4274,7 @@ Object.assign(ACT,{
     renderPlan();renderBagSel();
   }
 });
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&e.target.classList&&e.target.classList.contains('tsnew')){e.preventDefault();ACT['tsub-add']({dataset:{id:e.target.dataset.tid}});}});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&e.target.id==='bagIn'){e.preventDefault();ACT['bagx-add']();}});
 document.addEventListener('change',e=>{if(e.target&&e.target.closest&&e.target.closest('#fAct .slot'))renderBagSel();});
 const goalItems=()=>goalFlat().map(x=>({id:x.g.id,label:'› '.repeat(x.d)+x.g.title,sub:HNAME[x.g.horizon]}));
@@ -4342,6 +4459,7 @@ function openActForm(opts){
     '<div class="f"><span>Categoria <small>disciplina e eixo entram no título</small></span>'+catPickHTML('cat',p.catId)+'</div>'+
     '<div class="f"><span>Tema ou assunto</span><div class="frow" style="flex-wrap:nowrap"><input name="theme" '+(p.themeNA?'disabled':'')+' value="'+esc(p.theme)+'" autocomplete="off" style="flex:1"><label class="chip cb" title="Sem tema: o título fica só com o tipo, a disciplina e o eixo"><input type="checkbox" name="themeNA" '+(p.themeNA?'checked':'')+'><span>Sem tema</span></label></div><div class="tprev" id="tprev"></div></div>'+
     '<div class="f"><span>Horário</span><div id="slots">'+p.slots.map(slotRow).join('')+'</div><div><button type="button" class="btn sm" data-a="slot-add">'+ic('plus',14)+' Outro horário</button></div><div class="sprev" id="slotprev"></div></div>'+
+    '<label class="chip cb" style="align-self:flex-start;margin:4px 0"><input type="checkbox" name="rev" '+(p.rev?'checked':'')+'><span>'+ic('repeat',13)+' Gera revisão <small>(D1, D7, D30…)</small></span></label>'+
     '<div class="optchips" id="optchips"'+(OPTS.every(o=>has[o.k])?' hidden':'')+'><span class="lbl">Adicionar</span>'+OPTS.map(o=>'<button type="button" class="chip" data-a="opt-show" data-k="'+o.k+'" '+(has[o.k]?'hidden':'')+'>'+ic(o.icon,13)+o.label+'</button>').join('')+'</div>'+
     '<div class="opt" data-opt="loc" '+(has.loc?'':'hidden')+'><div class="fgrid"><label class="f">Professor<input name="teacher" value="'+esc(p.teacher)+'" autocomplete="off"></label><label class="f">Local / Sala<input name="place" value="'+esc(p.place)+'" autocomplete="off"></label></div><div class="profq" id="profchips"></div></div>'+
     '<div class="opt" data-opt="link" '+(has.link?'':'hidden')+'><label class="f">Link útil<input name="link" inputmode="url" value="'+esc(p.link)+'" autocomplete="off"></label></div>'+
@@ -4382,7 +4500,7 @@ function openActForm(opts){
     const E=f.elements,catId=$('[data-catpick="cat"]',f).dataset.value||'',theme=E.themeNA.checked?'':E.theme.value.trim(),ids=$$('input[name=it]:checked',f).map(i=>i.value),stow={};
     Object.keys(FORMPACK.stow).forEach(k=>{const c=FORMPACK.stow[k],ci=itemById(c);if(ids.indexOf(k)>=0&&ids.indexOf(c)>=0&&ci&&ci.container)stow[k]=c;});
     const extras=FORMPACK.extras.map(x=>({id:x.id,name:x.name,type:x.type||'Outro',into:(x.into&&ids.indexOf(x.into)>=0)?x.into:''}));
-    const data={theme:theme,themeNA:E.themeNA.checked,noArea:E.noArea.checked,tipoAtv:E.tipoAtv.value,stow:stow,extras:extras,kind:E.kind.value,blockType:E.blockType.value,catId:catId,
+    const data={rev:!!(E.rev&&E.rev.checked),theme:theme,themeNA:E.themeNA.checked,noArea:E.noArea.checked,tipoAtv:E.tipoAtv.value,stow:stow,extras:extras,kind:E.kind.value,blockType:E.blockType.value,catId:catId,
       teacher:E.teacher.value.trim(),place:E.place.value.trim(),link:E.link.value.trim(),doWhat:E.doWhat.value.trim(),where:E.where.value.trim(),plan:readPlan(f),bring:E.bring.value.trim(),
       slots:slots,docIds:pickedValues(f,'docs'),goalIds:pickedValues(f,'goals'),relId:E.relId.value,itemIds:ids,linkIds:pickedValues(f,'links'),moneys:readMoneys(f)};
     data.title=composeTitle(data);rememberTeachers(data.teacher);
@@ -4401,10 +4519,12 @@ function openActForm(opts){
 function openTaskForm(opts){
   opts=opts||{};
   const t0=opts.id?taskById(opts.id):null;
-  const p=Object.assign({title:'',notes:'',deadline:'',deadlineTime:'',catId:'',docId:'',activityIds:[],goalIds:[],dateIds:[],link:'',linkIds:[],itemIds:[],where:'',plan:{},moneys:[]},t0||{},opts.prefill||{});
+  const p=Object.assign({title:'',notes:'',deadline:'',deadlineTime:'',catId:'',docId:'',activityIds:[],goalIds:[],dateIds:[],link:'',linkIds:[],itemIds:[],where:'',plan:{},moneys:[],group:'',subs:[]},t0||{},opts.prefill||{});
   openModal('<form id="fTask" class="form"><div class="fh"><h2>'+(t0?'Editar tarefa':'Nova tarefa')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<label class="f">Título<input name="title" required value="'+esc(p.title)+'" autocomplete="off"></label>'+
     '<label class="f">Descrição / o que falta<textarea name="notes" rows="2">'+esc(p.notes)+'</textarea></label>'+
+    '<div class="fgrid"><label class="f">Grupo <small>ex.: TCC, Estágio</small><input name="group" list="tgroups" value="'+esc(p.group||'')+'" autocomplete="off"><datalist id="tgroups">'+[...new Set(S.tasks.map(t=>t.group).filter(Boolean))].map(g=>'<option value="'+esc(g)+'">').join('')+'</datalist></label>'+
+    '<label class="f">Subtarefas <small>uma por linha</small><textarea name="subs" rows="2">'+esc((p.subs||[]).map(x=>x.t).join('\n'))+'</textarea></label></div>'+
     '<label class="f">Metodologia <small>uma etapa por linha</small><textarea name="where" rows="2">'+esc(p.where)+'</textarea></label>'+
     '<div class="f"><span>O que levar / usar <small>aplicativos só para itens eletrônicos</small></span>'+itemsPickHTML(p.itemIds)+'</div><div id="planbox"></div>'+
     '<div class="fgrid"><div class="f"><span>Prazo próprio <small>hora limite opcional</small></span><div class="frow" style="flex-wrap:nowrap"><input type="date" name="deadline" value="'+esc(p.deadline)+'" style="flex:1"><input type="time" name="deadlineTime" value="'+esc(p.deadlineTime||'')+'" style="width:110px"></div><div class="quick"><button type="button" class="chip" data-a="quick-due" data-v="0">Hoje</button><button type="button" class="chip" data-a="quick-due" data-v="1">Amanhã</button><button type="button" class="chip" data-a="quick-due" data-v="7">+7 dias</button><button type="button" class="chip" data-a="quick-due" data-v="">Sem prazo</button></div></div>'+
@@ -4421,7 +4541,8 @@ function openTaskForm(opts){
   f.addEventListener('submit',ev=>{
     ev.preventDefault();const E=f.elements;
     const data={title:E.title.value.trim(),notes:E.notes.value.trim(),where:E.where.value.trim(),plan:readPlan(f),itemIds:$$('input[name=it]:checked',f).map(i=>i.value),deadline:E.deadline.value,deadlineTime:E.deadlineTime.value,docId:E.docId.value,catId:$('[data-catpick="cat"]',f).dataset.value||'',
-      activityIds:pickedValues(f,'acts'),goalIds:pickedValues(f,'goals'),dateIds:pickedValues(f,'dates'),link:E.link.value.trim(),linkIds:pickedValues(f,'links'),moneys:readMoneys(f)};
+      activityIds:pickedValues(f,'acts'),goalIds:pickedValues(f,'goals'),dateIds:pickedValues(f,'dates'),link:E.link.value.trim(),linkIds:pickedValues(f,'links'),moneys:readMoneys(f),group:E.group.value.trim()};
+    const old=(t0&&t0.subs)||[],used={};data.subs=E.subs.value.split('\n').map(x=>x.trim()).filter(Boolean).map(x=>{const m=old.find(o=>o.t===x&&!used[o.id]);if(m){used[m.id]=1;return m;}return {id:uid(),t:x,done:false,doneAt:0};});
     if(t0)Object.assign(t0,data);else S.tasks.push(Object.assign({id:uid(),done:false,createdAt:Date.now()},data));
     save();finishForm();toast('Tarefa salva.');
   });
@@ -4700,7 +4821,7 @@ function cleanHTML(html,opt){
         if(t==='A'&&(n==='data-ref'||n==='data-k'||n==='contenteditable'||n==='target'||n==='rel'))keep=true;
         if(t==='A'&&n==='href'&&/^https?:/i.test(at.value))keep=true;
         if(t==='IMG'&&(n==='src'||n==='alt'))keep=true;
-        if(t==='IMG'&&n==='class'){if(at.value.split(/\s+/).indexOf('gif')>=0)ch.setAttribute('class','gif');else ch.removeAttribute('class');return;}
+        if(t==='IMG'&&n==='class'){{const cl=at.value.split(/\s+/).filter(c=>c==='gif'||c==='imgL'||c==='imgR'||c==='imgC'||c==='imgF');if(cl.length)ch.setAttribute('class',cl.join(' '));else ch.removeAttribute('class');}return;}
         if(n==='style'&&STYLE_TAGS[t]&&!opt.plain){const st=cleanStyle(t,at.value);if(st){ch.setAttribute('style',st);}else ch.removeAttribute('style');return;}
         if(!keep)ch.removeAttribute(n);
       });
@@ -4745,6 +4866,7 @@ function notaItems(){
   let items=notaItemsAll();
   const ttl=i=>i.k==='deck'?i.o.name:i.o.title;
   if(UI.ntype)items=items.filter(i=>i.k===UI.ntype);
+  if(UI.nnk)items=items.filter(i=>UI.nnk==='__none'?!nkOf(i.o):(i.o&&i.o.nk===UI.nnk));
   if(UI.nf==='__none')items=items.filter(i=>!i.o.folderId);
   else if(UI.nf){const ids=flatOn('notes')&&!UI.nq?[UI.nf]:folderDesc(UI.nf);items=items.filter(i=>ids.indexOf(i.o.folderId)>=0);}
   else if(flatOn('notes')&&!UI.nq&&!UI.ncat&&!UI.ntype)items=items.filter(i=>!i.o.folderId||!folderById(i.o.folderId));
@@ -4790,7 +4912,7 @@ function nCardHTML(it){
       '<p>'+st.total+(st.total===1?' item de estudo':' itens de estudo')+' · '+(st.due?'<b style="color:var(--acc)">'+st.due+' para revisar agora</b>':'em dia')+'</p>'+foot+'</div>';
   }
   const body=it.k==='fluxo'?'<div class="fxcard">'+fxThumb(o)+'</div><p>'+o.fx.nodes.length+(o.fx.nodes.length===1?' caixa':' caixas')+' · '+o.fx.edges.length+(o.fx.edges.length===1?' ligação':' ligações')+'</p>':it.k==='pdf'?'<p>PDF · '+((o.annots||[]).length)+' anotação(ões)'+(o.src==='drive'?' · no Drive':' · neste aparelho')+'</p>':objCardHTML(o)+(isNoteK(it.k)&&it.k!=='fluxo'?ncImgsHTML(o):'')+'<p>'+esc((it.k==='bula'?bulaSnippet(o):noteText(o)).slice(0,220)||'Nota vazia')+'</p>';
-  return '<div class="ncard" data-a="n-open" data-k="'+it.k+'" data-id="'+o.id+'" style="--c:'+col+'" role="button" tabindex="0"><h3>'+ic(it.k==='pdf'?'file':it.k==='questao'?'help':it.k==='caso'?'pulse':it.k==='bula'?'pill':it.k==='fluxo'?'grid':'note',16)+esc(o.title||'Sem título')+(it.k==='bula'?'<span class="tag outline" style="margin-left:auto">'+(o.kind==='classe'?'Classe':'Medicamento')+'</span>':'')+(it.k==='questao'?'<span class="tag outline" style="margin-left:auto">Questão</span>':it.k==='caso'?'<span class="tag outline" style="margin-left:auto">Caso clínico</span>':it.k==='fluxo'?'<span class="tag outline" style="margin-left:auto">Fluxograma</span>':'')+'</h3>'+body+foot+'</div>';
+  return '<div class="ncard" data-a="n-open" data-k="'+it.k+'" data-id="'+o.id+'" style="--c:'+col+'" role="button" tabindex="0"><h3>'+ic(it.k==='pdf'?'file':it.k==='questao'?'help':it.k==='caso'?'pulse':it.k==='bula'?'pill':it.k==='fluxo'?'grid':'note',16)+nkBadge(o,13)+esc(o.title||'Sem título')+(it.k==='bula'?'<span class="tag outline" style="margin-left:auto">'+(o.kind==='classe'?'Classe':'Medicamento')+'</span>':'')+(it.k==='questao'?'<span class="tag outline" style="margin-left:auto">Questão</span>':it.k==='caso'?'<span class="tag outline" style="margin-left:auto">Caso clínico</span>':it.k==='fluxo'?'<span class="tag outline" style="margin-left:auto">Fluxograma</span>':'')+'</h3>'+body+foot+'</div>';
 }
 function nFolderTile(f){
   const ns=S.folders.filter(x=>x.parentId===f.id).length,tot=folderCount(f.id);
@@ -4816,7 +4938,7 @@ function nRowHTML(it){
   // três blocos fixos (miniatura/ícone, texto, meta): ter ou não imagem não muda o resto da linha
   return '<div class="nrow" style="--c:'+col+'" data-a="n-open" data-k="'+it.k+'" data-id="'+o.id+'" role="button" tabindex="0" title="'+esc(ttl)+'">'+
     '<span class="nrl">'+(img?'<img src="'+esc(img)+'" alt="" loading="lazy">':ic(ico,17))+'</span>'+
-    '<span class="nrt"><b>'+esc(ttl)+'</b>'+(snip?'<small>'+esc(snip)+'</small>':'')+'</span>'+
+    '<span class="nrt"><b>'+nkBadge(o,13)+esc(ttl)+'</b>'+(snip?'<small>'+esc(snip)+'</small>':'')+'</span>'+
     '<span class="nrm"><span class="tag outline">'+kind+'</span>'+(it.k==='questao'?qMetaChips(o):'')+(o.catId?tagHTML(o.catId):'')+(isNoteK(it.k)?cdChipHTML(o.cd):'')+(fp?'<span class="lpath">'+ic('folder',12)+esc(fp)+'</span>':'')+'<time>'+esc(upd)+'</time></span></div>';
 }
 function nCardsHTML(){
@@ -4855,6 +4977,9 @@ function nSortItems(items,ttl){
   return items.sort(f);
 }
 // categorias em árvore para a lista de seleção (com contagem de itens de cada uma, incluindo as subcategorias)
+const nkOf=o=>o&&o.nk?(S.nkinds||[]).find(k=>k.id===o.nk):null;
+const nkBadge=(o,size)=>{const k=nkOf(o);return k?'<span class="nkb" title="'+esc(k.name)+'">'+ic(k.icon,size||13)+'</span>':'';};
+const nkOptions=sel=>'<option value="">Sem tipo</option>'+(S.nkinds||[]).map(k=>'<option value="'+k.id+'" '+(k.id===sel?'selected':'')+'>'+esc(k.name)+'</option>').join('');
 function catTreeOpts(sel,countFn){
   const out=[],walk=(pid,d)=>S.cats.filter(c=>(c.parentId||null)===pid).forEach(c=>{
     const n=countFn?countFn(c.id):null;
@@ -4868,6 +4993,7 @@ function nFiltersHTML(tf,roots){
   const ts=allTags().slice(0,40),cur=norm(UI.nq||'').charAt(0)==='#'?norm(UI.nq).slice(1):'';
   return '<div class="nfbar">'+
     sel('ntypeSel','Tipo',tf.map(x=>'<option value="'+x[0]+'" '+(UI.ntype===x[0]?'selected':'')+'>'+x[1]+' ('+cnt(x[0])+')</option>').join(''))+
+    ((S.nkinds||[]).length?sel('nnkSel','Natureza','<option value="">Todas</option><option value="__none" '+(UI.nnk==='__none'?'selected':'')+'>Sem tipo</option>'+S.nkinds.map(k=>'<option value="'+k.id+'" '+(UI.nnk===k.id?'selected':'')+'>'+esc(k.name)+' ('+all.filter(i=>i.o&&i.o.nk===k.id).length+')</option>').join('')):'')+
     sel('ncatSel','Categoria','<option value="">Todas</option>'+catTreeOpts(UI.ncat,id=>{const cs=catDesc(id);return all.filter(i=>cs.indexOf(i.o.catId)>=0).length;}))+
     sel('nsortSel','Ordenar',N_SORTS.concat(UI.ntype==='questao'?N_SORTS_Q:[]).map(x=>'<option value="'+x[0]+'" '+(nSort()===x[0]?'selected':'')+'>'+x[1]+'</option>').join(''))+
     (ts.length?sel('ntagSel','Marcador','<option value="">Todos</option>'+ts.map(x=>'<option value="'+esc(x.t)+'" '+(cur===x.t?'selected':'')+'>#'+esc(x.t)+' ('+x.n+')</option>').join('')):'')+
@@ -4876,8 +5002,14 @@ function nFiltersHTML(tf,roots){
     '<div class="seg vseg icseg" aria-label="Modo de exibição">'+[['cartoes','Cartões','grid'],['lista','Lista','list']].map(v=>'<button class="'+(nview()===v[0]?'on':'')+'" data-a="nview" data-v="'+v[0]+'" title="'+v[1]+'" aria-label="'+v[1]+'">'+ic(v[2],16)+'</button>').join('')+'</div></div>';
 }
 document.addEventListener('change',e=>{
-  const t=e.target;if(!t||!t.id)return;
+  const t=e.target;
+  if(t&&t.classList&&t.classList.contains('rvcat')){rvSt(t.dataset.k).cat=t.value;save();renderMain();return;}
+  if(!t||!t.id)return;
+  if(t.id==='rvcatSel'){UI.rvCat=t.value;renderMain();return;}
   if(t.id==='ntypeSel'){UI.ntype=t.value;UI.qgrp='';renderMain();}
+  else if(t.id==='tcatSel'){UI.tcat=t.value;renderMain();}
+  else if(t.id==='tgrpSel'){S.prefs.tgrp=t.value;save();renderMain();}
+  else if(t.id==='nnkSel'){UI.nnk=t.value;renderMain();}
   else if(t.id==='ncatSel'){UI.ncat=t.value;renderMain();}
   else if(t.id==='nsortSel'){S.prefs.nsort=t.value;save();renderMain();}
   else if(t.id==='ntagSel'){UI.nq=t.value?'#'+t.value:'';renderMain();}
@@ -4971,11 +5103,11 @@ function noteViewHTML(n){
     '<button class="icon-btn" data-a="n-del" title="Excluir" aria-label="Excluir">'+ic('trash',18)+'</button></div>';
   if(edit){
     h+='<input id="ntitle" class="ntitle" value="'+esc(n.title)+'" placeholder="'+(isQ?'Título da questão (opcional)':isC?'Título do caso':isF?'Título do fluxograma':isB?(n.kind==='classe'?'Nome da classe':'Nome do medicamento'):'Título da nota')+'" autocomplete="off">'+
-      '<div class="nmeta"><label class="f">Pasta<select id="nfolder">'+folderOptions(n.folderId)+'</select></label><div class="f"><span>Categoria</span>'+catPickHTML('ncat',n.catId)+'</div>'+
+      '<div class="nmeta"><label class="f">Pasta<select id="nfolder">'+folderOptions(n.folderId)+'</select></label><div class="f"><span>Categoria</span>'+catPickHTML('ncat',n.catId)+'</div><label class="f">Tipo de nota<select id="nnk">'+nkOptions(n.nk)+'</select></label>'+
       '<div class="f"><span>Contagem regressiva <small>data e nome</small></span><div class="frow" style="flex-wrap:nowrap"><input type="date" id="ncd" value="'+esc((n.cd&&n.cd.date)||'')+'" style="flex:1"><input id="ncdl" value="'+esc((n.cd&&n.cd.label)||'')+'" style="flex:1" autocomplete="off"><button type="button" class="icon-btn sm" data-a="n-cd-clear" title="Remover contagem" aria-label="Remover contagem">'+ic('x',14)+'</button></div></div></div>'+
       (isQ?qEditMetaHTML(n):'')+(isF?'':noteToolbarHTML());
   }else{
-    h+='<h2 class="vt" style="margin-top:4px">'+esc(n.title||(isQ?'Questão':isC?'Caso clínico':isF?'Fluxograma':isB?'Bulário':'Sem título'))+'</h2><div class="nmetarow" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px;align-items:center">'+(isQ?'<span class="tag outline">Questão</span>':isC?'<span class="tag outline">Caso clínico</span>':isF?'<span class="tag outline">Fluxograma</span>':isB?'<span class="tag outline">'+(n.kind==='classe'?'Classe':'Medicamento')+'</span>':'')+(isQ?qMetaChips(n):'')+(n.catId?tagHTML(n.catId):'')+cdChipHTML(n.cd)+noteTags(n).map(tagChip).join('')+(n.folderId?'<span class="meta mi" style="font-size:13px;color:var(--mut)">'+ic('folder',13)+esc(folderPath(n.folderId).join(' › '))+'</span>':'')+'<span class="muted small">Atualizada '+(n.updated?fmtDM(toISO(new Date(n.updated))):'')+'</span></div>';
+    h+='<h2 class="vt" style="margin-top:4px">'+nkBadge(n,20)+esc(n.title||(isQ?'Questão':isC?'Caso clínico':isF?'Fluxograma':isB?'Bulário':'Sem título'))+'</h2><div class="nmetarow" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px;align-items:center">'+(isQ?'<span class="tag outline">Questão</span>':isC?'<span class="tag outline">Caso clínico</span>':isF?'<span class="tag outline">Fluxograma</span>':isB?'<span class="tag outline">'+(n.kind==='classe'?'Classe':'Medicamento')+'</span>':'')+(isQ?qMetaChips(n):'')+(n.catId?tagHTML(n.catId):'')+cdChipHTML(n.cd)+noteTags(n).map(tagChip).join('')+(n.folderId?'<span class="meta mi" style="font-size:13px;color:var(--mut)">'+ic('folder',13)+esc(folderPath(n.folderId).join(' › '))+'</span>':'')+'<span class="muted small">Atualizada '+(n.updated?fmtDM(toISO(new Date(n.updated))):'')+'</span></div>';
   }
   const ed=(f,id,ph)=>{
     const dec=edit?null:noteDecorate(n[f]||'',UI.prOpt);
@@ -6345,6 +6477,7 @@ function notasInput(e){ // campos da nota (título, nome da contagem, busca)
 }
 function notasChange(e){
   const t=e.target;
+  if(t.id==='nnk'){const n=noteById(UI.nview.id);if(n){n.nk=t.value;n.updated=Date.now();save();}return true;}
   if(t.id==='nfolder'){const n=noteById(UI.nview.id);if(n){n.folderId=t.value;n.updated=Date.now();save();}return true;}
   if(t.id==='qnivel'){const n=noteById(UI.nview.id);if(n){n.nivel=t.value;n.updated=Date.now();save();}return true;}
   if(t.id==='ncd'){const n=noteById(UI.nview.id);if(n){n.cd=Object.assign({date:'',label:''},n.cd,{date:t.value});save();}return true;}
@@ -6495,7 +6628,7 @@ function selectImg(im){
   IMGSEL=im||null;if(!im)return;
   im.classList.add('sel');
   const bar=document.createElement('div');bar.id='imgbar';
-  bar.innerHTML=[25,50,75,100].map(p=>'<button data-a="img-w" data-p="'+p+'" title="'+p+'% da largura">'+p+'%</button>').join('')+'<span class="sepv"></span><button data-a="img-step" data-d="-1" title="Menor" aria-label="Menor">−</button><button data-a="img-step" data-d="1" title="Maior" aria-label="Maior">+</button><span class="sepv"></span><button data-a="img-del" title="Remover imagem" aria-label="Remover imagem">'+ic('trash',15)+'</button>';
+  bar.innerHTML=[25,50,75,100].map(p=>'<button data-a="img-w" data-p="'+p+'" title="'+p+'% da largura">'+p+'%</button>').join('')+'<span class="sepv"></span><button data-a="img-step" data-d="-1" title="Menor" aria-label="Menor">−</button><button data-a="img-step" data-d="1" title="Maior" aria-label="Maior">+</button><span class="sepv"></span>'+[['imgL','Imagem à esquerda, texto à direita','alignL'],['imgR','Imagem à direita, texto à esquerda','alignR'],['imgC','Centralizada, sem texto ao lado','alignC'],['','Em linha com o texto','minus'],['imgF','Largura total','alignJ']].map(x=>'<button data-a="img-pos" data-v="'+x[0]+'" title="'+x[1]+'" aria-label="'+x[1]+'">'+ic(x[2],15)+'</button>').join('')+'<span class="sepv"></span><button data-a="img-del" title="Remover imagem" aria-label="Remover imagem">'+ic('trash',15)+'</button>';
   const h=document.createElement('div');h.id='imgh';h.title='Arraste para redimensionar';
   document.body.appendChild(bar);document.body.appendChild(h);posImgUI();
 }
@@ -6543,6 +6676,7 @@ Object.assign(ACT,{
   'n-size'(el){noteSize(Number(el.dataset.d));},
   'n-color'(el){noteColor(el.dataset.c);},
   'n-img'(){saveRange();$('#imgFile').click();},
+  'img-pos'(el){if(!IMGSEL)return;['imgL','imgR','imgC','imgF'].forEach(c=>IMGSEL.classList.remove(c));if(el.dataset.v)IMGSEL.classList.add(el.dataset.v);if(el.dataset.v==='imgF')IMGSEL.style.width='';posImgUI();onNoteInput();},
   'img-w'(el){if(IMGSEL)imgWidth(((((IMGSEL.closest('.ned')||{}).clientWidth)||600)-4)*Number(el.dataset.p)/100);},
   'img-step'(el){if(IMGSEL)imgWidth(IMGSEL.getBoundingClientRect().width*(1+0.15*Number(el.dataset.d)));},
   'img-del'(){if(!IMGSEL)return;const im=IMGSEL;selectImg(null);im.remove();onNoteInput();}
@@ -7046,12 +7180,14 @@ const NT_KINDS=[
   {k:'meal',l:'Refeições',unit:'min',d:'Avisa antes de cada refeição planejada.'},
   {k:'habit',l:'Hábitos',unit:'min',d:'Avisa no horário de cada hábito do dia que ainda não foi feito.'},
   {k:'bill',l:'Contas a Pagar',unit:'day',d:'Avisa antes do vencimento de contas não pagas.'},
+  {k:'rv',l:'Revisão do Dia',unit:'none',d:'Avisa das revisões D1, D7, D30… que vencem no dia.'},
+  {k:'rp',l:'Organizar Revisão',unit:'none',d:'Avisa alguns dias antes de cada revisão, para separar o material.'},
   {k:'prep',l:'Preparar o Dia Seguinte',unit:'none',d:'À noite, resume o que tem amanhã, o que levar e os objetivos de cada atividade.'}
 ];
 const NT_MIN=[0,5,10,15,30,60,120,1440],NT_DAY=[0,1,2,3,7];
 const NT_DEF={on:true,quiet:{on:false,from:'22:00',to:'07:00'},kinds:{
   event:{on:true,lead:[10]},task:{on:true,lead:[0],time:'08:00'},date:{on:true,lead:[1,0],time:'08:00'},
-  shop:{on:true,lead:[60]},meal:{on:false,lead:[15]},habit:{on:true,lead:[0],time:'20:00'},bill:{on:true,lead:[1,0],time:'09:00'},prep:{on:true,lead:[0],time:'20:00'}}};
+  shop:{on:true,lead:[60]},meal:{on:false,lead:[15]},habit:{on:true,lead:[0],time:'20:00'},bill:{on:true,lead:[1,0],time:'09:00'},prep:{on:true,lead:[0],time:'20:00'},rv:{on:true,lead:[0],time:'08:00'},rp:{on:true,lead:[0],time:'09:00'}}};
 function ntCfg(){
   const u=S.prefs.nt||{},c=JSON.parse(JSON.stringify(NT_DEF));
   if(u.on!==undefined)c.on=!!u.on;if(u.quiet)Object.assign(c.quiet,u.quiet);
@@ -7091,6 +7227,8 @@ function ntItems(){
     if(goals.length)lines.push('Objetivos: '+goals.slice(0,3).join(' · '));
     add('pp|'+tm,ntMs(d,K.prep.time||'20:00'),'Amanhã: '+os.length+(os.length===1?' Compromisso':' Compromissos'),lines.join('\n').slice(0,300));
   }
+  reviewList(from,addISO(T,9)).forEach(r=>{if(r.done)return;const kk=K[r.kind];if(!kk||!kk.on)return;
+    add('rvn|'+r.key,ntMs(r.date,kk.time),(r.kind==='rp'?'Organizar revisão: ':'Revisão: ')+r.theme,(r.kind==='rp'?'Revisão D+'+r.n+' em '+rvDayTxt(r)+' · ':'D+'+r.n+' · ')+r.min+' min');});
   NC.snoozed().forEach(x=>add(x.k,x.at,x.t,x.b));
   return out;
 }
@@ -7154,6 +7292,7 @@ function notifHTML(){
   return '<div class="card sec"><h3>Revisões e Notificações</h3><label class="sw" style="margin-bottom:10px"><input type="checkbox" data-a="rv-on" '+(rvCfg().on?'checked':'')+'> <b>Sugerir revisões em 1, 7 e 30 dias</b></label><div class="muted small" style="margin-bottom:12px">Cada aula, tutoria ou plantão gera uma revisão leve na semana e no painel.</div><h3>Notificações</h3><p>Permissão: <b>'+esc(ntPermTxt())+'</b></p>'+
     '<div class="addrow"><button class="btn primary" data-a="notif">'+ic('bell',15)+' Permitir Notificações</button><button class="btn" data-a="nt-test">Enviar Teste</button></div>'+
     '<label class="sw" style="margin-top:10px"><input type="checkbox" data-a="nt-master" '+(c.on?'checked':'')+'> <b>Receber notificações</b></label>'+
+    '<label class="sw" style="margin-top:10px"><input type="checkbox" data-a="due-badge" '+(S.prefs.hideDueBadge?'':'checked')+'> <b>Mostrar o número de cards a revisar na aba Notas</b></label>'+
     '<div class="ntrows" '+(c.on?'':'style="opacity:.5;pointer-events:none"')+'>'+NT_KINDS.map(row).join('')+
     '<div class="ntrow"><label class="sw"><input type="checkbox" data-a="nt-quiet" '+(c.quiet.on?'checked':'')+'> <b>Horário de Silêncio</b></label><div class="muted small">Nada é avisado nesse intervalo.</div>'+
       (c.quiet.on?'<div class="addrow"><label class="f ntt"><span>Das</span><input type="time" data-ntq="from" value="'+c.quiet.from+'"></label><label class="f ntt"><span>Até</span><input type="time" data-ntq="to" value="'+c.quiet.to+'"></label></div>':'')+'</div></div>'+
@@ -7161,9 +7300,25 @@ function notifHTML(){
 }
 Object.assign(ACT,{
   'rv-done'(el){const k=el.dataset.k;S.prefs.rvDone=S.prefs.rvDone||{};if(S.prefs.rvDone[k])delete S.prefs.rvDone[k];else S.prefs.rvDone[k]=todayISO();save();renderMain();},
+  'rv-tab'(el){UI.rvTab=el.dataset.v;renderMain();},
+  'rv-f'(el){UI.rvF=el.dataset.v;renderMain();},
+  'rv-min'(el){const k=el.dataset.k,r=reviewList(addISO(todayISO(),-45),addISO(todayISO(),60)).find(x=>x.key===k);if(!r)return;rvSt(k).min=Math.max(5,Math.min(240,r.min+Number(el.dataset.d)));save();renderMain();},
+  'rv-snz'(el){const k=el.dataset.k;openModal('<div class="form"><div class="fh"><h2>Adiar revisão</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><div class="frow">'+[[1,'Amanhã'],[2,'Em 2 dias'],[3,'Em 3 dias'],[7,'Em 1 semana']].map(x=>'<button class="btn" data-a="rv-snz-go" data-k="'+esc(k)+'" data-d="'+x[0]+'">'+x[1]+'</button>').join('')+'</div></div>');},
+  'rv-snz-go'(el){const k=el.dataset.k,r=reviewList(addISO(todayISO(),-45),addISO(todayISO(),60)).find(x=>x.key===k);if(!r)return;const base=r.date>todayISO()?r.date:todayISO();rvSt(k).to=addISO(base,Number(el.dataset.d));save();closeModal();renderMain();toast('Revisão adiada.');},
+  'rv-sched'(el){const k=el.dataset.k,r=reviewList(addISO(todayISO(),-45),addISO(todayISO(),60)).find(x=>x.key===k);if(!r)return;
+    const d=r.date<todayISO()?todayISO():r.date,st=nextTimes()[0],en=mt(tmin(st)+r.min);
+    openActForm({heading:'Agendar revisão',prefill:{title:(r.kind==='rp'?'Organizar revisão: ':'Revisar: ')+r.theme,theme:(r.kind==='rp'?'Organizar revisão: ':'Revisar: ')+r.theme,catId:r.catId,slots:[defaultSlot(d,st,en)]}});},
+  'rv-cfgmin'(el){const c=rvCfg(),d=c.days.find(x=>x.n===Number(el.dataset.n));if(!d)return;d.min=Math.max(5,Math.min(240,d.min+Number(el.dataset.d)));S.prefs.rv=c;save();renderMain();},
+  'rv-int-del'(el){const c=rvCfg();c.days=c.days.filter(x=>x.n!==Number(el.dataset.n));S.prefs.rv=c;save();renderMain();},
+  'rv-int-add'(){const i=$('#rvNewN'),n=Math.round(Number(i&&i.value));if(!n||n<1||n>365){if(i)i.focus();return;}const c=rvCfg();if(!c.days.some(x=>x.n===n))c.days.push({n:n,min:20});c.days.sort((a,b)=>a.n-b.n);S.prefs.rv=c;save();renderMain();},
+  'rv-prep'(el){const c=rvCfg();c.prep=Math.max(0,Math.min(14,c.prep+Number(el.dataset.d)));S.prefs.rv=c;save();renderMain();},
+  'rv-prepmin'(el){const c=rvCfg();c.prepMin=Math.max(5,Math.min(120,c.prepMin+Number(el.dataset.d)));S.prefs.rv=c;save();renderMain();},
+  'rv-mark-old'(){askConfirm('Marcar como revisáveis?','Todos os eventos de Aula, Tutoria e Plantão passam a gerar revisões.',()=>{S.acts.forEach(a=>{if(!a.rev&&RV_TIPO.test(norm((actParts(a).tipo||'')+' '+(a.kind||''))))a.rev=true;});save();renderMain();});},
   'rv-off'(){S.prefs.rv=Object.assign(rvCfg(),{on:false});save();renderMain();toast('Sugestões de revisão desativadas. Reative em Ajustes > Notificações.');},
   'rv-on'(el){S.prefs.rv=Object.assign(rvCfg(),{on:el.checked});save();renderMain();},
   'push-toggle'(el){if(el.checked)PUSH.enable();else PUSH.disable();},
+  'due-badge'(el){S.prefs.hideDueBadge=!el.checked;save();renderTabs();},
+  'cards-orph'(){const n=orphanCards().length;if(!n)return;askConfirm('Apagar '+n+(n===1?' card sem baralho?':' cards sem baralho?'),'São cards de baralhos que já foram excluídos. Esta ação não pode ser desfeita.',()=>{S.cards=S.cards.filter(c=>deckById(c.deckId));save();closeModal();renderTabs();renderMain();toast('Cards sem baralho apagados.');},'Apagar');},
   'nt-master'(el){ntSet(c=>{c.on=el.checked;});renderMain();},
   'nt-kind'(el){ntSet(c=>{c.kinds[el.dataset.k].on=el.checked;});renderMain();},
   'nt-lead'(el){const k=el.dataset.k,v=Number(el.dataset.v);ntSet(c=>{const a=c.kinds[k].lead,i=a.indexOf(v);if(i<0)a.push(v);else a.splice(i,1);a.sort((x,y)=>x-y);});renderMain();},
@@ -7710,7 +7865,9 @@ function deckStats(deckId,now){
   S.cards.forEach(c=>{if(c.deckId!==deckId)return;cardItems(c).forEach(i=>{total++;const s=sch(c,i);if(s.due<=now){due++;if(!s.reps)fresh++;}else if(next===null||s.due<next)next=s.due;});});
   return {total:total,due:due,fresh:fresh,review:due-fresh,next:next};
 }
-function dueCardCount(){const now=Date.now();let n=0;S.cards.forEach(c=>cardItems(c).forEach(i=>{if(sch(c,i).due<=now)n++;}));return n;}
+// só conta cards cujo baralho existe (cards de baralhos excluídos, que sobraram, não aparecem no número)
+const orphanCards=()=>S.cards.filter(c=>!deckById(c.deckId));
+function dueCardCount(){const now=Date.now();let n=0;S.cards.forEach(c=>{if(!deckById(c.deckId))return;cardItems(c).forEach(i=>{if(sch(c,i).due<=now)n++;});});return n;}
 function decksSection(list){
   if(!list||!list.length)return '';
   const now=Date.now();
@@ -8440,6 +8597,12 @@ Object.assign(ACT,{
   'new-task'(){UI.back=null;openTaskForm();},
   'view-task'(el){if(!openTaskView(el.dataset.id))toast('Esta tarefa não existe mais.');},
   'edit-task'(el){const id=el.dataset.id;if(UI.openTask===id)UI.back={type:'task',id:id};const t=taskById(id);if(t)openTaskForm({id:id});},
+  'tsub-open'(el){UI.tsubOpen[el.dataset.id]=!UI.tsubOpen[el.dataset.id];renderMain();const i=$('#tsn_'+el.dataset.id);if(i&&UI.tsubOpen[el.dataset.id])i.focus();},
+  'tsub-chk'(el){const t=taskById(el.dataset.id),x=t&&t.subs.find(y=>y.id===el.dataset.sid);if(!x)return;x.done=!x.done;x.doneAt=x.done?Date.now():0;save();renderMain();
+    if(x.done&&!t.done&&t.subs.every(y=>y.done))toastUndo('Todas as subtarefas feitas.',()=>{t.done=true;t.doneAt=Date.now();save();rerender();},'Concluir a tarefa');},
+  'tsub-del'(el){const t=taskById(el.dataset.id);if(!t)return;t.subs=t.subs.filter(y=>y.id!==el.dataset.sid);save();renderMain();},
+  'tsub-add'(el){const t=taskById(el.dataset.id),i=$('#tsn_'+el.dataset.id),v=i&&i.value.trim();if(!t)return;if(!v){if(i)i.focus();return;}t.subs.push({id:uid(),t:v,done:false,doneAt:0});save();renderMain();const n=$('#tsn_'+t.id);if(n)n.focus();},
+  'tg-fold'(el){UI.tgFold[el.dataset.k]=!UI.tgFold[el.dataset.k];renderMain();},
   'toggle-task'(el){
     const t=taskById(el.dataset.id);if(!t)return;t.done=!t.done;t.doneAt=t.done?Date.now():0;if(t.done&&t.status)delete t.status;save();
     if(!$('#modal').hidden&&!UI.openOcc&&!UI.openTask)closeModal();
@@ -8523,6 +8686,12 @@ Object.assign(ACT,{
   },
   /* categorias, tipos e naturezas */
   'pick-color'(el){UI.newColor=el.dataset.v;renderMain();},
+  'nk-add'(){const i=$('#nkNew'),v=i.value.trim();if(!v){i.focus();return;}S.nkinds.push({id:'nk_'+uid(),name:v,icon:'note'});save();renderMain();},
+  'nk-ren'(el){const k=S.nkinds.find(x=>x.id===el.dataset.id);if(!k)return;askText('Renomear tipo',k.name,v=>{k.name=v;save();renderMain();});},
+  'nk-icon'(el){const k=S.nkinds.find(x=>x.id===el.dataset.id);if(!k)return;const L=['microscope','pulse','image','flask','steth','list','layers','search','note','pill','heart','star','book','target','tasks','file','grid','cards','help','bell'].filter(n=>ICONS[n]);
+    openModal('<h3>Ícone de “'+esc(k.name)+'”</h3><div class="nkpick">'+L.map(n=>'<button class="icon-btn '+(k.icon===n?'on':'')+'" data-a="nk-pick" data-id="'+k.id+'" data-v="'+n+'">'+ic(n,20)+'</button>').join('')+'</div>');},
+  'nk-pick'(el){const k=S.nkinds.find(x=>x.id===el.dataset.id);if(!k)return;k.icon=el.dataset.v;save();closeModal();renderMain();},
+  'nk-del'(el){const k=S.nkinds.find(x=>x.id===el.dataset.id);if(!k)return;askConfirm('Excluir tipo','As notas “'+k.name+'” ficam sem tipo.',()=>{S.nkinds=S.nkinds.filter(x=>x!==k);[].concat(S.notes,S.pdfs,S.slides||[]).forEach(o=>{if(o.nk===k.id)o.nk='';});save();renderMain();});},
   'add-root'(){const i=$('#newRoot'),v=i.value.trim();if(!v){i.focus();return;}S.cats.push({id:uid(),name:v,parentId:null,color:UI.newColor,isTipo:false});save();renderMain();},
   'cat-open'(el){UI.catOpen[el.dataset.id]=!UI.catOpen[el.dataset.id];renderMain();},
   'cat-edit'(el){openCatForm(el.dataset.id);},
@@ -10416,6 +10585,7 @@ function pmGet(){
 }
 const pmDur=(p,ph)=>Math.max(1,Number(p.cfg[ph]||25))*60;
 const pmKey=p=>p.cur.taskId||'free';
+function pmSubs(p){const t=p.cur.taskId&&taskById(p.cur.taskId);if(t)return t.subs=t.subs||[];return p.subs.free=p.subs.free||[];}
 function pmLeft(p){return p.cur.running?Math.max(0,Math.round((p.cur.endsAt-Date.now())/1000)):p.cur.left;}
 const pmFmt=s=>pad(Math.floor(s/60))+':'+pad(s%60);
 function pmNext(p,ph){
@@ -10447,7 +10617,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 function pmHTML(){
   const p=pmGet(),c=p.cur,left=pmLeft(p),tot=pmDur(p,c.phase),circ=2*Math.PI*54;
   const tasks=S.tasks.filter(t=>!t.done||t.id===c.taskId);
-  const subs=p.subs[pmKey(p)]||[],dn=subs.filter(s=>s.done).length;
+  const subs=pmSubs(p),dn=subs.filter(s=>s.done).length;
   const today=p.log.filter(e=>e.d===todayISO()),mins=today.reduce((s,e)=>s+e.min,0);
   const cur=c.taskId&&taskById(c.taskId);
   return '<section class="card pmc" data-ph="'+c.phase+'"><div class="phead"><h3>'+ic('clock',17)+' Pomodoro</h3><span class="muted small">'+today.length+(today.length===1?' Ciclo':' Ciclos')+' Hoje · '+mins+' Min</span></div>'+
@@ -10468,9 +10638,9 @@ Object.assign(ACT,{
   'pm-reset'(){const p=pmGet(),c=p.cur;c.running=false;c.endsAt=0;c.left=pmDur(p,c.phase);save();renderMain();},
   'pm-skip'(){const p=pmGet(),c=p.cur;c.phase=c.phase==='focus'?'short':'focus';c.running=false;c.endsAt=0;c.left=pmDur(p,c.phase);save();renderMain();},
   'pm-phase'(el){const p=pmGet(),c=p.cur;c.phase=el.dataset.v;c.running=false;c.endsAt=0;c.left=pmDur(p,c.phase);save();renderMain();},
-  'pm-addsub'(){const p=pmGet(),i=$('#pmSubNew'),v=i&&i.value.trim();if(!v){if(i)i.focus();return;}const k=pmKey(p);(p.subs[k]=p.subs[k]||[]).push({id:uid(),t:v,done:false});save();renderMain();const n=$('#pmSubNew');if(n)n.focus();},
-  'pm-sub'(el){const p=pmGet(),s=(p.subs[pmKey(p)]||[]).find(x=>x.id===el.dataset.id);if(!s)return;s.done=!s.done;s.doneAt=s.done?Date.now():0;save();renderMain();},
-  'pm-subdel'(el){const p=pmGet(),k=pmKey(p);p.subs[k]=(p.subs[k]||[]).filter(x=>x.id!==el.dataset.id);save();renderMain();},
+  'pm-addsub'(){const p=pmGet(),i=$('#pmSubNew'),v=i&&i.value.trim();if(!v){if(i)i.focus();return;}pmSubs(p).push({id:uid(),t:v,done:false});save();renderMain();const n=$('#pmSubNew');if(n)n.focus();},
+  'pm-sub'(el){const p=pmGet(),s=pmSubs(p).find(x=>x.id===el.dataset.id);if(!s)return;s.done=!s.done;s.doneAt=s.done?Date.now():0;save();renderMain();},
+  'pm-subdel'(el){const p=pmGet(),a=pmSubs(p),i=a.findIndex(x=>x.id===el.dataset.id);if(i>=0)a.splice(i,1);save();renderMain();},
   'pm-finish-task'(){const p=pmGet(),t=taskById(p.cur.taskId);if(!t)return;t.done=true;t.doneAt=Date.now();p.cur.taskId='';save();toast('Tarefa concluída.');renderMain();}
 });
 document.addEventListener('change',e=>{const t=e.target;if(!t||!t.dataset)return;
@@ -10492,6 +10662,7 @@ function gmXP(){
   S.habits.forEach(h=>(h.log||[]).forEach(d=>add('habito',d)));
   const p=pmGet();p.log.forEach(e=>add('pomodoro',e.d));
   Object.keys(p.subs).forEach(k=>p.subs[k].forEach(s=>{if(s.done)add('sub',dOf(s.doneAt));}));
+  S.tasks.forEach(t=>(t.subs||[]).forEach(s=>{if(s.done)add('sub',dOf(s.doneAt));}));
   return {tot:tot,today:today,parts:parts};
 }
 function gmStage(inTree){let s=0;GM_STAGES.forEach((x,i)=>{if(inTree>=x[0])s=i;});return s;}
@@ -10538,7 +10709,7 @@ function renderPainel(){
   const rvs=reviewList(addISO(t,-6),t).filter(r=>!r.done);
   const paces=S.dates.map(d=>({d:d,p:paceFor(d)})).filter(x=>x.p&&x.p.days<=90).sort((a,b)=>a.d.date<b.d.date?-1:1);
   if(paces.length)H.push(sec('target','Ritmo para as provas',paces.length,paces.map(x=>'<div class="pacerow" data-a="view-date" data-id="'+x.d.id+'" role="button" tabindex="0"><b>'+esc(x.d.title)+'</b><span class="muted small">'+esc(x.p.text)+'</span></div>').join('')));
-  if(rvs.length)H.push(sec('repeat','Revisões sugeridas',rvs.length,rvs.map(r=>rvRow(r)).join('')+'<div class="muted small" style="margin-top:6px">Aulas, tutorias e plantões geram revisão em 1, 7 e 30 dias. <a href="#" data-a="rv-off">Desativar</a></div>'));
+  if(rvs.length)H.push(sec('repeat','Revisões',rvs.length,rvs.map(r=>rvRow(r)).join('')+'<div class="muted small" style="margin-top:6px">Vem dos eventos marcados com “Gera revisão”. <a href="#" data-a="tab" data-v="revisoes">Abrir Revisões</a></div>'));
   if(tasks.length)H.push(sec('tasks','Tarefas de hoje',tasks.length,tasks.map(taskRow).join('')));
   if(meals.length)H.push(sec('chef','Refeição planejada para hoje',meals.length,meals.map(m=>'<div class="mrow2" data-a="ml-open" data-id="'+m.id+'" role="button" tabindex="0"><span class="muted small">'+esc(slotBy(m.slot).l)+' · '+esc(slotBy(m.slot).t)+'</span><b>'+esc(mealTitle(m))+'</b>'+mstChip(mealLabel(m))+mealNextBtn(m)+'</div>').join('')));
   if(low.length)H.push(sec('bag','Estoque crítico',low.length,low.map(x=>{const p=pantryOf(x.ing.id);return '<div class="crow"><span class="lki">'+ic('bag',16)+'</span><div class="cprev"><b>'+esc(x.ing.name)+'</b><span class="muted small">restam '+fmtQty(x.qty,x.ing.unit)+' · mínimo '+fmtQty(x.min,x.ing.unit)+'</span></div>'+(p?'<button class="icon-btn sm" data-a="pa-use" data-id="'+p.id+'" aria-label="Registrar consumo" title="Registrar consumo">'+ic('minus',15)+'</button>':'')+'</div>';}).join('')+'<div style="margin-top:8px"><button class="btn sm primary" data-a="goto-mercado">'+ic('cart',14)+' Abrir lista de mercado</button></div>'));
@@ -11209,9 +11380,9 @@ function dayDoneBtn(date,mini){
   return mini?'<button class="ddbtn'+(all?' on':'')+'" data-a="day-done" data-date="'+date+'" title="'+t+'" aria-label="'+t+'">'+ic('check',13)+'</button>'
     :'<button class="btn sm ghost ddb'+(all?' on':'')+'" data-a="day-done" data-date="'+date+'" title="'+t+'">'+ic('check',14)+(all?' Desmarcar dia':' Concluir dia')+'</button>';
 }
-function toastUndo(msg,fn){
+function toastUndo(msg,fn,label){
   const t=$('#toast');t.innerHTML='';t.appendChild(document.createTextNode(msg+' '));
-  const b=document.createElement('button');b.className='tundo';b.textContent='Desfazer';b.onclick=()=>{t.classList.remove('show');fn();};t.appendChild(b);
+  const b=document.createElement('button');b.className='tundo';b.textContent=label||'Desfazer';b.onclick=()=>{t.classList.remove('show');fn();};t.appendChild(b);
   t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),6000);
 }
 Object.assign(ACT,{
