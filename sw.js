@@ -5,11 +5,11 @@ const API_KEY = 'AIzaSyBU4owCJwloUlcfTP-cOeHjEo5hyzMH2tU';
 const FB_KEY = 'hRM2z3YEF6yPtTwKQyFMIAQs551d6Jwh';
 const BASE = 'https://firestore.googleapis.com/v1/projects/' + PROJECT + '/databases/(default)/documents/rotina/';
 
-const VERSION = 'v9';
+const VERSION = 'v10';
 const CACHE = 'rotina-app-' + VERSION;
 const META = 'rotina-meta'; // dados dos widgets e avisos recebidos com o app fechado
 const FRONTS = ['painel', 'semana', 'tarefas', 'habitos', 'notas', 'fin'];
-const SHELL = ['./', 'index.html', 'slides.js', 'manifest.webmanifest', 'favicon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png', 'icons/badge-96.png',
+const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'favicon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png', 'icons/badge-96.png',
   'w/widget.css', 'w/widget.js', 'w/card.json'].concat(FRONTS.map((f) => 'w/' + f + '/'));
 
 self.addEventListener('install', (e) => e.waitUntil((async () => {
@@ -36,6 +36,8 @@ async function networkFirst(req) {
 }
 async function cacheFirst(req) {
   const c = await caches.open(CACHE), hit = await c.match(req);
+  // os apps compilados (pdfcraft/, deckcraft/) têm o hash no nome do arquivo: o que está no cache não muda, então não baixa de novo
+  if (hit && /\/(pdfcraft|deckcraft)\/.+-[0-9a-f]{8,}\./.test(req.url)) return hit;
   if (hit) { fetch(req).then((r) => { if (r && r.ok) c.put(req, r); }).catch(() => {}); return hit; }
   const r = await fetch(req);
   if (r && (r.ok || r.type === 'opaque')) c.put(req, r.clone());

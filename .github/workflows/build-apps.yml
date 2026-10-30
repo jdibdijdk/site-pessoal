@@ -1,0 +1,89 @@
+# Compila o PdfCraft e o DeckCraft (Rust, WebAssembly) e grava o resultado em pdfcraft/ e deckcraft/.
+# Os dois projetos são MIT OR Apache-2.0 (https://github.com/storytold). As versões ficam fixas pelos SHAs abaixo.
+name: Compilar PdfCraft e DeckCraft
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - apps-patches/**
+      - .github/workflows/build-apps.yml
+
+permissions:
+  contents: write
+
+env:
+  PDFCRAFT_REF: f76dbb9e8c4436d0ba879190c4fc44f9630d9c20
+  DECKCRAFT_REF: 97db282daf89d72c2ad93deef2a96efac5012311
+  WASM_BINDGEN_VERSION: 0.2.129
+  TRUNK_VERSION: 0.22.1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin/trunk
+            ~/.cargo/bin/wasm-bindgen
+            ~/.cargo/bin/wasm-bindgen-test-runner
+            ~/.cargo/bin/wasm2es6js
+          key: apps-cargo-${{ env.TRUNK_VERSION }}-${{ env.WASM_BINDGEN_VERSION }}-${{ hashFiles('.github/workflows/build-apps.yml') }}
+
+      - name: Ferramentas (trunk e wasm-bindgen)
+        run: |
+          command -v trunk >/dev/null || cargo install trunk --version "$TRUNK_VERSION" --locked
+          command -v wasm-bindgen >/dev/null || cargo install wasm-bindgen-cli --version "$WASM_BINDGEN_VERSION" --locked
+
+      - name: Baixar PdfCraft e DeckCraft nas versões fixas
+        run: |
+          git clone --filter=blob:none https://github.com/storytold/pdfcraft.git "$RUNNER_TEMP/pdfcraft"
+          git -C "$RUNNER_TEMP/pdfcraft" checkout "$PDFCRAFT_REF"
+          git clone --filter=blob:none https://github.com/storytold/deckcraft.git "$RUNNER_TEMP/deckcraft"
+          git -C "$RUNNER_TEMP/deckcraft" checkout "$DECKCRAFT_REF"
+          git -C "$RUNNER_TEMP/deckcraft" apply "$GITHUB_WORKSPACE/apps-patches/deckcraft-host.patch"
+
+      - name: Compilar PdfCraft
+        working-directory: ${{ runner.temp }}/pdfcraft/apps/pdfcraft-web
+        run: trunk build --release
+
+      - name: Compilar DeckCraft
+        working-directory: ${{ runner.temp }}/deckcraft/apps/deckcraft-web
+        run: trunk build --release
+
+      - name: Copiar o resultado e as licenças
+        run: |
+          for app in pdfcraft deckcraft; do
+            rm -rf "$app"
+            mkdir -p "$app"
+            cp -r "$RUNNER_TEMP/$app/dist/web/." "$app/"
+            for f in LICENSE-MIT LICENSE-APACHE NOTICE ATTRIBUTION.md; do
+              [ -f "$RUNNER_TEMP/$app/$f" ] && cp "$RUNNER_TEMP/$app/$f" "$app/$f"
+            done
+          done
+          echo "pdfcraft $PDFCRAFT_REF" > pdfcraft/VERSION
+          echo "deckcraft $DECKCRAFT_REF (com apps-patches/deckcraft-host.patch)" > deckcraft/VERSION
+          # a Cloudflare aceita até 25 MiB por arquivo
+          find pdfcraft deckcraft -type f -size +25M -print -exec false {} + || { echo "::error::Algum arquivo passa de 25 MiB"; exit 1; }
+          du -ah pdfcraft deckcraft | sort -h | tail -8
+
+      - name: Gravar no repositório
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pdfcraft deckcraft
+          git diff --cached --quiet && { echo "Nada mudou"; exit 0; }
+          git commit -m "Atualizar PdfCraft e DeckCraft compilados"
+          git push
