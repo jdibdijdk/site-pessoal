@@ -1831,6 +1831,9 @@ body.qtab #toast{z-index:90}
 /* apresentações */
 .slcv{background:var(--soft);border-radius:10px;overflow:hidden;display:grid;place-items:center;color:var(--mut2);margin:4px 0 6px}
 .slcv img{width:100%;height:100%;object-fit:cover;display:block}
+.hostbox{position:relative;border-radius:12px;overflow:hidden;background:#262626;border:1px solid var(--line)}
+.hostbox iframe{display:block;width:100%;height:calc(100vh - 190px);min-height:460px;border:0}
+@media(max-width:760px){.hostbox iframe{height:calc(100vh - 230px)}}
 .slact{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
 .slgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
 .slt{background:none;border:0;padding:0;text-align:left;cursor:pointer;font:inherit;color:var(--mut);font-size:12.5px}
@@ -4151,7 +4154,10 @@ function applyLook(){
   try{localStorage.setItem('rotina_theme',dk?'dark':'light');}catch(e){}
   const b=$('#btnTheme');if(b){b.innerHTML=ic(dk?'sun':'moon',18);b.title=dk?'Voltar ao modo claro':'Modo escuro';b.setAttribute('aria-label',b.title);}
 }
+// o PdfCraft e o DeckCraft rodam num iframe: redesenhar a página o recarregaria e perderia o que foi editado
+function hostAlive(){const v=UI.nview;return !!(UI.tab==='notas'&&v&&((v.type==='pdf'&&PV&&PV.p.id===v.id&&PV.frame&&PV.frame.isConnected)||(v.type==='slides'&&SL&&SL.x.id===v.id&&SL.frame&&SL.frame.isConnected)));}
 function renderMain(){
+  if(hostAlive())return;
   applyLook();
   const mn=$('#main');if(mn)mn.classList.toggle('wide',UI.tab==='semana'&&UI.view==='grade');
   const map={painel:renderPainel,semana:renderSemana,tarefas:renderTarefas,revisoes:renderRevisoes,habitos:renderHabitos,docs:renderDocs,notas:renderNotas,questoes:renderQuestoes,metas:renderMetas,datas:renderDatas,links:renderLinks,saude:renderSaude,cul:renderCul,fin:renderFin,ajustes:renderAjustes};
@@ -4955,7 +4961,7 @@ function nCreateHTML(){
     '<div class="ntm" data-m="ncr"><button class="btn primary ntmb splitc" data-a="ntm" data-m="ncr" aria-haspopup="true" aria-label="Criar outro tipo">'+ic('chevD',15)+'</button><div class="ntmp right ncrmenu" role="menu">'+
     hd('Escrever')+mi('n-new','note','Nota')+mi('n-new-q','help','Questão')+mi('n-new-caso','pulse','Caso clínico')+mi('n-new-bula','pill','Bulário','Medicamento ou classe')+mi('n-new-fluxo','grid','Fluxograma')+
     hd('Estudar')+mi('deck-new','cards','Baralho')+mi('qt-open','play','Treino de questões','Certa ou errada, sem saber qual é qual')+
-    hd('Importar')+mi('pdf-open-file','file','PDF do computador')+mi('pdf-open-drive','cloud','PDF do Drive')+mi('sl-import','monitor','Apresentação (.pptx)','Apresente com caneta e anotações')+
+    hd('Importar')+mi('pdf-open-file','file','PDF do computador')+mi('pdf-open-drive','cloud','PDF do Drive')+mi('sl-new','monitor','Nova apresentação','Editor e apresentador DeckCraft')+mi('sl-import','upload','Apresentação (.pptx)','Abre um arquivo do computador')+
     '</div></div></div>'+(UI.ntype==='questao'?'<button class="btn" data-a="qt-open">'+ic('play',15)+' Treinar questões</button>':'')+'</div>';
 }
 
@@ -6103,7 +6109,6 @@ document.addEventListener('pointerup',e=>{
     if(nd&&nd.dataset.nid!==g.from)fxConnect(g.from,nd.dataset.nid);
   }
 });
-document.addEventListener('input',e=>{const t=e.target;if(t&&t.id==='pdfCustom'&&PV){if(PV.tool==='pen')PV.penColor=t.value;else PV.color=t.value;$$('#pdfSw .csw').forEach(b=>{if(b.dataset.c)b.classList.remove('on');});}});
 document.addEventListener('pointercancel',()=>{FXD=null;});
 document.addEventListener('dblclick',e=>{
   const nd=e.target.closest&&e.target.closest('.fxwrap.edit .fxn');if(!nd||e.target.closest('a.ref'))return;
@@ -6390,7 +6395,7 @@ function gsOpen(it){
   if(it.k==='tab'){ACT.tab({dataset:{v:it.id}});return;}
   if(it.k==='recipe'){ACT['rc-open']({dataset:{id:it.id}});return;}
   if(it.k==='habit'){ACT.tab({dataset:{v:'habitos'}});return;}
-  if(it.k==='health'){flushNote();pdfLeave();studyStop();UI.tab='saude';renderTabs();renderMain();window.scrollTo(0,0);return;}
+  if(it.k==='health'){flushNote();pdfLeave();slLeave();studyStop();UI.tab='saude';renderTabs();renderMain();window.scrollTo(0,0);return;}
   openRef(it.k+':'+it.id);
 }
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='gsq'){clearTimeout(GS_TIMER);GS_TIMER=setTimeout(gsRefresh,e.isTrusted===false?0:120);}});
@@ -6456,7 +6461,7 @@ function openRef(ref){
   else if(k==='date'){if(dateById(id))openDateView(id);else toast('Esta data não existe mais.');}
   else if(k==='link'){const l=linkById(id);if(l){S.linkClicks[normUrl(l.url)]=(S.linkClicks[normUrl(l.url)]||0)+1;save();window.open(normUrl(l.url),'_blank','noopener');}else toast('Este link não existe mais.');}
   else if(k==='deck'){if(deckById(id))ACT['deck-open']({dataset:{id:id}});else toast('Este baralho não existe mais.');}
-  else if(k==='note'||k==='pdf'){if(k==='note'?noteById(id):pdfById(id)){flushNote();pdfLeave();UI.tab='notas';UI.nview={type:k,id:id,edit:false};closeModal();renderTabs();renderMain();window.scrollTo(0,0);}else toast('Este item não existe mais.');}
+  else if(k==='note'||k==='pdf'){if(k==='note'?noteById(id):pdfById(id)){flushNote();pdfLeave();slLeave();UI.tab='notas';UI.nview={type:k,id:id,edit:false};closeModal();renderTabs();renderMain();window.scrollTo(0,0);}else toast('Este item não existe mais.');}
 }
 function notasInput(e){ // campos da nota (título, nome da contagem, busca)
   const t=e.target;
@@ -6511,17 +6516,17 @@ Object.assign(ACT,{
   'qt-next'(){qtNext();},
   'qt-stop'(){closeModal();UI.qt=null;},
   'qt-open-q'(el){closeModal();UI.qt=null;UI.tab='notas';UI.nsub='notas';UI.nview={type:'note',id:el.dataset.id,edit:false};renderTabs();renderMain();window.scrollTo(0,0);},
-  'n-open'(el){flushNote();UI.exOpen={};const k=el.dataset.k;UI.nview={type:(k==='questao'||k==='caso'||k==='fluxo'||k==='bula')?'note':k,id:el.dataset.id,edit:false};renderMain();window.scrollTo(0,0);},
-  'n-sub'(el){flushNote();pdfLeave();studyStop();UI.nview=null;UI.nsub=el.dataset.v;renderMain();},
+  'n-open'(el){flushNote();pdfLeave();slLeave();UI.exOpen={};const k=el.dataset.k;UI.nview={type:(k==='questao'||k==='caso'||k==='fluxo'||k==='bula')?'note':k,id:el.dataset.id,edit:false};renderMain();window.scrollTo(0,0);},
+  'n-sub'(el){flushNote();pdfLeave();slLeave();studyStop();UI.nview=null;UI.nsub=el.dataset.v;renderMain();},
   'n-type'(el){UI.ntype=el.dataset.v;UI.qgrp='';renderMain();},
   'q-reveal'(el){const a=$('#qans');if(!a)return;a.hidden=!a.hidden;el.innerHTML=ic('eye',15)+(a.hidden?' Mostrar resposta':' Ocultar resposta');},
-  'n-back'(){flushNote();tidyCaso(curNote());pdfLeave();UI.nview=null;renderMain();},
+  'n-back'(){const go=()=>{flushNote();tidyCaso(curNote());pdfLeave();slLeave();UI.nview=null;renderMain();};if(PV&&PV.dirty)askConfirm('Sair sem salvar?','Há anotações no PDF que ainda não foram salvas (Ctrl+S dentro do PdfCraft).',go,'Sair');else go();},
   'n-edit'(){const v=UI.nview;if(!v)return;if(v.edit){flushNote();if(tidyCaso(curNote()))save();}v.edit=!v.edit;renderMain();},
   'n-del'(){
     const v=UI.nview;if(!v)return;const o=v.type==='note'?noteById(v.id):pdfById(v.id);if(!o)return;
     askConfirm('Excluir "'+(o.title||'Sem título')+'"?',v.type==='note'?'A nota será removida.':'O PDF e todos os grifos e comentários serão removidos.',()=>{
       if(v.type==='note'){S.notes=S.notes.filter(x=>x!==o);S.docs.forEach(d=>{if(d.noteIds&&d.noteIds.indexOf(o.id)>=0)d.noteIds=d.noteIds.filter(i=>i!==o.id);});}else{S.pdfs=S.pdfs.filter(x=>x!==o);PdfDB.del(o.id);delete PdfMem[o.id];}
-      pdfLeave();UI.nview=null;save();closeModal();renderMain();
+      pdfLeave();slLeave();UI.nview=null;save();closeModal();renderMain();
     });
   },
   'n-serif'(){flushNote();S.prefs.noteSerif=!S.prefs.noteSerif;save();applyLook();renderMain();},
@@ -6685,24 +6690,7 @@ Object.assign(ACT,{
 /* ==========================================================================
    24. LEITOR DE PDF COM GRIFOS, COMENTÁRIOS E TEXTO POR CIMA
    ========================================================================== */
-const PDFJS_URL='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-const PDFJS_WORKER='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-let pdfLibP=null,PV=null;
-function loadPdfLib(){
-  if(pdfLibP)return pdfLibP;
-  pdfLibP=new Promise((res,rej)=>{
-    if(window.pdfjsLib){res(window.pdfjsLib);return;}
-    const s=document.createElement('script');s.src=PDFJS_URL;
-    s.onload=async()=>{
-      try{const r=await fetch(PDFJS_WORKER);const t=await r.text();window.pdfjsLib.GlobalWorkerOptions.workerSrc=URL.createObjectURL(new Blob([t],{type:'text/javascript'}));}
-      catch(e){window.pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS_WORKER;}
-      res(window.pdfjsLib);
-    };
-    s.onerror=()=>{pdfLibP=null;rej(new Error('Não foi possível carregar o leitor de PDF. Verifique a internet.'));};
-    document.head.appendChild(s);
-  });
-  return pdfLibP;
-}
+let PV=null; // PDF aberto no PdfCraft: {p,frame,ready,dirty,buf}
 const PdfMem={};
 const PdfDB={db:null,
   open(){return new Promise((res,rej)=>{if(this.db)return res(this.db);if(!window.indexedDB)return rej(new Error('sem indexedDB'));const r=indexedDB.open('rotina_pdfs',1);r.onupgradeneeded=()=>r.result.createObjectStore('f');r.onsuccess=()=>{this.db=r.result;res(this.db);};r.onerror=()=>rej(r.error);});},
@@ -6778,284 +6766,68 @@ function pdfBackfill(){
   })();
 }
 setTimeout(()=>{try{pdfBackfill();}catch(e){}},12000);
-const PDF_COLORS=['#FFE066','#9BE59B','#8FD3FF','#FFB3C7','#FFC48A','#D3B8FF','#7FE5D6','#D4E26B'];
-const PEN_COLORS=['#16181D','#E5383B','#2547D0','#1F9D55','#F08C00','#7A4CC2','#0AA3B5','#8A92A1'];
-const INK_TOOLS={pen:1,fhl:1};
-const PEN_W=[['Fina',1.4],['Média',2.6],['Grossa',5]];
+/* ----- Leitor de PDF: o PdfCraft (pdfcraft/, compilado do projeto storytold/pdfcraft) roda num iframe da mesma origem e fala com a página por mensagens ----- */
+const PDFCRAFT_URL='pdfcraft/index.html';
 function pdfViewHTML(p){
   const gas=!!(window.google&&window.google.script&&window.google.script.run);
-  const tool=(t,i,l)=>'<button class="icon-btn" data-a="pdf-tool" data-t="'+t+'" title="'+l+'" aria-label="'+l+'">'+ic(i,17)+'</button>';
   return '<div class="nhead"><button class="btn sm ghost" data-a="n-back">'+ic('chevL',14)+' Notas</button><span class="sp"></span><span id="pdfSync" class="pdfsync"></span>'+
     (gas&&p.src==='local'?'<button class="btn sm" data-a="pdf-todrive" title="Guardar uma cópia no Drive para abrir em qualquer aparelho">'+ic('cloud',14)+' Salvar no Drive</button>':'')+
     '<button class="icon-btn" data-a="pdf-info" title="Nome, pasta e categoria" aria-label="Editar informações">'+ic('edit',19)+'</button><button class="icon-btn" data-a="n-del" title="Excluir" aria-label="Excluir">'+ic('trash',18)+'</button></div>'+
-    '<h2 class="vt" id="pdfTitle" style="margin:0 0 6px">'+esc(p.title)+'</h2><div class="muted small" id="pdfStatus" style="margin-bottom:8px">Carregando…</div>'+
-    '<div class="pdfbar" id="pdfbar">'+tool('select','pointer','Selecionar e mover')+tool('hl','marker','Grifar texto selecionado')+tool('rect','square','Grifar uma área')+tool('pen','edit','Caneta (escrever à mão)')+tool('fhl','highlighter','Marca-texto à mão livre')+tool('note','msg','Comentário em um ponto')+tool('text','type','Texto por cima')+tool('erase','eraser','Apagar (também apaga o traço da caneta)')+
-    '<button class="icon-btn" data-a="pdf-undo" title="Desfazer a última marcação" aria-label="Desfazer">'+ic('undo',17)+'</button>'+
-    '<span class="sepv"></span><span id="pdfSw" class="pdfsw"></span>'+
-    '<span class="sepv"></span><button class="icon-btn" data-a="pdf-zoom" data-d="-1" title="Diminuir" aria-label="Diminuir">'+ic('zoomOut',17)+'</button><button class="icon-btn" data-a="pdf-zoom" data-d="1" title="Aumentar" aria-label="Aumentar">'+ic('zoomIn',17)+'</button><button class="icon-btn" data-a="pdf-fit" title="Ajustar à largura" aria-label="Ajustar à largura">'+ic('fit',17)+'</button>'+
-    '<span class="sepv"></span><button class="btn sm" data-a="pdf-addpage" title="Adicionar uma página em branco, pautada ou quadriculada">'+ic('filePlus',15)+' Página</button></div>'+
-    '<div class="pdfscroll" id="pdfScroll"><div id="pdfPages"></div></div>';
-}
-function pdfSyncBar(){
-  if(!PV)return;
-  $$('#pdfbar [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===PV.tool));
-  const ink=!!INK_TOOLS[PV.tool],mark=PV.tool==='hl'||PV.tool==='rect'||PV.tool==='fhl';
-  const sw=$('#pdfSw');
-  if(sw){
-    const pal=ink&&PV.tool==='pen'?PEN_COLORS:PDF_COLORS,cur=PV.tool==='pen'?PV.penColor:PV.color;
-    let h='';
-    if(ink||mark){
-      h+=pal.map(c=>'<button class="csw '+(c.toLowerCase()===String(cur).toLowerCase()?'on':'')+'" data-a="pdf-color" data-c="'+c+'" style="background:'+c+'" aria-label="Cor '+c+'"></button>').join('');
-      h+='<label class="csw cust" title="Outra cor" style="background:conic-gradient(red,yellow,lime,aqua,blue,magenta,red)"><input type="color" id="pdfCustom" value="'+(/^#[0-9a-f]{6}$/i.test(cur)?cur:'#2547D0')+'" aria-label="Outra cor"></label>';
-    }
-    if(ink)h+='<span class="sepv"></span>'+PEN_W.map(w=>'<button class="icon-btn pw '+(PV.pw===w[1]?'on':'')+'" data-a="pdf-pw" data-w="'+w[1]+'" title="Espessura: '+w[0]+'" aria-label="Espessura '+w[0]+'"><i style="width:'+(6+w[1]*2.4)+'px;height:'+(3+w[1]*1.4)+'px"></i></button>').join('')+
-      '<button class="btn sm ghost '+(PV.finger?'on':'')+'" data-a="pdf-finger" title="Quando ligado, o dedo também desenha; desligado, o dedo apenas rola a página e só a caneta escreve">'+ic('hand',14)+' Dedo '+(PV.finger?'desenha':'rola')+'</button>';
-    sw.innerHTML=h;
-  }
-  $$('.pdfpage').forEach(pg=>{pg.classList.toggle('rect-mode',PV.tool==='rect');pg.classList.toggle('pt-mode',PV.tool==='note'||PV.tool==='text');pg.classList.toggle('ink-mode',!!INK_TOOLS[PV.tool]||PV.tool==='erase');});
+    '<h2 class="vt" id="pdfTitle" style="margin:0 0 6px">'+esc(p.title)+'</h2><div class="muted small" id="pdfStatus" style="margin-bottom:8px">Carregando o PdfCraft…</div>'+
+    '<div class="hostbox" id="pdfHost"></div>';
 }
 function pdfLeave(){
-  if(PV&&PV.obs)PV.obs.disconnect();
-  PV=null;const pop=$('#pdfPop');if(pop)pop.remove();
+  if(PV&&PV.frame)PV.frame.remove();
+  PV=null;
+}
+function hostFrame(box,src,title){
+  const f=document.createElement('iframe');
+  f.src=src;f.title=title;f.setAttribute('allow','clipboard-read; clipboard-write; fullscreen');f.setAttribute('allowfullscreen','');
+  box.appendChild(f);return f;
 }
 async function pdfMount(p){
-  const st=$('#pdfStatus');if(!st)return;
-  const kp=PV&&PV.p.id===p.id?PV:null,keepTool=kp?kp.tool:'select',keepColor=kp?kp.color:PDF_COLORS[0];
+  const st=$('#pdfStatus'),box=$('#pdfHost');if(!st||!box)return;
   try{
     if(p.mid&&!PdfMem[p.id]&&!(await PdfDB.get(p.id)))st.textContent='Baixando o PDF dos outros aparelhos…';
-    const lib=await loadPdfLib(),buf=await pdfBytes(p);
+    const buf=await pdfBytes(p);
+    if(!$('#pdfHost'))return;
     if(buf&&!p.mid&&!pdfWatch[p.id])pdfPush(p,buf);
     pdfSyncPaint(p);
     if(!buf){
-      st.innerHTML='Este PDF foi aberto em outro aparelho e não está aqui. Seus grifos e comentários estão guardados. <button class="btn sm" data-a="pdf-reattach">Selecionar o arquivo novamente</button>';
+      st.innerHTML='Este PDF foi aberto em outro aparelho e não está aqui. <button class="btn sm" data-a="pdf-reattach">Selecionar o arquivo novamente</button>';
       return;
     }
-    const doc=await lib.getDocument({data:buf.slice(0)}).promise;
-    if(!$('#pdfPages'))return;
-    pdfLeave();
-    PV={p:p,doc:doc,lib:lib,scale:1.3,tool:keepTool,color:keepColor,penColor:kp?kp.penColor:PEN_COLORS[0],pw:kp?kp.pw:2.6,finger:kp?kp.finger:!S.prefs.penSeen,pages:[],obs:null,seq:null,base:null};
-    PV.seq=pdfSeqOf(p,doc.numPages);
-    const first=await doc.getPage(1),w=($('#pdfScroll').clientWidth||800)-40;
-    PV.base={w:first.getViewport({scale:1}).width,h:first.getViewport({scale:1}).height};
-    PV.scale=Math.max(.6,Math.min(2.2,w/first.getViewport({scale:1}).width));
-    await pdfBuildPages();
-    st.textContent=PV.seq.length+(PV.seq.length===1?' página':' páginas')+' · grife, escreva com a caneta, comente ou adicione páginas';
-    pdfSyncBar();
+    pdfLeave();slLeave();
+    PV={p:p,buf:buf,ready:false,dirty:false,frame:null};
+    PV.frame=hostFrame(box,PDFCRAFT_URL+'?host=parent','PdfCraft');
+    setTimeout(()=>{if(PV&&PV.p===p&&!PV.ready){const s=$('#pdfStatus');if(s)s.innerHTML='O PdfCraft não respondeu (precisa de WebGL). <button class="btn sm" data-a="pdf-download">Baixar o PDF</button>';}},20000);
   }catch(e){st.textContent='Não foi possível abrir o PDF: '+(e&&e.message?e.message:e);}
 }
-const pdfSeqOf=(p,n)=>(Array.isArray(p.vp)&&p.vp.length?p.vp.map(x=>Object.assign({},x)):Array.from({length:n},(_,i)=>({k:'pdf',n:i+1})));
-async function pdfBuildPages(){
-  const host=$('#pdfPages');if(!host||!PV)return;
-  if(PV.obs)PV.obs.disconnect();
-  host.innerHTML='';PV.pages=[];
-  PV.obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)pdfRenderPage(Number(e.target.dataset.p));}),{root:$('#pdfScroll'),rootMargin:'900px 0px'});
-  for(let i=1;i<=PV.seq.length;i++){
-    const it=PV.seq[i-1],el=document.createElement('div');
-    if(it.k==='blank'){
-      const w=(it.w||PV.base.w)*PV.scale,h=(it.h||PV.base.h)*PV.scale;
-      el.className='pdfpage blank s-'+(it.s||'plain');el.dataset.p=i;el.style.width=w+'px';el.style.height=h+'px';el.style.setProperty('--g',(26*PV.scale)+'px');
-      el.innerHTML='<div class="annlayer"></div><button class="pgdel" data-a="pdf-delpage" data-i="'+i+'" title="Remover esta página" aria-label="Remover esta página">'+ic('trash',14)+'</button>';
-      host.appendChild(el);PV.pages[i]={page:null,vp:{width:w,height:h,scale:PV.scale},el:el,done:true,blank:true};drawAnn(i);continue;
+function downloadBuf(buf,name,type){
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([buf],{type:type||'application/octet-stream'}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),10000);
+}
+function hostStatus(txt){const s=$('#pdfStatus')||$('#slStatus');if(s)s.textContent=txt;}
+window.addEventListener('message',async e=>{
+  const d=e.data;if(e.origin!==location.origin||!d||typeof d.type!=='string')return;
+  if(d.type.indexOf('pdfcraft:')===0&&PV&&PV.frame&&e.source===PV.frame.contentWindow){
+    const p=PV.p;
+    if(d.type==='pdfcraft:ready'){
+      PV.ready=true;const copy=PV.buf.slice(0);
+      PV.frame.contentWindow.postMessage({type:'pdfcraft:open',name:(p.name||p.title+'.pdf').replace(/[\\/:*?"<>|]/g,'_'),bytes:copy},location.origin,[copy]);
+      hostStatus('PDF aberto no PdfCraft. Use Salvar (Ctrl+S) para guardar as anotações.');
+    }else if(d.type==='pdfcraft:dirty'){
+      PV.dirty=!!d.dirty;hostStatus(PV.dirty?'Alterações não salvas. Salve (Ctrl+S) antes de sair.':'Tudo salvo.');
+    }else if(d.type==='pdfcraft:save'&&d.bytes){
+      const buf=d.bytes;PdfMem[p.id]=buf;PV.buf=buf;p.updated=Date.now();
+      await PdfDB.put(p.id,buf.slice(0));pdfPush(p,buf);save();
+      if(d.saveAs)downloadBuf(buf,(d.name||p.title+'.pdf'),'application/pdf');
+      PV.dirty=false;toast('PDF salvo.');hostStatus('Tudo salvo.');
+    }else if(d.type==='pdfcraft:failed'){
+      const s=$('#pdfStatus');if(s)s.innerHTML='O PdfCraft não conseguiu iniciar'+(d.error?' ('+esc(String(d.error).slice(0,120))+')':'')+'. <button class="btn sm" data-a="pdf-download">Baixar o PDF</button>';
     }
-    const page=await PV.doc.getPage(it.n),vp=page.getViewport({scale:PV.scale});
-    el.className='pdfpage';el.dataset.p=i;el.style.width=vp.width+'px';el.style.height=vp.height+'px';
-    el.innerHTML='<canvas></canvas><div class="textLayer"></div><div class="annlayer"></div>';
-    host.appendChild(el);PV.pages[i]={page:page,vp:vp,el:el,done:false};PV.obs.observe(el);drawAnn(i);
-  }
-  pdfSyncBar();
-}
-function pdfSaveSeq(){PV.p.vp=PV.seq.map(x=>Object.assign({},x));}
-async function pdfAddPage(kind,pos){ // pos = quantas páginas ficam antes da nova
-  pos=Math.max(0,Math.min(PV.seq.length,pos));
-  PV.seq.splice(pos,0,{k:'blank',s:kind,w:Math.round(PV.base.w),h:Math.round(PV.base.h),id:uid()});
-  (PV.p.annots||[]).forEach(a=>{if(a.p>=pos+1)a.p++;});
-  pdfSaveSeq();PV.p.updated=Date.now();save();
-  await pdfBuildPages();const pg=PV.pages[pos+1];if(pg&&pg.el.scrollIntoView)pg.el.scrollIntoView({block:'start'});
-  const st=$('#pdfStatus');if(st)st.textContent=PV.seq.length+' páginas · grife, escreva com a caneta, comente ou adicione páginas';
-}
-async function pdfDelPage(i){
-  const it=PV.seq[i-1];if(!it||it.k!=='blank')return;
-  PV.seq.splice(i-1,1);PV.p.annots=(PV.p.annots||[]).filter(a=>a.p!==i);PV.p.annots.forEach(a=>{if(a.p>i)a.p--;});
-  pdfSaveSeq();PV.p.updated=Date.now();save();await pdfBuildPages();
-}
-async function pdfRenderPage(i){
-  const pg=PV&&PV.pages[i];if(!pg||pg.done||pg.blank)return;pg.done=true;
-  const cv=$('canvas',pg.el),ratio=Math.min(2,window.devicePixelRatio||1);
-  cv.width=pg.vp.width*ratio;cv.height=pg.vp.height*ratio;cv.style.width=pg.vp.width+'px';cv.style.height=pg.vp.height+'px';
-  try{
-    await pg.page.render({canvasContext:cv.getContext('2d'),viewport:pg.vp,transform:[ratio,0,0,ratio,0,0]}).promise;
-    const tc=await pg.page.getTextContent(),tl=$('.textLayer',pg.el);
-    tl.style.setProperty('--scale-factor',pg.vp.scale);
-    PV.lib.renderTextLayer({textContentSource:tc,container:tl,viewport:pg.vp,textDivs:[]});
-  }catch(e){pg.done=false;}
-}
-function drawAnn(i){
-  const pg=PV&&PV.pages[i];if(!pg)return;const L=$('.annlayer',pg.el);L.innerHTML='';
-  const inks=(PV.p.annots||[]).filter(a=>a.p===i&&a.type==='ink'&&a.pts&&a.pts.length>=2);
-  if(inks.length){
-    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('class','inksvg');svg.setAttribute('viewBox','0 0 10000 10000');svg.setAttribute('preserveAspectRatio','none');
-    inks.forEach(a=>svg.appendChild(inkEl(a)));L.appendChild(svg);
-  }
-  const pos=(d,r)=>{d.style.left=(r.x*100)+'%';d.style.top=(r.y*100)+'%';if(r.w!=null){d.style.width=(r.w*100)+'%';d.style.height=(r.h*100)+'%';}};
-  (PV.p.annots||[]).filter(a=>a.p===i).forEach(a=>{
-    if(a.type==='hl'){(a.rects||[]).forEach(r=>{const d=document.createElement('div');d.className='ahl'+(a.text?' has':'');d.dataset.id=a.id;pos(d,r);d.style.background=a.color;L.appendChild(d);});}
-    else if(a.type==='note'){const d=document.createElement('div');d.className='anote';d.dataset.id=a.id;pos(d,a);d.title=a.text||'Comentário';d.innerHTML=ic('msg',14);L.appendChild(d);}
-    else if(a.type==='text'){const d=document.createElement('div');d.className='atext';d.dataset.id=a.id;pos(d,{x:a.x,y:a.y});d.style.fontSize=((a.fs||16)*PV.scale/1.3)+'px';d.style.color=a.color||'#16181D';d.textContent=a.text||'Texto';L.appendChild(d);}
-  });
-}
-function inkPath(pts){
-  if(pts.length<4)return 'M'+pts[0]+' '+pts[1]+' L'+pts[0]+' '+pts[1];
-  let d='M'+pts[0]+' '+pts[1];
-  for(let i=2;i<pts.length-2;i+=2)d+=' Q'+pts[i]+' '+pts[i+1]+' '+((pts[i]+pts[i+2])/2)+' '+((pts[i+1]+pts[i+3])/2);
-  return d+' L'+pts[pts.length-2]+' '+pts[pts.length-1];
-}
-function inkEl(a){
-  const e=document.createElementNS('http://www.w3.org/2000/svg','path');
-  e.setAttribute('d',inkPath(a.pts));e.setAttribute('class','aink'+(a.hl?' hl':''));e.setAttribute('stroke',a.color||'#16181D');
-  e.style.strokeWidth=((a.w||2.6)*(PV?PV.scale:1.3))+'px';e.dataset.id=a.id||'';return e;
-}
-let pdfSaveTimer=null;
-function pdfCommit(){clearTimeout(pdfSaveTimer);pdfSaveTimer=setTimeout(()=>{if(PV){PV.p.updated=Date.now();save();}},400);}
-function annById(id){return PV&&PV.p.annots.find(a=>a.id===id);}
-function pdfSelectionHL(){
-  if(!PV||PV.tool!=='hl')return;
-  const sel=window.getSelection();if(!sel||sel.isCollapsed||!sel.rangeCount)return;
-  const range=sel.getRangeAt(0),n=range.startContainer,el=(n.nodeType===3?n.parentElement:n),pgEl=el&&el.closest?el.closest('.pdfpage'):null;if(!pgEl)return;
-  const i=Number(pgEl.dataset.p),pr=pgEl.getBoundingClientRect(),rects=[];
-  Array.from(range.getClientRects()).forEach(r=>{
-    const x=Math.max(r.left,pr.left),y=Math.max(r.top,pr.top),x2=Math.min(r.right,pr.right),y2=Math.min(r.bottom,pr.bottom);
-    if(x2-x<2||y2-y<2)return;
-    rects.push({x:(x-pr.left)/pr.width,y:(y-pr.top)/pr.height,w:(x2-x)/pr.width,h:(y2-y)/pr.height});
-  });
-  if(!rects.length)return;
-  PV.p.annots.push({id:uid(),p:i,type:'hl',color:PV.color,rects:rects,text:''});
-  sel.removeAllRanges();drawAnn(i);pdfCommit();
-}
-function relXY(pgEl,e){const r=pgEl.getBoundingClientRect();return {x:Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)),y:Math.max(0,Math.min(1,(e.clientY-r.top)/r.height))};}
-function pdfPop(a,anchor){
-  const old=$('#pdfPop');if(old)old.remove();
-  const pop=document.createElement('div');pop.id='pdfPop';pop.className='pop';
-  const isText=a.type==='text',cols=isText?['#16181D','#C62F2F','#2547D0','#2F7D57']:PDF_COLORS;
-  pop.innerHTML='<div class="prow"><b style="font-size:14px">'+(a.type==='hl'?'Grifo':a.type==='note'?'Comentário':'Texto')+'</b><span class="sp"></span><button class="icon-btn sm" data-p="close" aria-label="Fechar">'+ic('x',14)+'</button></div>'+
-    '<textarea data-p="text" placeholder="'+(a.type==='text'?'Digite o texto':'Escreva um comentário…')+'">'+esc(a.text||'')+'</textarea>'+
-    (a.type!=='note'?'<div class="prow">'+cols.map(c=>'<button class="csw" data-p="color" data-c="'+c+'" style="width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 '+((a.color||'')===c?'2px var(--ink)':'1px var(--line3)')+';background:'+c+'" aria-label="Cor"></button>').join('')+(isText?'<span class="sp"></span><button class="icon-btn sm" data-p="smaller" aria-label="Menor">'+ic('zoomOut',14)+'</button><button class="icon-btn sm" data-p="bigger" aria-label="Maior">'+ic('zoomIn',14)+'</button>':'')+'</div>':'')+
-    '<div class="prow" style="margin-top:8px"><button class="btn sm danger" data-p="del">'+ic('trash',14)+' Apagar</button><span class="sp"></span><button class="btn sm primary" data-p="close">Pronto</button></div>';
-  document.body.appendChild(pop);
-  const r=anchor.getBoundingClientRect(),w=290;let left=Math.min(window.innerWidth-w-10,Math.max(10,r.right+8)),top=Math.min(window.innerHeight-260,Math.max(10,r.top-10));
-  if(r.right+w+10>window.innerWidth)left=Math.max(10,r.left-w-8);
-  pop.style.left=left+'px';pop.style.top=top+'px';
-  const ta=$('textarea',pop),pgNo=a.p;
-  const refresh=()=>drawAnn(pgNo);
-  ta.addEventListener('input',()=>{a.text=ta.value;refresh();pdfCommit();});
-  pop.addEventListener('click',ev=>{
-    const b=ev.target.closest('[data-p]');if(!b)return;const act=b.dataset.p;
-    if(act==='close'){pop.remove();}
-    else if(act==='del'){PV.p.annots=PV.p.annots.filter(x=>x!==a);pop.remove();refresh();pdfCommit();}
-    else if(act==='color'){a.color=b.dataset.c;refresh();pdfCommit();pdfPop(a,anchor);}
-    else if(act==='bigger'){a.fs=Math.min(60,(a.fs||16)+2);refresh();pdfCommit();}
-    else if(act==='smaller'){a.fs=Math.max(8,(a.fs||16)-2);refresh();pdfCommit();}
-  });
-  setTimeout(()=>ta.focus(),30);
-}
-// Eventos do leitor (delegados no documento)
-document.addEventListener('mouseup',()=>{if(PV&&PV.tool==='hl')setTimeout(pdfSelectionHL,10);});
-document.addEventListener('touchend',()=>{if(PV&&PV.tool==='hl')setTimeout(pdfSelectionHL,300);});
-let PD=null;
-function inkDist(px,py,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy;let t=l?((px-ax)*dx+(py-ay)*dy)/l:0;t=Math.max(0,Math.min(1,t));const x=ax+t*dx,y=ay+t*dy;return Math.hypot(px-x,py-y);}
-function inkErase(pgEl,e){ // apaga os traços de caneta tocados pelo ponto
-  const i=Number(pgEl.dataset.p),r=pgEl.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;let n=0;
-  const keep=[];
-  (PV.p.annots||[]).forEach(a=>{
-    if(a.p!==i||a.type!=='ink'||!a.pts){keep.push(a);return;}
-    const th=Math.max(7,(a.w||2.6)*PV.scale/2+5);let hit=false;
-    for(let k=0;k<a.pts.length-1&&!hit;k+=2){
-      const ax=a.pts[k]/10000*r.width,ay=a.pts[k+1]/10000*r.height,bx=(a.pts[k+2]!=null?a.pts[k+2]:a.pts[k])/10000*r.width,by=(a.pts[k+3]!=null?a.pts[k+3]:a.pts[k+1])/10000*r.height;
-      if(inkDist(px,py,ax,ay,bx,by)<=th)hit=true;
-    }
-    if(hit)n++;else keep.push(a);
-  });
-  if(n){PV.p.annots=keep;drawAnn(i);pdfCommit();}
-  return n;
-}
-function inkDown(e,pgEl){
-  const pen=e.pointerType==='pen';
-  if(pen&&!S.prefs.penSeen){S.prefs.penSeen=true;PV.finger=false;pdfSyncBar();save();}
-  if(e.pointerType==='touch'&&!PV.finger){const sc=$('#pdfScroll');PD={mode:'pan',sc:sc,x:e.clientX,y:e.clientY,l:sc.scrollLeft,t:sc.scrollTop};e.preventDefault();return true;}
-  const eraserEnd=pen&&(e.button===5||(e.buttons&32));
-  if(PV.tool==='erase'||eraserEnd){
-    const n=inkErase(pgEl,e);
-    if(n||eraserEnd){PD={mode:'ink-erase',pg:pgEl};e.preventDefault();return true;}
-    return false; // borracha fora de um traço: apaga grifos/comentários como antes
-  }
-  if(!INK_TOOLS[PV.tool])return false;
-  const i=Number(pgEl.dataset.p),s0=relXY(pgEl,e),hl=PV.tool==='fhl';
-  const a={id:uid(),p:i,type:'ink',hl:hl,color:hl?PV.color:PV.penColor,w:hl?PV.pw*4.5:PV.pw,pts:[]};
-  let svg=$('.inksvg',pgEl);if(!svg){svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('class','inksvg');svg.setAttribute('viewBox','0 0 10000 10000');svg.setAttribute('preserveAspectRatio','none');$('.annlayer',pgEl).prepend(svg);}
-  a.pts.push(Math.round(s0.x*10000),Math.round(s0.y*10000));
-  const el=inkEl(a);el.classList.add('live');svg.appendChild(el);
-  PD={mode:'ink',pg:pgEl,a:a,el:el,last:s0,pid:e.pointerId};
-  try{pgEl.setPointerCapture(e.pointerId);}catch(x){}
-  e.preventDefault();return true;
-}
-document.addEventListener('pointerdown',e=>{
-  if(!PV)return;
-  const pgEl=e.target.closest&&e.target.closest('.pdfpage');if(!pgEl||e.target.closest('#pdfPop,.pgdel'))return;
-  if(e.button!==0&&!(e.pointerType==='pen'&&e.button===5))return;
-  if(inkDown(e,pgEl))return;
-  if(e.button!==0)return;
-  const annEl=e.target.closest('.ahl,.anote,.atext');
-  if(annEl){
-    const a=annById(annEl.dataset.id);if(!a)return;
-    if(PV.tool==='erase'){PV.p.annots=PV.p.annots.filter(x=>x!==a);drawAnn(a.p);pdfCommit();return;}
-    if(PV.tool==='select'&&(a.type==='note'||a.type==='text')){PD={mode:'move',a:a,el:annEl,pg:pgEl,sx:e.clientX,sy:e.clientY,moved:false};e.preventDefault();return;}
-    if(PV.tool==='select'||PV.tool==='hl'){PD={mode:'open',a:a,el:annEl};e.preventDefault();return;}
-    return;
-  }
-  if(PV.tool==='rect'){
-    const s=relXY(pgEl,e),pv=document.createElement('div');pv.className='dragprev';$('.annlayer',pgEl).appendChild(pv);
-    PD={mode:'rect',pg:pgEl,s:s,pv:pv};e.preventDefault();return;
-  }
-  if(PV.tool==='note'||PV.tool==='text'){
-    const s=relXY(pgEl,e),i=Number(pgEl.dataset.p);
-    const a=PV.tool==='note'?{id:uid(),p:i,type:'note',x:s.x,y:s.y,text:''}:{id:uid(),p:i,type:'text',x:s.x,y:s.y,text:'Texto',fs:16,color:'#16181D'};
-    PV.p.annots.push(a);drawAnn(i);pdfCommit();
-    const el=$('[data-id="'+a.id+'"]',pgEl);pdfPop(a,el||pgEl);e.preventDefault();
-  }
+  }else if(d.type.indexOf('deckcraft:')===0&&SL&&SL.frame&&e.source===SL.frame.contentWindow)slHostMessage(d);
 });
-document.addEventListener('pointermove',e=>{
-  if(!PD)return;
-  if(PD.mode==='ink'){
-    const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];
-    (evs.length?evs:[e]).forEach(ev=>{
-      const c=relXY(PD.pg,ev);if(Math.abs(c.x-PD.last.x)+Math.abs(c.y-PD.last.y)<0.0008)return;
-      PD.a.pts.push(Math.round(c.x*10000),Math.round(c.y*10000));PD.last=c;
-    });
-    PD.el.setAttribute('d',inkPath(PD.a.pts));e.preventDefault();return;
-  }
-  if(PD.mode==='ink-erase'){inkErase(PD.pg,e);return;}
-  if(PD.mode==='pan'){PD.sc.scrollLeft=PD.l-(e.clientX-PD.x);PD.sc.scrollTop=PD.t-(e.clientY-PD.y);return;}
-  if(PD.mode==='move'){
-    const dx=e.clientX-PD.sx,dy=e.clientY-PD.sy;if(Math.abs(dx)+Math.abs(dy)>4)PD.moved=true;
-    if(PD.moved){const r=PD.pg.getBoundingClientRect(),x=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)),y=Math.max(0,Math.min(1,(e.clientY-r.top)/r.height));PD.el.style.left=(x*100)+'%';PD.el.style.top=(y*100)+'%';PD.nx=x;PD.ny=y;}
-  }else if(PD.mode==='rect'){
-    const c=relXY(PD.pg,e),x=Math.min(PD.s.x,c.x),y=Math.min(PD.s.y,c.y),w=Math.abs(c.x-PD.s.x),h=Math.abs(c.y-PD.s.y);
-    PD.pv.style.left=(x*100)+'%';PD.pv.style.top=(y*100)+'%';PD.pv.style.width=(w*100)+'%';PD.pv.style.height=(h*100)+'%';PD.r={x:x,y:y,w:w,h:h};
-  }
-});
-document.addEventListener('pointercancel',()=>{if(PD&&PD.mode==='ink'){if(PD.el)PD.el.remove();}PD=null;});
-document.addEventListener('pointerup',e=>{
-  if(!PD)return;const d=PD;PD=null;
-  if(d.mode==='ink'){d.el.remove();PV.p.annots.push(d.a);drawAnn(d.a.p);pdfCommit();return;}
-  if(d.mode==='ink-erase'||d.mode==='pan')return;
-  if(d.mode==='move'){
-    if(d.moved&&d.nx!=null){d.a.x=d.nx;d.a.y=d.ny;pdfCommit();drawAnn(d.a.p);}
-    else pdfPop(d.a,d.el);
-  }else if(d.mode==='open'){pdfPop(d.a,d.el);}
-  else if(d.mode==='rect'){
-    d.pv.remove();
-    if(d.r&&d.r.w>.01&&d.r.h>.005){const i=Number(d.pg.dataset.p);PV.p.annots.push({id:uid(),p:i,type:'hl',color:PV.color,rects:[d.r],text:''});drawAnn(i);pdfCommit();}
-  }
-});
+window.addEventListener('beforeunload',e=>{if((PV&&PV.dirty)||(SL&&SL.dirty)){e.preventDefault();e.returnValue='';}});
 function onPdfFile(file){
   if(!file)return;
   file.arrayBuffer().then(async buf=>{
@@ -7083,23 +6855,7 @@ Object.assign(ACT,{
       }catch(e){toast(e.message||'Não foi possível abrir do Drive.');}
     });
   },
-  'pdf-tool'(el){if(!PV)return;PV.tool=el.dataset.t;pdfSyncBar();},
-  'pdf-color'(el){if(!PV)return;if(PV.tool==='pen')PV.penColor=el.dataset.c;else PV.color=el.dataset.c;pdfSyncBar();},
-  'pdf-pw'(el){if(!PV)return;PV.pw=Number(el.dataset.w);pdfSyncBar();},
-  'pdf-finger'(){if(!PV)return;PV.finger=!PV.finger;pdfSyncBar();},
-  'pdf-undo'(){if(!PV||!PV.p.annots.length){toast('Nada para desfazer.');return;}const a=PV.p.annots.pop();drawAnn(a.p);pdfCommit();},
-  'pdf-addpage'(){
-    if(!PV)return;const n=PV.seq.length;
-    openModal('<form id="fPg" class="form"><div class="fh"><h2>Adicionar página</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
-      '<label class="f"><span>Tipo de página</span><select name="kind"><option value="plain">Em branco</option><option value="lines">Pautada</option><option value="grid">Quadriculada</option></select></label>'+
-      '<label class="f"><span>Onde</span><select name="pos"><option value="0">No início</option>'+Array.from({length:n},(_,i)=>'<option value="'+(i+1)+'" '+(i+1===n?'selected':'')+'>Depois da página '+(i+1)+(i+1===n?' (no fim)':'')+'</option>').join('')+'</select></label>'+
-      '<p class="muted small" style="margin:0">A página fica só nesta anotação; o arquivo PDF original não é alterado. Dá para escrever nela com a caneta.</p>'+
-      '<div class="ff"><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary" type="submit">Adicionar</button></div></form>');
-    $('#fPg').addEventListener('submit',ev=>{ev.preventDefault();const f=ev.target.elements;const k=f.kind.value,pos=Number(f.pos.value);closeModal();pdfAddPage(k,pos);});
-  },
-  'pdf-delpage'(el){const i=Number(el.dataset.i);askConfirm('Remover esta página?','As anotações feitas nela também serão removidas.',()=>{closeModal();pdfDelPage(i);});},
-  async 'pdf-zoom'(el){if(!PV)return;const sc=$('#pdfScroll'),ratio=sc.scrollTop/Math.max(1,sc.scrollHeight);PV.scale=Math.max(.6,Math.min(3,PV.scale+0.2*Number(el.dataset.d)));await pdfBuildPages();sc.scrollTop=ratio*sc.scrollHeight;},
-  async 'pdf-fit'(){if(!PV)return;const first=await PV.doc.getPage(1);PV.scale=Math.max(.6,Math.min(3,(($('#pdfScroll').clientWidth||800)-40)/first.getViewport({scale:1}).width));await pdfBuildPages();},
+  'pdf-download'(){const p=pdfById(UI.nview&&UI.nview.id);if(!p)return;pdfBytes(p).then(b=>{if(b)downloadBuf(b,(p.name||p.title+'.pdf'),'application/pdf');else toast('O arquivo não está neste aparelho.');});},
   'pdf-info'(){
     const p=pdfById(UI.nview.id);if(!p)return;UI.pinfo=p.id;
     openModal('<form id="fPdf" class="form"><div class="fh"><h2>Informações do PDF</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div><label class="f">Nome<input name="title" required value="'+esc(p.title)+'" autocomplete="off"></label>'+
@@ -8142,7 +7898,7 @@ Object.assign(ACT,{
   },
   'deck-open'(el){
     const id=el.dataset.id;if(!deckById(id)){toast('Este baralho não existe mais.');return;}
-    flushNote();pdfLeave();studyStop();closeModal();UI.tab='notas';UI.nsub='notas';UI.nview={type:'deck',id:id};renderTabs();renderMain();window.scrollTo(0,0);
+    flushNote();pdfLeave();slLeave();studyStop();closeModal();UI.tab='notas';UI.nsub='notas';UI.nview={type:'deck',id:id};renderTabs();renderMain();window.scrollTo(0,0);
   },
   'deck-edit'(el){const d=deckById(el.dataset.id);if(d)openDeckInfo(d,false);},
   'deck-del'(el){
@@ -8180,7 +7936,7 @@ Object.assign(ACT,{
   'st-start'(el){
     const ids=el&&el.dataset&&el.dataset.id?[el.dataset.id]:S.decks.filter(d=>deckStats(d.id,Date.now()).due>0).map(d=>d.id);
     if(!ids.length){toast('Não há cards pendentes agora.');return;}
-    studyStop();flushNote();pdfLeave();UI.tab='notas';UI.nsub='estudar';UI.nview=null;
+    studyStop();flushNote();pdfLeave();slLeave();UI.tab='notas';UI.nsub='estudar';UI.nview=null;
     UI.study={deckIds:ids,cur:null,revealed:false,done:0,wait:null,timer:null};studyAdvance();renderTabs();renderMain();window.scrollTo(0,0);
   },
   'st-exit'(){studyStop();renderTabs();renderMain();},
@@ -8495,7 +8251,7 @@ window.addEventListener('beforeprint',()=>{PRINT_SEEN=true;buildPrintSheet();});
    ========================================================================== */
 Object.assign(ACT,{
   tab(el){
-    flushNote();pdfLeave();studyStop();const old=TABS.findIndex(t=>t[0]===UI.tab),nw=TABS.findIndex(t=>t[0]===el.dataset.v),chg=UI.tab!==el.dataset.v;
+    flushNote();pdfLeave();slLeave();studyStop();const old=TABS.findIndex(t=>t[0]===UI.tab),nw=TABS.findIndex(t=>t[0]===el.dataset.v),chg=UI.tab!==el.dataset.v;
     UI.tab=el.dataset.v;closeModal();renderTabs();renderMain();window.scrollTo(0,0);if(chg)tabAnim(nw>=old?1:-1);
   },
   set(el){UI[el.dataset.k]=el.dataset.v;renderMain();},
@@ -10983,7 +10739,7 @@ const ROUTE={
     try{const u=new URL(location.href),q=u.searchParams;['tab','d','nota','do','k','t','b','src'].forEach(k=>q.delete(k));if(UI.tab!=='painel')q.set('tab',UI.tab);history.replaceState(null,'',u.pathname+(q.toString()?'?'+q.toString():'')+u.hash);}catch(e){}
   },
   go(u){
-    flushNote();pdfLeave();closeModal();
+    flushNote();pdfLeave();slLeave();closeModal();
     const i=String(u||'').indexOf('?');this.read(i>=0?String(u).slice(i):'');
     renderTabs();renderMain();window.scrollTo(0,0);this.write();
   }
@@ -11454,10 +11210,10 @@ Object.assign(ACT,{
 
 
 /* ==========================================================================
-   34d. APRESENTAÇÕES (.pptx): arquivo guardado no aparelho, desenhos sincronizados; o leitor fica em slides.js
+   34d. APRESENTAÇÕES (.pptx): arquivo guardado no aparelho; o editor e o apresentador são o DeckCraft embutido (deckcraft/)
    ========================================================================== */
 const slideById=id=>(S.slides||[]).find(x=>x.id===id);
-const slAnnotCount=x=>Object.keys(x.annots||{}).reduce((n,k)=>n+((x.annots[k]||[]).length),0);
+const slAnnotCount=()=>0; // os desenhos do apresentador antigo continuam nos dados, mas não aparecem mais
 // arquivos grandes ficam só neste aparelho (IndexedDB), identificados pelo hash do conteúdo
 const SLF={
   db:null,
@@ -11467,89 +11223,86 @@ const SLF={
   async del(id){const db=await this.open();return new Promise(res=>{const t=db.transaction('f','readwrite');t.objectStore('f').delete(id);t.oncomplete=()=>res();t.onerror=()=>res();});},
   async hash(buf){const h=await crypto.subtle.digest('SHA-256',buf);return Array.from(new Uint8Array(h)).slice(0,12).map(b=>b.toString(16).padStart(2,'0')).join('');}
 };
-let SLKIT=null;
-function slKit(){
-  if(window.SlidesKit)return Promise.resolve(window.SlidesKit);
-  return SLKIT||(SLKIT=new Promise((res,rej)=>{const s=document.createElement('script');s.src='slides.js';s.onload=()=>res(window.SlidesKit);s.onerror=()=>{SLKIT=null;rej(new Error('Não consegui carregar o apresentador.'));};document.head.appendChild(s);}));
+// quantidade de slides: conta os arquivos ppt/slides/slideN.xml dentro do .pptx (que é um zip)
+function pptxSlideCount(buf){
+  const u=new Uint8Array(buf);let t='';for(let i=0;i<u.length;i+=0x8000)t+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));
+  const m=t.match(/ppt\/slides\/slide\d+\.xml/g);return m?new Set(m).size:0;
 }
-const SLDECK={}; // apresentações já lidas nesta sessão (por fileId)
-async function slDeck(x){
-  if(SLDECK[x.fileId])return SLDECK[x.fileId];
-  const buf=await SLF.get(x.fileId);if(!buf)return null;
-  const K=await slKit();const d=await K.parse(buf);SLDECK[x.fileId]=d;return d;
-}
-// miniatura pequena do 1º slide para o cartão (desenha o HTML do slide numa imagem via SVG)
-async function slThumbData(deck){
-  try{
-    const s=deck.slides[0],w=320,h=Math.round(320*deck.H/deck.W);
-    const imgs=s.html.match(/blob:[^"']+/g)||[];let html=s.html;
-    for(const u of imgs){const b=await (await fetch(u)).blob();const d=await new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b);});html=html.split(u).join(d);}
-    const k=w/(deck.W*4/3);
-    const svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml" style="width:'+deck.W+'pt;height:'+deck.H+'pt;transform:scale('+k+');transform-origin:0 0;position:relative;overflow:hidden;background:'+s.bg+';font-family:'+s.font.replace(/"/g,"'")+'"><style>.sle{position:absolute;box-sizing:border-box}.sltx{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box}.sltx p{margin:0;white-space:pre-wrap}.slbu{display:inline-block}.sltbl{width:100%;height:100%;border-collapse:collapse;table-layout:fixed}.slhid{visibility:visible}</style>'+html.replace(/&nbsp;/g,'&#160;').replace(/<(br|img|col|hr)([^>]*?)\/?>/g,'<$1$2/>')+'</div></foreignObject></svg>';
-    const im=new Image();im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);await im.decode();
-    const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,w,h);g.drawImage(im,0,0);
-    return c.toDataURL('image/jpeg',0.72);
-  }catch(e){return '';}
-}
+const DECKCRAFT_URL='deckcraft/index.html';
+let SL=null; // apresentação aberta no DeckCraft: {x,frame,ready,dirty}
 async function slImportFile(file,into){
   if(!file)return;
   if(!/\.pptx$/i.test(file.name)){toast('Escolha um arquivo .pptx (PowerPoint).');return;}
-  toast('Lendo a apresentação…');
   try{
-    const buf=await file.arrayBuffer(),id=await SLF.hash(buf);
+    const buf=await file.arrayBuffer(),id=await SLF.hash(buf),n=pptxSlideCount(buf);
     await SLF.put(id,buf);
-    const K=await slKit(),deck=await K.parse(buf);SLDECK[id]=deck;
-    if(!deck.slides.length)throw new Error('Não encontrei slides nesse arquivo.');
     let x=into;
-    if(x){if(x.fileId&&x.fileId!==id)delete SLDECK[x.fileId];Object.assign(x,{fileId:id,fileName:file.name,n:deck.slides.length,ratio:deck.W/deck.H,updated:Date.now()});}
-    else{x={id:uid(),title:file.name.replace(/\.pptx$/i,''),folderId:(UI.nf&&UI.nf!=='__none')?UI.nf:'',catId:'',fileId:id,fileName:file.name,n:deck.slides.length,ratio:deck.W/deck.H,annots:{},created:Date.now(),updated:Date.now()};S.slides=S.slides||[];S.slides.push(x);}
-    x.thumb=await slThumbData(deck);
-    save();UI.tab='notas';UI.nview={type:'slides',id:x.id};renderTabs();renderMain();window.scrollTo(0,0);toast('Apresentação pronta: '+deck.slides.length+' slides.');
+    if(x){if(x.fileId&&x.fileId!==id&&!S.slides.some(y=>y!==x&&y.fileId===x.fileId))SLF.del(x.fileId);Object.assign(x,{fileId:id,fileName:file.name,n:n,updated:Date.now()});}
+    else{x={id:uid(),title:file.name.replace(/\.pptx$/i,''),folderId:(UI.nf&&UI.nf!=='__none')?UI.nf:'',catId:'',fileId:id,fileName:file.name,n:n,ratio:16/9,annots:{},created:Date.now(),updated:Date.now()};S.slides.push(x);}
+    save();UI.tab='notas';UI.nview={type:'slides',id:x.id};renderTabs();renderMain();window.scrollTo(0,0);
   }catch(e){toast(e.message||'Não consegui ler esse arquivo.');}
+}
+function slNew(){
+  const x={id:uid(),title:'Nova apresentação',folderId:(UI.nf&&UI.nf!=='__none')?UI.nf:'',catId:'',fileId:'',fileName:'Nova apresentação.pptx',n:1,ratio:16/9,annots:{},created:Date.now(),updated:Date.now()};
+  S.slides.push(x);save();UI.tab='notas';UI.nview={type:'slides',id:x.id};renderTabs();renderMain();window.scrollTo(0,0);
 }
 let SL_INTO=null;
 $('#pptxFile').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';const into=SL_INTO?slideById(SL_INTO):null;SL_INTO=null;slImportFile(f,into);});
 function slViewHTML(x){
-  const na=slAnnotCount(x);
-  return '<div class="nhead"><button class="btn sm ghost" data-a="n-back">'+ic('chevL',14)+' Notas</button><span class="sp"></span>'+
+  return '<div class="nhead"><button class="btn sm ghost" data-a="sl-back">'+ic('chevL',14)+' Notas</button><span class="sp"></span>'+
+    '<button class="btn sm" data-a="sl-download" title="Baixar o arquivo .pptx">'+ic('download',14)+' .pptx</button>'+
     '<button class="icon-btn" data-a="sl-rename" title="Renomear, pasta e categoria" aria-label="Editar informações">'+ic('edit',18)+'</button><button class="icon-btn" data-a="sl-del" title="Excluir" aria-label="Excluir">'+ic('trash',18)+'</button></div>'+
-    '<h2 class="vt" style="margin-top:4px">'+esc(x.title||'Apresentação')+'</h2><div class="nmetarow" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px;align-items:center"><span class="tag outline">Apresentação</span>'+(x.catId?tagHTML(x.catId):'')+'<span class="muted small">'+x.n+(x.n===1?' slide':' slides')+(na?' · '+na+(na===1?' anotação':' anotações'):'')+' · '+esc(x.fileName||'')+'</span></div>'+
-    '<div class="slact"><button class="btn primary" data-a="sl-play" data-i="0">'+ic('play',15)+' Apresentar</button>'+(x.last?'<button class="btn" data-a="sl-play" data-i="'+x.last+'">Continuar do slide '+(x.last+1)+'</button>':'')+'<button class="btn" data-a="sl-play" data-i="'+(x.last||0)+'" data-fs="1">'+ic('maximize',15)+' Tela cheia</button><span class="sp"></span><button class="btn ghost" data-a="sl-file">'+ic('upload',15)+' Trocar arquivo</button></div>'+
-    '<div id="slgrid" class="slgrid"><div class="muted small">Abrindo a apresentação…</div></div>';
+    '<h2 class="vt" style="margin:0 0 6px">'+esc(x.title||'Apresentação')+'</h2><div class="muted small" id="slStatus" style="margin-bottom:8px">Carregando o DeckCraft…</div><div class="hostbox" id="slHost"></div>';
 }
+function slLeave(){if(SL&&SL.frame)SL.frame.remove();SL=null;}
 async function slMount(x){
-  const g=$('#slgrid');if(!g)return;
-  let deck=null;try{deck=await slDeck(x);}catch(e){g.innerHTML='<div class="warn">'+esc(e.message||'Não consegui abrir.')+'</div>';return;}
-  if(!$('#slgrid'))return;
-  if(!deck){g.innerHTML='<div class="empty">O arquivo desta apresentação não está neste aparelho.<br>Os desenhos ficam salvos; escolha o mesmo .pptx para apresentar aqui.<br><button class="btn primary" data-a="sl-file">'+ic('upload',15)+' Escolher o arquivo</button></div>';return;}
-  const K=await slKit();
-  g.innerHTML=deck.slides.map((s,i)=>'<button class="slt" data-a="sl-play" data-i="'+i+'" title="Apresentar a partir do slide '+(i+1)+'"><div class="sltb"></div><span>'+(i+1)+((x.annots&&x.annots[i]&&x.annots[i].length)?' · '+ic('pen',11):'')+'</span></button>').join('');
-  $$('.sltb',g).forEach((b,i)=>K.thumb(deck,i,b));
+  const box=$('#slHost');if(!box)return;
+  let buf=null;
+  try{buf=x.fileId?await SLF.get(x.fileId):null;}catch(e){}
+  if(!$('#slHost'))return;
+  if(x.fileId&&!buf){$('#slStatus').innerHTML='O arquivo desta apresentação não está neste aparelho. <button class="btn sm primary" data-a="sl-file">'+ic('upload',14)+' Escolher o .pptx</button>';return;}
+  slLeave();
+  SL={x:x,buf:buf,ready:false,dirty:false,frame:null};
+  SL.frame=hostFrame(box,DECKCRAFT_URL+'?host=parent','DeckCraft');
+  setTimeout(()=>{if(SL&&SL.x===x&&!SL.ready){const s=$('#slStatus');if(s)s.innerHTML='O DeckCraft não respondeu (precisa de WebGPU ou WebGL2).'+(buf?' <button class="btn sm" data-a="sl-download">Baixar o .pptx</button>':'');}},25000);
 }
-async function slPlay(x,start,fs){
-  let deck;try{deck=await slDeck(x);}catch(e){toast(e.message||'Não consegui abrir.');return;}
-  if(!deck){SL_INTO=x.id;toast('Escolha o arquivo .pptx desta apresentação.');$('#pptxFile').click();return;}
-  const K=await slKit();x.annots=x.annots||{};
-  K.present(deck,{start:start,fullscreen:fs,annots:x.annots,
-    onSave(i,list){if(list&&list.length)x.annots[i]=list;else delete x.annots[i];x.updated=Date.now();save();},
-    onSlide(i){x.last=i;},
-    onClose(i){x.last=i;save();if(UI.nview&&UI.nview.id===x.id)renderMain();}});
+async function slHostMessage(d){
+  const x=SL.x;
+  if(d.type==='deckcraft:ready'){
+    SL.ready=true;
+    if(SL.buf){const copy=SL.buf.slice(0);SL.frame.contentWindow.postMessage({type:'deckcraft:open',name:(x.fileName||x.title+'.pptx').replace(/[\\/:*?"<>|]/g,'_'),bytes:copy},location.origin,[copy]);}
+    else SL.frame.contentWindow.postMessage({type:'deckcraft:new'},location.origin);
+    hostStatus('Edite e apresente aqui. Salve (Ctrl+S) para guardar as alterações.');
+  }else if(d.type==='deckcraft:dirty'){
+    SL.dirty=!!d.dirty;hostStatus(SL.dirty?'Alterações não salvas. Salve (Ctrl+S) antes de sair.':'Tudo salvo.');
+  }else if(d.type==='deckcraft:save'&&d.bytes){
+    const buf=d.bytes,id=await SLF.hash(buf),old=x.fileId;
+    await SLF.put(id,buf);
+    if(old&&old!==id&&!S.slides.some(y=>y!==x&&y.fileId===old))SLF.del(old);
+    x.fileId=id;SL.buf=buf;x.n=pptxSlideCount(buf)||x.n;x.updated=Date.now();x.thumb='';save();
+    SL.dirty=false;toast('Apresentação salva.');hostStatus('Tudo salvo.');
+  }
 }
 Object.assign(ACT,{
   'sl-import'(){SL_INTO=null;$('#pptxFile').click();},
+  'sl-new'(){slNew();},
+  'sl-back'(){
+    const go=()=>{slLeave();UI.nview=null;renderMain();};
+    if(SL&&SL.dirty)askConfirm('Sair sem salvar?','Há alterações que ainda não foram salvas (Ctrl+S dentro do DeckCraft).',go,'Sair');else go();
+  },
+  'sl-download'(){const x=slideById(UI.nview&&UI.nview.id);if(!x||!x.fileId)return;SLF.get(x.fileId).then(b=>{if(b)downloadBuf(b,x.fileName||x.title+'.pptx','application/vnd.openxmlformats-officedocument.presentationml.presentation');else toast('O arquivo não está neste aparelho.');});},
   'sl-file'(){const v=UI.nview;SL_INTO=v&&v.type==='slides'?v.id:null;$('#pptxFile').click();},
-  'sl-play'(el){const v=UI.nview,x=v&&slideById(v.id);if(x)slPlay(x,Number(el.dataset.i)||0,!!el.dataset.fs);},
   'sl-rename'(){
     const x=slideById(UI.nview&&UI.nview.id);if(!x)return;
     openModal('<form id="fSl" class="form"><div class="fh"><h2>Apresentação</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
       '<label class="f">Nome<input name="t" value="'+esc(x.title)+'" required autocomplete="off"></label><div class="fgrid"><label class="f">Pasta<select name="folder">'+folderOptions(x.folderId)+'</select></label><div class="f"><span>Categoria</span>'+catPickHTML('slcat',x.catId)+'</div></div>'+
       '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
     const f=$('#fSl');mountCatPicks(f);
-    f.addEventListener('submit',ev=>{ev.preventDefault();x.title=f.elements.t.value.trim()||x.title;x.folderId=f.elements.folder.value;x.catId=$('[data-catpick="slcat"]',f).dataset.value||'';x.updated=Date.now();save();closeModal();renderMain();});
+    f.addEventListener('submit',ev=>{ev.preventDefault();x.title=f.elements.t.value.trim()||x.title;x.folderId=f.elements.folder.value;x.catId=$('[data-catpick="slcat"]',f).dataset.value||'';x.updated=Date.now();save();closeModal();renderMain();const h=$('#main h2.vt');if(h)h.textContent=x.title;});
   },
   'sl-del'(){
     const x=slideById(UI.nview&&UI.nview.id);if(!x)return;
-    askConfirm('Excluir a apresentação "'+x.title+'"?','Os desenhos feitos nela também serão apagados.',()=>{S.slides=S.slides.filter(y=>y!==x);if(!S.slides.some(y=>y.fileId===x.fileId))SLF.del(x.fileId);save();UI.nview=null;closeModal();renderMain();});
+    askConfirm('Excluir a apresentação "'+x.title+'"?','Os desenhos feitos nela também serão apagados.',()=>{slLeave();S.slides=S.slides.filter(y=>y!==x);if(x.fileId&&!S.slides.some(y=>y.fileId===x.fileId))SLF.del(x.fileId);save();UI.nview=null;closeModal();renderMain();});
   }
 });
 
