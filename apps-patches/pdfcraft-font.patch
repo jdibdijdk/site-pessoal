@@ -1,0 +1,14 @@
+diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
+index c3ce3e0..52af983 100644
+--- a/crates/ui-egui/src/theme.rs
++++ b/crates/ui-egui/src/theme.rs
+@@ -367,6 +367,9 @@ fn font_definitions_for_platform(prefer_hans: bool, platform: FontPolicyPlatform
+     add(&mut fonts, "Inter-SemiBold", include_bytes!("../../../assets/fonts/Inter-SemiBold.ttf"));
+     add(&mut fonts, "JetBrainsMono", include_bytes!("../../../assets/fonts/JetBrainsMono-Regular.ttf"));
+     fonts.families.entry(FontFamily::Proportional).or_default().insert(0, "Inter".to_owned());
++    // Poppins (OFL) first, to match the host site; Inter stays behind it for the glyphs Poppins lacks.
++    fonts.font_data.insert("Poppins".to_owned(), Arc::new(FontData::from_static(include_bytes!("../../../assets/fonts/Poppins-Regular.ttf"))));
++    fonts.families.entry(FontFamily::Proportional).or_default().insert(0, "Poppins".to_owned());
+     fonts.families.entry(FontFamily::Monospace).or_default().insert(0, "JetBrainsMono".to_owned());
+     // Keep missing Latin/Cyrillic letters in the app's own faces (for example Bulgarian ѝ,
+     // absent from JetBrains Mono), before egui's defaults or optional system/CJK fallbacks.

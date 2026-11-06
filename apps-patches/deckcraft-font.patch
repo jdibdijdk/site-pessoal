@@ -1,0 +1,20 @@
+diff --git a/crates/ui-egui/src/theme.rs b/crates/ui-egui/src/theme.rs
+index 2e14bba..3aaf481 100644
+--- a/crates/ui-egui/src/theme.rs
++++ b/crates/ui-egui/src/theme.rs
+@@ -210,8 +210,15 @@ pub fn font_definitions(extra: &[std::sync::Arc<deckcraft_fonts::FontFace>]) ->
+             list.insert(k, n.clone());
+         }
+     }
++    // Poppins (OFL) first, to match the host site; the faces above stay behind it for the glyphs Poppins lacks.
++    defs.font_data.insert("Poppins".into(), std::sync::Arc::new(FontData::from_static(include_bytes!("../../../assets/fonts/Poppins-Regular.ttf"))));
++    defs.font_data.insert("Poppins-SemiBold".into(), std::sync::Arc::new(FontData::from_static(include_bytes!("../../../assets/fonts/Poppins-SemiBold.ttf"))));
++    if let Some(list) = defs.families.get_mut(&FontFamily::Proportional) {
++        list.insert(0, "Poppins".into());
++    }
+     // A bold family for headings and selected tabs.
+     let mut bold: Vec<String> = names.iter().filter(|(fam, st, _)| *fam == "Inter" && *st == "SemiBold").map(|(_, _, n)| n.clone()).collect();
++    bold.insert(0, "Poppins-SemiBold".into());
+     bold.extend(defs.families.get(&FontFamily::Proportional).cloned().unwrap_or_default());
+     defs.families.insert(FontFamily::Name("bold".into()), bold);
+     // Hack is already bundled for Monospace and covers the interface's arrows and triangles.
