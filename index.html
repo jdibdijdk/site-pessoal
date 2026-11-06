@@ -165,6 +165,10 @@ main{max-width:1240px;margin:0 auto;padding:22px 26px 80px}
 .gc{display:block;font-size:11px;color:var(--mut2);font-weight:400;margin-top:1px}
 .ev.qk{display:flex;align-items:center;justify-content:center;padding:2px}
 .ev.qk svg{opacity:.85}
+.ev.miss{background-image:repeating-linear-gradient(135deg,transparent 0 7px,rgba(224,160,48,.28) 7px 9px)!important;outline:2px dashed #E0A030;outline-offset:-2px}
+.lrow.miss,.tcard.miss{background-image:repeating-linear-gradient(135deg,transparent 0 9px,rgba(224,160,48,.16) 9px 11px);border-color:#E0A030}
+.missb.on{color:#C77700;background:rgba(224,160,48,.2)}.warnb{border-color:#E0A030!important;color:#9A5B00}
+.pendrow{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--line)}.pendrow .pm{display:flex;flex-direction:column;min-width:0}.pendrow .pa{display:flex;gap:6px;flex-wrap:wrap}
 .ev.done{opacity:.45}
 .ev.done b{text-decoration:line-through}
 .now{position:absolute;left:0;right:0;border-top:2px solid #E5484D;z-index:3;pointer-events:none}
@@ -2356,7 +2360,7 @@ function normalize(o){
     links:arr('links'),
     linkCats:(Array.isArray(o.linkCats)&&o.linkCats.length)?o.linkCats:LINKCATS.slice(),
     packed:o.packed||{},health:arr('health'),hprefs:Object.assign({weeklyMin:150,sleepH:7,heightCm:''},o.hprefs||{}),fin:normFin(o.fin),
-    acts:arr('acts').map(a=>{const x=Object.assign({title:'',kind:'Atividade',tipoAtv:'',blockType:'estudo',catId:'',teacher:'',place:'',link:'',doWhat:'',where:'',plan:{},bring:'',slots:[],done:{},goalIds:[],docIds:[],relId:'',itemIds:[],linkIds:[],stow:{},extras:[],moneys:[],noArea:false,themeNA:false},a);if(x.theme==null)x.theme=x.title;return x;}),
+    acts:arr('acts').map(a=>{const x=Object.assign({title:'',kind:'Atividade',tipoAtv:'',blockType:'estudo',catId:'',teacher:'',place:'',link:'',doWhat:'',where:'',plan:{},bring:'',slots:[],done:{},miss:{},goalIds:[],docIds:[],relId:'',itemIds:[],linkIds:[],stow:{},extras:[],moneys:[],noArea:false,themeNA:false},a);if(x.theme==null)x.theme=x.title;return x;}),
     tasks:arr('tasks').map(t=>Object.assign({title:'',notes:'',deadline:'',catId:'',docId:'',link:'',done:false,activityIds:[],goalIds:[],linkIds:[],itemIds:[],where:'',plan:{},deadlineTime:'',dateIds:[],moneys:[],group:'',subs:[]},t)),
     docs:arr('docs').map(d=>Object.assign({title:'',catId:'',link:'',notes:'',todo:[],goalIds:[],linkIds:[],noteIds:[],folderId:'',ext:'',status:'',source:'',srcLink:'',starnote:false,driveId:'',driveMod:0},d)),
     goals:arr('goals').map(g=>Object.assign({title:'',horizon:'curto',parentId:'',done:false,linkIds:[]},g,{deadline:'',firm:false})),
@@ -2376,6 +2380,7 @@ function normalize(o){
     slides:arr('slides').map(x=>Object.assign({title:'',folderId:'',catId:'',fileId:'',fileName:'',n:0,ratio:16/9,annots:{},created:0,updated:0},x)),
     docTpls:arr('docTpls').map(x=>Object.assign({name:'',catId:'',url:'',folderId:'',pinned:true},x)),
     pdfs:arr('pdfs').map(p=>Object.assign({title:'',folderId:'',catId:'',src:'local',driveId:'',annots:[],vp:null,created:0,updated:0},p)),
+    places:(function(){const t=Array.isArray(o.places)?o.places.filter(x=>typeof x==='string'&&x.trim()):null;if(t)return t;const r=[];arr('acts').forEach(a=>{const x=String(a.place||'').trim();if(x&&r.map(y=>y.toLowerCase()).indexOf(x.toLowerCase())<0)r.push(x);});return r;})(),
     teachers:(function(){const t=Array.isArray(o.teachers)?o.teachers.slice():[];if(ver<8)arr('acts').forEach(a=>String(a.teacher||'').split(',').map(x=>x.trim()).filter(Boolean).forEach(x=>{if(t.map(y=>y.toLowerCase()).indexOf(x.toLowerCase())<0)t.push(x);}));return t;})(),
     dismissed:o.dismissed||{},linkClicks:o.linkClicks||{},
     prefs:Object.assign({radarOpen:true,view:'',dview:''},o.prefs||{}),savedAt:o.savedAt||0};
@@ -2987,7 +2992,7 @@ function cdInfo(iso){
 /* ==========================================================================
    6. OCORRÊNCIAS: uma atividade, vários horários (semanais ou datas únicas)
    ========================================================================== */
-function mkOcc(a,s,date){const key=s.id+'|'+date;return {act:a,slot:s,date:date,start:s.start,end:s.end,key:key,done:!!a.done[key]};}
+function mkOcc(a,s,date){const key=s.id+'|'+date;return {act:a,slot:s,date:date,start:s.start,end:s.end,key:key,done:!!a.done[key],miss:!!(a.miss&&a.miss[key]&&!a.done[key])};}
 function occurrences(fromD,toD){
   const out=[],d0=parseISO(fromD),d1=parseISO(toD);
   S.acts.forEach(a=>a.slots.forEach(s=>{
@@ -3022,6 +3027,7 @@ function passOcc(o){
   if(f.roots.length){const r=catRoot(a.catId);if(!r||!f.roots.includes(r.id))return false;}
   if(f.status==='pend'&&o.done)return false;
   if(f.status==='done'&&!o.done)return false;
+  if(f.status==='miss'&&!o.miss)return false;
   if(f.q&&!norm([aT(a),a.teacher,a.place,a.doWhat,a.where,a.bring].concat((a.extras||[]).map(x=>x.type+' '+x.name)).join(' ')).includes(norm(f.q)))return false;
   return true;
 }
@@ -3210,11 +3216,11 @@ function occDetail(o,opt){
 }
 function tcard(o){
   const a=o.act,col=catColor(a.catId),weekly=o.slot.mode==='weekly';
-  return '<article class="tcard '+(o.done?'done':'')+'" style="--c:'+col+';--ct:'+ink(col)+'">'+
+  return '<article class="tcard '+(o.done?'done':o.miss?'miss':'')+'" style="--c:'+col+';--ct:'+ink(col)+'">'+
     '<div class="tt"><b>'+o.start+'</b><span>'+o.end+'</span></div>'+
     '<div class="tb"><div class="tr">'+tagHTML(a.catId)+'<span class="kd">'+esc(blockById(a.blockType).label)+'</span>'+(weekly?'<span class="rp" title="Repete toda semana">'+ic('repeat',13)+'</span>':'')+'</div>'+
     '<h3>'+esc(aT(a))+'</h3>'+occDetail(o)+'</div>'+
-    '<div class="ts"><button class="chk big '+(o.done?'on':'')+'" data-a="toggle-occ" data-aid="'+a.id+'" data-key="'+esc(o.key)+'" aria-label="Marcar como concluída" title="Concluir">'+ic('check',18)+'</button>'+
+    '<div class="ts"><button class="chk big '+(o.done?'on':'')+'" data-a="toggle-occ" data-aid="'+a.id+'" data-key="'+esc(o.key)+'" aria-label="Marcar como concluída" title="Concluir">'+ic('check',18)+'</button>'+(o.done?'':'<button class="icon-btn missb '+(o.miss?'on':'')+'" data-a="miss-occ" data-aid="'+a.id+'" data-key="'+esc(o.key)+'" title="'+(o.miss?'Desfazer o Não fiz':'Não fiz')+'" aria-label="Não fiz">'+ic('x',17)+'</button>')+
     '<button class="icon-btn" data-a="edit-act" data-aid="'+a.id+'" title="Editar" aria-label="Editar">'+ic('edit',17)+'</button>'+
     '<button class="icon-btn" data-a="dup-act" data-aid="'+a.id+'" title="Duplicar com materiais e objetivos" aria-label="Duplicar">'+ic('copy',17)+'</button>'+
     '<button class="icon-btn" data-a="del-act" data-aid="'+a.id+'" title="Excluir" aria-label="Excluir">'+ic('trash',17)+'</button></div></article>';
@@ -3253,7 +3259,7 @@ function gridEvHTML(ev,lo,hi,span,print,pxh){
   const tip=[aT(a),o.start+'–'+o.end,where].filter(Boolean).join(' · ');
   if(qk||dur<=15){ // atalhos rápidos e eventos de até 15 min: só o ícone
     const sz=qk?16:Math.max(9,Math.min(14,Math.round(hpx)));
-    return '<div class="ev ico '+(qk?'qk ':'')+(dur<=15?'tiny ':'')+(o.done?'done':'')+'" style="'+pos+'"'+act+' title="'+esc(tip)+'" aria-label="'+esc(tip)+'">'+ic(qk?qk.icon:catIcon(a.catId),sz)+'</div>';
+    return '<div class="ev ico '+(qk?'qk ':'')+(dur<=15?'tiny ':'')+(o.done?'done':o.miss?'miss':'')+'" style="'+pos+'"'+act+' title="'+esc(tip)+'" aria-label="'+esc(tip)+'">'+ic(qk?qk.icon:catIcon(a.catId),sz)+'</div>';
   }
   if(!print)return gridEvCard(ev,o,a,pt,pos,act,tip,hpx);
   // Cartão: horário, título em negrito (tipo | tema), caminho da categoria, local/professor, o que fazer, refeição e marcadores.
@@ -3282,7 +3288,7 @@ function gridEvHTML(ev,lo,hi,span,print,pxh){
   if(inc.dw)h+='<span class="th dw ln"'+clamp(inc.dw)+'>'+esc(dw)+'</span>';
   if(inc.bds)h+='<span class="bds">'+bd+'</span>';
   if(!print&&nar===1&&inc.time&&hpx>=40)h+='<span class="eic">'+ic(catIcon(a.catId),14)+'</span>';
-  return '<div class="ev '+(ev.n>1?'nar'+Math.min(ev.n,3)+' ':'')+(o.done?'done':'')+'" style="'+pos+'"'+act+' title="'+esc(tip)+'">'+h+'</div>';
+  return '<div class="ev '+(ev.n>1?'nar'+Math.min(ev.n,3)+' ':'')+(o.done?'done':o.miss?'miss':'')+'" style="'+pos+'"'+act+' title="'+esc(tip)+'">'+h+'</div>';
 }
 // Bloco da grade na tela: uma informação por linha (horário, título, categoria, local, professor, o que levar, tarefas…),
 // cada uma em uma única linha; entram por ordem de importância até ocupar a altura real do evento.
@@ -3306,7 +3312,7 @@ function gridEvCard(ev,o,a,pt,pos,act,tip,hpx){
   if(L<rows.length){rows=[L2[1]];if(L>=2)rows.unshift(L2[0]);rows=rows.concat(L2.slice(2,2+Math.max(0,L-rows.length)));}
   const tt2=L>=rows.length+1&&title.length>(nar===1?20:10); // sobra espaço: o título usa duas linhas
   const h=rows.map(x=>'<span class="el el-'+x[0]+'"'+(x[0]==='tt'&&tt2?' style="-webkit-line-clamp:2;white-space:normal"':'')+'>'+(x[1]&&nar===1?ic(x[1],11):'')+esc(x[2])+'</span>').join('');
-  return '<div class="ev ev2 '+(nar>1?'nar'+nar+' ':'')+(o.done?'done':'')+'" style="'+pos+'"'+act+' title="'+esc(tip)+'">'+h+'</div>';
+  return '<div class="ev ev2 '+(nar>1?'nar'+nar+' ':'')+(o.done?'done':o.miss?'miss':'')+'" style="'+pos+'"'+act+' title="'+esc(tip)+'">'+h+'</div>';
 }
 function gridHTML(ws,occ,dues,dts,print,rev){
   rev=rev||[];
@@ -3359,12 +3365,12 @@ function listaHTML(ws,occ,dues,dts,rev){
     });
     os.forEach(o=>{
       const a=o.act,col=catColor(a.catId),pt=actParts(a);
-      h+='<div class="lrow '+(o.done?'done':'')+'" style="--c:'+col+'" data-a="open-occ" data-aid="'+a.id+'" data-key="'+esc(o.key)+'" role="button" tabindex="0">'+
+      h+='<div class="lrow '+(o.done?'done':o.miss?'miss':'')+'" style="--c:'+col+'" data-a="open-occ" data-aid="'+a.id+'" data-key="'+esc(o.key)+'" role="button" tabindex="0">'+
         '<button class="chk sm '+(o.done?'on':'')+'" data-a="toggle-occ" data-aid="'+a.id+'" data-key="'+esc(o.key)+'" aria-label="Concluir">'+ic('check',12)+'</button>'+
         '<div class="lt">'+o.start+' – '+o.end+'</div><div class="lm"><b>'+esc([pt.tipo,pt.theme,pt.disc,pt.eixo].filter(Boolean).join(' | '))+'</b>'+
         '<div class="small muted">'+tagHTML(a.catId)+(a.place?'<span class="mi">'+ic('pin',12)+esc(a.place)+'</span>':'')+(a.teacher?'<span class="mi">'+ic('user',12)+esc(a.teacher)+'</span>':'')+'<span class="bds row">'+badgesHTML(a,o.date)+'</span></div>'+
         (textLines(a.doWhat).length?'<div class="small muted clip">'+esc(textLines(a.doWhat)[0])+'</div>':'')+'</div>'+
-        '<div class="rp">'+(o.slot.mode==='weekly'?ic('repeat',14):'')+'</div></div>';
+        '<div class="rp">'+(o.slot.mode==='weekly'?ic('repeat',14):'')+(o.done?'':'<button class="icon-btn sm missb '+(o.miss?'on':'')+'" data-a="miss-occ" data-aid="'+a.id+'" data-key="'+esc(o.key)+'" title="'+(o.miss?'Desfazer o Não fiz':'Não fiz')+'" aria-label="Não fiz">'+ic('x',14)+'</button>')+'</div></div>';
     });
     ts.forEach(t=>{
       h+='<div class="lrow due '+(t.done?'done':'')+'" data-a="view-task" data-id="'+t.id+'" role="button" tabindex="0"><button class="chk sm '+(t.done?'on':'')+'" data-a="toggle-task" data-id="'+t.id+'" aria-label="Concluir">'+ic('check',12)+'</button>'+
@@ -3373,6 +3379,23 @@ function listaHTML(ws,occ,dues,dts,rev){
     h+='</div>';
   }
   return h;
+}
+/* ----- eventos que não foram feitos: lista de pendentes ----- */
+function missList(){
+  const T=todayISO();
+  return occurrences(addISO(T,-60),addISO(T,1)).filter(o=>o.miss&&!(o.act.miss[o.key]||{}).rs).sort((x,y)=>x.date<y.date?1:x.date>y.date?-1:tmin(x.start)-tmin(y.start));
+}
+function pendBtnHTML(){const n=missList().length;return '<button class="btn sm '+(n?'warnb':'')+'" data-a="pend-open" title="Eventos que você marcou como não feitos">'+ic('clock',14)+' Pendentes'+(n?' <span class="count">'+n+'</span>':'')+'</button>';}
+function pendRowHTML(o){
+  const a=o.act,pt=actParts(a),d=parseISO(o.date);
+  return '<div class="pendrow"><div class="pm"><b>'+esc([pt.tipo,pt.theme,pt.disc].filter(Boolean).join(' | ')||aT(a))+'</b><span class="muted small">'+WDL[d.getDay()]+' '+fmtDM(o.date)+' · '+o.start+' – '+o.end+(a.place?' · '+esc(a.place):'')+'</span></div>'+
+    '<div class="pa"><button class="btn sm primary" data-a="miss-done" data-aid="'+a.id+'" data-key="'+esc(o.key)+'">'+ic('check',13)+' Fiz agora</button><button class="btn sm" data-a="miss-resched" data-aid="'+a.id+'" data-key="'+esc(o.key)+'">'+ic('calendar',13)+' Reagendar</button><button class="btn sm ghost" data-a="miss-drop" data-aid="'+a.id+'" data-key="'+esc(o.key)+'">Descartar</button></div></div>';
+}
+function pendModalHTML(){
+  const l=missList();
+  return '<div class="form"><div class="fh"><h2>Eventos pendentes</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
+    '<p class="muted small" style="margin:0 0 8px">Eventos marcados como “Não fiz” nos últimos 60 dias. Faça agora, reagende ou descarte.</p>'+
+    (l.length?l.map(pendRowHTML).join(''):'<div class="empty">Nenhum evento pendente.</div>')+'</div>';
 }
 function packHTML(date,os){
   const seen={},list=[];
@@ -3502,7 +3525,7 @@ function renderSemana(){
   const views=[['grade','Grade','grid'],['lista','Lista','list'],['dia','Dia','calendar']];
   let h=radarHTML();
   h+='<div class="toolbar"><div class="wnav"><button class="icon-btn" data-a="wk" data-v="-1" aria-label="Semana anterior">'+ic('chevL')+'</button><button class="icon-btn" data-a="wk" data-v="1" aria-label="Próxima semana">'+ic('chevR')+'</button>'+
-    '<div class="wlabel"><b>'+label+'</b><span class="muted small">'+occ.length+(occ.length===1?' Atividade':' Atividades')+' · '+hoursStr(occ)+' Planejadas · '+occ.filter(o=>o.done).length+(occ.filter(o=>o.done).length===1?' Concluída':' Concluídas')+' · '+(dues.length+dts.length)+((dues.length+dts.length)===1?' Prazo':' Prazos')+'</span></div><button class="btn sm" data-a="wk-today">Hoje</button><button class="btn sm" data-a="quick" title="Locomoção, descanso, rotina, limpeza, culinária, alimentação">'+ic('zap',14)+' Rápido</button><button class="btn sm" data-a="ia-open" title="Copiar um resumo da semana para colar numa IA">'+ic('copy',14)+' Para IA</button><button class="btn sm" data-a="paste-open" title="Colar a organização que a IA devolveu">'+ic('download',14)+' Colar da IA</button><button class="btn sm" data-a="batch-open" title="Criar vários eventos de uma vez">'+ic('list',14)+' Em lote</button>'+
+    '<div class="wlabel"><b>'+label+'</b><span class="muted small">'+occ.length+(occ.length===1?' Atividade':' Atividades')+' · '+hoursStr(occ)+' Planejadas · '+occ.filter(o=>o.done).length+(occ.filter(o=>o.done).length===1?' Concluída':' Concluídas')+' · '+(dues.length+dts.length)+((dues.length+dts.length)===1?' Prazo':' Prazos')+'</span></div><button class="btn sm" data-a="wk-today">Hoje</button>'+pendBtnHTML()+'<button class="btn sm" data-a="quick" title="Locomoção, descanso, rotina, limpeza, culinária, alimentação">'+ic('zap',14)+' Rápido</button><button class="btn sm" data-a="ia-open" title="Copiar um resumo da semana para colar numa IA">'+ic('copy',14)+' Para IA</button><button class="btn sm" data-a="paste-open" title="Colar a organização que a IA devolveu">'+ic('download',14)+' Colar da IA</button><button class="btn sm" data-a="batch-open" title="Criar vários eventos de uma vez">'+ic('list',14)+' Em lote</button>'+
     (filterCount()&&!UI.fopen?'<span class="factive">'+filterCount()+' filtro(s) ativo(s) <button class="btn sm ghost" data-a="f-clear">Limpar</button></span>':'')+'</div>'+
     '<div class="seg">'+views.map(v=>'<button class="'+(UI.view===v[0]?'on':'')+'" data-a="view" data-v="'+v[0]+'">'+ic(v[2],15)+v[1]+'</button>').join('')+'</div></div>';
   h+=focusHTML(occ);
@@ -3991,8 +4014,10 @@ function renderAjustes(){
   SEC.titulo='<div class="card sec"><h3>Título padronizado</h3><p>Todo evento segue o formato <b>Tipo de atividade | Tema (se houver) | Disciplina | Eixo (se houver)</b>. O tipo vem da lista abaixo; a disciplina e o eixo vêm da categoria escolhida.</p>'+
     '<div class="opts"><label class="chip cb"><input type="checkbox" data-topt="tipo" '+(cfg.tipo?'checked':'')+'><span>Incluir o tipo</span></label><label class="chip cb"><input type="checkbox" data-topt="area" '+(cfg.area?'checked':'')+'><span>Incluir o eixo</span></label></div>'+
     '<div class="tprev">Exemplo: <b>'+esc(ex)+'</b></div></div>'+
-    '<div class="card sec"><h3>Professores</h3><p>Os nomes usados nas atividades ficam guardados aqui e aparecem como atalhos ao criar um evento.</p><div class="addrow"><input type="text" id="newProf" placeholder="Novo professor(a)" autocomplete="off"><button class="btn primary sm" data-a="prof-add">Adicionar</button></div>'+
-    '<div class="kinds">'+teacherList().map(k=>'<span class="chip">'+esc(k)+'<button data-a="prof-del" data-v="'+esc(k)+'" aria-label="Remover '+esc(k)+'">'+ic('x',13)+'</button></span>').join('')+'</div></div>'+
+    '<div class="card sec"><h3>Professores</h3><p>Os nomes usados nas atividades ficam guardados aqui e aparecem como atalhos ao criar um evento. Ao renomear, os eventos são atualizados.</p><div class="addrow"><input type="text" id="newProf" placeholder="Novo professor(a)" autocomplete="off"><button class="btn primary sm" data-a="prof-add">Adicionar</button></div>'+
+    '<div class="kinds">'+teacherList().map(k=>'<span class="chip">'+esc(k)+'<button data-a="prof-ren" data-v="'+esc(k)+'" aria-label="Renomear '+esc(k)+'">'+ic('edit',12)+'</button><button data-a="prof-del" data-v="'+esc(k)+'" aria-label="Remover '+esc(k)+'">'+ic('x',13)+'</button></span>').join('')+'</div></div>'+
+    '<div class="card sec"><h3>Locais</h3><p>Os locais usados ficam guardados e aparecem como atalhos no formulário do evento. Ao renomear, os eventos são atualizados.</p><div class="addrow"><input type="text" id="newPlace" placeholder="Novo local ou sala" autocomplete="off"><button class="btn primary sm" data-a="place-add">Adicionar</button></div>'+
+    '<div class="kinds">'+placeList().map(k=>'<span class="chip">'+ic('pin',12)+esc(k)+'<button data-a="place-ren" data-v="'+esc(k)+'" aria-label="Renomear '+esc(k)+'">'+ic('edit',12)+'</button><button data-a="place-del" data-v="'+esc(k)+'" aria-label="Remover '+esc(k)+'">'+ic('x',13)+'</button></span>').join('')+'</div></div>'+
     '<div class="card sec"><h3>Tipos de atividade</h3><p>Aparecem no início do título e no campo "Tipo de atividade" do formulário.</p><div class="addrow"><input type="text" id="newTipo" placeholder="Novo tipo de atividade" autocomplete="off"><button class="btn primary sm" data-a="tipo-add">Adicionar</button></div>'+
     '<div class="kinds">'+S.tipos.map((k,i)=>'<span class="chip">'+esc(k)+'<button data-a="tipo-del" data-i="'+i+'" aria-label="Remover '+esc(k)+'">'+ic('x',13)+'</button></span>').join('')+'</div></div>';
   SEC.objs='<div class="card sec"><h3>O que levar (kits, objetos e aplicativos)</h3><p>Mochilas, pastas e bolsas são <b>kits prontos</b>: abra cada uma e defina o que fica sempre dentro. No evento basta marcar o kit; o conteúdo vem junto e vale para todos os eventos do mesmo dia. Aplicativos existem apenas para itens do grupo <b>Eletrônicos</b>.</p>'+
@@ -4145,7 +4170,7 @@ function renderFilters(){
     '<div class="frow"><span class="fl">Bloco</span>'+BLOCKS.map(b=>chip('blocks',b.id,b.filter)).join('')+'</div>'+
     '<div class="frow"><span class="fl">Natureza</span>'+S.kinds.map(k=>chip('kinds',k,k)).join('')+'</div>'+
     '<div class="frow"><span class="fl">Categoria</span>'+S.cats.filter(c=>!c.parentId).map(c=>chip('roots',c.id,c.name,'<i class="dot" style="background:'+c.color+'"></i>')).join('')+'</div>'+
-    '<div class="frow"><span class="fl">Status</span><div class="seg">'+[['all','Todos'],['pend','Pendentes'],['done','Concluídos']].map(v=>'<button class="'+(f.status===v[0]?'on':'')+'" data-a="f-status" data-v="'+v[0]+'">'+v[1]+'</button>').join('')+'</div><button class="btn sm ghost" data-a="f-clear">Limpar filtros</button></div>'+
+    '<div class="frow"><span class="fl">Status</span><div class="seg">'+[['all','Todos'],['pend','A fazer'],['miss','Não feitos'],['done','Concluídos']].map(v=>'<button class="'+(f.status===v[0]?'on':'')+'" data-a="f-status" data-v="'+v[0]+'">'+v[1]+'</button>').join('')+'</div><button class="btn sm ghost" data-a="f-clear">Limpar filtros</button></div>'+
     '<div class="muted small">Bloco, natureza e status valem para a agenda. Busca e categoria valem também para tarefas e documentos.</div></div>';
 }
 function applyLook(){
@@ -4449,7 +4474,7 @@ function updTitlePrev(){
   const t=composeTitle({tipoAtv:E.tipoAtv.value,kind:E.kind.value,blockType:E.blockType.value,catId:$('[data-catpick="cat"]',f).dataset.value||'',theme:E.themeNA.checked?'':(E.theme.value.trim()||'Tema ou assunto'),noArea:E.noArea.checked,themeNA:E.themeNA.checked});
   el.innerHTML='Título automático: <b>'+esc(t||'—')+'</b>';
 }
-const OPTS=[{k:'loc',label:'Local e professor',icon:'pin'},{k:'link',label:'Link',icon:'link'},{k:'obj',label:'Objetivos',icon:'target'},{k:'met',label:'Metodologia',icon:'list'},{k:'bag',label:'O que levar',icon:'bag'},{k:'money',label:'Dinheiro',icon:'dollar'},{k:'vinc',label:'Vínculos',icon:'layers'},{k:'tipo',label:'Tipo e título',icon:'tag'}];
+const OPTS=[{k:'link',label:'Link',icon:'link'},{k:'obj',label:'Objetivos',icon:'target'},{k:'met',label:'Metodologia',icon:'list'},{k:'bag',label:'O que levar',icon:'bag'},{k:'money',label:'Dinheiro',icon:'dollar'},{k:'vinc',label:'Vínculos',icon:'layers'},{k:'tipo',label:'Tipo e título',icon:'tag'}];
 function openActForm(opts){
   opts=opts||{};
   const a0=opts.id?actById(opts.id):null;
@@ -4458,16 +4483,16 @@ function openActForm(opts){
   if(a0&&!(opts.prefill&&opts.prefill.taskIds))p.taskIds=S.tasks.filter(t=>t.activityIds.includes(a0.id)).map(t=>t.id);
   if(!p.slots.length){fixDay();p.slots=[defaultSlot(UI.day)];}
   const kinds=Array.from(new Set(S.kinds.concat([p.kind]))),tipos=Array.from(new Set(S.tipos.concat(p.tipoAtv?[p.tipoAtv]:[])));
-  const has={loc:!!(p.teacher||p.place),link:!!p.link,obj:!!p.doWhat,met:!!p.where,bag:!!((p.itemIds||[]).length||p.bring||(p.extras||[]).length),money:!!(p.moneys||[]).length,
+  const has={link:!!p.link,obj:!!p.doWhat,met:!!p.where,bag:!!((p.itemIds||[]).length||p.bring||(p.extras||[]).length),money:!!(p.moneys||[]).length,
     vinc:!!(p.taskIds.length||p.docIds.length||p.goalIds.length||p.linkIds.length||p.relId||(p.kind&&p.kind!==(S.kinds[0]||'Atividade'))),tipo:!!(p.tipoAtv||p.noArea||(p.blockType&&p.blockType!=='estudo'))};
   openModal('<form id="fAct" class="form"><div class="fh"><h2>'+(a0?'Editar atividade':(opts.heading||'Nova atividade'))+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
     (a0?'':quickRowHTML())+
     '<div class="f"><span>Categoria <small>disciplina e eixo entram no título</small></span>'+catPickHTML('cat',p.catId)+'</div>'+
     '<div class="f"><span>Tema ou assunto</span><div class="frow" style="flex-wrap:nowrap"><input name="theme" '+(p.themeNA?'disabled':'')+' value="'+esc(p.theme)+'" autocomplete="off" style="flex:1"><label class="chip cb" title="Sem tema: o título fica só com o tipo, a disciplina e o eixo"><input type="checkbox" name="themeNA" '+(p.themeNA?'checked':'')+'><span>Sem tema</span></label></div><div class="tprev" id="tprev"></div></div>'+
     '<div class="f"><span>Horário</span><div id="slots">'+p.slots.map(slotRow).join('')+'</div><div><button type="button" class="btn sm" data-a="slot-add">'+ic('plus',14)+' Outro horário</button></div><div class="sprev" id="slotprev"></div></div>'+
+    '<div class="locbox"><div class="fgrid"><label class="f">'+ic('pin',13)+' Local / sala<input name="place" list="placedl" value="'+esc(p.place)+'" placeholder="Onde vai ser" autocomplete="off"></label><label class="f">'+ic('user',13)+' Professor(a)<input name="teacher" value="'+esc(p.teacher)+'" placeholder="Quem conduz" autocomplete="off"></label></div><datalist id="placedl">'+placeList().map(n=>'<option value="'+esc(n)+'">').join('')+'</datalist><div class="profq" id="placechips"></div><div class="profq" id="profchips"></div></div>'+
     '<label class="chip cb" style="align-self:flex-start;margin:4px 0"><input type="checkbox" name="rev" '+(p.rev?'checked':'')+'><span>'+ic('repeat',13)+' Gera revisão <small>(D1, D7, D30…)</small></span></label>'+
     '<div class="optchips" id="optchips"'+(OPTS.every(o=>has[o.k])?' hidden':'')+'><span class="lbl">Adicionar</span>'+OPTS.map(o=>'<button type="button" class="chip" data-a="opt-show" data-k="'+o.k+'" '+(has[o.k]?'hidden':'')+'>'+ic(o.icon,13)+o.label+'</button>').join('')+'</div>'+
-    '<div class="opt" data-opt="loc" '+(has.loc?'':'hidden')+'><div class="fgrid"><label class="f">Professor<input name="teacher" value="'+esc(p.teacher)+'" autocomplete="off"></label><label class="f">Local / Sala<input name="place" value="'+esc(p.place)+'" autocomplete="off"></label></div><div class="profq" id="profchips"></div></div>'+
     '<div class="opt" data-opt="link" '+(has.link?'':'hidden')+'><label class="f">Link útil<input name="link" inputmode="url" value="'+esc(p.link)+'" autocomplete="off"></label></div>'+
     '<div class="opt" data-opt="obj" '+(has.obj?'':'hidden')+'><label class="f">Objetivos da Atividade <small>um por linha; cada linha vira um item numerado</small><textarea name="doWhat" rows="3">'+esc(p.doWhat)+'</textarea></label></div>'+
     '<div class="opt" data-opt="met" '+(has.met?'':'hidden')+'><label class="f">Metodologia <small>uma etapa por linha; cada linha vira um item numerado</small><textarea name="where" rows="3">'+esc(p.where)+'</textarea></label></div>'+
@@ -4486,7 +4511,7 @@ function openActForm(opts){
     '<label class="f">Tipo de bloco<select name="blockType">'+BLOCKS.map(b=>'<option value="'+b.id+'" '+sel(b.id,p.blockType)+'>'+esc(b.label)+'</option>').join('')+'</select></label></div>'+
     '<label class="chip cb" style="align-self:flex-start;margin-top:8px"><input type="checkbox" name="noArea" '+(p.noArea?'checked':'')+'><span>Título curto: sem o eixo</span></label></div>'+
     '<div class="ff">'+(a0?'<button type="button" class="btn danger" data-a="del-act" data-aid="'+a0.id+'">Excluir</button><button type="button" class="btn" data-a="dup-act" data-aid="'+a0.id+'">'+ic('copy',14)+' Duplicar</button>':'')+'<span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
-  const f=$('#fAct');f.dataset.aid=a0?a0.id:'';UI.prevSid='';mountCatPicks(f);renderProfChips();
+  const f=$('#fAct');f.dataset.aid=a0?a0.id:'';UI.prevSid='';mountCatPicks(f);renderProfChips();renderPlaceChips();
   FORMPLAN=JSON.parse(JSON.stringify(p.plan||{}));FORMPACK={stow:Object.assign({},p.stow||{}),extras:JSON.parse(JSON.stringify(p.extras||[]))};renderPlan();renderPack();renderBagSel();updTitlePrev();renderSlotPrev();
   f.addEventListener('submit',ev=>{
     ev.preventDefault();
@@ -4509,9 +4534,10 @@ function openActForm(opts){
     const data={rev:!!(E.rev&&E.rev.checked),theme:theme,themeNA:E.themeNA.checked,noArea:E.noArea.checked,tipoAtv:E.tipoAtv.value,stow:stow,extras:extras,kind:E.kind.value,blockType:E.blockType.value,catId:catId,
       teacher:E.teacher.value.trim(),place:E.place.value.trim(),link:E.link.value.trim(),doWhat:E.doWhat.value.trim(),where:E.where.value.trim(),plan:readPlan(f),bring:E.bring.value.trim(),
       slots:slots,docIds:pickedValues(f,'docs'),goalIds:pickedValues(f,'goals'),relId:E.relId.value,itemIds:ids,linkIds:pickedValues(f,'links'),moneys:readMoneys(f)};
-    data.title=composeTitle(data);rememberTeachers(data.teacher);
+    data.title=composeTitle(data);rememberTeachers(data.teacher);rememberPlace(data.place);
     let a=a0;
-    if(a)Object.assign(a,data);else{a=Object.assign({id:uid(),done:{},createdAt:Date.now()},data);S.acts.push(a);}
+    if(a)Object.assign(a,data);else{a=Object.assign({id:uid(),done:{},miss:{},createdAt:Date.now()},data);S.acts.push(a);}
+    if(opts.prefill&&opts.prefill.missFrom){const o0=actById(opts.prefill.missFrom.aid);if(o0&&o0.miss&&o0.miss[opts.prefill.missFrom.key])o0.miss[opts.prefill.missFrom.key].rs=Date.now();}
     Object.keys(a.done).forEach(k=>{if(!a.slots.some(s=>k.indexOf(s.id+'|')===0))delete a.done[k];});
     syncTaskLinks(a.id,pickedValues(f,'tasks'));
     if(!a0&&slots[0].mode==='date'){UI.weekStart=mondayOf(slots[0].date);UI.day=slots[0].date;}
@@ -4712,7 +4738,7 @@ function openOcc(aid,key){
     '<h2 class="vt">'+esc(aT(a))+'</h2>'+
     '<dl class="facts">'+facts.map(f=>'<div class="fact">'+ic(f[0],16)+'<div><dt>'+f[1]+'</dt><dd>'+esc(f[2])+'</dd></div></div>').join('')+'</dl>'+
     occDetail(o,{noPlace:true})+
-    '<div class="mfoot"><button class="btn '+(o.done?'':'primary')+'" data-a="toggle-occ" data-aid="'+aid+'" data-key="'+esc(key)+'">'+ic('check',15)+(o.done?' Concluída (desfazer)':' Marcar como concluída')+'</button><span class="sp"></span><button class="btn sm" data-a="hb-new-evt" data-aid="'+aid+'">'+ic('sprout',14)+' Hábito depois deste evento</button><button class="btn sm" data-a="new-task-for" data-aid="'+aid+'">'+ic('plus',14)+' Nova tarefa desta atividade</button></div>');
+    '<div class="mfoot"><button class="btn '+(o.done?'':'primary')+'" data-a="toggle-occ" data-aid="'+aid+'" data-key="'+esc(key)+'">'+ic('check',15)+(o.done?' Concluída (desfazer)':' Marcar como concluída')+'</button>'+(o.done?'':'<button class="btn '+(o.miss?'warnb':'')+'" data-a="miss-occ" data-aid="'+aid+'" data-key="'+esc(key)+'">'+ic('x',15)+(o.miss?' Não fiz (desfazer)':' Não fiz')+'</button>')+'<span class="sp"></span><button class="btn sm" data-a="hb-new-evt" data-aid="'+aid+'">'+ic('sprout',14)+' Hábito depois deste evento</button><button class="btn sm" data-a="new-task-for" data-aid="'+aid+'">'+ic('plus',14)+' Nova tarefa desta atividade</button></div>');
   UI.openOcc={aid:aid,key:key};return true;
 }
 function openTaskView(id){
@@ -7998,6 +8024,20 @@ function renderProfChips(){
   box.innerHTML=list.length?'<span class="lbl">Usados antes:</span>'+list.slice(0,14).map(n=>'<button type="button" class="chip '+(cur.indexOf(n.toLowerCase())>=0?'on':'')+'" data-a="prof-pick" data-v="'+esc(n)+'">'+esc(n)+'</button>').join(''):'';
 }
 
+// ----- locais já usados (mesma ideia dos professores) -----
+function placeList(){
+  const cnt={};S.acts.forEach(a=>{const k=String(a.place||'').trim().toLowerCase();if(k)cnt[k]=(cnt[k]||0)+1;});
+  return (S.places||[]).slice().sort((a,b)=>(cnt[b.toLowerCase()]||0)-(cnt[a.toLowerCase()]||0)||a.localeCompare(b,'pt-BR'));
+}
+function rememberPlace(text){
+  const v=String(text||'').trim();if(!v)return false;S.places=S.places||[];
+  if(S.places.map(x=>x.toLowerCase()).indexOf(v.toLowerCase())>=0)return false;S.places.push(v);return true;
+}
+function renderPlaceChips(){
+  const box=$('#placechips'),f=$('#fAct');if(!box||!f)return;
+  const cur=f.elements.place.value.trim().toLowerCase();
+  box.innerHTML=placeList().slice(0,14).map(n=>'<button type="button" class="chip '+(cur===n.toLowerCase()?'on':'')+'" data-a="place-pick" data-v="'+esc(n)+'">'+ic('pin',12)+esc(n)+'</button>').join('');
+}
 // ----- eventos de inserção rápida -----
 const QUICK=[
   {k:'loc',label:'Locomoção',short:'Locomoção',icon:'car',tipo:'Locomoção',theme:'',block:'rotina',dur:30,cat:['Pessoal']},
@@ -8073,15 +8113,28 @@ Object.assign(ACT,{
     inp.value=cur.join(', ');renderProfChips();
   },
   'prof-add'(){const i=$('#newProf'),v=i.value.trim();if(!v){i.focus();return;}rememberTeachers(v);save();renderMain();},
-  'prof-del'(el){const v=el.dataset.v;S.teachers=S.teachers.filter(x=>x!==v);save();renderMain();}
+  'prof-del'(el){const v=el.dataset.v;S.teachers=S.teachers.filter(x=>x!==v);save();renderMain();},
+  'prof-ren'(el){
+    const v=el.dataset.v;askText('Renomear professor(a)',v,n=>{n=n.trim();if(!n||n===v)return;
+      S.teachers=S.teachers.map(x=>x===v?n:x).filter((x,i,a)=>a.findIndex(y=>y.toLowerCase()===x.toLowerCase())===i);
+      S.acts.forEach(a=>{if(a.teacher&&splitTeachers(a.teacher).indexOf(v)>=0)a.teacher=splitTeachers(a.teacher).map(x=>x===v?n:x).join(', ');});save();renderMain();toast('Nome atualizado nos eventos.');});
+  },
+  'place-pick'(el){const f=$('#fAct');if(!f)return;const inp=f.elements.place;inp.value=inp.value.trim().toLowerCase()===el.dataset.v.toLowerCase()?'':el.dataset.v;renderPlaceChips();},
+  'place-add'(){const i=$('#newPlace'),v=i.value.trim();if(!v){i.focus();return;}rememberPlace(v);save();renderMain();},
+  'place-del'(el){const v=el.dataset.v;S.places=S.places.filter(x=>x!==v);save();renderMain();},
+  'place-ren'(el){
+    const v=el.dataset.v;askText('Renomear local',v,n=>{n=n.trim();if(!n||n===v)return;
+      S.places=S.places.map(x=>x===v?n:x).filter((x,i,a)=>a.findIndex(y=>y.toLowerCase()===x.toLowerCase())===i);
+      S.acts.forEach(a=>{if((a.place||'').trim()===v)a.place=n;});save();renderMain();toast('Local atualizado nos eventos.');});
+  },
 });
-document.addEventListener('input',e=>{if(e.target&&e.target.matches&&e.target.matches('#fAct [name=teacher]'))renderProfChips();});
+document.addEventListener('input',e=>{if(e.target&&e.target.matches&&e.target.matches('#fAct [name=teacher]'))renderProfChips();if(e.target&&e.target.matches&&e.target.matches('#fAct [name=place]'))renderPlaceChips();});
 document.addEventListener('change',e=>{
   if(e.target&&e.target.closest&&e.target.closest('#fQuick')&&/date|start|end|rep/.test(e.target.name||'')){
     const f=$('#fQuick');if(!f)return;if(e.target.name==='start'){const q=quickById(f.dataset.k);if(f.elements.start.value)f.elements.end.value=mt(Math.min(1439,tmin(f.elements.start.value)+q.dur));}
   }
 });
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='newProf'){e.preventDefault();ACT['prof-add']();}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='newProf'){e.preventDefault();ACT['prof-add']();}if(e.key==='Enter'&&e.target.id==='newPlace'){e.preventDefault();ACT['place-add']();}});
 
 /* ==========================================================================
    31. IMPRESSÃO DA SEMANA (grade em uma página A4 paisagem)
@@ -8307,10 +8360,26 @@ Object.assign(ACT,{
   'new-act'(el){fixDay();openActForm({prefill:{slots:[defaultSlot((el&&el.dataset&&el.dataset.date)||UI.day)]}});},
   'open-occ'(el){openOcc(el.dataset.aid,el.dataset.key);},
   'view-act'(el){const a=actById(el.dataset.aid);if(!a)return;const o=nextOccOf(a);if(o)openOcc(a.id,o.key);},
+  'miss-occ'(el){
+    const a=actById(el.dataset.aid);if(!a)return;const k=el.dataset.key;a.miss=a.miss||{};
+    if(a.miss[k]){delete a.miss[k];save();rerender();toast('Marca de “Não fiz” removida.');}
+    else{a.miss[k]={at:Date.now()};delete a.done[k];save();rerender();toastUndo('Marcado como não feito. Está em Pendentes.',()=>{delete a.miss[k];save();rerender();});}
+    if(!$('#modal').hidden&&UI.openOcc&&UI.openOcc.aid===a.id&&UI.openOcc.key===k)closeModal();
+  },
+  'pend-open'(){openModal(pendModalHTML());},
+  'miss-done'(el){const a=actById(el.dataset.aid);if(!a)return;const k=el.dataset.key;a.done[k]=Date.now();if(a.miss)delete a.miss[k];save();rerender();if(!$('#modal').hidden&&$('.pendrow'))openModal(pendModalHTML());},
+  'miss-drop'(el){const a=actById(el.dataset.aid);if(!a||!a.miss)return;delete a.miss[el.dataset.key];save();rerender();if(!$('#modal').hidden&&$('.pendrow'))openModal(pendModalHTML());},
+  'miss-resched'(el){
+    const a=actById(el.dataset.aid),o=a&&occFromKey(a.id,el.dataset.key);if(!o)return;
+    const copy={};['theme','themeNA','noArea','tipoAtv','kind','blockType','catId','teacher','place','link','doWhat','where','rev','bring'].forEach(f=>{if(a[f]!==undefined)copy[f]=a[f];});
+    copy.itemIds=(a.itemIds||[]).slice();copy.title=a.title;
+    copy.slots=[defaultSlot(addISO(todayISO(),1),o.start,o.end)];copy.missFrom={aid:a.id,key:o.key};
+    closeModal();openActForm({heading:'Reagendar evento',prefill:copy});
+  },
   'toggle-occ'(el){
     const a=actById(el.dataset.aid);if(!a)return;const k=el.dataset.key;
     if(a.done[k]){delete a.done[k];save();rerender();unlinkHealth(a,k);}
-    else{a.done[k]=Date.now();save();rerender();maybeHealth(a,k);}
+    else{a.done[k]=Date.now();if(a.miss)delete a.miss[k];save();rerender();maybeHealth(a,k);}
   },
   'edit-act'(el){if(UI.openOcc&&UI.openOcc.aid===el.dataset.aid)UI.back={type:'occ',aid:UI.openOcc.aid,key:UI.openOcc.key};openActForm({id:el.dataset.aid});},
   'del-act'(el){
@@ -8733,7 +8802,7 @@ function loadSample(){
   const t4=mkT({title:'Refazer as questões erradas de embriologia',catId:findCat('Universidade','Morfofuncional','Estudo - Morfofuncional'),dateIds:[prova.id]});
   const t5=mkT({title:'Imprimir o roteiro da prática',dateIds:[prova.id],moneys:[{id:uid(),desc:'Impressão do roteiro',amount:6.5,kind:'out',cat:'Material',date:addISO(todayISO(),2),acc:accId}]});
   S.tasks.push(t1,t2,t3,t4,t5);
-  const act=(o)=>{const a=Object.assign({id:uid(),title:'',kind:'Atividade',tipoAtv:'',blockType:'estudo',catId:'',teacher:'',place:'',link:'',doWhat:'',where:'',bring:'',slots:[],done:{},goalIds:[],docIds:[],relId:'',itemIds:[],linkIds:[],moneys:[],theme:''},o);S.acts.push(a);return a;};
+  const act=(o)=>{const a=Object.assign({id:uid(),title:'',kind:'Atividade',tipoAtv:'',blockType:'estudo',catId:'',teacher:'',place:'',link:'',doWhat:'',where:'',bring:'',slots:[],done:{},miss:{},goalIds:[],docIds:[],relId:'',itemIds:[],linkIds:[],moneys:[],theme:''},o);S.acts.push(a);return a;};
   act({theme:'Problema 2: dor torácica',kind:'Estudo para Atividade',tipoAtv:'Estudo Individual',catId:findCat('Universidade','Tutoria','Estudo - Tutoria'),teacher:'Profa. Marina',place:'Biblioteca',doWhat:'Ler o problema e levantar hipóteses.',slots:[W(1,'14:00','16:00'),W(4,'08:00','10:00')]});
   act({theme:'Visita aos leitos e discussão de casos',tipoAtv:'Rodízio',blockType:'clinica',catId:findCat('Universidade','Habilidades Profissionais','Rodízio','Eixo Cardiologia'),teacher:'Dr. Paulo',place:'Enfermaria',doWhat:'Examinar três pacientes\nApresentar um caso ao preceptor\nRegistrar a evolução no prontuário',where:'Passar nos leitos 3 a 8\nConsultar protocolos no tablet\nAnotar pendências no caderno',itemIds:itemIdsBy('Bolsa 2','Estetoscópio','Jaleco','Crachá Institucional - HRBA','Samsung S24 FE','Caderno'),stow:stowOf('Bolsa 2',['Caderno']),extras:extrasIn('Bolsa 2'),
     moneys:[{id:uid(),desc:'Almoço no hospital',amount:28,kind:'out',cat:'Almoço',date:addISO(wk,2),acc:accId}],slots:[W(2,'07:00','12:00')]});
@@ -10482,6 +10551,8 @@ function renderPainel(){
   const paces=S.dates.map(d=>({d:d,p:paceFor(d)})).filter(x=>x.p&&x.p.days<=90).sort((a,b)=>a.d.date<b.d.date?-1:1);
   if(paces.length)H.push(sec('target','Ritmo para as provas',paces.length,paces.map(x=>'<div class="pacerow" data-a="view-date" data-id="'+x.d.id+'" role="button" tabindex="0"><b>'+esc(x.d.title)+'</b><span class="muted small">'+esc(x.p.text)+'</span></div>').join('')));
   if(rvs.length)H.push(sec('repeat','Revisões',rvs.length,rvs.map(r=>rvRow(r)).join('')+'<div class="muted small" style="margin-top:6px">Vem dos eventos marcados com “Gera revisão”. <a href="#" data-a="tab" data-v="revisoes">Abrir Revisões</a></div>'));
+  const mss=missList();
+  if(mss.length)H.push(sec('clock','Eventos pendentes',mss.length,mss.slice(0,5).map(pendRowHTML).join('')+(mss.length>5?'<button class="btn sm ghost" data-a="pend-open">Ver todos ('+mss.length+')</button>':'')));
   if(tasks.length)H.push(sec('tasks','Tarefas de hoje',tasks.length,tasks.map(taskRow).join('')));
   if(meals.length)H.push(sec('chef','Refeição planejada para hoje',meals.length,meals.map(m=>'<div class="mrow2" data-a="ml-open" data-id="'+m.id+'" role="button" tabindex="0"><span class="muted small">'+esc(slotBy(m.slot).l)+' · '+esc(slotBy(m.slot).t)+'</span><b>'+esc(mealTitle(m))+'</b>'+mstChip(mealLabel(m))+mealNextBtn(m)+'</div>').join('')));
   if(low.length)H.push(sec('bag','Estoque crítico',low.length,low.map(x=>{const p=pantryOf(x.ing.id);return '<div class="crow"><span class="lki">'+ic('bag',16)+'</span><div class="cprev"><b>'+esc(x.ing.name)+'</b><span class="muted small">restam '+fmtQty(x.qty,x.ing.unit)+' · mínimo '+fmtQty(x.min,x.ing.unit)+'</span></div>'+(p?'<button class="icon-btn sm" data-a="pa-use" data-id="'+p.id+'" aria-label="Registrar consumo" title="Registrar consumo">'+ic('minus',15)+'</button>':'')+'</div>';}).join('')+'<div style="margin-top:8px"><button class="btn sm primary" data-a="goto-mercado">'+ic('cart',14)+' Abrir lista de mercado</button></div>'));
