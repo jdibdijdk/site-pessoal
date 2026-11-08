@@ -5,7 +5,7 @@ const API_KEY = 'AIzaSyBU4owCJwloUlcfTP-cOeHjEo5hyzMH2tU';
 const FB_KEY = 'hRM2z3YEF6yPtTwKQyFMIAQs551d6Jwh';
 const BASE = 'https://firestore.googleapis.com/v1/projects/' + PROJECT + '/databases/(default)/documents/rotina/';
 
-const VERSION = 'v15';
+const VERSION = 'v16';
 const CACHE = 'rotina-app-' + VERSION;
 const META = 'rotina-meta'; // dados dos widgets e avisos recebidos com o app fechado
 const FRONTS = ['painel', 'semana', 'tarefas', 'habitos', 'notas', 'fin'];
@@ -56,7 +56,7 @@ self.addEventListener('fetch', (e) => {
     return;
   }
   // fontes do Google: guardadas para funcionar sem internet; Firestore, Storage e Drive nunca entram no cache
-  if (u.hostname === 'fonts.googleapis.com' || u.hostname === 'fonts.gstatic.com' || (u.hostname === 'cdnjs.cloudflare.com' && u.pathname.indexOf('/jszip/') >= 0)) e.respondWith(cacheFirst(req));
+  if (u.hostname === 'fonts.googleapis.com' || u.hostname === 'fonts.gstatic.com' || (u.hostname === 'cdnjs.cloudflare.com' && (u.pathname.indexOf('/jszip/') >= 0 || u.pathname.indexOf('/pdf.js/') >= 0))) e.respondWith(cacheFirst(req));
 });
 
 /* ----- mensagens do app ----- */
