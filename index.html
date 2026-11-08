@@ -2247,6 +2247,21 @@ html[data-theme="dark"] .fpill{color:color-mix(in srgb,var(--fc) 50%,#fff);backg
 .dyi{position:absolute;top:6px;right:6px;color:var(--em);cursor:pointer}
 .pfilter{width:100%;margin-bottom:4px;font-size:13px}
 .tmeta .fpill{font-size:11px;padding:1px 8px 1px 7px}
+
+.qsub{margin:0 0 6px;color:var(--mut);font-size:13px}.qsub b{color:var(--tx);font-size:16px}
+.mfareas{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.mfarea{border:1px solid transparent;background:none;border-radius:9999px;padding:2px}.mfarea.on{border-color:var(--acc)}
+.mfl{margin-top:6px}.mfrow{display:flex;align-items:center;gap:12px;width:100%;border:0;border-bottom:1px solid var(--line2);background:none;padding:8px 10px;text-align:left;font-size:13.5px;color:var(--tx)}
+.mfrow:hover{background:var(--soft)}.mft{min-width:150px}.mfsub{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mfst{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;border:1.5px dashed var(--line3);color:var(--mut2)}
+.mfst.certa{border:1.5px solid #1F9D55;color:#1F9D55}.mfst.errada{border:1.5px solid #E5383B;color:#E5383B}.mfst.anulada{border:1.5px solid var(--mut2)}
+.mfmk{color:#E0A030}
+.mfq .mfenun p{margin:0 0 8px;line-height:1.55}.mfimg{margin:8px 0;text-align:center}.mfimg img{max-width:100%;max-height:360px;border-radius:10px}
+.mfalts{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.mfalt{display:flex;gap:10px;align-items:flex-start;text-align:left;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:9px 12px;color:var(--tx)}
+.mfalt b{flex:none;width:22px;height:22px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line3);font-size:12px}
+.mfalt:hover:not(:disabled){border-color:var(--acc)}.mfalt.sel{border-color:var(--acc)}.mfalt.ok{border-color:#1F9D55;background:rgba(31,157,85,.08)}.mfalt.bad{border-color:#E5383B;background:rgba(229,56,59,.08)}
+.mfcom{font-size:13px;color:var(--mut);padding:0 12px 4px 44px}.mfres{margin:8px 0;font-size:14px}.mfcomg{background:var(--soft);border-radius:12px;padding:10px 14px;margin:8px 0;font-size:13.5px}.mfcomg p{margin:4px 0}
+.mfnota{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}.mfnota textarea{flex:1 1 100%}
 </style>
 </head>
 <body>
@@ -3897,7 +3912,7 @@ function taskRow(t){
       dts.map(d=>'<span class="mi">'+ic('clock',13)+esc(d.title)+'</span>').join('')+
       gs.map(g=>'<span class="mi">'+ic('target',13)+esc(g.title)+'</span>').join('')+((t.itemIds||[]).length?'<span class="mi">'+ic('bag',13)+t.itemIds.length+' objeto(s)</span>':'')+((t.moneys||[]).length?'<span class="mi">'+ic('dollar',13)+t.moneys.length+'</span>':'')+(t.link?linkHTML(t.link):'')+savedLinksHTML(t.linkIds)+(t.group?'<span class="mi">'+ic('layers',13)+esc(t.group)+'</span>':'')+tSubsChip(t)+'</div>'+tSubsBox(t)+
     (t.notes?'<div class="tnote">'+esc(t.notes)+'</div>':'')+(t.where?'<div class="tnote">'+ic('pin',12)+' '+esc(t.where)+'</div>':'')+planLines(t)+(t.min?'<div class="lc-time">'+ic('clock',13)+' '+hm(t.min)+' estimado</div>':'')+(t.done?'':'<div class="lc-foot"><button class="btn sm" data-a="toggle-task" data-id="'+t.id+'">'+ic('check',13)+' Concluir</button><button class="btn sm ghost" data-a="att-plus1" data-id="'+t.id+'">Adiar</button><button class="btn sm primary" data-a="task-focus" data-id="'+t.id+'">'+ic('play',13)+' Foco</button></div>')+'</div>'+
-    '<div class="tact"><button class="icon-btn" data-a="sched-task" data-id="'+t.id+'" title="Agendar em um horário" aria-label="Agendar">'+ic('calendar',17)+'</button>'+
+    '<div class="tact"><button class="icon-btn" data-a="doc-from" data-w="task" data-id="'+t.id+'" title="'+(doc?'Abrir o documento':'Criar documento desta tarefa')+'" aria-label="Documento">'+ic(doc?'file':'filePlus',17)+'</button><button class="icon-btn" data-a="sched-task" data-id="'+t.id+'" title="Agendar em um horário" aria-label="Agendar">'+ic('calendar',17)+'</button>'+
     '<button class="icon-btn" data-a="edit-task" data-id="'+t.id+'" title="Editar" aria-label="Editar">'+ic('edit',17)+'</button>'+
     '<button class="icon-btn" data-a="del-task" data-id="'+t.id+'" title="Excluir" aria-label="Excluir">'+ic('trash',17)+'</button></div></div>';
 }
@@ -5015,7 +5030,13 @@ function openDocForm(opts){
     const lbls=Array.from(new Set(chosen.concat(extra))),old=d0?d0.todo:[];
     const todo=lbls.map(l=>old.find(x=>x.label===l)||{id:uid(),label:l,done:false});
     const data={title:E.title.value.trim(),catId:$('[data-catpick="cat"]',f).dataset.value||'',link:E.link.value.trim(),notes:E.notes.value.trim(),todo:todo,goalIds:pickedValues(f,'goals'),focoIds:pickedValues(f,'focos'),linkIds:pickedValues(f,'links'),noteIds:pickedValues(f,'notes'),folderId:E.folder.value,ext:E.ext.value,status:st,source:E.source.value.trim(),srcLink:E.srcLink.value.trim()};
-    if(d0)Object.assign(d0,data);else S.docs.push(Object.assign({id:uid(),createdAt:Date.now()},data));
+    let dn=d0;
+    if(d0)Object.assign(d0,data);else{dn=Object.assign({id:uid(),createdAt:Date.now()},data);S.docs.push(dn);}
+    if(!d0&&opts.from){ // documento criado a partir de uma tarefa ou de um evento: vincula nos dois lados
+      if(opts.from.k==='task'){const t=taskById(opts.from.id);if(t)t.docId=dn.id;}
+      else{const a=actById(opts.from.id);if(a){a.docIds=a.docIds||[];if(a.docIds.indexOf(dn.id)<0)a.docIds.push(dn.id);}}
+      dn.fromKind=opts.from.k;dn.fromId=opts.from.id;
+    }
     save();closeModal();rerender();toast('Documento salvo.');
   });
 }
@@ -5132,7 +5153,7 @@ function openOcc(aid,key){
     '<h2 class="vt">'+esc(aT(a))+'</h2>'+(focoIdsOf(a).length?'<div class="tmeta">'+focoChips(a)+'</div>':'')+
     '<dl class="facts">'+facts.map(f=>'<div class="fact">'+ic(f[0],16)+'<div><dt>'+f[1]+'</dt><dd>'+esc(f[2])+'</dd></div></div>').join('')+'</dl>'+
     occDetail(o,{noPlace:true})+occHabitsHTML(o)+
-    '<div class="mfoot"><button class="btn '+(o.done?'':'primary')+'" data-a="toggle-occ" data-aid="'+aid+'" data-key="'+esc(key)+'">'+ic('check',15)+(o.done?' Concluída (desfazer)':' Marcar como concluída')+'</button>'+(o.done?'':'<button class="btn '+(o.miss?'warnb':'')+'" data-a="miss-occ" data-aid="'+aid+'" data-key="'+esc(key)+'">'+ic('x',15)+(o.miss?' Não fiz (desfazer)':' Não fiz')+'</button>')+'<span class="sp"></span><button class="btn sm" data-a="hb-new-evt" data-aid="'+aid+'">'+ic('sprout',14)+' Hábito depois deste evento</button><button class="btn sm" data-a="new-task-for" data-aid="'+aid+'">'+ic('plus',14)+' Nova tarefa desta atividade</button></div>');
+    '<div class="mfoot"><button class="btn '+(o.done?'':'primary')+'" data-a="toggle-occ" data-aid="'+aid+'" data-key="'+esc(key)+'">'+ic('check',15)+(o.done?' Concluída (desfazer)':' Marcar como concluída')+'</button>'+(o.done?'':'<button class="btn '+(o.miss?'warnb':'')+'" data-a="miss-occ" data-aid="'+aid+'" data-key="'+esc(key)+'">'+ic('x',15)+(o.miss?' Não fiz (desfazer)':' Não fiz')+'</button>')+'<span class="sp"></span><button class="btn sm" data-a="doc-from" data-w="act" data-id="'+aid+'">'+ic(a.docIds&&a.docIds.length&&docById(a.docIds[0])?'file':'filePlus',14)+(a.docIds&&a.docIds.length&&docById(a.docIds[0])?' Abrir documento':' Criar documento')+'</button><button class="btn sm" data-a="hb-new-evt" data-aid="'+aid+'">'+ic('sprout',14)+' Hábito depois deste evento</button><button class="btn sm" data-a="new-task-for" data-aid="'+aid+'">'+ic('plus',14)+' Nova tarefa desta atividade</button></div>');
   UI.openOcc={aid:aid,key:key};return true;
 }
 function openTaskView(id){
@@ -5151,6 +5172,7 @@ function openTaskView(id){
   const its=(t.itemIds||[]).map(itemById).filter(Boolean);
   openModal('<div class="mh">'+tagHTML(t.catId)+'<span class="kd">Tarefa</span>'+(t.done?'<span class="due">Concluída</span>':'')+'<span class="sp"></span>'+
     '<button class="icon-btn" data-a="edit-task" data-id="'+id+'" title="Editar" aria-label="Editar">'+ic('edit',19)+'</button>'+
+    '<button class="icon-btn" data-a="doc-from" data-w="task" data-id="'+id+'" title="'+(t.docId&&docById(t.docId)?'Abrir o documento':'Criar documento desta tarefa')+'" aria-label="Documento">'+ic(t.docId&&docById(t.docId)?'file':'filePlus',18)+'</button>'+
     '<button class="icon-btn" data-a="sched-task" data-id="'+id+'" title="Agendar em um horário" aria-label="Agendar">'+ic('calendar',18)+'</button>'+
     '<button class="icon-btn" data-a="del-task" data-id="'+id+'" title="Excluir" aria-label="Excluir">'+ic('trash',18)+'</button>'+
     '<button class="icon-btn" data-a="close" title="Fechar" aria-label="Fechar">'+ic('x',19)+'</button></div>'+
@@ -10811,6 +10833,22 @@ Object.assign(ACT,{
       toastUndo(gone.length+(gone.length===1?' tarefa excluída.':' tarefas excluídas.'),()=>{S.tasks=old;save();rerender();});
     },'Excluir');
   },
+  'doc-from'(el){
+    const w=el.dataset.w,id=el.dataset.id;
+    if(w==='task'){
+      const t=taskById(id);if(!t)return;
+      if(t.docId&&docById(t.docId)){closeModal();openDocView(t.docId);return;}
+      const notes=[t.notes,t.where?'Metodologia:\n'+t.where:'',(t.subs||[]).length?'Etapas:\n'+t.subs.map(x=>'- '+x.t).join('\n'):''].filter(Boolean).join('\n\n');
+      closeModal();openDocForm({prefill:{title:t.title,catId:t.catId,link:t.link||'',notes:notes,goalIds:(t.goalIds||[]).slice(),focoIds:(t.focoIds||[]).slice(),linkIds:(t.linkIds||[]).slice()},from:{k:'task',id:t.id}});
+    }else{
+      const a=actById(id);if(!a)return;
+      const ex=(a.docIds||[]).map(docById).filter(Boolean)[0];
+      if(ex){closeModal();openDocView(ex.id);return;}
+      const pt=actParts(a),obj=textLines(a.doWhat);
+      const notes=[obj.length?'Objetivos:\n'+obj.map(x=>'- '+x).join('\n'):'',a.where?'Metodologia:\n'+a.where:''].filter(Boolean).join('\n\n');
+      closeModal();openDocForm({prefill:{title:pt.theme||aT(a),catId:a.catId,link:a.link||'',notes:notes,goalIds:(a.goalIds||[]).slice(),focoIds:(a.focoIds||[]).slice(),linkIds:(a.linkIds||[]).slice()},from:{k:'act',id:a.id}});
+    }
+  },
   'sum-toggle'(el){S.prefs.sumC=S.prefs.sumC||{};S.prefs.sumC[el.dataset.k]=!S.prefs.sumC[el.dataset.k];save();renderMain();},
   'sb-toggle'(){S.prefs.sbCollapsed=!S.prefs.sbCollapsed;save();renderTabs();},
   'sb-open'(){document.body.classList.toggle('sb-open');},
@@ -11297,39 +11335,171 @@ function appHTML(){
 /* ==========================================================================
    34c. QUESTÕES: banco MedFisher embutido; "Enviar para Notas" vira Questão ou Caso clínico
    ========================================================================== */
-const MF_BASE='https://medfisher-2.luiswgustavo15.workers.dev/'; // endereço do banco de questões
-const MF_ORIGIN=new URL(MF_BASE).origin; // só aceita "Enviar para Notas" vindo deste endereço
+/* ----- Questões: o banco do MedFisher, lido e gravado direto no mesmo Firestore (coleção "sheets"), sem iframe ----- */
+const MF_CFG={apiKey:"AIzaSyDxslO8uCqWpPgGK5KmjN1IlWpPA_QJkDQ",authDomain:"medfisher-35af0.firebaseapp.com",projectId:"medfisher-35af0",storageBucket:"medfisher-35af0.firebasestorage.app",messagingSenderId:"348645111179",appId:"1:348645111179:web:e05014d62ad02bf574ab8e"};
 const mfUser=()=>/^(0[1-9]|10)$/.test(S.prefs.mfUser||'')?S.prefs.mfUser:'02';
-const mfUrl=()=>MF_BASE+'?u='+mfUser()+'#/questoes';
-// O banco fica num quadro que nunca é recriado: trocar de aba e voltar mantém a questão onde estava
-const QF={
-  el:null,user:'',
-  sync(){
-    const on=UI.tab==='questoes',slot=$('#qslot');
-    if(!on||!slot){if(this.el)this.el.hidden=true;document.body.classList.remove('qtab');return;}
-    if(!this.el||this.user!==mfUser()){
-      if(this.el)this.el.remove();
-      const f=document.createElement('iframe');f.id='qframe';f.className='qframe';f.title='Banco de questões MedFisher';f.src=mfUrl();
-      f.setAttribute('allow','clipboard-write; fullscreen');document.body.appendChild(f);this.el=f;this.user=mfUser();
-    }
-    document.body.classList.add('qtab');this.el.hidden=false;this.place();
-  },
-  place(){
-    const slot=$('#qslot');if(!slot||!this.el||this.el.hidden)return;
-    const r=slot.getBoundingClientRect(),top=r.top+window.scrollY,bar=$('#tabs'),bb=bar&&getComputedStyle(bar).position==='fixed'?bar.offsetHeight:0;
-    Object.assign(this.el.style,{top:top+'px',left:r.left+'px',width:r.width+'px',height:Math.max(360,window.innerHeight-r.top-bb-8)+'px'});
-  },
-  reload(){if(this.el){this.el.src=mfUrl();}}
-};
-window.addEventListener('resize',()=>QF.place());
-function renderQuestoes(){
-  const n=S.notes.filter(x=>x.mfId).length;
-  return '<div class="qhead"><h2 class="vt">Questões</h2><span class="muted small">MedFisher · usuário '+mfUser()+(n?' · '+n+(n===1?' enviada para Notas':' enviadas para Notas'):'')+'</span><span class="sp"></span>'+
-    '<button class="btn sm ghost" data-a="mf-user" title="Trocar o usuário do MedFisher">'+ic('user',14)+' '+mfUser()+'</button>'+
-    '<button class="btn sm ghost" data-a="mf-reload" title="Voltar para a lista de questões">'+ic('repeat',14)+' Recarregar</button>'+
-    '<a class="btn sm ghost" href="'+esc(mfUrl())+'" target="_blank" rel="noopener">'+ic('external',14)+' Abrir em nova aba</a></div>'+
-    '<p class="muted small qtip">Abra uma questão e toque em <b>Enviar para Notas</b> para guardá-la como Questão ou Caso clínico.</p><div id="qslot" class="qslot"></div>';
+const MF_BLOCO_MAX=350000;
+const MFD={st:'idle',err:'',user:'',sdk:null,db:null,T:{Questoes:new Map(),Respostas:new Map(),Favoritas:new Map(),Anotacoes:new Map(),Trilhas:new Map(),Reportes:new Map()},size:{},idx:[],byId:{},est:{r:{},f:{},v:{}},imgs:{},n:0};
+const mfChave=(()=>{let n=0;return()=>Date.now().toString(36).padStart(9,'0')+(n++%46656).toString(36).padStart(3,'0')+Math.random().toString(36).slice(2,5);})();
+const mfJ=(s,d)=>{try{return s?JSON.parse(s):d;}catch(e){return d;}};
+function mfPaint(){if(UI.tab==='questoes'&&!UI.mfq)renderMain();}
+async function mfLoad(force){
+  const user=mfUser();
+  if(MFD.st==='loading')return;
+  if(MFD.st==='ok'&&MFD.user===user&&!force)return;
+  MFD.st='loading';MFD.err='';MFD.user=user;mfPaint();
+  try{
+    const k=await FB.load();MFD.sdk=k;
+    if(!MFD.db){const ap=(k.getApps?k.getApps().find(a=>a.name==='mf'):null)||k.initializeApp(MF_CFG,'mf');MFD.db=k.getFirestore(ap);}
+    const col=k.collection(MFD.db,'sheets');
+    const pre=async p=>(await k.getDocs(k.query(col,k.where(k.documentId(),'>=',p),k.where(k.documentId(),'<',p+'')))).docs;
+    const got=await Promise.all([pre('Questoes__'),pre('Respostas__u'+user+'__'),pre('Favoritas__u'+user+'__'),pre('Anotacoes__u'+user+'__')]);
+    Object.keys(MFD.T).forEach(t=>MFD.T[t].clear());MFD.size={};
+    got.forEach(ds=>ds.forEach(d=>{
+      const tb=d.id.split('__')[0],T=MFD.T[tb],rows=(d.data()||{}).rows||{};if(!T)return;
+      Object.keys(rows).forEach(ch=>{const js=rows[ch];if(typeof js!=='string')return;const v=mfJ(js,null);if(!Array.isArray(v))return;T.set(ch,{bloco:d.id,v:v});MFD.size[d.id]=(MFD.size[d.id]||0)+js.length;});
+    }));
+    mfBuild();MFD.st='ok';
+  }catch(e){
+    MFD.st='err';MFD.err=/permission|insufficient/i.test(String((e&&e.code)||e&&e.message))?'O banco recusou o acesso deste site (regras ou domínios autorizados do projeto do MedFisher).':String((e&&e.message)||e);
+  }
+  mfPaint();
 }
+function mfBuild(){
+  const seen={},idx=[];
+  [...MFD.T.Questoes.entries()].sort((a,b)=>a[0]<b[0]?-1:1).forEach(([ch,r])=>{const v=r.v,id=String(v[0]);if(seen[id])return;seen[id]=1;idx.push({id:id,prova:String(v[1]),inst:String(v[2]),ano:Number(v[3])||0,num:Number(v[4])||0,area:String(v[5]),sub:String(v[6]),foco:String(v[7]),anul:v[11]==='S',v:v});});
+  idx.sort((a,b)=>a.inst<b.inst?-1:a.inst>b.inst?1:(a.ano-b.ano)||(a.num-b.num));
+  MFD.idx=idx;MFD.byId={};idx.forEach(q=>{MFD.byId[q.id]=q;});
+  const e={r:{},f:{},v:{}};
+  [...MFD.T.Respostas.entries()].sort((a,b)=>a[0]<b[0]?-1:1).forEach(([ch,r])=>{const v=r.v;if(String(v[0])!==MFD.user)return;const q=String(v[1]),c=(v[3]===''||v[3]===null)?2:Number(v[3]),a=e.r[q];e.r[q]=[String(v[2]),c,(a?a[2]:0)+1];});
+  MFD.T.Favoritas.forEach((r,ch)=>{if(String(r.v[0])===MFD.user)e.f[String(r.v[1])]=ch;});
+  MFD.T.Anotacoes.forEach((r,ch)=>{if(String(r.v[0])===MFD.user&&Number(r.v[3])===1)e.v[String(r.v[1])]=ch;});
+  MFD.est=e;
+}
+const mfQ=q=>({id:q.id,provaId:q.prova,instituicao:q.inst,ano:q.ano,numero:q.num,area:q.area,subarea:q.sub,foco:q.foco,enunciado:String(q.v[8]),alternativas:mfJ(q.v[9],[]),gabarito:String(q.v[10]),anulada:q.anul,comentario:String(q.v[12]),imagens:mfJ(q.v[13],[]),provaNome:(mfJ(q.v[15],{})||{}).prova_nome||''});
+const mfNotaOf=id=>{for(const r of MFD.T.Anotacoes.values())if(String(r.v[0])===MFD.user&&String(r.v[1])===id)return r.v;return null;};
+// ----- gravação (mesmo formato do MedFisher: linha em JSON dentro do bloco, com merge) -----
+function mfBloco(tb){const base=tb+'__u'+MFD.user;let b=0;while((MFD.size[base+'__'+b]||0)>MF_BLOCO_MAX)b++;return base+'__'+b;}
+function mfPut(tb,bloco,chave,row){
+  const k=MFD.sdk,T=MFD.T[tb];
+  if(row===null){T.delete(chave);}else{const js=JSON.stringify(row);T.set(chave,{bloco:bloco,v:row});MFD.size[bloco]=(MFD.size[bloco]||0)+js.length;}
+  return k.setDoc(k.doc(MFD.db,'sheets',bloco),{rows:{[chave]:row===null?k.deleteField():JSON.stringify(row)}},{merge:true}).catch(e=>{toast('Não consegui gravar no banco: '+((e&&e.message)||e));});
+}
+function mfAnswer(id,alt,tempo){
+  const q=MFD.byId[id];if(!q)return null;
+  const c=q.anul?'':(alt===String(q.v[10])?1:0),tb='Respostas',ch=mfChave();
+  mfPut(tb,mfBloco(tb),ch,[MFD.user,id,alt,c,Math.max(0,Math.min(86400,Math.round(tempo||0))),'livre','',new Date().toISOString()]);
+  const a=MFD.est.r[id];MFD.est.r[id]=[alt,c===''?2:c,(a?a[2]:0)+1];return c;
+}
+function mfFav(id){
+  if(MFD.est.f[id]){const ch=MFD.est.f[id],r=MFD.T.Favoritas.get(ch);mfPut('Favoritas',r?r.bloco:mfBloco('Favoritas'),ch,null);delete MFD.est.f[id];return false;}
+  const ch=mfChave();mfPut('Favoritas',mfBloco('Favoritas'),ch,[MFD.user,id,new Date().toISOString()]);MFD.est.f[id]=ch;return true;
+}
+function mfNota(id,texto,revisar){
+  let ch=null,bl=null;MFD.T.Anotacoes.forEach((r,c)=>{if(String(r.v[0])===MFD.user&&String(r.v[1])===id){ch=c;bl=r.bloco;}});
+  texto=String(texto||'').slice(0,5000);
+  if(!texto&&!revisar){if(ch)mfPut('Anotacoes',bl,ch,null);delete MFD.est.v[id];return;}
+  if(ch)mfPut('Anotacoes',bl,ch,[MFD.user,id,texto,revisar?1:0]);else{ch=mfChave();mfPut('Anotacoes',mfBloco('Anotacoes'),ch,[MFD.user,id,texto,revisar?1:0]);}
+  if(revisar)MFD.est.v[id]=ch;else delete MFD.est.v[id];
+}
+async function mfImg(fid){
+  if(MFD.imgs[fid])return MFD.imgs[fid];
+  try{const k=MFD.sdk,s=await k.getDoc(k.doc(MFD.db,'imagens',fid));const d=s.exists()?s.data().d:null;if(d)MFD.imgs[fid]=d;return d;}catch(e){return null;}
+}
+// ----- filtros -----
+const MFF=()=>UI.mff||(UI.mff={areas:[],prova:'',ano:'',sub:'',foco:'',nao:false,err:false,cer:false,fav:false,rev:false,anul:false});
+function mfFiltered(){
+  const f=MFF(),e=MFD.est;
+  return MFD.idx.filter(q=>{
+    if(q.anul&&!f.anul)return false;
+    if(f.areas.length&&f.areas.indexOf(q.area)<0)return false;
+    if(f.prova&&q.prova!==f.prova)return false;
+    if(f.ano&&String(q.ano)!==f.ano)return false;
+    if(f.sub&&q.sub!==f.sub)return false;
+    if(f.foco&&q.foco!==f.foco)return false;
+    if(f.nao||f.err||f.cer||f.fav||f.rev){
+      const r=e.r[q.id];let ok=false;
+      if(f.nao&&!r)ok=true;if(f.err&&r&&r[1]===0)ok=true;if(f.cer&&r&&r[1]===1)ok=true;if(f.fav&&e.f[q.id])ok=true;if(f.rev&&e.v[q.id])ok=true;
+      if(!ok)return false;
+    }
+    return true;
+  });
+}
+const mfAreaStyle=nm=>{const a=(S.areas||[]).find(x=>norm(nm).indexOf(norm(x.name).slice(0,9))===0||norm(x.name).indexOf(norm(nm))===0)||{icon:'tag',color:'#5B6B85'};return a;};
+const mfAreaPill=nm=>{const a=mfAreaStyle(nm);return '<span class="fpill" style="--fc:'+esc(a.color)+'">'+ic(a.icon,13)+'<span>'+esc(nm)+'</span></span>';};
+const mfStatus=id=>{const r=MFD.est.r[id];return r?(r[1]===1?'certa':r[1]===0?'errada':'anulada'):'nova';};
+function renderQuestoes(){
+  const nNotas=S.notes.filter(x=>x.mfId).length,head='<div class="qhead"><h2 class="vt">Questões</h2><span class="muted small">MedFisher · usuário '+mfUser()+(nNotas?' · '+nNotas+(nNotas===1?' enviada para Notas':' enviadas para Notas'):'')+'</span><span class="sp"></span>'+
+    '<button class="btn sm ghost" data-a="mf-user">'+ic('user',14)+' '+mfUser()+'</button><button class="btn sm ghost" data-a="mf-reload">'+ic('repeat',14)+' Recarregar</button></div>';
+  if(MFD.st==='idle'||MFD.user!==mfUser()&&MFD.st!=='loading'){setTimeout(()=>mfLoad(),0);}
+  if(MFD.st==='loading'||MFD.st==='idle')return head+'<div class="empty">Carregando o banco de questões…</div>';
+  if(MFD.st==='err')return head+'<div class="warn">'+esc(MFD.err)+'</div><div class="addrow"><button class="btn" data-a="mf-reload">Tentar de novo</button></div>';
+  const f=MFF(),list=mfFiltered(),areas=Array.from(new Set(MFD.idx.map(q=>q.area))).sort();
+  const base=MFD.idx.filter(q=>(!f.areas.length||f.areas.indexOf(q.area)>=0));
+  const provas=Array.from(new Map(base.map(q=>[q.prova,q.inst+' '+q.ano])).entries()).sort((a,b)=>a[1]<b[1]?-1:1),anos=Array.from(new Set(base.map(q=>q.ano))).sort((a,b)=>b-a);
+  const subs=Array.from(new Set(base.map(q=>q.sub))).filter(Boolean).sort((a,b)=>a.localeCompare(b,'pt-BR')),focos=Array.from(new Set(base.filter(q=>!f.sub||q.sub===f.sub).map(q=>q.foco))).filter(Boolean).sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  const sel=(id,lab,opts,cur)=>'<label class="nfsel"><span>'+lab+'</span><select id="'+id+'"><option value="">Todos</option>'+opts.map(o=>'<option value="'+esc(o[0])+'" '+(String(cur)===String(o[0])?'selected':'')+'>'+esc(o[1])+'</option>').join('')+'</select></label>';
+  const cb=(k,l)=>'<label class="chip cb"><input type="checkbox" data-mf="'+k+'" '+(f[k]?'checked':'')+'><span>'+l+'</span></label>';
+  const shown=list.slice(0,UI.mfn||50);
+  return head+'<div class="qsub"><b>'+list.length+'</b> questões encontradas</div>'+
+    '<div class="toolbar" style="margin-bottom:4px"><span class="sp"></span><button class="btn sm" data-a="mf-trilha">'+ic('list',14)+' Salvar como trilha</button><button class="btn primary sm" data-a="mf-treinar">'+ic('play',14)+' Treinar com estes filtros</button></div>'+
+    '<div class="mfareas">'+areas.map(a=>'<button class="mfarea '+(f.areas.indexOf(a)>=0?'on':'')+'" data-a="mf-area" data-v="'+esc(a)+'">'+mfAreaPill(a)+'</button>').join('')+'</div>'+
+    '<div class="nfbar">'+sel('mfProva','Prova',provas,f.prova)+sel('mfAno','Ano',anos.map(a=>[a,a]),f.ano)+sel('mfSub','Subárea',subs.map(a=>[a,a]),f.sub)+sel('mfFoco','Foco',focos.map(a=>[a,a]),f.foco)+'</div>'+
+    '<div class="frow" style="margin:6px 0 10px">'+cb('nao','Não respondidas')+cb('err','Erradas')+cb('cer','Certas')+cb('fav','Favoritas')+cb('rev','Revisar depois')+cb('anul','Incluir anuladas')+'<button class="btn sm ghost" data-a="mf-limpar">Limpar filtros</button></div>'+
+    (shown.length?'<div class="llist mfl">'+shown.map(q=>{const st=mfStatus(q.id);return '<button class="mfrow" data-a="mf-open" data-id="'+esc(q.id)+'"><span class="mfst '+st+'">'+ic(st==='certa'?'check':st==='errada'?'x':'minus',13)+'</span><span class="mft"><b>'+esc(q.inst)+' '+q.ano+'</b> · Questão '+q.num+'</span>'+mfAreaPill(q.area)+'<span class="muted small mfsub">'+esc([q.sub,q.foco].filter(Boolean).join(' › '))+'</span>'+(MFD.est.f[q.id]?'<span class="mfmk">'+ic('star',13)+'</span>':'')+(MFD.est.v[q.id]?'<span class="mfmk">'+ic('bell',13)+'</span>':'')+'</button>';}).join('')+'</div>'+(list.length>shown.length?'<div style="text-align:center;margin:10px"><button class="btn" data-a="mf-mais">Mostrar mais ('+(list.length-shown.length)+')</button></div>':''):'<div class="empty">Nenhuma questão com estes filtros.</div>')+
+    '<p class="muted small" style="margin-top:12px">Simulados, trilhas salvas, flashcards e importação continuam no MedFisher.</p>';
+}
+function mfTxtB(t){return String(t||'').split(/\n+/).map(l=>l.trim()).filter(Boolean).map(l=>'<p>'+esc(l)+'</p>').join('');}
+function mfQHTML(){
+  const m=UI.mfq;if(!m)return '';const id=m.ids[m.i],q=MFD.byId[id];if(!q)return '<div class="form"><div class="fh"><h2>Questão</h2><button class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div><div class="empty">Questão não encontrada.</div></div>';
+  const Q=mfQ(q),r=MFD.est.r[id],rev=!!r||m.show,marcada=r?r[0]:'',nota=mfNotaOf(id);
+  const imgs=pos=>Q.imagens.filter(x=>pos?x.posicao===pos:x.posicao!=='comentario'&&String(x.posicao).indexOf('alternativa_')!==0).map(x=>x.fileId?'<figure class="mfimg"><img data-fid="'+esc(x.fileId)+'" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="'+esc(x.legenda||'Imagem da questão')+'">'+(x.legenda?'<figcaption>'+esc(x.legenda)+'</figcaption>':'')+'</figure>':'').join('');
+  return '<div class="form mfq"><div class="fh"><div><div class="muted small">'+esc(q.inst)+' '+q.ano+' · Questão '+q.num+(m.ids.length>1?' · '+(m.i+1)+'/'+m.ids.length:'')+'</div>'+mfAreaPill(q.area)+' <span class="muted small">'+esc([q.sub,q.foco].filter(Boolean).join(' › '))+'</span></div><span class="sp"></span>'+
+    '<button class="icon-btn '+(MFD.est.f[id]?'on':'')+'" data-a="mf-fav" aria-label="Favoritar" title="Favoritar">'+ic('star',18)+'</button><button class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
+    (q.anul?'<div class="warn">Questão anulada.</div>':'')+'<div class="mfenun">'+mfTxtB(Q.enunciado)+imgs()+'</div>'+
+    '<div class="mfalts">'+Q.alternativas.map(a=>{let cl='';if(rev){if(a.letra===Q.gabarito&&!q.anul)cl=' ok';else if(a.letra===marcada)cl=' bad';}else if(a.letra===marcada)cl=' sel';
+      return '<button class="mfalt'+cl+'" data-a="mf-alt" data-l="'+esc(a.letra)+'" '+(r?'disabled':'')+'><b>'+esc(a.letra)+'</b><span>'+esc(a.texto)+'</span></button>'+(rev&&a.comentario?'<div class="mfcom">'+esc(a.comentario)+'</div>':'');}).join('')+'</div>'+
+    (rev?'<div class="mfres">'+(q.anul?'Anulada.':'Gabarito: <b>'+esc(Q.gabarito)+'</b>'+(r&&r[1]===1?' · você acertou':r&&r[1]===0?' · você marcou '+esc(marcada):''))+'</div>'+(Q.comentario?'<div class="mfcomg"><b>Comentário</b>'+mfTxtB(Q.comentario)+imgs('comentario')+'</div>':''):'<div class="ff"><span class="sp"></span><button class="btn" data-a="mf-reveal">Ver gabarito sem responder</button></div>')+
+    '<div class="mfnota"><textarea id="mfNota" rows="2" placeholder="Anotação" aria-label="Anotação">'+esc(nota?nota[2]:'')+'</textarea><label class="chip cb"><input type="checkbox" id="mfRev" '+(MFD.est.v[id]?'checked':'')+'><span>Revisar depois</span></label><button class="btn sm" data-a="mf-nota">Salvar anotação</button></div>'+
+    '<div class="ff"><button class="btn sm ghost" data-a="mf-report">Relatar problema</button><button class="btn sm" data-a="mf-send">'+ic('download',14)+' Enviar para Notas</button><span class="sp"></span>'+(m.ids.length>1?'<button class="btn sm" data-a="mf-nav" data-d="-1" '+(m.i?'':'disabled')+'>'+ic('chevL',14)+'</button><button class="btn sm primary" data-a="mf-nav" data-d="1">'+(m.i<m.ids.length-1?'Próxima':'Concluir')+'</button>':'')+'</div></div>';
+}
+async function mfShowQ(){
+  openModal(mfQHTML(),true);UI.mfT=Date.now();
+  $$('#sheet img[data-fid]').forEach(async im=>{const d=await mfImg(im.dataset.fid);if(d)im.src=d;else im.replaceWith(Object.assign(document.createElement('div'),{className:'muted small',textContent:'Imagem indisponível no banco.'}));});
+}
+function mfEnviar(){
+  const m=UI.mfq,q=m&&MFD.byId[m.ids[m.i]];if(!q)return;const Q=mfQ(q);
+  const imgs=[];Q.imagens.forEach(x=>{if(x.fileId&&MFD.imgs[x.fileId])imgs.push(MFD.imgs[x.fileId]);});
+  closeModal();openMfImport(mfClean({id:Q.id,numero:Q.numero,instituicao:Q.instituicao,ano:Q.ano,area:Q.area,subarea:Q.subarea,foco:Q.foco,enunciado:Q.enunciado,alternativas:Q.alternativas,gabarito:Q.gabarito,anulada:Q.anulada,comentario:Q.comentario,imagens:imgs}));
+}
+document.addEventListener('change',e=>{
+  const t=e.target;if(!t||UI.tab!=='questoes')return;const f=MFF();
+  if(t.id==='mfProva'){f.prova=t.value;UI.mfn=50;renderMain();}else if(t.id==='mfAno'){f.ano=t.value;UI.mfn=50;renderMain();}
+  else if(t.id==='mfSub'){f.sub=t.value;f.foco='';UI.mfn=50;renderMain();}else if(t.id==='mfFoco'){f.foco=t.value;UI.mfn=50;renderMain();}
+  else if(t.dataset&&t.dataset.mf){f[t.dataset.mf]=t.checked;UI.mfn=50;renderMain();}
+});
+Object.assign(ACT,{
+  'mf-reload'(){mfLoad(true);},
+  'mf-mais'(){UI.mfn=(UI.mfn||50)+50;renderMain();},
+  'mf-limpar'(){UI.mff=null;UI.mfn=50;renderMain();},
+  'mf-area'(el){const f=MFF(),a=el.dataset.v,i=f.areas.indexOf(a);if(i>=0)f.areas.splice(i,1);else f.areas.push(a);f.sub='';f.foco='';UI.mfn=50;renderMain();},
+  'mf-open'(el){const ids=mfFiltered().map(q=>q.id);UI.mfq={ids:ids,i:Math.max(0,ids.indexOf(el.dataset.id)),show:false};mfShowQ();},
+  'mf-treinar'(){const ids=mfFiltered().map(q=>q.id).slice(0,500);if(!ids.length){toast('Nenhuma questão com estes filtros.');return;}UI.mfq={ids:ids,i:0,show:false,train:true,res:[]};mfShowQ();},
+  'mf-nav'(el){const m=UI.mfq;if(!m)return;const j=m.i+Number(el.dataset.d);if(j>=m.ids.length){closeModal();UI.mfq=null;if(m.train&&m.res.length)toast('Treino concluído: '+m.res.filter(x=>x).length+' certas de '+m.res.length+'.');renderMain();return;}if(j<0)return;m.i=j;m.show=false;mfShowQ();},
+  'mf-alt'(el){const m=UI.mfq;if(!m)return;const id=m.ids[m.i],c=mfAnswer(id,el.dataset.l,(Date.now()-(UI.mfT||Date.now()))/1000);if(m.res)m.res.push(c===1);mfShowQ();},
+  'mf-reveal'(){const m=UI.mfq;if(!m)return;m.show=true;mfShowQ();},
+  'mf-fav'(){const m=UI.mfq;if(!m)return;mfFav(m.ids[m.i]);mfShowQ();},
+  'mf-nota'(){const m=UI.mfq;if(!m)return;mfNota(m.ids[m.i],$('#mfNota').value,$('#mfRev').checked);toast('Anotação salva.');},
+  'mf-send'(){mfEnviar();},
+  'mf-report'(){const m=UI.mfq;if(!m)return;const id=m.ids[m.i];askText('Descreva o problema','',v=>{mfPut('Reportes',mfBloco('Reportes'),mfChave(),[MFD.user,id,String(v).trim().slice(0,2000),new Date().toISOString()]);toast('Problema registrado.');setTimeout(mfShowQ,0);});},
+  'mf-trilha'(){
+    const f=MFF(),ids=mfFiltered().length;askText('Nome da trilha','',nome=>{
+      const filtro={area:f.areas,provaId:f.prova?[f.prova]:[],ano:f.ano?[Number(f.ano)]:[],subarea:f.sub?[f.sub]:[],foco:f.foco?[f.foco]:[],status:[f.nao&&'nao_respondidas',f.err&&'erradas',f.cer&&'certas',f.fav&&'favoritas',f.rev&&'revisar'].filter(Boolean),incluirAnuladas:f.anul};
+      mfPut('Trilhas',mfBloco('Trilhas'),mfChave(),[mfChave().slice(0,12),MFD.user,nome.slice(0,80),JSON.stringify(filtro),Math.min(ids,500),'prova',new Date().toISOString()]);toast('Trilha salva (visível no MedFisher).');});
+  },
+  'mf-user'(){askText('Usuário do MedFisher (01 a 10)',mfUser(),v=>{v=String(v).trim().padStart(2,'0');if(!/^(0[1-9]|10)$/.test(v)){toast('Use um código entre 01 e 10.');return;}S.prefs.mfUser=v;save();MFD.st='idle';renderMain();});}
+});
+const QF={sync(){document.body.classList.remove('qtab');},place(){},reload(){mfLoad(true);}};
 // texto puro do banco → HTML seguro das notas
 const mfTxt=t=>String(t||'').split(/\n+/).map(l=>l.trim()).filter(Boolean).map(l=>'<div>'+esc(l)+'</div>').join('');
 const mfImgs=l=>(l||[]).filter(s=>typeof s==='string'&&IMG_SRC.test(s)).slice(0,8).map(s=>'<img src="'+s+'" style="width:480px"><br>').join('');
@@ -11374,15 +11544,8 @@ function openMfImport(q){
     else{toast((kind==='caso'?'Caso clínico':'Questão')+' salva em Notas.');if(UI.tab==='questoes')renderMain();}
   });
 }
-window.addEventListener('message',e=>{
-  if(e.origin!==MF_ORIGIN)return;const d=e.data;
-  if(!d||d.tipo!=='medfisher:questao'||!d.questao||typeof d.questao!=='object')return;
-  openMfImport(mfClean(d.questao));
-});
 Object.assign(ACT,{
-  'mf-kind'(el){$$('#mfKind button').forEach(b=>b.classList.toggle('on',b===el));},
-  'mf-reload'(){QF.reload();},
-  'mf-user'(){askText('Usuário do MedFisher (01 a 10)',mfUser(),v=>{v=String(v).trim().padStart(2,'0');if(!/^(0[1-9]|10)$/.test(v)){toast('Use um código entre 01 e 10.');return;}S.prefs.mfUser=v;save();renderMain();});}
+  'mf-kind'(el){$$('#mfKind button').forEach(b=>b.classList.toggle('on',b===el));}
 });
 
 /* ==========================================================================
