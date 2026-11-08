@@ -7267,14 +7267,14 @@ window.addEventListener('message',async e=>{
     if(d.type==='pdfcraft:ready'){
       PV.ready=true;const copy=PV.buf.slice(0);
       PV.frame.contentWindow.postMessage({type:'pdfcraft:open',name:(p.name||p.title+'.pdf').replace(/[\\/:*?"<>|]/g,'_'),bytes:copy},location.origin,[copy]);
-      hostStatus('PDF aberto no PdfCraft. Use Salvar (Ctrl+S) para guardar as anotações.');
+      hostStatus('PDF aberto. As alterações são salvas automaticamente.');
     }else if(d.type==='pdfcraft:dirty'){
-      PV.dirty=!!d.dirty;hostStatus(PV.dirty?'Alterações não salvas. Salve (Ctrl+S) antes de sair.':'Tudo salvo.');
+      PV.dirty=!!d.dirty;hostStatus(PV.dirty?'Salvando as alterações…':'Tudo salvo.');
     }else if(d.type==='pdfcraft:save'&&d.bytes){
       const buf=d.bytes;PdfMem[p.id]=buf;PV.buf=buf;p.updated=Date.now();
       await PdfDB.put(p.id,buf.slice(0));pdfPush(p,buf);save();
       if(d.saveAs)downloadBuf(buf,(d.name||p.title+'.pdf'),'application/pdf');
-      PV.dirty=false;toast('PDF salvo.');hostStatus(RF.ok()?'Salvo. Enviando para os outros aparelhos…':'Salvo neste aparelho (sincronização desligada).');
+      PV.dirty=false;if(d.saveAs)toast('PDF salvo.');hostStatus(RF.ok()?'Salvo automaticamente. Enviando para os outros aparelhos…':'Salvo neste aparelho (sincronização desligada).');
     }else if(d.type==='pdfcraft:failed'){
       const s=$('#pdfStatus');if(s)s.innerHTML='O PdfCraft não conseguiu iniciar'+(d.error?' ('+esc(String(d.error).slice(0,120))+')':'')+'. <button class="btn sm" data-a="pdf-download">Baixar o PDF</button>';
     }
