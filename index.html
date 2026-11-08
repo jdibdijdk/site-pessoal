@@ -2313,6 +2313,19 @@ html[data-theme="dark"] .fpill{color:color-mix(in srgb,var(--fc) 50%,#fff);backg
 .mfalt:hover:not(:disabled){border-color:var(--acc)}.mfalt.sel{border-color:var(--acc)}.mfalt.ok{border-color:#1F9D55;background:rgba(31,157,85,.08)}.mfalt.bad{border-color:#E5383B;background:rgba(229,56,59,.08)}
 .mfcom{font-size:13px;color:var(--mut);padding:0 12px 4px 44px}.mfres{margin:8px 0;font-size:14px}.mfcomg{background:var(--soft);border-radius:12px;padding:10px 14px;margin:8px 0;font-size:13.5px}.mfcomg p{margin:4px 0}
 .mfnota{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}.mfnota textarea{flex:1 1 100%}
+.mfpw{position:relative}.mfpb{display:inline-flex;align-items:center;gap:8px;justify-content:space-between;min-width:150px;max-width:240px;padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-size:13.5px;color:var(--tx);cursor:pointer}
+.mfpb b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mfpp{position:absolute;left:0;top:100%;margin-top:6px;z-index:30;width:min(360px,90vw);background:var(--card);border:1px solid var(--line3);border-radius:14px;box-shadow:0 12px 40px rgba(22,24,29,.22);padding:10px;display:flex;flex-direction:column;gap:8px}
+.mfpp[hidden]{display:none}
+.mfpp input[type=search]{width:100%;padding:7px 10px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--tx);box-sizing:border-box}
+.mfph{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mfpp ul{list-style:none;margin:0;padding:0;max-height:260px;overflow:auto}
+.mfpi{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;font-size:13.5px;cursor:pointer;color:var(--tx)}
+.mfpi:hover{background:var(--soft)}.mfpi span{flex:1;min-width:0}.mfpi em{font-style:normal;font-size:12px;color:var(--mut)}
+.mfdisc{margin:10px 0}.mfdisc textarea{width:100%;min-height:150px;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--tx);font:inherit;resize:vertical;box-sizing:border-box;margin-top:6px}
+.mfmy{border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:6px 0 10px}
+.mfexp{border:2px solid #0F9D8A;background:rgba(15,157,138,.08)}
+.mfdn{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}.mfdn button{padding:12px;border:0;border-radius:12px;color:#fff;font-weight:700;cursor:pointer}.mfdn .ok{background:#0F9D8A}.mfdn .no{background:#D6405A}
 </style>
 </head>
 <body>
@@ -11393,7 +11406,7 @@ function appHTML(){
    ========================================================================== */
 /* ----- Questões: o banco do MedFisher, lido e gravado direto no mesmo Firestore (coleção "sheets"), sem iframe ----- */
 const MF_CFG={apiKey:"AIzaSyDxslO8uCqWpPgGK5KmjN1IlWpPA_QJkDQ",authDomain:"medfisher-35af0.firebaseapp.com",projectId:"medfisher-35af0",storageBucket:"medfisher-35af0.firebasestorage.app",messagingSenderId:"348645111179",appId:"1:348645111179:web:e05014d62ad02bf574ab8e"};
-const mfUser=()=>/^(0[1-9]|10)$/.test(S.prefs.mfUser||'')?S.prefs.mfUser:'02';
+const mfUser=()=>/^(0[1-9]|1\d|20)$/.test(S.prefs.mfUser||'')?S.prefs.mfUser:'02';
 const MF_BLOCO_MAX=350000;
 const MFD={st:'idle',err:'',user:'',sdk:null,db:null,T:{Questoes:new Map(),Respostas:new Map(),Favoritas:new Map(),Anotacoes:new Map(),Trilhas:new Map(),Reportes:new Map()},size:{},idx:[],byId:{},est:{r:{},f:{},v:{}},imgs:{},n:0};
 const mfChave=(()=>{let n=0;return()=>Date.now().toString(36).padStart(9,'0')+(n++%46656).toString(36).padStart(3,'0')+Math.random().toString(36).slice(2,5);})();
@@ -11426,8 +11439,8 @@ function mfBuild(){
   [...MFD.T.Questoes.entries()].sort((a,b)=>a[0]<b[0]?-1:1).forEach(([ch,r])=>{const v=r.v,id=String(v[0]);if(seen[id])return;seen[id]=1;idx.push({id:id,prova:String(v[1]),inst:String(v[2]),ano:Number(v[3])||0,num:Number(v[4])||0,area:String(v[5]),sub:String(v[6]),foco:String(v[7]),anul:v[11]==='S',v:v});});
   idx.sort((a,b)=>a.inst<b.inst?-1:a.inst>b.inst?1:(a.ano-b.ano)||(a.num-b.num));
   MFD.idx=idx;MFD.byId={};idx.forEach(q=>{MFD.byId[q.id]=q;});
-  const e={r:{},f:{},v:{}};
-  [...MFD.T.Respostas.entries()].sort((a,b)=>a[0]<b[0]?-1:1).forEach(([ch,r])=>{const v=r.v;if(String(v[0])!==MFD.user)return;const q=String(v[1]),c=(v[3]===''||v[3]===null)?2:Number(v[3]),a=e.r[q];e.r[q]=[String(v[2]),c,(a?a[2]:0)+1];});
+  const e={r:{},f:{},v:{},t:{}};
+  [...MFD.T.Respostas.entries()].sort((a,b)=>a[0]<b[0]?-1:1).forEach(([ch,r])=>{const v=r.v;if(String(v[0])!==MFD.user)return;const q=String(v[1]),c=(v[3]===''||v[3]===null)?2:Number(v[3]),a=e.r[q];const al=String(v[2]),dc=al.charAt(0)==='§';e.r[q]=[dc?'§':al,c,(a?a[2]:0)+1];if(dc)e.t[q]=al.slice(1);});
   MFD.T.Favoritas.forEach((r,ch)=>{if(String(r.v[0])===MFD.user)e.f[String(r.v[1])]=ch;});
   MFD.T.Anotacoes.forEach((r,ch)=>{if(String(r.v[0])===MFD.user&&Number(r.v[3])===1)e.v[String(r.v[1])]=ch;});
   MFD.est=e;
@@ -11463,13 +11476,13 @@ async function mfImg(fid){
   try{const k=MFD.sdk,s=await k.getDoc(k.doc(MFD.db,'imagens',fid));const d=s.exists()?s.data().d:null;if(d)MFD.imgs[fid]=d;return d;}catch(e){return null;}
 }
 // ----- filtros -----
-const MFF=()=>UI.mff||(UI.mff={areas:[],prova:'',ano:'',sub:'',foco:'',nao:false,err:false,cer:false,fav:false,rev:false,anul:false});
+const MFF=()=>UI.mff||(UI.mff={areas:[],provas:[],ano:'',sub:'',foco:'',nao:false,err:false,cer:false,fav:false,rev:false,anul:false});
 function mfFiltered(){
   const f=MFF(),e=MFD.est;
   return MFD.idx.filter(q=>{
     if(q.anul&&!f.anul)return false;
     if(f.areas.length&&f.areas.indexOf(q.area)<0)return false;
-    if(f.prova&&q.prova!==f.prova)return false;
+    if(f.provas.length&&f.provas.indexOf(q.prova)<0)return false;
     if(f.ano&&String(q.ano)!==f.ano)return false;
     if(f.sub&&q.sub!==f.sub)return false;
     if(f.foco&&q.foco!==f.foco)return false;
@@ -11498,9 +11511,9 @@ function renderQuestoes(){
   const cb=(k,l)=>'<label class="chip cb"><input type="checkbox" data-mf="'+k+'" '+(f[k]?'checked':'')+'><span>'+l+'</span></label>';
   const shown=list.slice(0,UI.mfn||50);
   return head+'<div class="qsub"><b>'+list.length+'</b> questões encontradas</div>'+
-    '<div class="toolbar" style="margin-bottom:4px"><span class="sp"></span><button class="btn sm" data-a="mf-trilha">'+ic('list',14)+' Salvar como trilha</button><button class="btn primary sm" data-a="mf-treinar">'+ic('play',14)+' Treinar com estes filtros</button></div>'+
+    '<div class="toolbar" style="margin-bottom:4px"><span class="sp"></span><button class="btn sm" data-a="mf-imprimir">'+ic('printer',14)+' Imprimir</button><button class="btn sm" data-a="mf-trilha">'+ic('list',14)+' Salvar como trilha</button><button class="btn primary sm" data-a="mf-treinar">'+ic('play',14)+' Treinar com estes filtros</button></div>'+
     '<div class="mfareas">'+areas.map(a=>'<button class="mfarea '+(f.areas.indexOf(a)>=0?'on':'')+'" data-a="mf-area" data-v="'+esc(a)+'">'+mfAreaPill(a)+'</button>').join('')+'</div>'+
-    '<div class="nfbar">'+sel('mfProva','Prova',provas,f.prova)+sel('mfAno','Ano',anos.map(a=>[a,a]),f.ano)+sel('mfSub','Subárea',subs.map(a=>[a,a]),f.sub)+sel('mfFoco','Foco',focos.map(a=>[a,a]),f.foco)+'</div>'+
+    '<div class="nfbar">'+mfProvaHTML()+sel('mfAno','Ano',anos.map(a=>[a,a]),f.ano)+sel('mfSub','Subárea',subs.map(a=>[a,a]),f.sub)+sel('mfFoco','Foco',focos.map(a=>[a,a]),f.foco)+'</div>'+
     '<div class="frow" style="margin:6px 0 10px">'+cb('nao','Não respondidas')+cb('err','Erradas')+cb('cer','Certas')+cb('fav','Favoritas')+cb('rev','Revisar depois')+cb('anul','Incluir anuladas')+'<button class="btn sm ghost" data-a="mf-limpar">Limpar filtros</button></div>'+
     (shown.length?'<div class="llist mfl">'+shown.map(q=>{const st=mfStatus(q.id);return '<button class="mfrow" data-a="mf-open" data-id="'+esc(q.id)+'"><span class="mfst '+st+'">'+ic(st==='certa'?'check':st==='errada'?'x':'minus',13)+'</span><span class="mft"><b>'+esc(q.inst)+' '+q.ano+'</b> · Questão '+q.num+'</span>'+mfAreaPill(q.area)+'<span class="muted small mfsub">'+esc([q.sub,q.foco].filter(Boolean).join(' › '))+'</span>'+(MFD.est.f[q.id]?'<span class="mfmk">'+ic('star',13)+'</span>':'')+(MFD.est.v[q.id]?'<span class="mfmk">'+ic('bell',13)+'</span>':'')+'</button>';}).join('')+'</div>'+(list.length>shown.length?'<div style="text-align:center;margin:10px"><button class="btn" data-a="mf-mais">Mostrar mais ('+(list.length-shown.length)+')</button></div>':''):'<div class="empty">Nenhuma questão com estes filtros.</div>')+
     '<p class="muted small" style="margin-top:12px">Simulados, trilhas salvas, flashcards e importação continuam no MedFisher.</p>';
@@ -11509,13 +11522,14 @@ function mfTxtB(t){return String(t||'').split(/\n+/).map(l=>l.trim()).filter(Boo
 function mfQHTML(){
   const m=UI.mfq;if(!m)return '';const id=m.ids[m.i],q=MFD.byId[id];if(!q)return '<div class="form"><div class="fh"><h2>Questão</h2><button class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div><div class="empty">Questão não encontrada.</div></div>';
   const Q=mfQ(q),r=MFD.est.r[id],rev=!!r||m.show,marcada=r?r[0]:'',nota=mfNotaOf(id);
+  const disc=!Q.alternativas.length,H=mfDividirComentario({com:Q.comentario,alts:Q.alternativas});Q.alternativas=H.alts;Q.comentario=H.com;
   const imgs=pos=>Q.imagens.filter(x=>pos?x.posicao===pos:x.posicao!=='comentario'&&String(x.posicao).indexOf('alternativa_')!==0).map(x=>x.fileId?'<figure class="mfimg"><img data-fid="'+esc(x.fileId)+'" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="'+esc(x.legenda||'Imagem da questão')+'">'+(x.legenda?'<figcaption>'+esc(x.legenda)+'</figcaption>':'')+'</figure>':'').join('');
   return '<div class="form mfq"><div class="fh"><div><div class="muted small">'+esc(q.inst)+' '+q.ano+' · Questão '+q.num+(m.ids.length>1?' · '+(m.i+1)+'/'+m.ids.length:'')+'</div>'+mfAreaPill(q.area)+' <span class="muted small">'+esc([q.sub,q.foco].filter(Boolean).join(' › '))+'</span></div><span class="sp"></span>'+
     '<button class="icon-btn '+(MFD.est.f[id]?'on':'')+'" data-a="mf-fav" aria-label="Favoritar" title="Favoritar">'+ic('star',18)+'</button><button class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
     (q.anul?'<div class="warn">Questão anulada.</div>':'')+'<div class="mfenun">'+mfTxtB(Q.enunciado)+imgs()+'</div>'+
-    '<div class="mfalts">'+Q.alternativas.map(a=>{let cl='';if(rev){if(a.letra===Q.gabarito&&!q.anul)cl=' ok';else if(a.letra===marcada)cl=' bad';}else if(a.letra===marcada)cl=' sel';
+    (disc?mfDiscHTML(q,Q,r,m,imgs):    '<div class="mfalts">'+Q.alternativas.map(a=>{let cl='';if(rev){if(a.letra===Q.gabarito&&!q.anul)cl=' ok';else if(a.letra===marcada)cl=' bad';}else if(a.letra===marcada)cl=' sel';
       return '<button class="mfalt'+cl+'" data-a="mf-alt" data-l="'+esc(a.letra)+'" '+(r?'disabled':'')+'><b>'+esc(a.letra)+'</b><span>'+esc(a.texto)+'</span></button>'+(rev&&a.comentario?'<div class="mfcom">'+esc(a.comentario)+'</div>':'');}).join('')+'</div>'+
-    (rev?'<div class="mfres">'+(q.anul?'Anulada.':'Gabarito: <b>'+esc(Q.gabarito)+'</b>'+(r&&r[1]===1?' · você acertou':r&&r[1]===0?' · você marcou '+esc(marcada):''))+'</div>'+(Q.comentario?'<div class="mfcomg"><b>Comentário</b>'+mfTxtB(Q.comentario)+imgs('comentario')+'</div>':''):'<div class="ff"><span class="sp"></span><button class="btn" data-a="mf-reveal">Ver gabarito sem responder</button></div>')+
+    (rev?'<div class="mfres">'+(q.anul?'Anulada.':'Gabarito: <b>'+esc(Q.gabarito)+'</b>'+(r&&r[1]===1?' · você acertou':r&&r[1]===0?' · você marcou '+esc(marcada):''))+'</div>'+(Q.comentario?'<div class="mfcomg"><b>Comentário</b>'+mfTxtB(Q.comentario)+imgs('comentario')+'</div>':''):'<div class="ff"><span class="sp"></span><button class="btn" data-a="mf-reveal">Ver gabarito sem responder</button></div>'))+
     '<div class="mfnota"><textarea id="mfNota" rows="2" placeholder="Anotação" aria-label="Anotação">'+esc(nota?nota[2]:'')+'</textarea><label class="chip cb"><input type="checkbox" id="mfRev" '+(MFD.est.v[id]?'checked':'')+'><span>Revisar depois</span></label><button class="btn sm" data-a="mf-nota">Salvar anotação</button></div>'+
     '<div class="ff"><button class="btn sm ghost" data-a="mf-report">Relatar problema</button><button class="btn sm" data-a="mf-send">'+ic('download',14)+' Enviar para Notas</button><span class="sp"></span>'+(m.ids.length>1?'<button class="btn sm" data-a="mf-nav" data-d="-1" '+(m.i?'':'disabled')+'>'+ic('chevL',14)+'</button><button class="btn sm primary" data-a="mf-nav" data-d="1">'+(m.i<m.ids.length-1?'Próxima':'Concluir')+'</button>':'')+'</div></div>';
 }
@@ -11528,9 +11542,167 @@ function mfEnviar(){
   const imgs=[];Q.imagens.forEach(x=>{if(x.fileId&&MFD.imgs[x.fileId])imgs.push(MFD.imgs[x.fileId]);});
   closeModal();openMfImport(mfClean({id:Q.id,numero:Q.numero,instituicao:Q.instituicao,ano:Q.ano,area:Q.area,subarea:Q.subarea,foco:Q.foco,enunciado:Q.enunciado,alternativas:Q.alternativas,gabarito:Q.gabarito,anulada:Q.anulada,comentario:Q.comentario,imagens:imgs}));
 }
+/* ----- comentário dividido por alternativa (igual ao MedFisher) ----- */
+var MF_RE_ALT = /(^|\n|[.!?;:]\s+)[ \t>*•\-–]*(?:\*\*)?(?:\(?(?:[Aa]lternativa|[Ll]etra|[Ii]tem|[Oo]p[cç][aã]o)\s+\(?([A-Ea-e])\)?(?![A-Za-zÀ-ú])|\(([A-E])\)|([A-E])\s*[)\]:.\-–—](?=[\s*])|([a-e])\))(?:\*\*)?[ \t]*[:\-–—.]?(?:\*\*)?[ \t]*/g;
+function mfDividirComentario(h) {
+  if (!h || !h.com || !Array.isArray(h.alts) || h.alts.some(a => a.comentario)) return h;
+  let letras = h.alts.map(a => a.letra), txt = String(h.com), cand = [], m;
+  MF_RE_ALT.lastIndex = 0;
+  while ((m = MF_RE_ALT.exec(txt))) {
+    let l = (m[2] || m[3] || m[4] || m[5]).toUpperCase();
+    letras.includes(l) && cand.push({ l, ini: m.index + m[1].length, fim: m.index + m[0].length });
+    if (!m[0].length) MF_RE_ALT.lastIndex++;
+  }
+  // Maior sequência de marcadores em ordem alfabética (ignora "Gabarito: C." antes de "A) … B) …")
+  let melhor = [], cadeia = cand.map(() => null);
+  cand.forEach((c, i) => {
+    let ant = null;
+    for (let j = 0; j < i; j++) if (cand[j].l < c.l && cadeia[j] && (!ant || cadeia[j].length >= ant.length)) ant = cadeia[j];
+    cadeia[i] = ant ? [...ant, c] : [c];
+    if (cadeia[i].length > melhor.length) melhor = cadeia[i];
+  });
+  if (melhor.length < 2) return h;
+  let seg = {};
+  melhor.forEach((x, i) => { seg[x.l] = txt.slice(x.fim, i + 1 < melhor.length ? melhor[i + 1].ini : txt.length).trim(); });
+  return { ...h, com: txt.slice(0, melhor[0].ini).trim(), alts: h.alts.map(a => ({ ...a, comentario: seg[a.letra] || "" })) };
+}
+/* ----- várias provas ----- */
+function mfProvaList(){
+  if(!MFD._pv||MFD._pvN!==MFD.idx.length){const m=new Map();MFD.idx.forEach(q=>{const o=m.get(q.prova)||{id:q.prova,label:q.inst+' '+q.ano,n:0};o.n++;m.set(q.prova,o);});MFD._pv=[...m.values()].sort((a,b)=>a.label<b.label?-1:a.label>b.label?1:0);MFD._pvN=MFD.idx.length;}
+  return MFD._pv;
+}
+function mfProvaTxt(){const s=MFF().provas;if(!s.length)return 'Todas';if(s.length===1){const p=mfProvaList().find(x=>x.id===s[0]);return p?p.label:s[0];}return s.length+' provas selecionadas';}
+function mfProvaItems(){
+  const sel=new Set(MFF().provas),q=norm(UI.mfPq||''),it=mfProvaList().filter(p=>!q||norm(p.label).indexOf(q)>=0);
+  return it.length?it.map(p=>'<li><label class="mfpi"><input type="checkbox" data-pv="'+esc(p.id)+'" '+(sel.has(p.id)?'checked':'')+'><span>'+esc(p.label)+'</span><em>'+p.n+'</em></label></li>').join(''):'<li class="muted small" style="padding:10px;text-align:center">Nenhuma prova encontrada.</li>';
+}
+function mfProvaHTML(){
+  const n=MFF().provas.length;
+  return '<div class="nfsel mfpw" id="mfPwrap"><span>Provas</span><button type="button" class="mfpb" data-a="mf-pop" aria-haspopup="true" aria-expanded="'+(UI.mfPop?'true':'false')+'"><b id="mfPtxt">'+esc(mfProvaTxt())+'</b>'+ic('chevD',14)+'</button>'+
+    '<div class="mfpp" id="mfPpop" '+(UI.mfPop?'':'hidden')+'><input type="search" id="mfPq" placeholder="Buscar prova…" autocomplete="off" aria-label="Buscar prova" value="'+esc(UI.mfPq||'')+'">'+
+    '<div class="mfph"><span class="muted small">'+(n?n+(n===1?' selecionada':' selecionadas'):'Nenhuma selecionada (todas as provas)')+'</span><button type="button" class="btn sm ghost" data-a="mf-pclear">Limpar</button></div>'+
+    '<ul id="mfPlist">'+mfProvaItems()+'</ul><div style="text-align:right"><button type="button" class="btn sm primary" data-a="mf-pok">Pronto</button></div></div></div>';
+}
+function mfKeepPop(){const l=$('#mfPlist'),top=l?l.scrollTop:0;UI.mfn=50;renderMain();const n=$('#mfPlist');if(n)n.scrollTop=top;}
+/* ----- discursivas ----- */
+const mfRascGet=id=>{try{return localStorage.getItem('bq_rasc_'+MFD.user+'_'+id)||'';}catch(e){return '';}};
+const mfRascSet=(id,t)=>{try{if(t)localStorage.setItem('bq_rasc_'+MFD.user+'_'+id,t);else localStorage.removeItem('bq_rasc_'+MFD.user+'_'+id);}catch(e){}};
+function mfAnswerDisc(id,texto,correta,tempo){
+  const q=MFD.byId[id];if(!q)return null;
+  const c=q.anul?'':(correta===1?1:0),tx=String(texto||'').slice(0,8000),tb='Respostas';
+  mfPut(tb,mfBloco(tb),mfChave(),[MFD.user,id,'§'+tx,c,Math.max(0,Math.min(86400,Math.round(tempo||0))),'livre','',new Date().toISOString()]);
+  const a=MFD.est.r[id];MFD.est.r[id]=['§',c===''?2:c,(a?a[2]:0)+1];MFD.est.t[id]=tx;return c;
+}
+function mfDiscHTML(q,Q,r,m,imgs){
+  const id=q.id,done=!!r&&!m.redo;
+  const minha=t=>'<div class="mfdisc"><b>Sua resposta</b><div class="mfmy">'+mfTxtB(t)+'</div></div>';
+  const box=(tit,body,hi)=>'<div class="mfcomg'+(hi?' mfexp':'')+'"><b>'+tit+'</b>'+body+'</div>';
+  const gab=String(Q.gabarito||'').trim(),com=String(Q.comentario||'').trim();
+  const res=()=>{let h='';if(gab)h+=box('Resposta esperada',mfTxtB(gab),true);if(gab&&com)h+=box('Comentário',mfTxtB(com)+imgs('comentario'));if(!gab&&com)h+=box('Resposta esperada',mfTxtB(com)+imgs('comentario'),true);if(!gab&&!com)h='<p class="muted small">Esta questão não tem resposta esperada cadastrada. Avalie pelo seu conhecimento.</p>';return h;};
+  if(done){const c=r[1];return minha(MFD.est.t[id]||'')+'<div class="mfres">'+(c===2?'Anulada.':c===1?'Você marcou que acertou.':'Você marcou que errou.')+'</div>'+res()+'<div class="ff"><button class="btn sm ghost" data-a="mf-disc-redo">'+ic('repeat',14)+' Responder de novo</button></div>';}
+  if(m.rev)return minha(m.txt||'')+res()+'<div class="mfdisc"><b>Como você se saiu?</b><p class="muted small">Compare a sua resposta com a resposta esperada e diga se acertou ou errou.</p><div class="mfdn"><button class="ok" data-a="mf-disc-nota" data-n="1">Acertei</button><button class="no" data-a="mf-disc-nota" data-n="0">Errei</button></div><button class="btn sm ghost" data-a="mf-disc-edit">'+ic('edit',14)+' Editar minha resposta</button></div>';
+  const txt=m.txt!=null?m.txt:mfRascGet(id);
+  return '<div class="mfdisc"><label for="mfTxt"><b>Sua resposta</b></label><textarea id="mfTxt" maxlength="8000" rows="7" placeholder="Escreva aqui a sua resposta…">'+esc(txt)+'</textarea><div class="ff"><span class="muted small">Depois de responder, você compara com a resposta esperada e marca se acertou ou errou.</span><span class="sp"></span>'+(m.show?'':'<button class="btn sm ghost" data-a="mf-reveal">Ver resposta sem responder</button>')+'<button class="btn primary" data-a="mf-disc-resp">Responder</button></div></div>'+(m.show?res():'');
+}
+/* ----- imprimir ----- */
+const MF_CSS_PRINT=`#print-root{display:none}
+@media print{
+@page{size:A4;margin:14mm 12mm}
+html,body{background:#fff!important;color:#000!important}
+body>*:not(#print-root){display:none!important}
+body>#print-root{display:block!important;font:11pt/1.45 Arial,Helvetica,sans-serif;color:#000}
+#print-root *{color:#000!important;background:transparent!important;box-shadow:none!important}
+#print-root .pmh{border-bottom:1.5pt solid #000;margin-bottom:12pt;padding-bottom:6pt}
+#print-root h1{font-size:16pt;margin:0;font-weight:700}
+#print-root .pms{font-size:9pt;margin:3pt 0 0}
+#print-root h2{font-size:11pt;font-weight:700;margin:0 0 5pt}
+#print-root h3{font-size:10pt;font-weight:700;margin:0 0 3pt}
+#print-root p{margin:0 0 4pt;text-align:justify}
+#print-root .pmq{margin:0 0 16pt;break-inside:avoid-page}
+#print-root .pmq.nova{break-after:page}
+#print-root .pmalts{list-style:none;margin:7pt 0 0;padding:0}
+#print-root .pmalts li{margin:0 0 4pt;display:flex;gap:6pt}
+#print-root .pml{font-weight:700;flex:none}
+#print-root figure{margin:6pt 0;text-align:center;break-inside:avoid}
+#print-root img{max-height:8cm;max-width:100%;width:auto;border:0!important;border-radius:0!important}
+#print-root figcaption{font-size:8pt;margin-top:2pt}
+#print-root .pmresp{box-sizing:border-box;border:1pt solid #888;height:4.5cm;margin-top:7pt;padding:4pt;font-size:9pt}
+#print-root table{width:100%;border-collapse:collapse;font-size:10pt}
+#print-root th,#print-root td{border:.5pt solid #888;padding:2pt 5pt;text-align:left;vertical-align:top}
+#print-root .pmbr{break-before:page}
+#print-root .pmcq{margin:0 0 11pt;break-inside:avoid-page}
+}`;
+const mfPImgs=(Q,pos)=>(Q.imagens||[]).filter(m=>m&&m.fileId&&(pos==='enun'?(m.posicao!=='comentario'&&String(m.posicao).indexOf('alternativa_')!==0):m.posicao===pos)).map(m=>'<figure><img data-fid="'+esc(m.fileId)+'" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="">'+(m.legenda?'<figcaption>'+esc(m.legenda)+'</figcaption>':'')+'</figure>').join('');
+async function mfImgsLoad(raiz){
+  await Promise.all([...raiz.querySelectorAll('img[data-fid]')].map(async im=>{
+    let d=null;try{d=await Promise.race([mfImg(im.dataset.fid),new Promise(r=>setTimeout(()=>r(null),12000))]);}catch(e){}
+    if(d){im.src=d;try{await im.decode();}catch(e){}}else{const p=document.createElement('p');p.textContent='[Imagem indisponível]';im.replaceWith(p);}
+  }));
+}
+function mfTituloFiltro(){
+  const f=MFF(),pv=mfProvaList(),p=f.provas.map(id=>{const x=pv.find(y=>y.id===id);return x?x.label:id;}),pt=[];
+  if(p.length)pt.push(p.join(' + '));if(f.ano)pt.push(f.ano);if(f.areas.length)pt.push(f.areas.join(' + '));if(f.sub)pt.push(f.sub);if(f.foco)pt.push('Foco: '+f.foco);
+  return pt.join(' · ')||'Questões';
+}
+async function mfImprimir(o){
+  toast('Preparando a impressão…');
+  let ids=mfFiltered().map(q=>q.id);
+  if(o.ordem==='aleatoria')for(let i=ids.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=ids[i];ids[i]=ids[j];ids[j]=t;}
+  if(o.qtd>0)ids=ids.slice(0,o.qtd);
+  if(!ids.length){toast('Nenhuma questão para imprimir.');return;}
+  const itens=ids.map(id=>{const Q=mfQ(MFD.byId[id]);return Q;}),titulo=mfTituloFiltro();
+  const rot=q=>q.instituicao+' '+q.ano+' · Questão '+q.numero,disc=q=>!(q.alternativas||[]).length,gab=q=>q.anulada?'Anulada':(q.gabarito||'—');
+  const corpo=itens.map((q,k)=>'<section class="pmq'+(o.paginar?' nova':'')+'"><h2>'+(k+1)+'. '+esc(rot(q))+(q.anulada?' (anulada)':'')+'</h2><div>'+mfTxtB(q.enunciado)+mfPImgs(q,'enun')+'</div>'+
+    (disc(q)?'<div class="pmresp">Resposta:</div>':'<ol class="pmalts">'+q.alternativas.map(a=>'<li><span class="pml">'+esc(a.letra)+')</span><span>'+esc(a.texto)+mfPImgs(q,'alternativa_'+a.letra)+'</span></li>').join('')+'</ol>')+'</section>').join('');
+  const mesma=new Set(itens.map(q=>q.provaId)).size===1;
+  const gabarito=o.conteudo==='questoes'?'':'<section class="pmbr"><h2>Gabarito</h2><table><thead><tr><th>Nº</th><th>Questão</th><th>Gabarito</th><th>Área › Foco</th></tr></thead><tbody>'+itens.map((q,k)=>'<tr><td>'+(k+1)+'</td><td>'+esc(mesma?'Questão '+q.numero:rot(q))+'</td><td>'+esc(gab(q))+'</td><td>'+esc(q.area+' › '+q.foco)+'</td></tr>').join('')+'</tbody></table></section>';
+  const coment=o.conteudo!=='completo'?'':'<section class="pmbr"><h2>Comentários</h2>'+itens.map((q,k)=>{const h=mfDividirComentario({com:q.comentario,alts:q.alternativas||[]});
+    return '<div class="pmcq"><h3>'+(k+1)+'. '+esc(rot(q))+' — Gabarito: '+esc(disc(q)?'resposta esperada':gab(q))+'</h3>'+(h.com?mfTxtB(h.com):'')+h.alts.filter(a=>a.comentario).map(a=>'<p><b>'+esc(a.letra)+')</b> '+esc(a.comentario)+'</p>').join('')+mfPImgs(q,'comentario')+'</div>';}).join('')+'</section>';
+  const old=document.getElementById('print-root');if(old)old.remove();
+  if(!document.getElementById('mf-print-css')){const st=document.createElement('style');st.id='mf-print-css';st.textContent=MF_CSS_PRINT;document.head.appendChild(st);}
+  const raiz=document.createElement('div');raiz.id='print-root';
+  raiz.innerHTML='<header class="pmh"><h1>'+esc(titulo)+'</h1><p class="pms">'+itens.length+(itens.length===1?' questão':' questões')+' · '+new Date().toLocaleDateString('pt-BR')+'</p></header>'+corpo+gabarito+coment;
+  document.body.appendChild(raiz);
+  await mfImgsLoad(raiz);
+  const limpar=()=>{window.removeEventListener('afterprint',limpar);raiz.remove();};
+  window.addEventListener('afterprint',limpar);
+  await new Promise(r=>setTimeout(r,60));
+  window.print();
+}
+function mfPrintDlg(){
+  const n=mfFiltered().length;if(!n){toast('Nenhuma questão com estes filtros.');return;}
+  openModal('<form id="fMfPrint" class="form"><div class="fh"><h2>Imprimir questões</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
+    '<p class="muted small">'+esc(mfTituloFiltro())+' · '+n+(n===1?' questão disponível':' questões disponíveis')+'</p>'+
+    '<label class="f">Quantidade (0 = todas)<input type="number" name="qtd" min="0" max="500" value="0"></label>'+
+    '<label class="f">Ordem<select name="ordem"><option value="prova">Por prova</option><option value="aleatoria">Aleatória</option></select></label>'+
+    '<label class="f">O que imprimir<select name="conteudo"><option value="questoes">Somente as questões</option><option value="gabarito">Questões + gabarito no final</option><option value="completo">Questões + gabarito e comentários no final</option></select></label>'+
+    '<label class="chip cb"><input type="checkbox" name="pagina"><span>Uma questão por página</span></label>'+
+    '<p class="muted small">Máximo de 500 questões por impressão. Na tela de impressão, escolha a impressora ou "Salvar como PDF".</p>'+
+    '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">'+ic('printer',14)+' Imprimir</button></div></form>');
+  const f=$('#fMfPrint');
+  f.addEventListener('submit',ev=>{ev.preventDefault();const E=f.elements,qtd=Math.min(500,Math.max(0,Math.floor(Number(E.qtd.value)||0)))||(n>500?500:0);
+    closeModal();setTimeout(()=>mfImprimir({qtd:qtd,ordem:E.ordem.value,conteudo:E.conteudo.value,paginar:E.pagina.checked}).catch(e=>toast(String((e&&e.message)||e))),180);});
+}
+document.addEventListener('click',e=>{if(UI.mfPop&&!e.target.closest('#mfPwrap')){UI.mfPop=false;const p=$('#mfPpop');if(p)p.hidden=true;}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.mfPop){UI.mfPop=false;const p=$('#mfPpop');if(p)p.hidden=true;}});
+document.addEventListener('input',e=>{
+  const t=e.target;if(!t)return;
+  if(t.id==='mfPq'){UI.mfPq=t.value;const l=$('#mfPlist');if(l)l.innerHTML=mfProvaItems();}
+  else if(t.id==='mfTxt'&&UI.mfq)mfRascSet(UI.mfq.ids[UI.mfq.i],t.value);
+});
+Object.assign(ACT,{
+  'mf-pop'(){UI.mfPop=!UI.mfPop;const p=$('#mfPpop');if(p)p.hidden=!UI.mfPop;if(UI.mfPop){const i=$('#mfPq');if(i)i.focus();}},
+  'mf-pclear'(){MFF().provas=[];mfKeepPop();},
+  'mf-pok'(){UI.mfPop=false;const p=$('#mfPpop');if(p)p.hidden=true;},
+  'mf-imprimir'(){mfPrintDlg();},
+  'mf-disc-resp'(){const m=UI.mfq;if(!m)return;const t=String(($('#mfTxt')||{}).value||'').trim();if(!t){toast('Escreva a sua resposta.');return;}m.txt=t.slice(0,8000);mfRascSet(m.ids[m.i],m.txt);m.rev=true;mfShowQ();},
+  'mf-disc-edit'(){const m=UI.mfq;if(!m)return;m.rev=false;mfShowQ();},
+  'mf-disc-redo'(){const m=UI.mfq;if(!m)return;m.redo=true;m.rev=false;m.txt=MFD.est.t[m.ids[m.i]]||'';mfShowQ();},
+  'mf-disc-nota'(el){const m=UI.mfq;if(!m)return;const id=m.ids[m.i],c=mfAnswerDisc(id,m.txt,Number(el.dataset.n),(Date.now()-(UI.mfT||Date.now()))/1000);mfRascSet(id,'');m.rev=false;m.redo=false;m.txt=null;if(m.res)m.res.push(c===1);mfShowQ();}
+});
 document.addEventListener('change',e=>{
   const t=e.target;if(!t||UI.tab!=='questoes')return;const f=MFF();
-  if(t.id==='mfProva'){f.prova=t.value;UI.mfn=50;renderMain();}else if(t.id==='mfAno'){f.ano=t.value;UI.mfn=50;renderMain();}
+  if(t.dataset&&t.dataset.pv){const k=f.provas.indexOf(t.dataset.pv);if(t.checked&&k<0)f.provas.push(t.dataset.pv);else if(!t.checked&&k>=0)f.provas.splice(k,1);mfKeepPop();}else if(t.id==='mfAno'){f.ano=t.value;UI.mfn=50;renderMain();}
   else if(t.id==='mfSub'){f.sub=t.value;f.foco='';UI.mfn=50;renderMain();}else if(t.id==='mfFoco'){f.foco=t.value;UI.mfn=50;renderMain();}
   else if(t.dataset&&t.dataset.mf){f[t.dataset.mf]=t.checked;UI.mfn=50;renderMain();}
 });
@@ -11541,7 +11713,7 @@ Object.assign(ACT,{
   'mf-area'(el){const f=MFF(),a=el.dataset.v,i=f.areas.indexOf(a);if(i>=0)f.areas.splice(i,1);else f.areas.push(a);f.sub='';f.foco='';UI.mfn=50;renderMain();},
   'mf-open'(el){const ids=mfFiltered().map(q=>q.id);UI.mfq={ids:ids,i:Math.max(0,ids.indexOf(el.dataset.id)),show:false};mfShowQ();},
   'mf-treinar'(){const ids=mfFiltered().map(q=>q.id).slice(0,500);if(!ids.length){toast('Nenhuma questão com estes filtros.');return;}UI.mfq={ids:ids,i:0,show:false,train:true,res:[]};mfShowQ();},
-  'mf-nav'(el){const m=UI.mfq;if(!m)return;const j=m.i+Number(el.dataset.d);if(j>=m.ids.length){closeModal();UI.mfq=null;if(m.train&&m.res.length)toast('Treino concluído: '+m.res.filter(x=>x).length+' certas de '+m.res.length+'.');renderMain();return;}if(j<0)return;m.i=j;m.show=false;mfShowQ();},
+  'mf-nav'(el){const m=UI.mfq;if(!m)return;const j=m.i+Number(el.dataset.d);if(j>=m.ids.length){closeModal();UI.mfq=null;if(m.train&&m.res.length)toast('Treino concluído: '+m.res.filter(x=>x).length+' certas de '+m.res.length+'.');renderMain();return;}if(j<0)return;m.i=j;m.show=false;m.rev=false;m.redo=false;m.txt=null;mfShowQ();},
   'mf-alt'(el){const m=UI.mfq;if(!m)return;const id=m.ids[m.i],c=mfAnswer(id,el.dataset.l,(Date.now()-(UI.mfT||Date.now()))/1000);if(m.res)m.res.push(c===1);mfShowQ();},
   'mf-reveal'(){const m=UI.mfq;if(!m)return;m.show=true;mfShowQ();},
   'mf-fav'(){const m=UI.mfq;if(!m)return;mfFav(m.ids[m.i]);mfShowQ();},
@@ -11550,10 +11722,10 @@ Object.assign(ACT,{
   'mf-report'(){const m=UI.mfq;if(!m)return;const id=m.ids[m.i];askText('Descreva o problema','',v=>{mfPut('Reportes',mfBloco('Reportes'),mfChave(),[MFD.user,id,String(v).trim().slice(0,2000),new Date().toISOString()]);toast('Problema registrado.');setTimeout(mfShowQ,0);});},
   'mf-trilha'(){
     const f=MFF(),ids=mfFiltered().length;askText('Nome da trilha','',nome=>{
-      const filtro={area:f.areas,provaId:f.prova?[f.prova]:[],ano:f.ano?[Number(f.ano)]:[],subarea:f.sub?[f.sub]:[],foco:f.foco?[f.foco]:[],status:[f.nao&&'nao_respondidas',f.err&&'erradas',f.cer&&'certas',f.fav&&'favoritas',f.rev&&'revisar'].filter(Boolean),incluirAnuladas:f.anul};
+      const filtro={area:f.areas,provaId:f.provas.slice(),ano:f.ano?[Number(f.ano)]:[],subarea:f.sub?[f.sub]:[],foco:f.foco?[f.foco]:[],status:[f.nao&&'nao_respondidas',f.err&&'erradas',f.cer&&'certas',f.fav&&'favoritas',f.rev&&'revisar'].filter(Boolean),incluirAnuladas:f.anul};
       mfPut('Trilhas',mfBloco('Trilhas'),mfChave(),[mfChave().slice(0,12),MFD.user,nome.slice(0,80),JSON.stringify(filtro),Math.min(ids,500),'prova',new Date().toISOString()]);toast('Trilha salva (visível no MedFisher).');});
   },
-  'mf-user'(){askText('Usuário do MedFisher (01 a 10)',mfUser(),v=>{v=String(v).trim().padStart(2,'0');if(!/^(0[1-9]|10)$/.test(v)){toast('Use um código entre 01 e 10.');return;}S.prefs.mfUser=v;save();MFD.st='idle';renderMain();});}
+  'mf-user'(){askText('Usuário do MedFisher (01 a 20)',mfUser(),v=>{v=String(v).trim().padStart(2,'0');if(!/^(0[1-9]|1\d|20)$/.test(v)){toast('Use um código entre 01 e 20.');return;}S.prefs.mfUser=v;save();MFD.st='idle';renderMain();});}
 });
 const QF={sync(){document.body.classList.remove('qtab');},place(){},reload(){mfLoad(true);}};
 // texto puro do banco → HTML seguro das notas
