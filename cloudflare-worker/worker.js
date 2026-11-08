@@ -59,5 +59,19 @@ export async function run(env = {}, now = Date.now()) {
 
 export default {
   async scheduled(event, env, ctx) { ctx.waitUntil(run(env).then((l) => console.log(l.join('\n') || 'Nada a enviar.'))); },
-  async fetch(request, env) { return new Response(env.VAPID_PRIVATE ? 'Rotina de Estudos · avisos ativos (verifica a cada 5 minutos).' : 'Falta configurar o segredo VAPID_PRIVATE.', { headers: { 'content-type': 'text/plain; charset=utf-8' } }); },
+  async fetch(request, env) {
+    const u = new URL(request.url), cors = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
+    // título de uma página pública (usado ao colar links em Documentos): ?u=<endereço>
+    if (u.searchParams.get('u')) {
+      try {
+        const t = new URL(u.searchParams.get('u'));
+        if (!/^https?:$/.test(t.protocol)) throw new Error('endereço inválido');
+        const r = await fetch(t, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; RotinaTitulo/1.0)' }, redirect: 'follow' });
+        const html = (await r.text()).slice(0, 200000);
+        const m = html.match(/<title[^>]*>([^<]*)<\/title>/i);
+        const title = m ? m[1].replace(/\s+/g, ' ').replace(/ - (Google (Docs|Sheets|Slides|Drive)|Planilhas Google|Apresentações Google|Documentos Google)$/i, '').trim() : '';
+        return new Response(JSON.stringify({ title }), { headers: cors });
+      } catch (e) { return new Response(JSON.stringify({ title: '' }), { headers: cors }); }
+    }
+    return new Response(env.VAPID_PRIVATE ? 'Rotina de Estudos · avisos ativos (verifica a cada 5 minutos).' : 'Falta configurar o segredo VAPID_PRIVATE.', { headers: { 'content-type': 'text/plain; charset=utf-8' } }); },
 };
