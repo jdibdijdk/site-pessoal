@@ -1,0 +1,109 @@
+diff --git a/crates/ui-egui/src/app.rs b/crates/ui-egui/src/app.rs
+index 23bee9b..287f43e 100644
+--- a/crates/ui-egui/src/app.rs
++++ b/crates/ui-egui/src/app.rs
+@@ -125,6 +125,7 @@ impl PdfCraftApp {
+             os_events: None,
+             host_save: None,
+             host_dirty: None,
++            host_autosave_at: None,
+             close_request: None,
+             save_prompt_button: Default::default(),
+             save_prompt_seen: false,
+@@ -485,6 +486,24 @@ impl eframe::App for PdfCraftApp {
+             if let Some(report) = self.host_dirty.as_mut() {
+                 report(dirty);
+             }
++            // Embedded in a host page: save on its own a moment after the first change, with no Ctrl+S.
++            if self.host_save.is_some() {
++                let now = web_time::Instant::now();
++                let wait = std::time::Duration::from_millis(2500);
++                if !dirty {
++                    self.host_autosave_at = None;
++                } else if let Some(at) = self.host_autosave_at {
++                    if now >= at {
++                        self.host_autosave_at = None;
++                        self.run_command("file.save");
++                    } else {
++                        ctx.request_repaint_after(at - now);
++                    }
++                } else {
++                    self.host_autosave_at = Some(now + wait);
++                    ctx.request_repaint_after(wait);
++                }
++            }
+         }
+         self.poll_updates();
+         self.poll_print();
+diff --git a/crates/ui-egui/src/chrome.rs b/crates/ui-egui/src/chrome.rs
+index aa6233c..9cffab9 100644
+--- a/crates/ui-egui/src/chrome.rs
++++ b/crates/ui-egui/src/chrome.rs
+@@ -65,7 +65,8 @@ pub fn tab_strip(app: &mut PdfCraftApp, ui: &mut egui::Ui) {
+                     });
+                     ui.add_space(window_controls::SIDE_GAP - 4.0);
+                 }
+-                if icons::button(ui, "house", button, app.active.is_none() && !app.combine_showing(), tl!("Home")).clicked() {
++                // Embedded in a host page the Home tab (welcome and community links) is not shown.
++                if app.host_save.is_none() && icons::button(ui, "house", button, app.active.is_none() && !app.combine_showing(), tl!("Home")).clicked() {
+                     app.active = None;
+                     app.combine_tab.focused = false;
+                 }
+@@ -310,7 +311,9 @@ pub fn tab_strip(app: &mut PdfCraftApp, ui: &mut egui::Ui) {
+                         app.dialog = Some(Dialog::Shortcuts);
+                     }
+                     // One click to the community, from anywhere in the app.
+-                    if widgets::ghost_button_sized(ui, "messages-square", "Discord", tab_h).on_hover_text(pdfcraft_engine::links::DISCORD).clicked() {
++                    if app.host_save.is_none()
++                        && widgets::ghost_button_sized(ui, "messages-square", "Discord", tab_h).on_hover_text(pdfcraft_engine::links::DISCORD).clicked()
++                    {
+                         app.execute("help.discord");
+                     }
+                 });
+diff --git a/crates/ui-egui/src/home.rs b/crates/ui-egui/src/home.rs
+index 390b059..e4cf1ec 100644
+--- a/crates/ui-egui/src/home.rs
++++ b/crates/ui-egui/src/home.rs
+@@ -23,6 +23,10 @@ pub(crate) fn card_lift(ui: &egui::Ui, t: &Tokens, rect: Rect, press: theme::Pre
+ /// Draw the Home page with the welcome text, community card and recent documents.
+ pub fn show(app: &mut PdfCraftApp, ui: &mut egui::Ui) {
+     let t = Tokens::get(ui.ctx());
++    // Embedded in a host page: no welcome text, community card or links, just a quiet page until the host opens a file.
++    if app.host_save.is_some() {
++        return;
++    }
+     egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
+         egui::Frame::NONE.inner_margin(egui::Margin { left: 36, right: 36, top: 28, bottom: 28 }).show(ui, |ui| {
+             ui.label(egui::RichText::new(tl!("Welcome to PdfCraft")).font(theme::semibold(24.0)));
+diff --git a/crates/ui-egui/src/lib.rs b/crates/ui-egui/src/lib.rs
+index 8a8c517..bd61401 100644
+--- a/crates/ui-egui/src/lib.rs
++++ b/crates/ui-egui/src/lib.rs
+@@ -403,6 +403,8 @@ pub struct PdfCraftApp {
+     pub host_save: Option<HostSaveFn>,
+     /// Reports unsaved work to the embedding page (web, see [`HostDirtyFn`]).
+     pub host_dirty: Option<HostDirtyFn>,
++    /// When the embedded app saves by itself (host page only): a pause after the first unsaved change.
++    pub host_autosave_at: Option<web_time::Instant>,
+     /// A pending "save changes?" question (closing a dirty tab or quitting).
+     pub close_request: Option<CloseRequest>,
+     /// The button of the "save changes?" question the keyboard has chosen; Save when it opens.
+diff --git a/crates/ui-egui/src/menus.rs b/crates/ui-egui/src/menus.rs
+index b6dcc67..181d353 100644
+--- a/crates/ui-egui/src/menus.rs
++++ b/crates/ui-egui/src/menus.rs
+@@ -332,7 +332,13 @@ impl PdfCraftApp {
+         )];
+         sign.extend(list(SIGN, &mut used));
+         let window = list(WINDOW, &mut used);
+-        let help = list(HELP, &mut used);
++        // Embedded in a host page the community, website and update entries are left out.
++        let help_ids: Vec<&str> = if self.host_save.is_some() {
++            HELP.iter().copied().filter(|id| !matches!(*id, "help.app_page" | "help.github" | "help.website" | "help.discord" | "help.check_updates" | "help.about")).collect()
++        } else {
++            HELP.to_vec()
++        };
++        let help = list(&help_ids, &mut used);
+         let mut view = vec![
+             Node::submenu(tl!("Zoom"), list(ZOOM, &mut used)),
+             Node::submenu(tl!("Rotate view"), list(&[ROTATE_CW, ROTATE_CCW], &mut used)),
