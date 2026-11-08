@@ -1472,7 +1472,7 @@ main.wide{max-width:none;padding-left:18px;padding-right:18px}
 .pmsub.done span{text-decoration:line-through;opacity:.55}
 .pmcfg{margin-top:10px}.pmcfg summary{cursor:pointer;color:var(--mut);font-size:13px}
 .pmcfgg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-.gmtree{display:flex;justify-content:center}
+.rwrow{display:flex;align-items:center;gap:10px;padding:7px 0}.rwrow b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}.rwn{font-size:12px;font-weight:700;color:var(--acc)}
 .tree{width:210px;height:220px}
 .tree.mini{width:38px;height:40px}
 .tr-soil{fill:#E6DDD0}.tr-seed{fill:#8A6A47}.tr-trunk{stroke:#8A6A47;stroke-linecap:round;fill:none}
@@ -2009,26 +2009,151 @@ main{min-width:0}
 .qsec.soapgapsec h5.soapfree .ic{flex:none;opacity:.8}
 .qsec.soapgapsec .ned{font-size:15px;color:var(--tx);opacity:.9;padding:2px 0}
 .qsec.soapgapsec .ned.editing{padding:12px 14px}
+
+/* ==========================================================================
+   NOVO VISUAL (Soft UI): fundo gelo, cards brancos com sombra suave, navy e esmeralda, pílulas
+   ========================================================================== */
+:root{
+  --bg:#F8FAFC; --soft:#EEF2F7; --card:#FFFFFF; --line:#E8ECF2; --line2:#F0F3F8; --line3:#D9DFE8;
+  --tx:#18203A; --mut:#5B6478; --mut2:#8A93A6;
+  --ink:#1E2A5A; --onink:#fff; --topbg:rgba(248,250,252,.92); --acc:#1E2A5A; --accs:#E8ECF7; --em:#10B981; --ems:rgba(16,185,129,.12); --emd:#047857;
+  --r:18px; --sh:0 4px 20px rgba(15,23,42,.04); --sh2:0 8px 28px rgba(15,23,42,.12);
+}
+html[data-theme="dark"]{
+  --bg:#0F1218; --soft:#181C25; --card:#171B24; --line:#242936; --line2:#1E2330; --line3:#323949;
+  --tx:#E8EBF3; --mut:#A4ACBD; --mut2:#7C8599; --ink:#E8EBF3; --onink:#14161B; --topbg:rgba(15,18,24,.9);
+  --acc:#9DB0FF; --accs:#222B4D; --em:#34D399; --ems:rgba(52,211,153,.14); --emd:#6EE7B7;
+  --sh:0 4px 20px rgba(0,0,0,.35);
+}
+body{background:var(--bg)}
+.card,.pmc,.gmc{border:1px solid rgba(15,23,42,.045);border-radius:var(--r);box-shadow:var(--sh)}
+html[data-theme="dark"] .card{border-color:rgba(255,255,255,.05)}
+.btn,.chip,.pill,.tag,.count,.pillb,.gsearch{border-radius:9999px}
+.btn{padding:9px 18px;border-color:var(--line3)}
+.btn.primary{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn.primary:hover{background:#151F47;box-shadow:0 6px 18px rgba(30,42,90,.28)}
+html[data-theme="dark"] .btn.primary{background:#3B4E9E;border-color:#3B4E9E}
+.btn.ghost{border-color:transparent;background:transparent}
+.seg{background:#EAEFF5;border:0;border-radius:9999px;padding:4px}
+.seg button{border-radius:9999px}
+.seg button.on{background:var(--card);color:var(--tx);box-shadow:0 2px 8px rgba(15,23,42,.1)}
+.seg .segind{border-radius:9999px;box-shadow:0 2px 8px rgba(15,23,42,.1)}
+html[data-theme="dark"] .seg{background:#1E2330}
+.tag{background:color-mix(in srgb,var(--c,#9AA3B5) 15%,#fff);color:color-mix(in srgb,var(--c,#5B6478) 40%,#1F2937);gap:6px;font-weight:500}
+.tag::before{content:'';flex:none;width:7px;height:7px;border-radius:50%;background:var(--c,#9AA3B5)}
+.tag.outline{background:transparent;border:1px solid var(--line3);color:var(--mut)}
+.tag.outline::before{display:none}
+html[data-theme="dark"] .tag{background:color-mix(in srgb,var(--c,#9AA3B5) 20%,#171B24);color:color-mix(in srgb,var(--c,#9AA3B5) 55%,#fff)}
+input,select,textarea{border-radius:12px}
+.count{background:var(--em);color:#fff}
+
+/* ----- barra lateral ----- */
+.sb{position:fixed;left:0;top:0;bottom:0;width:236px;background:var(--card);border-right:1px solid var(--line);z-index:40;display:flex;flex-direction:column;padding:16px 12px;transition:width .25s var(--ease)}
+.sb-brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;padding:4px 8px 16px;color:var(--ink)}
+.sb-brand i{width:32px;height:32px;border-radius:10px;background:var(--ink);color:var(--onink);display:grid;place-items:center;flex:none}
+#sbnav{flex:1;overflow-y:auto;scrollbar-width:thin;padding-bottom:12px}
+.sbg{margin-bottom:14px}
+.sbh{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mut2);padding:6px 10px}
+.sbi{position:relative;display:flex;align-items:center;gap:12px;width:100%;border:0;background:none;padding:9px 12px;border-radius:12px;color:var(--mut);font-weight:500;font-size:14px;text-align:left}
+.sbi:hover{background:var(--soft);color:var(--tx)}
+.sbi.on{background:var(--ems);color:var(--emd);font-weight:600}
+.sbi.on::before{content:'';position:absolute;left:-12px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--em)}
+.sbi .lbl{flex:1;white-space:nowrap}
+.sbi .count{font-size:11px;padding:1px 7px;line-height:1.5}
+.sb-toggle{position:absolute;right:-13px;top:26px;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);background:var(--card);box-shadow:0 2px 8px rgba(15,23,42,.1);display:grid;place-items:center;color:var(--mut);padding:0;z-index:2}
+.sb-toggle svg{transition:transform .25s}
+.appcol{margin-left:236px;min-width:0;transition:margin-left .25s var(--ease)}
+body.sbc .sb{width:72px}
+body.sbc .appcol{margin-left:72px}
+body.sbc .sb-brand span,body.sbc .sbi .lbl,body.sbc .sbi .count,body.sbc .sbh{display:none}
+body.sbc .sbg{border-top:1px solid var(--line);padding-top:8px;margin-bottom:6px}
+body.sbc .sbg:first-child{border-top:0}
+body.sbc .sbi{justify-content:center;padding:11px 0}
+body.sbc .sb-brand{justify-content:center;padding-left:0;padding-right:0}
+body.sbc .sb-toggle svg{transform:rotate(180deg)}
+.sb-scrim,.sb-menu{display:none}
+
+/* ----- cabeçalho global ----- */
+.top{position:sticky;top:0;z-index:30;background:var(--topbg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:0;display:flex;align-items:center;gap:14px;padding:12px 28px}
+.ctx{display:flex;align-items:baseline;gap:6px;font-size:15px;white-space:nowrap}
+.ctx b{font-weight:600}.ctx span{color:var(--mut)}
+.gsearch{flex:1;max-width:520px;margin:0 auto;display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--card);padding:9px 16px;color:var(--mut2);font-size:14px;box-shadow:0 2px 10px rgba(15,23,42,.03)}
+.gsearch:hover{border-color:var(--line3);color:var(--mut)}
+.gsearch .gst{flex:1;text-align:left}
+.gsearch kbd{font:inherit;font-size:11px;border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--mut2)}
+.actions{display:flex;align-items:center;gap:6px;flex:none}
+.pillb{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--card);padding:8px 14px;font-size:13.5px;font-weight:500;color:var(--em);color:var(--emd)}
+#btnMore{display:inline-grid!important}
+.actions .btn.primary{padding:9px 18px}
+
+@media (max-width:1100px){.gsearch kbd,.pillb .lbl{display:none}}
+@media (max-width:760px){
+  .sb{transform:translateX(-102%);width:272px!important;box-shadow:var(--sh2);transition:transform .28s var(--ease)}
+  body.sb-open .sb{transform:none}
+  body.sbc .sb-brand span,body.sbc .sbi .lbl,body.sbc .sbh{display:revert}
+  body.sbc .sbi{justify-content:flex-start;padding:9px 12px}
+  .sb-toggle{display:none}
+  .sb-scrim{display:block;position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:35;opacity:0;pointer-events:none;transition:opacity .25s}
+  body.sb-open .sb-scrim{opacity:1;pointer-events:auto}
+  .appcol,body.sbc .appcol{margin-left:0}
+  .sb-menu{display:inline-grid}
+  .top{padding:9px 12px;gap:8px}
+  .ctx{display:none}
+  .gsearch{margin:0;min-width:0;padding:8px 12px}
+  .gsearch .gst{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pillb{display:none}
+  .actions .btn.primary .lbl{display:none}.actions .btn.primary{padding:9px 12px}
+  main{padding-bottom:24px!important}
+}
+
+/* cabeçalho de resumo retrátil, cards de modo e campos limpos */
+.sumhead{position:relative;background:linear-gradient(180deg,#E6EDF7 0%,#F8FAFC 100%);border-radius:var(--r);padding:14px 16px 26px;margin-bottom:16px}
+html[data-theme="dark"] .sumhead{background:linear-gradient(180deg,#1C2540 0%,#171B24 100%)}
+.sumhead.col{padding:4px 16px 18px;background:none}
+.sumhead .focus{background:transparent;border:0;box-shadow:none}
+.sumtog{position:absolute;left:50%;bottom:-12px;transform:translateX(-50%);display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:var(--card);border-radius:9999px;padding:3px 12px;font-size:12px;color:var(--mut);box-shadow:0 2px 8px rgba(15,23,42,.08)}
+.mcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.mcard{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:1px solid rgba(15,23,42,.05);background:var(--card);border-radius:var(--r);padding:14px 16px 12px;box-shadow:var(--sh);min-height:104px;color:var(--tx)}
+.mcard>svg{color:var(--mut);margin-bottom:6px}
+.mcard b{font-weight:600;font-size:14.5px}
+.mcard .mcs{font-size:12px;color:var(--mut)}
+.mcard .mcn{margin-top:auto;font-size:20px;font-weight:700;padding-top:6px}
+.mcard.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.mcard.on>svg,.mcard.on .mcs{color:rgba(255,255,255,.8)}
+html[data-theme="dark"] .mcard.on{background:#3B4E9E}
+/* campos limpos e compactos: sem caixa preenchida, só a linha de baixo */
+.form input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]):not([type=file]),.form select,.form textarea,.addrow input,.addrow select,.gform input,.gform select{background:transparent;border:0;border-bottom:1.5px solid var(--line3);border-radius:0;padding:7px 2px;box-shadow:none}
+.form input:focus,.form select:focus,.form textarea:focus,.addrow input:focus,.gform input:focus{outline:0;border-bottom-color:var(--em)}
+.form textarea{border:1.5px solid var(--line3);border-radius:12px;padding:8px 10px}
+.tprev,.sprev,.pcard{background:none!important;border:0!important;padding-left:0!important;padding-right:0!important}
+.warn{background:none;border:0;border-left:3px solid #E0A030;border-radius:0}
+.seg button.on::after{content:'';position:absolute;left:34%;right:34%;bottom:2px;height:2px;border-radius:2px;background:var(--em)}
 </style>
 </head>
 <body>
 <!-- ===== ESTRUTURA DA PÁGINA ===== -->
+<aside id="sb" class="sb" aria-label="Menu principal">
+  <div class="sb-brand"><i data-ic="book" data-s="17"></i><span>Rotina</span></div>
+  <nav id="sbnav"></nav>
+  <button class="sb-toggle" data-a="sb-toggle" aria-label="Recolher o menu" title="Recolher o menu"><span data-ic="chevL" data-s="14"></span></button>
+</aside>
+<div class="sb-scrim" data-a="sb-open"></div>
+<div class="appcol">
 <header class="top">
-  <div class="brand"><i data-ic="book" data-s="17"></i><span>Rotina</span></div>
-  <nav id="tabs" aria-label="Seções"></nav>
+  <button class="icon-btn sb-menu" data-a="sb-open" aria-label="Abrir o menu"><span data-ic="list"></span></button>
+  <div class="ctx"><b>Rotina</b><span>· <span id="ctxYear"></span></span></div>
+  <button class="gsearch" data-a="gs-open" aria-label="Pesquisar em todo o site"><span data-ic="search" data-s="16"></span><span class="gst">Faça uma pesquisa</span><kbd>Ctrl K</kbd></button>
   <div class="actions">
+    <button class="pillb" data-a="tab" data-v="habitos" title="Trilha do dia"><span data-ic="sprout" data-s="15"></span><span class="lbl">Trilha do dia</span></button>
+    <button class="icon-btn" id="btnBell" data-a="nc-open" title="Avisos e pendências" aria-label="Avisos e pendências"><span data-ic="bell"></span><span class="badge" id="ncbadge" hidden></span></button>
     <button class="icon-btn" id="btnMore" data-a="more-menu" title="Mais opções" aria-label="Mais opções"><span data-ic="more"></span></button>
-    <button class="icon-btn" id="btnBell" data-a="nc-open" title="Central de avisos" aria-label="Central de avisos"><span data-ic="bell"></span><span class="badge" id="ncbadge" hidden></span></button>
-    <button class="icon-btn" id="btnTheme" data-a="theme" title="Modo escuro" aria-label="Alternar modo escuro"><span data-ic="moon"></span></button>
-    <button class="icon-btn" data-a="gs-open" title="Buscar em todo o site (Ctrl+K ou /)" aria-label="Buscar em todo o site"><span data-ic="search"></span></button>
-    <button class="icon-btn" data-a="quick" title="Inserção rápida (locomoção, descanso, rotina…)" aria-label="Inserção rápida"><span data-ic="zap"></span></button>
-    <button class="icon-btn" id="btnFilter" data-a="toggle-filters" title="Filtros" aria-label="Filtros"><span data-ic="filter"></span><span class="badge" id="fbadge" hidden></span></button>
-    <button class="icon-btn" data-a="print" title="Imprimir a semana em grade (1 página)" aria-label="Imprimir semana"><span data-ic="printer"></span></button>
     <button class="btn primary" data-a="new-act"><span data-ic="plus" data-s="16"></span><span class="lbl">Nova atividade</span></button>
   </div>
+  <span id="fbadge" hidden></span>
 </header>
 <div id="fpanel" class="fpanel" hidden></div>
 <main id="main"></main>
+</div>
 
 <div id="printSheet"></div>
 <div id="modal" class="overlay" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
@@ -2393,7 +2518,7 @@ function normalize(o){
 }
 
 /* ==========================================================================
-   3. PERSISTÊNCIA: tudo é salvo no aparelho na hora e enviado à planilha
+   3. PERSISTÊNCIA: tudo é salvo no aparelho na hora e enviado à nuvem
       em segundo plano (sem recarregar a tela e sem perder alterações)
    ========================================================================== */
 /* Mídia (imagens e PDFs): fica guardada à parte, no IndexedDB deste aparelho, e o armazenamento principal só leva uma referência "media:ID".
@@ -2420,42 +2545,38 @@ const Media={cache:{},done:{},be:null,ok:false,rt:null,
     try{Store.set(Store.mem||JSON.stringify(S));}catch(e){}
     this.sched();
   }};
-/* Mídia no Google Drive: depois de guardada no aparelho, cada imagem/PDF é enviada à pasta do Drive (pelo Apps Script) com o mesmo ID.
-   Só quando o Drive confirma é que a sincronização passa a levar a referência "media:ID" no lugar do arquivo. Outros aparelhos baixam pelo ID. */
+/* Mídia no Firebase Storage: depois de guardada no aparelho, cada imagem/PDF é enviada ao Storage com o mesmo ID.
+   Só quando o Storage confirma é que a sincronização passa a levar a referência "media:ID" no lugar do arquivo. Outros aparelhos baixam pelo ID. */
 Object.assign(Media,{up:(function(){try{return JSON.parse(localStorage.getItem('rotina_mediaup')||'{}');}catch(e){return {};}})(),upq:{},tries:{},fail:{},pumping:false,scanning:false,st:null,
   RE:/data:(?:image\/[a-z0-9.+-]+|application\/pdf);base64,[A-Za-z0-9+\/=]{3000,}/g,
   upSave(){try{localStorage.setItem('rotina_mediaup',JSON.stringify(this.up));}catch(e){}},
   stripRemote(json){
-    if(typeof json!=='string'||json.length<4000||!WEB_APP_URL)return json;
+    if(typeof json!=='string'||json.length<4000||!RF.ok())return json;
     const out=json.replace(this.RE,m=>{const id=Media.hash(m);if(Media.up[id])return 'media:'+id;if(!Media.upq[id]&&(Media.tries[id]||0)<4){Media.upq[id]=m;Media.cache[id]=Media.cache[id]||m;}return m;});
     if(Object.keys(this.upq).length)setTimeout(()=>Media.pump(),50);
     return out;
   },
   async pump(){
-    if(this.pumping||!WEB_APP_URL||(typeof navigator!=='undefined'&&navigator.onLine===false))return;
+    if(this.pumping||!RF.ok()||(typeof navigator!=='undefined'&&navigator.onLine===false))return;
     const ids=Object.keys(this.upq);if(!ids.length)return;this.pumping=true;
     const sleep=ms=>new Promise(r=>setTimeout(r,ms));
     try{
       for(const id of ids.slice(0,3)){
         const data=this.upq[id];this.tries[id]=(this.tries[id]||0)+1;
-        try{await fetch(WEB_APP_URL+'?action=putmedia',{method:'POST',body:JSON.stringify({n:id,d:data}),headers:{'Content-Type':'text/plain'},mode:'no-cors'});}catch(e){continue;}
-        for(const w of [1500,3500,7000,14000]){
-          await sleep(w);
-          try{const r=await fetch(WEB_APP_URL+'?action=hasmedia&name='+id+'&t='+Date.now()),j=await r.json();if(j&&j.ok&&j.has){this.up[id]=1;delete this.upq[id];this.upSave();break;}}catch(e){}
-        }
+        try{await RF.put(id,data);if(await RF.has(id)){this.up[id]=1;delete this.upq[id];this.upSave();}}catch(e){continue;}
       }
     }finally{this.pumping=false;}
     if(Object.keys(this.upq).length&&ids.some(i=>this.upq[i]&&this.tries[i]<4))setTimeout(()=>Media.pump(),30000);
   },
   sched(){clearTimeout(this.st);this.st=setTimeout(()=>Media.scan(),1200);},
   async scan(){
-    const s=Store.mem||'';if(this.scanning||!WEB_APP_URL||s.indexOf('media:m')<0)return;
+    const s=Store.mem||'';if(this.scanning||!RF.ok()||s.indexOf('media:m')<0)return;
     const ids=Array.from(new Set((s.match(/media:m[0-9a-z]+/g)||[]).map(x=>x.slice(6)))).filter(id=>!this.cache[id]&&Date.now()-(this.fail[id]||0)>60000);
     if(!ids.length)return;this.scanning=true;let got=0;
     try{
       for(const id of ids){
-        try{const r=await fetch(WEB_APP_URL+'?action=getmedia&name='+id+'&t='+Date.now()),j=await r.json();
-          if(j&&j.ok&&j.d){this.cache[id]=j.d;this.up[id]=1;this.done[id]=0;got++;if(this.be)this.be.put(id,j.d).then(()=>{this.done[id]=1;}).catch(()=>{});}else this.fail[id]=Date.now();}
+        try{const d=await RF.get(id);
+          if(d){this.cache[id]=d;this.up[id]=1;this.done[id]=0;got++;if(this.be)this.be.put(id,d).then(()=>{this.done[id]=1;}).catch(()=>{});}else this.fail[id]=Date.now();}
         catch(e){this.fail[id]=Date.now();}
       }
     }finally{this.scanning=false;}
@@ -2475,22 +2596,16 @@ const Store={mem:null,fail:false,
 let S;
 (function(){let raw=null;try{raw=Store.get();S=normalize(raw?JSON.parse(raw):null);}catch(e){S=normalize(null);}if(!raw)Store.set(JSON.stringify(S));})();
 /* --- Salvar e sincronizar (modelo simples: a versão mais nova vence) ---
-   Tudo é salvo neste aparelho na hora e enviado à planilha logo depois.
-   Ao abrir e a cada ~45 s, o site confere se a planilha tem uma versão mais nova. */
+   Tudo é salvo neste aparelho na hora e enviado à nuvem logo depois.
+   Ao abrir e a cada ~45 s, o site confere se a nuvem tem uma versão mais nova. */
 const SYNC_KEY='rotina_lastsync',PREV_KEY='rotina_prev';
 const LS={get(k){try{return localStorage.getItem(k);}catch(e){return null;}},set(k,v){try{localStorage.setItem(k,k===PREV_KEY?Media.strip(v):v);return true;}catch(e){return false;}}};
 const hasData=st=>['acts','tasks','docs','goals','dates','notes','pdfs','decks','cards','recipes','pantry','meals','health','links','habits'].reduce((n,k)=>n+((st&&st[k])||[]).length,0);
-// A data de gravação nunca fica atrás da última versão vista na planilha (relógios diferentes entre aparelhos não atrapalham)
+// A data de gravação nunca fica atrás da última versão vista na nuvem (relógios diferentes entre aparelhos não atrapalham)
 function save(){try{Watch.touch();}catch(e){}HBMEMO={};DAYMEMO={};S.savedAt=Math.max(Date.now(),(S.savedAt||0)+1,(Cloud.lastSeen||0)+1);Store.set(JSON.stringify(S));Cloud.changed();if(typeof WG==='object'&&WG)WG.soon();}
 
-// SEU LINK DO APPS SCRIPT (implantação "App da Web")
-const WEB_APP_URL='https://script.google.com/macros/s/AKfycbyXvRsx5Lhgc8Oawg4N3siTjaviHeRL5aGpowejoaJedfhNdsG7bTK1vAnEW1SR-XBbJw/exec';
-
-// Dentro do Apps Script / Google Sites o site fala com o servidor por google.script.run (sem CORS nem
-// redirecionamento). Fora dele (arquivo no computador, outro hospedeiro) usa o link /exec por fetch.
-const GSR=()=>{try{return(window.google&&google.script&&google.script.run)||null;}catch(e){return null;}};
 const UNSENT_KEY='rotina_unsent';
-// Listas que nunca devem encolher de repente sem você saber (a planilha e o site checam as duas).
+// Listas que nunca devem encolher de repente sem você saber (a nuvem e o site checam as duas).
 const PROT=[['acts','Eventos'],['tasks','Tarefas'],['docs','Documentos'],['goals','Objetivos'],['notes','Notas'],['pdfs','PDFs'],['decks','Baralhos'],['cards','Questões e cards'],['recipes','Receitas'],['pantry','Estoque'],['meals','Refeições'],['health','Saúde'],['links','Links'],['dates','Datas'],['habits','Hábitos'],['slides','Apresentações'],['docTpls','Modelos de documento'],['spends','Saídas']];
 const getL=(st,k)=>k==='spends'?(st&&st.fin&&st.fin.spends)||[]:(st&&st[k])||[];
 function lossInfo(L,R){ // listas em que um lado tem menos da metade do outro (com pelo menos 3 no maior)
@@ -2510,7 +2625,7 @@ function unionKeep(base,other,keys){ // acrescenta em base o que só existe em o
 
 /* ==========================================================================
    FIREBASE (Firestore + login por e-mail e senha): destino principal opcional.
-   O Apps Script/Planilha continua como cópia de segurança. Mesmas regras de proteção.
+   Mesmas regras de proteção contra perda de dados.
    ========================================================================== */
 const FB_CFG={apiKey:"AIzaSyBU4owCJwloUlcfTP-cOeHjEo5hyzMH2tU",authDomain:"site-pessoal-b4b19.firebaseapp.com",projectId:"site-pessoal-b4b19",storageBucket:"site-pessoal-b4b19.firebasestorage.app",messagingSenderId:"60932685115",appId:"1:60932685115:web:b69d8d756d3ac98e0d8b1e"};
 // Sem login: os documentos ficam em "rotina/<chave>_..." e as regras do Firestore só permitem ler/gravar documento por nome
@@ -2522,12 +2637,11 @@ const FB={
   sdk:null,app:null,db:null,user:null,unsub:null,err:'',
   enabled(){return LS.get('rotina_fb')!=='0';},
   active(){return !!(this.enabled()&&this.user&&this.db);},
-  mirrorOn(){return LS.get('rotina_fbmirror')!=='0';},
   async load(){
     if(this.sdk)return this.sdk;
     if(window.__FBSDK){this.sdk=window.__FBSDK;return this.sdk;}
-    const m=await Promise.all([import(FB_BASE+'firebase-app.js'),import(FB_BASE+'firebase-firestore.js')]);
-    this.sdk=Object.assign({},m[0],m[1]);return this.sdk;
+    const m=await Promise.all([import(FB_BASE+'firebase-app.js'),import(FB_BASE+'firebase-firestore.js'),import(FB_BASE+'firebase-storage.js').catch(()=>({}))]);
+    this.sdk=Object.assign({},m[0],m[1],m[2]);return this.sdk;
   },
   async init(){
     if(this.db&&this.user)return;
@@ -2597,62 +2711,37 @@ const FB={
   }
 };
 function fbPanelHTML(){return '';}
+/* Arquivos (imagens, PDFs, apresentações): ficam no Firebase Storage em rotina/<chave>/<id>, como texto data: URL */
+const RF={
+  ok(){return !!(FB.active()&&FB.sdk&&FB.sdk.getStorage&&FB.sdk.uploadString);},
+  r(id){return FB.sdk.ref(FB.sdk.getStorage(FB.app),'rotina/'+FB_KEY+'/'+id);},
+  async put(id,dataUrl){await FB.sdk.uploadString(this.r(id),dataUrl,'raw',{contentType:'text/plain'});return true;},
+  async has(id){try{await FB.sdk.getMetadata(this.r(id));return true;}catch(e){return false;}},
+  async get(id){try{const b=await FB.sdk.getBytes(this.r(id));return new TextDecoder().decode(b);}catch(e){return null;}}
+};
 function paintFb(){const el=$('#fbBox');if(el)el.innerHTML=fbPanelHTML();try{Cloud.paint();Cloud.setStatus(Cloud.status);}catch(e){}}
 
 const Cloud={
   ready:false,dirty:false,pushing:false,pulling:false,again:false,force:false,timer:null,retry:0,status:'local',url:'',sid:'',sname:'',pending:null,lastOk:0,
-  via:'',lastErr:'',errAt:0,gsFail:0,noGSUntil:0,remoteN:null,remoteAt:0,hold:null,asked:'',toastedErr:false,
-  lastSeen:Number(LS.get(SYNC_KEY)||0), // data de gravação da última versão da planilha que este aparelho já viu/enviou
-  on(){return !!(WEB_APP_URL||GSR()||FB.active());},
+  via:'',lastErr:'',errAt:0,remoteN:null,remoteAt:0,hold:null,asked:'',toastedErr:false,
+  lastSeen:Number(LS.get(SYNC_KEY)||0), // data de gravação da última versão da nuvem que este aparelho já viu/enviou
+  on(){return !!FB.active();},
   // ----- transporte -----
   async call(kind,body){
-    if(kind!=='resumos'&&FB.active()){
+    if(FB.active()){
       try{
         this.via='fb';
         if(kind==='info')return {url:'https://console.firebase.google.com/project/'+FB_CFG.projectId+'/firestore',nome:'Firebase · '+(FB.user.email||''),sid:''};
         if(kind==='meta'){const m=await FB.meta();return {savedAt:m?Number(m.savedAt):0,n:m?Number(m.cnt||0):0};}
         if(kind==='sync')return await FB.readAll();
-        if(kind==='save'){const r=await FB.write(body);if(r.status==='success')this.mirror(body);return r;}
+        if(kind==='save'){const r=await FB.write(body);return r;}
       }catch(e){throw new Error('Firebase: '+((e&&e.message)||e));}
     }
-    return this.callGS(kind,body);
-  },
-  // cópia na planilha (melhor esforço, uma por vez, sempre a versão mais recente)
-  mirror(body){
-    if(!FB.mirrorOn()||!(WEB_APP_URL||GSR()))return;
-    this.mirrorNext=body;if(this.mirroring)return;this.mirroring=true;
-    (async()=>{while(this.mirrorNext){const b=this.mirrorNext;this.mirrorNext=null;try{await this.callGS('save',b);}catch(e){}}this.mirroring=false;})();
-  },
-  async callGS(kind,body){
-    const gs=(Date.now()>this.noGSUntil)?GSR():null;let gsErr=null;
-    if(gs){
-      try{
-        const txt=await new Promise((res,rej)=>{
-          const to=setTimeout(()=>rej(new Error('tempo esgotado')),kind==='save'?240000:100000);
-          const r=gs.withSuccessHandler(v=>{clearTimeout(to);res(v);}).withFailureHandler(e=>{clearTimeout(to);rej(new Error((e&&e.message)||String(e)));});
-          if(kind==='save')r.api_save(body);else if(kind==='sync')r.api_sync();else if(kind==='meta')r.api_meta();else if(kind==='resumos')r.api_resumos();else r.api_info();
-        });
-        const j=JSON.parse(txt);this.via='gs';this.gsFail=0;return j;
-      }catch(e){
-        gsErr=e;
-        // função ausente (Code.gs antigo) ou falhas repetidas: usa só o link /exec por um tempo (a varredura do Drive não conta)
-        if(kind!=='resumos'){this.gsFail++;if(/is not a function|not defined|api_(sync|meta|save|info)/i.test(e.message)||this.gsFail>=2)this.noGSUntil=Date.now()+10*60e3;}
-      }
-    }
-    this.gsNote=gsErr?gsErr.message:'';
-    if(!WEB_APP_URL)throw gsErr||new Error('sem conexão com o servidor');
-    try{
-      if(kind==='save'){await fetch(WEB_APP_URL,{method:'POST',body:body,headers:{'Content-Type':'text/plain'},mode:'no-cors'});this.via='fetch';return {status:'sent'};}
-      const r=await fetch(WEB_APP_URL+'?action='+kind+'&t='+Date.now());const txt=await r.text();let j;
-      try{j=JSON.parse(txt);}catch(e){throw new Error(/^\s*</.test(txt)?'O Apps Script devolveu uma página em vez de dados: confira se a implantação está como "Qualquer pessoa" e se a nova versão foi publicada':'resposta inválida do servidor');}
-      this.via='fetch';return j;
-    }catch(e){
-      throw new Error(e.message+(gsErr?' (google.script.run: '+gsErr.message+')':''));
-    }
+    throw new Error('sem conexão com o Firebase');
   },
   fail(e){
     let m=String((e&&e.message)||e||'erro');
-    if(/failed to fetch|networkerror|load failed|network request failed/i.test(m))m='sem conexão com o Apps Script (internet ou link /exec); '+m;
+    if(/failed to fetch|networkerror|load failed|network request failed/i.test(m))m='sem conexão com o Firebase (internet); '+m;
     this.lastErr=m;this.errAt=Date.now();
   },
   // ----- estado visível -----
@@ -2677,7 +2766,7 @@ const Cloud={
   changed(){ // chamado a cada alteração
     this.dirty=true;LS.set(UNSENT_KEY,'1');if(!this.on())return;
     this.setStatus(this.hold?'hold':'syncing');
-    if(!this.ready){this.pull();return;} // nada é enviado antes de ler a planilha pela primeira vez
+    if(!this.ready){this.pull();return;} // nada é enviado antes de ler a nuvem pela primeira vez
     clearTimeout(this.timer);this.timer=setTimeout(()=>{this.timer=null;this.push();},700);
   },
   meta(){return this.call('meta');},
@@ -2699,10 +2788,10 @@ const Cloud={
   receive(r){
     const rs=Number(r&&r.savedAt||0),R=normalize(r||{}),rd=hasData(R),ld=hasData(S),prevSeen=this.lastSeen;
     this.remoteN=rd;this.remoteAt=rs;this.mark(rs);
-    if(!rs||rd===0){if(ld>0){this.dirty=true;this.force=true;}return;}   // planilha vazia: sobe o que existe aqui
-    if(ld===0){this.apply(R);this.dirty=false;return;}                   // este aparelho está vazio: recebe da planilha
+    if(!rs||rd===0){if(ld>0){this.dirty=true;this.force=true;}return;}   // nuvem vazia: sobe o que existe aqui
+    if(ld===0){this.apply(R);this.dirty=false;return;}                   // este aparelho está vazio: recebe da nuvem
     if(rs===S.savedAt){this.dirty=false;LS.set(UNSENT_KEY,'0');return;}  // já são a mesma versão
-    const unsent=this.dirty||LS.get(UNSENT_KEY)==='1',remoteNewer=rs>S.savedAt,changed=rs>prevSeen; // changed: a planilha mudou desde a última vez que este aparelho a viu
+    const unsent=this.dirty||LS.get(UNSENT_KEY)==='1',remoteNewer=rs>S.savedAt,changed=rs>prevSeen; // changed: a nuvem mudou desde a última vez que este aparelho a viu
     const bigC=ld>=8&&rd<ld*0.6,bigL=rd>=8&&ld<rd*0.6;
     const loss=lossInfo(S,R),lossC=remoteNewer&&loss.some(x=>x.cloud<x.local),lossL=!remoteNewer&&loss.some(x=>x.local<x.cloud);
     // Nunca troca uma versão pela outra sem perguntar quando há risco de perder informação:
@@ -2715,7 +2804,7 @@ const Cloud={
       return;
     }
     this.hold=null;
-    if(remoteNewer){this.apply(R);this.dirty=false;return;}              // a planilha tem uma versão mais nova
+    if(remoteNewer){this.apply(R);this.dirty=false;return;}              // a nuvem tem uma versão mais nova
     this.dirty=true;                                                      // este aparelho tem a versão mais nova: envia
   },
   askHold(){
@@ -2723,31 +2812,31 @@ const Cloud={
     if(!this.safe()){return;} // espera a pessoa terminar o que está fazendo (flush tenta de novo)
     this.asked=h.key;
     const when=h.rs?new Date(h.rs).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
-    const why={both:'Este aparelho tem alterações que ainda não foram enviadas e a planilha recebeu outra versão de outro aparelho.',
-      'cloud-smaller':'A planilha tem bem menos itens do que este aparelho. Pode ser uma planilha nova ou vazia.',
-      'local-smaller':'Este aparelho tem bem menos itens do que a planilha. Pode ser um aparelho com dados antigos.',
-      'loss-push':'A planilha recusou a gravação porque ela apagaria muita coisa de uma vez.'}[h.why];
-    const ls=(h.loss||[]).map(x=>'<li><b>'+esc(x.nome)+'</b>: planilha '+x.cloud+' · este aparelho '+x.local+'</li>').join('');
+    const why={both:'Este aparelho tem alterações que ainda não foram enviadas e a nuvem recebeu outra versão de outro aparelho.',
+      'cloud-smaller':'A nuvem tem bem menos itens do que este aparelho. Pode ser uma nuvem nova ou vazia.',
+      'local-smaller':'Este aparelho tem bem menos itens do que a nuvem. Pode ser um aparelho com dados antigos.',
+      'loss-push':'A nuvem recusou a gravação porque ela apagaria muita coisa de uma vez.'}[h.why];
+    const ls=(h.loss||[]).map(x=>'<li><b>'+esc(x.nome)+'</b>: nuvem '+x.cloud+' · este aparelho '+x.local+'</li>').join('');
     openModal('<div class="fh"><h2>Qual versão você quer usar?</h2><button class="icon-btn" data-a="close" aria-label="Decidir depois">'+ic('x')+'</button></div>'+
       '<p>'+esc(why)+' Nada foi apagado ainda.</p>'+
       (ls?'<ul class="small" style="margin:0 0 8px;padding-left:18px">'+ls+'</ul>':'')+
-      '<div class="cfopt"><b>Juntar as duas (recomendado)</b><span>Mantém o que este aparelho tem e traz de volta o que só existe na planilha. Não remove nada.</span><button class="btn primary" data-a="cf-merge">Juntar</button></div>'+
-      '<div class="cfopt"><b>Planilha (nuvem)</b><span>'+(h.rd==null?'':h.rd+' itens')+(when?' · gravada em '+esc(when):'')+'</span><button class="btn" data-a="cf-cloud">Usar a da planilha</button></div>'+
+      '<div class="cfopt"><b>Juntar as duas (recomendado)</b><span>Mantém o que este aparelho tem e traz de volta o que só existe na nuvem. Não remove nada.</span><button class="btn primary" data-a="cf-merge">Juntar</button></div>'+
+      '<div class="cfopt"><b>Planilha (nuvem)</b><span>'+(h.rd==null?'':h.rd+' itens')+(when?' · gravada em '+esc(when):'')+'</span><button class="btn" data-a="cf-cloud">Usar a da nuvem</button></div>'+
       '<div class="cfopt"><b>Este aparelho</b><span>'+h.ld+' itens</span><button class="btn" data-a="cf-local">Enviar a deste aparelho</button></div>'+
       '<p class="muted small">A versão que você não escolher fica guardada em Ajustes > Dados > Restaurar versão anterior.</p>');
   },
-  async resolve(choice){ // choice: true = planilha, false = este aparelho, 'merge' = juntar
+  async resolve(choice){ // choice: true = nuvem, false = este aparelho, 'merge' = juntar
     const h=this.hold;if(!h)return;
-    if(!h.R){ // veio de uma recusa da planilha: precisa ler a versão de lá
+    if(!h.R){ // veio de uma recusa da nuvem: precisa ler a versão de lá
       try{const r=await this.call('sync');if(r&&r.erro)throw new Error(r.erro);h.R=normalize(r);h.rs=Number(r&&r.savedAt||0);h.rd=hasData(h.R);}
-      catch(e){toast('Não consegui ler a planilha: '+e.message);return;}
+      catch(e){toast('Não consegui ler a nuvem: '+e.message);return;}
     }
     this.hold=null;this.asked='';closeModal();
     if(choice==='merge'){
       const R=h.R,keys=(h.loss&&h.loss.length)?h.loss.map(x=>x.k):PROT.map(x=>x[0]);
       LS.set(PREV_KEY,JSON.stringify(h.rs>(S.savedAt||0)?S:R));
       let base,n;
-      if(h.rs>(S.savedAt||0)){base=JSON.parse(JSON.stringify(R));n=unionKeep(base,S,keys);} // planilha mais nova: acrescenta o daqui
+      if(h.rs>(S.savedAt||0)){base=JSON.parse(JSON.stringify(R));n=unionKeep(base,S,keys);} // nuvem mais nova: acrescenta o daqui
       else{base=S;n=unionKeep(base,R,keys);}                                               // aqui é mais novo: acrescenta o de lá
       S=normalize(base);S.savedAt=Math.max(Date.now(),(S.savedAt||0)+1,h.rs+1);Store.set(JSON.stringify(S));HBMEMO={};
       this.dirty=true;LS.set(UNSENT_KEY,'1');this.force=false;rerender();
@@ -2757,7 +2846,7 @@ const Cloud={
     const useCloud=choice===true;
     if(useCloud){
       LS.set(PREV_KEY,JSON.stringify(S));S=h.R;Store.set(JSON.stringify(S));LS.set(UNSENT_KEY,'0');this.dirty=false;this.mark(h.rs);
-      rerender();toast('Versão da planilha aplicada.');this.setStatus('ok');
+      rerender();toast('Versão da nuvem aplicada.');this.setStatus('ok');
     }else{
       LS.set(PREV_KEY,JSON.stringify(h.R));S.savedAt=Math.max(Date.now(),(S.savedAt||0)+1,h.rs+1);Store.set(JSON.stringify(S));
       this.dirty=true;LS.set(UNSENT_KEY,'1');this.force=true;toast('Enviando a versão deste aparelho…');this.push();
@@ -2792,16 +2881,16 @@ const Cloud={
     try{
       const body=Media.stripRemote(JSON.stringify(this.force?Object.assign({},S,{allowEmpty:true,allowLoss:true}):S));
       const res=await this.call('save',body);
-      if(res&&res.status==='refused'&&res.motivo==='perda'){ // a planilha não aceita encolher de repente: pergunta
+      if(res&&res.status==='refused'&&res.motivo==='perda'){ // a nuvem não aceita encolher de repente: pergunta
         this.hold={R:null,rs:0,ld:hasData(S),rd:this.remoteN==null?null:this.remoteN,why:'loss-push',key:'lp|'+sent,
           loss:(res.tabelas||[]).map(t=>({k:t.k,nome:t.nome,cloud:t.antes,local:t.depois}))};
         this.retry=0;this.setStatus('hold');this.askHold();return;
       }
-      if(res&&res.status==='refused')throw new Error('a planilha recusou gravar um estado vazio');
-      if(res&&res.status==='error')throw new Error(res.msg||'erro ao gravar na planilha');
-      if(res&&res.status==='success'){if(Number(res.savedAt)!==sent)throw new Error('a planilha não confirmou a gravação');}
+      if(res&&res.status==='refused')throw new Error('a nuvem recusou gravar um estado vazio');
+      if(res&&res.status==='error')throw new Error(res.msg||'erro ao gravar na nuvem');
+      if(res&&res.status==='success'){if(Number(res.savedAt)!==sent)throw new Error('a nuvem não confirmou a gravação');}
       else{ // enviado por fetch (sem resposta legível): confere pela data gravada
-        const m=await this.meta();if(!m||Number(m.savedAt)!==sent)throw new Error((this.gsNote?'o Apps Script respondeu: '+this.gsNote:'a planilha não confirmou a gravação (confira se a nova versão do Code.gs foi publicada)'));
+        const m=await this.meta();if(!m||Number(m.savedAt)!==sent)throw new Error(('a nuvem não confirmou a gravação (confira se a nova versão do Code.gs foi publicada)'));
       }
       this.force=false;
       this.mark(sent);this.remoteAt=sent;
@@ -2820,20 +2909,20 @@ const Cloud={
     if(!this.dirty&&R.savedAt>S.savedAt)this.apply(R);
   },
   // ----- botões de Ajustes > Dados -----
-  async forceUp(){ // este aparelho passa por cima da planilha
+  async forceUp(){ // este aparelho passa por cima da nuvem
     try{
       const r=await this.call('sync');if(r&&r.erro)throw new Error(r.erro);
       if(hasData(normalize(r))>0)LS.set(PREV_KEY,JSON.stringify(normalize(r)));
       this.hold=null;this.ready=true;S.savedAt=Math.max(Date.now(),(S.savedAt||0)+1,Number(r&&r.savedAt||0)+1);Store.set(JSON.stringify(S));
-      this.dirty=true;LS.set(UNSENT_KEY,'1');this.force=true;toast('Enviando este aparelho para a planilha…');await this.push();
+      this.dirty=true;LS.set(UNSENT_KEY,'1');this.force=true;toast('Enviando este aparelho para a nuvem…');await this.push();
     }catch(e){this.fail(e);this.setStatus('error');toast('Não consegui: '+e.message);}
   },
-  async forceDown(){ // a planilha passa por cima deste aparelho
+  async forceDown(){ // a nuvem passa por cima deste aparelho
     try{
       const r=await this.call('sync');if(r&&r.erro)throw new Error(r.erro);
-      const R=normalize(r);if(!Number(r&&r.savedAt)||hasData(R)===0){toast('A planilha está vazia: nada para baixar.');return;}
+      const R=normalize(r);if(!Number(r&&r.savedAt)||hasData(R)===0){toast('A nuvem está vazia: nada para baixar.');return;}
       LS.set(PREV_KEY,JSON.stringify(S));this.hold=null;this.ready=true;S=R;Store.set(JSON.stringify(S));LS.set(UNSENT_KEY,'0');this.dirty=false;this.mark(R.savedAt);
-      closeModal();rerender();toast('Dados da planilha baixados.');this.lastOk=Date.now();this.lastErr='';this.setStatus('ok');
+      closeModal();rerender();toast('Dados da nuvem baixados.');this.lastOk=Date.now();this.lastErr='';this.setStatus('ok');
     }catch(e){this.fail(e);this.setStatus('error');toast('Não consegui: '+e.message);}
   }
 };
@@ -2846,6 +2935,7 @@ function syncInfoHTML(){
   else if(C.status==='hold'){st='Aguardando sua escolha';cls='';}
   else{st='Tudo certo';cls='pos';}
   let h='<div class="sirow"><span>Firebase</span><b class="'+cls+'">'+st+'</b></div>';
+  h+='<div class="sirow"><span>Arquivos (Storage)</span><b class="'+(RF.ok()?'pos':'neg')+'">'+(RF.ok()?'Ligado':'Indisponível')+'</b></div>';
   if(C.hold)h+='<div class="warn" style="margin-top:8px">As versões deste aparelho e da nuvem são diferentes. <button class="btn sm" data-a="cf-ask">Escolher agora</button></div>';
   if(FB.err&&!on)h+='<div class="warn">'+esc(FB.err)+'</div>';
   if(st==='Com problema'||st==='Desligado')h+='<div class="addrow"><button class="btn" data-a="'+(on?'sync-now':'fb-on')+'">Tentar novamente</button></div>';
@@ -3394,7 +3484,7 @@ function pendRowHTML(o){
 function pendModalHTML(){
   const l=missList();
   return '<div class="form"><div class="fh"><h2>Eventos pendentes</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
-    '<p class="muted small" style="margin:0 0 8px">Eventos marcados como “Não fiz” nos últimos 60 dias. Faça agora, reagende ou descarte.</p>'+
+    
     (l.length?l.map(pendRowHTML).join(''):'<div class="empty">Nenhum evento pendente.</div>')+'</div>';
 }
 function packHTML(date,os){
@@ -3426,6 +3516,14 @@ function diaHTML(ws,occ,dues,dts,rev){
   h+=(os.length?'<div class="daybar">'+dayDoneBtn(UI.day)+'</div>':'')+packHTML(UI.day,os)+hbDayHTML(UI.day)+os.map(tcard).join('');
   if(ts.length)h+='<div class="sechead">Prazos do dia</div>'+ts.map(taskRow).join('');
   return h;
+}
+function sumWrap(key,html){
+  if(!html)return '';const c=(S.prefs.sumC||{})[key];
+  return '<section class="sumhead'+(c?' col':'')+'">'+(c?'':html)+'<button class="sumtog" data-a="sum-toggle" data-k="'+key+'">'+(c?'Expandir':'Recolher')+' '+ic(c?'chevD':'chevU',13)+'</button></section>';
+}
+// cards de modo: ícone, rótulo, subtítulo e contador; o selecionado fica em azul sólido
+function modeCards(list,cur,act,key){
+  return '<div class="mcards">'+list.map(m=>'<button class="mcard '+(cur===m[0]?'on':'')+'" data-a="'+act+'" data-k="'+key+'" data-v="'+m[0]+'">'+ic(m[3]||'layers',18)+'<b>'+esc(m[1])+'</b><span class="mcs">'+esc(m[4]||'')+'</span><span class="mcn">'+m[2]+'</span></button>').join('')+'</div>';
 }
 function focusHTML(occ){
   const shorts=S.goals.filter(g=>g.horizon==='curto'&&!g.done);
@@ -3487,10 +3585,10 @@ function rvDays(list){
 function rvSettingsHTML(){
   const c=rvCfg(),old=S.acts.filter(a=>!a.rev&&RV_TIPO.test(norm((actParts(a).tipo||'')+' '+(a.kind||'')))).length;
   return '<div class="card sec"><h3>Intervalos de revisão</h3><label class="sw" style="margin-bottom:10px"><input type="checkbox" data-a="rv-on" '+(c.on?'checked':'')+'> <b>Revisões ligadas</b></label>'+
-    '<p class="muted small">Cada evento marcado com “Gera revisão” ganha uma revisão em cada intervalo. D1, D7 e D30 são os principais; os maiores são as revisões posteriores.</p>'+
+    
     c.days.map(d=>'<div class="rvset"><b>D+'+d.n+'</b><span class="muted small">'+(d.n<=30?'Principal':'Posterior')+'</span><span class="sp"></span><span class="rvmin"><button class="icon-btn sm" data-a="rv-cfgmin" data-n="'+d.n+'" data-d="-5">−</button><b>'+d.min+' min</b><button class="icon-btn sm" data-a="rv-cfgmin" data-n="'+d.n+'" data-d="5">+</button></span><button class="icon-btn sm" data-a="rv-int-del" data-n="'+d.n+'" aria-label="Remover intervalo">'+ic('trash',14)+'</button></div>').join('')+
     '<div class="addrow"><input type="number" min="1" max="365" id="rvNewN" placeholder="Novo intervalo (dias)"><button class="btn primary sm" data-a="rv-int-add">Adicionar</button></div></div>'+
-    '<div class="card sec"><h3>Organizar revisão</h3><p class="muted small">Um lembrete antes de cada revisão, para separar o material.</p>'+
+    '<div class="card sec"><h3>Organizar revisão</h3>'+
     '<div class="rvset"><b>Antecedência</b><span class="sp"></span><span class="rvmin"><button class="icon-btn sm" data-a="rv-prep" data-d="-1">−</button><b>'+(c.prep?c.prep+(c.prep===1?' dia':' dias'):'Desligado')+'</b><button class="icon-btn sm" data-a="rv-prep" data-d="1">+</button></span></div>'+
     '<div class="rvset"><b>Tempo para organizar</b><span class="sp"></span><span class="rvmin"><button class="icon-btn sm" data-a="rv-prepmin" data-d="-5">−</button><b>'+c.prepMin+' min</b><button class="icon-btn sm" data-a="rv-prepmin" data-d="5">+</button></span></div></div>'+
     '<div class="card sec"><h3>Eventos que geram revisão</h3><p class="muted small">Marque “Gera revisão” ao criar ou editar um evento. '+(old?'Há '+old+' evento(s) de Aula, Tutoria ou Plantão ainda sem a marca.':'Nenhum evento de Aula, Tutoria ou Plantão está sem a marca.')+'</p>'+
@@ -3501,7 +3599,7 @@ function renderRevisoes(){
   const all=reviewList(addISO(T,-45),addISO(T,60)).filter(rvPass);
   const dueNow=all.filter(r=>!r.done&&r.date<=T),next=all.filter(r=>!r.done&&r.date>T),dn=all.filter(r=>r.done).reverse();
   const wkEnd=addISO(T,6),sum=a=>a.reduce((x,r)=>x+r.min,0),wk=all.filter(r=>!r.done&&r.date<=wkEnd);
-  let h='<h2 class="vt" style="margin:0 0 4px">Revisões</h2><p class="muted small" style="margin:0 0 12px">'+(c.on?'D'+c.days.map(d=>d.n).join(' · D')+'. Só entram eventos marcados com “Gera revisão”.':'As revisões estão desligadas (aba Ajustes).')+'</p>'+
+  let h='<h2 class="vt" style="margin:0 0 4px">Revisões</h2>'+(c.on?'':'<p class="muted small" style="margin:0 0 12px">As revisões estão desligadas.</p>')+
     '<div class="rvsum"><div><b>'+dueNow.length+'</b><span>pendentes agora</span></div><div><b>'+sum(dueNow)+' min</b><span>previstos hoje</span></div><div><b>'+sum(wk)+' min</b><span>nos próximos 7 dias</span></div></div>'+
     '<div class="toolbar"><div class="seg">'+[['hoje','Hoje e atrasadas ('+dueNow.length+')'],['prox','Próximas ('+next.length+')'],['feitas','Concluídas ('+dn.length+')'],['cfg','Ajustes']].map(v=>'<button class="'+(tab===v[0]?'on':'')+'" data-a="rv-tab" data-v="'+v[0]+'">'+v[1]+'</button>').join('')+'</div></div>';
   if(tab==='cfg')return h+rvSettingsHTML();
@@ -3528,9 +3626,9 @@ function renderSemana(){
     '<div class="wlabel"><b>'+label+'</b><span class="muted small">'+occ.length+(occ.length===1?' Atividade':' Atividades')+' · '+hoursStr(occ)+' Planejadas · '+occ.filter(o=>o.done).length+(occ.filter(o=>o.done).length===1?' Concluída':' Concluídas')+' · '+(dues.length+dts.length)+((dues.length+dts.length)===1?' Prazo':' Prazos')+'</span></div><button class="btn sm" data-a="wk-today">Hoje</button>'+pendBtnHTML()+'<button class="btn sm" data-a="quick" title="Locomoção, descanso, rotina, limpeza, culinária, alimentação">'+ic('zap',14)+' Rápido</button><button class="btn sm" data-a="ia-open" title="Copiar um resumo da semana para colar numa IA">'+ic('copy',14)+' Para IA</button><button class="btn sm" data-a="paste-open" title="Colar a organização que a IA devolveu">'+ic('download',14)+' Colar da IA</button><button class="btn sm" data-a="batch-open" title="Criar vários eventos de uma vez">'+ic('list',14)+' Em lote</button>'+
     (filterCount()&&!UI.fopen?'<span class="factive">'+filterCount()+' filtro(s) ativo(s) <button class="btn sm ghost" data-a="f-clear">Limpar</button></span>':'')+'</div>'+
     '<div class="seg">'+views.map(v=>'<button class="'+(UI.view===v[0]?'on':'')+'" data-a="view" data-v="'+v[0]+'">'+ic(v[2],15)+v[1]+'</button>').join('')+'</div></div>';
-  h+=focusHTML(occ);
+  h+=sumWrap('semana',focusHTML(occ));
   if(!S.acts.length&&!dues.length&&!dts.length)h+='<div class="empty">Sua semana está vazia.<br>Crie uma atividade ou agende um lembrete do radar.<br><button class="btn primary" data-a="new-act">'+ic('plus',15)+' Nova atividade</button></div>';
-  else if(UI.view==='grade')h+=gridHTML(ws,occ,dues,dts,false,rev)+'<p class="muted small" style="margin-top:8px">Clique ou arraste em um dia para criar um evento.</p>';
+  else if(UI.view==='grade')h+=gridHTML(ws,occ,dues,dts,false,rev);
   else if(UI.view==='lista')h+=listaHTML(ws,occ,dues,dts,rev);
   else h+=diaHTML(ws,occ,dues,dts,rev);
   return h;
@@ -3722,8 +3820,8 @@ function openFolderLook(k,id){
   const prev=()=>{const L=folderLook(Object.assign({},f,st));return '<span class="ftile pst fprev" style="'+L.style+'"><span class="fti">'+ic(L.icon,22)+'</span><span class="ftn">'+esc(f.name)+'</span></span>';};
   openModal('<form id="fLook" class="form"><div class="fh"><h2>Aparência da pasta</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<div id="lkPrev">'+prev()+'</div>'+
-    '<label class="f"><span>Seguir um eixo <small>usa a cor e o ícone da categoria e muda junto com ela</small></span><select name="axis"><option value="">Nenhum: escolho a cor e o ícone</option>'+catTreeOpts(st.axis)+'</select></label>'+
-    '<div class="f" id="lkCol"><span>Cor <small>sempre em tom pastel</small></span><div class="lkcols"><button type="button" class="lkc none'+(st.color?'':' on')+'" data-c="" aria-label="Padrão"></button>'+FOLDER_PASTEL.map(c=>'<button type="button" class="lkc'+(st.color===c?' on':'')+'" data-c="'+c+'" style="background:'+c+'" aria-label="Cor '+c+'"></button>').join('')+'<input type="color" name="pick" value="'+(st.color||'#9CCBF2')+'" aria-label="Outra cor"></div></div>'+
+    '<label class="f"><span>Seguir um eixo</span><select name="axis"><option value="">Nenhum: escolho a cor e o ícone</option>'+catTreeOpts(st.axis)+'</select></label>'+
+    '<div class="f" id="lkCol"><span>Cor</span><div class="lkcols"><button type="button" class="lkc none'+(st.color?'':' on')+'" data-c="" aria-label="Padrão"></button>'+FOLDER_PASTEL.map(c=>'<button type="button" class="lkc'+(st.color===c?' on':'')+'" data-c="'+c+'" style="background:'+c+'" aria-label="Cor '+c+'"></button>').join('')+'<input type="color" name="pick" value="'+(st.color||'#9CCBF2')+'" aria-label="Outra cor"></div></div>'+
     '<div class="f"><span>Ícone</span><div class="icons">'+FOLDER_ICONS.map(n=>'<button type="button" class="ibtn lki'+((st.icon||'folder')===n?' on':'')+'" data-i="'+n+'" aria-label="Ícone '+n+'">'+ic(n,18)+'</button>').join('')+'</div></div>'+
     (hasSubs?'<label class="chip cb" style="align-self:flex-start"><input type="checkbox" name="subs" checked><span>Aplicar também às subpastas</span></label>':'')+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
@@ -3803,7 +3901,7 @@ function renderDocs(){
   const main='<div class="toolbar"><div class="seg">'+[['todo','A fazer ('+pend.length+')'],['ok','Em dia ('+ok.length+')'],['all','Todos']].map(v=>'<button class="'+(UI.docTab===v[0]?'on':'')+'" data-a="set" data-k="docTab" data-v="'+v[0]+'">'+v[1]+'</button>').join('')+'</div>'+
     '<span class="sp"></span>'+flatBtn('docs')+treeBtn('docs')+'<div class="seg vseg" aria-label="Modo de exibição">'+[['grade','Grade'],['cartoes','Cartões'],['lista','Lista']].map(v=>'<button class="'+(dv===v[0]?'on':'')+'" data-a="dview" data-v="'+v[0]+'" title="'+v[1]+'">'+v[1]+'</button>').join('')+'</div>'+
     '<button class="btn primary" data-a="new-doc">'+ic('plus',15)+' Novo documento</button></div>'+
-    '<div class="frow" style="margin-bottom:10px"><span class="fl" style="min-width:auto">Status</span><button class="chip '+(!UI.dstat?'on':'')+'" data-a="set" data-k="dstat" data-v="">Todos</button>'+DST.map(x=>'<button class="chip '+(UI.dstat===x[0]?'on':'')+'" data-a="set" data-k="dstat" data-v="'+x[0]+'">'+x[1]+' ('+S.docs.filter(d=>d.status===x[0]).length+')</button>').join('')+'</div>'+tplBarHTML()+crumbs+subRow+
+    sumWrap('docs',modeCards([['','Todos',S.docs.length,'layers','Todos os documentos']].concat(DST.map(x=>[x[0],x[1],S.docs.filter(d=>d.status===x[0]).length,{iniciar:'play',andamento:'clock',finalizado:'check'}[x[0]]||'file',{iniciar:'Ainda não comecei',andamento:'Em produção',finalizado:'Prontos'}[x[0]]||''])),UI.dstat||'','set','dstat'))+tplBarHTML()+crumbs+subRow+
     (list.length?(dv==='grade'?'<div class="gtiles">'+list.map(d=>docTile(d,showPath)).join('')+'</div>':dv==='lista'?'<div class="llist">'+list.map(docRow).join('')+'</div>':'<div class="dgrid">'+list.map(docCard).join('')+'</div>'):'<div class="empty">'+(cur?'Nenhum documento nesta pasta.':'Nenhum documento aqui.')+'<br><button class="btn primary" data-a="new-doc">'+ic('plus',15)+' Adicionar documento</button></div>');
   return '<div class="nlay'+(UI.ftoff.docs?' nofo':'')+'">'+tree+'<section>'+main+'</section></div>';
 }
@@ -3924,7 +4022,7 @@ function renderMetas(){
   const tabs=[['hier','Hierarquia'],['curto','Curto'],['medio','Médio'],['longo','Longo']];
   const selH=UI.goalTab==='hier'?'curto':UI.goalTab;
   let h='<div class="toolbar"><div class="seg">'+tabs.map(v=>'<button class="'+(UI.goalTab===v[0]?'on':'')+'" data-a="set" data-k="goalTab" data-v="'+v[0]+'">'+v[1]+'</button>').join('')+'</div></div>'+
-    '<div class="card gform"><input id="newGoal" type="text" placeholder="Novo objetivo… (Enter para adicionar)" autocomplete="off"><select id="newGoalH" aria-label="Prazo">'+
+    '<div class="card gform"><input id="newGoal" type="text" placeholder="Novo objetivo" autocomplete="off"><select id="newGoalH" aria-label="Prazo">'+
     ['curto','medio','longo'].map(k=>'<option value="'+k+'" '+(k===selH?'selected':'')+'>'+HNAME[k]+'</option>').join('')+'</select><button class="btn primary sm" data-a="add-goal">Adicionar</button></div>';
   let lines='';
   if(UI.goalTab==='hier'){
@@ -4007,33 +4105,33 @@ function bagHTML(c,depth,seen){
 }
 function renderAjustes(){
   const SEC={};
-  SEC.cats='<div class="card sec"><h3>Categorias</h3><p>Cada categoria e subcategoria pode ter a sua própria cor (seletor ou código HEX). Sem cor própria, ela herda da categoria acima. Marque como <b>disciplina</b> a que aparece no título, e como <b>tipo</b> as que representam o tipo da atividade.</p>'+
+  SEC.cats='<div class="card sec"><h3>Categorias</h3>'+
     '<div class="addrow"><input type="text" id="newRoot" placeholder="Nova categoria principal" autocomplete="off"><div class="sw">'+PAL.map(c=>'<button type="button" class="'+(UI.newColor===c?'on':'')+'" style="background:'+c+'" data-a="pick-color" data-v="'+c+'" aria-label="Cor '+c+'"></button>').join('')+'</div><button class="btn primary sm" data-a="add-root">Adicionar</button></div>'+
     '<div>'+treeHTML(null,0)+'</div></div>';
   const cfg=titleCfg(),ex=S.acts[0]?aT(S.acts[0]):'Rodízio | Tema ou assunto | Habilidades Profissionais | Cardiologia';
-  SEC.titulo='<div class="card sec"><h3>Título padronizado</h3><p>Todo evento segue o formato <b>Tipo de atividade | Tema (se houver) | Disciplina | Eixo (se houver)</b>. O tipo vem da lista abaixo; a disciplina e o eixo vêm da categoria escolhida.</p>'+
+  SEC.titulo='<div class="card sec"><h3>Título padronizado</h3>'+
     '<div class="opts"><label class="chip cb"><input type="checkbox" data-topt="tipo" '+(cfg.tipo?'checked':'')+'><span>Incluir o tipo</span></label><label class="chip cb"><input type="checkbox" data-topt="area" '+(cfg.area?'checked':'')+'><span>Incluir o eixo</span></label></div>'+
     '<div class="tprev">Exemplo: <b>'+esc(ex)+'</b></div></div>'+
-    '<div class="card sec"><h3>Professores</h3><p>Os nomes usados nas atividades ficam guardados aqui e aparecem como atalhos ao criar um evento. Ao renomear, os eventos são atualizados.</p><div class="addrow"><input type="text" id="newProf" placeholder="Novo professor(a)" autocomplete="off"><button class="btn primary sm" data-a="prof-add">Adicionar</button></div>'+
+    '<div class="card sec"><h3>Professores</h3><div class="addrow"><input type="text" id="newProf" placeholder="Novo professor(a)" autocomplete="off"><button class="btn primary sm" data-a="prof-add">Adicionar</button></div>'+
     '<div class="kinds">'+teacherList().map(k=>'<span class="chip">'+esc(k)+'<button data-a="prof-ren" data-v="'+esc(k)+'" aria-label="Renomear '+esc(k)+'">'+ic('edit',12)+'</button><button data-a="prof-del" data-v="'+esc(k)+'" aria-label="Remover '+esc(k)+'">'+ic('x',13)+'</button></span>').join('')+'</div></div>'+
-    '<div class="card sec"><h3>Locais</h3><p>Os locais usados ficam guardados e aparecem como atalhos no formulário do evento. Ao renomear, os eventos são atualizados.</p><div class="addrow"><input type="text" id="newPlace" placeholder="Novo local ou sala" autocomplete="off"><button class="btn primary sm" data-a="place-add">Adicionar</button></div>'+
+    '<div class="card sec"><h3>Locais</h3><div class="addrow"><input type="text" id="newPlace" placeholder="Novo local ou sala" autocomplete="off"><button class="btn primary sm" data-a="place-add">Adicionar</button></div>'+
     '<div class="kinds">'+placeList().map(k=>'<span class="chip">'+ic('pin',12)+esc(k)+'<button data-a="place-ren" data-v="'+esc(k)+'" aria-label="Renomear '+esc(k)+'">'+ic('edit',12)+'</button><button data-a="place-del" data-v="'+esc(k)+'" aria-label="Remover '+esc(k)+'">'+ic('x',13)+'</button></span>').join('')+'</div></div>'+
-    '<div class="card sec"><h3>Tipos de atividade</h3><p>Aparecem no início do título e no campo "Tipo de atividade" do formulário.</p><div class="addrow"><input type="text" id="newTipo" placeholder="Novo tipo de atividade" autocomplete="off"><button class="btn primary sm" data-a="tipo-add">Adicionar</button></div>'+
+    '<div class="card sec"><h3>Tipos de atividade</h3><div class="addrow"><input type="text" id="newTipo" placeholder="Novo tipo de atividade" autocomplete="off"><button class="btn primary sm" data-a="tipo-add">Adicionar</button></div>'+
     '<div class="kinds">'+S.tipos.map((k,i)=>'<span class="chip">'+esc(k)+'<button data-a="tipo-del" data-i="'+i+'" aria-label="Remover '+esc(k)+'">'+ic('x',13)+'</button></span>').join('')+'</div></div>';
-  SEC.objs='<div class="card sec"><h3>O que levar (kits, objetos e aplicativos)</h3><p>Mochilas, pastas e bolsas são <b>kits prontos</b>: abra cada uma e defina o que fica sempre dentro. No evento basta marcar o kit; o conteúdo vem junto e vale para todos os eventos do mesmo dia. Aplicativos existem apenas para itens do grupo <b>Eletrônicos</b>.</p>'+
+  SEC.objs='<div class="card sec"><h3>O que levar (kits, objetos e aplicativos)</h3>'+
     '<div class="addrow"><input type="text" id="newItem" placeholder="Novo objeto" autocomplete="off"><input type="text" id="newItemG" list="itemGroups" placeholder="Grupo" autocomplete="off"><datalist id="itemGroups">'+itemGroups().map(g=>'<option value="'+esc(g)+'"></option>').join('')+'</datalist><button class="btn primary sm" data-a="item-add">Adicionar</button></div>'+
     itemGroups().map(g=>'<div class="f" style="margin-bottom:10px"><span>'+esc(g)+'</span>'+S.items.filter(i=>(i.group||'Geral')===g).map(i=>
       '<div class="irow"><div class="in">'+(i.container?'<button class="bagname" data-a="item-open" data-id="'+i.id+'" aria-expanded="'+(UI.itOpen[i.id]?'true':'false')+'">'+ic(UI.itOpen[i.id]?'chevD':'chevR',15)+'<b>'+esc(i.name)+'</b>'+((i.inside||[]).length?'<span class="count">'+i.inside.length+'</span>':'')+'</button>':'<b>'+esc(i.name)+'</b>')+'<label class="chip cb" title="Permite guardar outros objetos dentro, só em cada atividade"><input type="checkbox" data-icont="'+i.id+'" '+(i.container?'checked':'')+'><span>Guarda outros objetos</span></label><span class="gact" style="opacity:1;margin-left:auto"><button class="icon-btn sm" data-a="item-rename" data-id="'+i.id+'" title="Renomear" aria-label="Renomear">'+ic('edit',15)+'</button><button class="icon-btn sm" data-a="item-del" data-id="'+i.id+'" title="Remover" aria-label="Remover">'+ic('trash',15)+'</button></span></div>'+
       (isEletro(i)?'<div class="kinds">'+(i.apps||[]).map((ap,k)=>'<span class="chip">'+esc(ap)+'<button data-a="app-del" data-id="'+i.id+'" data-i="'+k+'" aria-label="Remover '+esc(ap)+'">'+ic('x',13)+'</button></span>').join('')+
       '<span class="padd"><input type="text" class="app-new" data-id="'+i.id+'" placeholder="+ aplicativo" autocomplete="off"><button class="icon-btn sm" data-a="app-add" data-id="'+i.id+'" aria-label="Adicionar aplicativo">'+ic('plus',14)+'</button></span></div>':'')+(i.container&&UI.itOpen[i.id]?bagHTML(i,0):'')+'</div>').join('')+'</div>').join('')+'</div>';
-  SEC.titulo+='<div class="card sec"><h3>Naturezas</h3><p>Classificam o que é cada bloco (atividade, tarefa, estudo individual…).</p><div class="addrow"><input type="text" id="newKind" placeholder="Nova natureza" autocomplete="off"><button class="btn primary sm" data-a="kind-add">Adicionar</button></div>'+
+  SEC.titulo+='<div class="card sec"><h3>Naturezas</h3><div class="addrow"><input type="text" id="newKind" placeholder="Nova natureza" autocomplete="off"><button class="btn primary sm" data-a="kind-add">Adicionar</button></div>'+
     '<div class="kinds">'+S.kinds.map((k,i)=>'<span class="chip">'+esc(k)+'<button data-a="kind-del" data-i="'+i+'" aria-label="Remover '+esc(k)+'">'+ic('x',13)+'</button></span>').join('')+'</div></div>';
-  SEC.titulo+='<div class="card sec"><h3>Categorias de links</h3><p>Agrupam a aba Links (por exemplo Uso, Fontes e Cursos).</p><div class="addrow"><input type="text" id="newLinkCat" placeholder="Nova categoria de link" autocomplete="off"><button class="btn primary sm" data-a="linkcat-add">Adicionar</button></div>'+
+  SEC.titulo+='<div class="card sec"><h3>Categorias de links</h3><div class="addrow"><input type="text" id="newLinkCat" placeholder="Nova categoria de link" autocomplete="off"><button class="btn primary sm" data-a="linkcat-add">Adicionar</button></div>'+
     '<div class="kinds">'+S.linkCats.map((k,i)=>'<span class="chip">'+esc(k)+'<button data-a="linkcat-del" data-i="'+i+'" aria-label="Remover '+esc(k)+'">'+ic('x',13)+'</button></span>').join('')+'</div></div>';
   SEC.dados='<div class="card sec"><h3>Dados</h3><div id="syncInfo">'+syncInfoHTML()+'</div><div id="fbBox"></div>'+(Store.fail?'<div class="warn">O navegador bloqueou o armazenamento local. Use Exportar para guardar seus dados.</div>':'')+
     '<div class="addrow"><button class="btn" data-a="notif">'+ic('bell',15)+' Receber notificações</button><button class="btn" data-a="export">'+ic('download',15)+' Exportar backup</button><button class="btn" data-a="import">'+ic('upload',15)+' Importar backup</button><button class="btn danger" data-a="reset">'+ic('trash',15)+' Apagar tudo</button></div>'+
     (orphanCards().length?'<div class="addrow" style="margin-top:10px"><button class="btn" data-a="cards-orph">'+ic('trash',15)+' Limpar cards sem baralho ('+orphanCards().length+')</button><span class="muted small">Cards de baralhos que já foram excluídos.</span></div>':'')+'</div>';
-  SEC.nk='<div class="card sec"><h3>Tipos de nota</h3><p>Diferencie as notas de uma mesma pasta ou disciplina por um ícone (Patologia, Fisiologia, Imagem…). Escolha o tipo ao editar a nota e filtre pela lista “Natureza”.</p>'+
+  SEC.nk='<div class="card sec"><h3>Tipos de nota</h3>'+
     (S.nkinds||[]).map(k=>'<div class="nkrow"><span class="nkb">'+ic(k.icon,18)+'</span><b>'+esc(k.name)+'</b><span class="sp"></span><button class="icon-btn sm" data-a="nk-icon" data-id="'+k.id+'" title="Trocar ícone">'+ic('image',14)+'</button><button class="icon-btn sm" data-a="nk-ren" data-id="'+k.id+'" title="Renomear">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="nk-del" data-id="'+k.id+'" title="Excluir">'+ic('trash',14)+'</button></div>').join('')+
     '<div class="addrow"><input type="text" id="nkNew" placeholder="Novo tipo de nota" autocomplete="off"><button class="btn primary sm" data-a="nk-add">Adicionar</button></div></div>';
   SEC.notif=notifHTML();
@@ -4045,7 +4143,7 @@ function renderAjustes(){
 /* ==========================================================================
    17. RENDERIZAÇÃO GERAL
    ========================================================================== */
-const TABS=[['painel','Painel','home'],['semana','Semana','calendar'],['tarefas','Tarefas','tasks'],['revisoes','Revisões','repeat'],['habitos','Hábitos','sprout'],['docs','Documentos','file'],['notas','Notas','note'],['questoes','Questões','cap'],['metas','Objetivos','target'],['datas','Datas','clock'],['links','Links','link'],['saude','Saúde','pulse'],['cul','Culinária','chef'],['fin','Finanças','wallet'],['ajustes','Ajustes','settings']];
+const TABS=[['painel','Painel','home'],['semana','Semana','calendar'],['tarefas','Tarefas','tasks'],['revisoes','Revisões','repeat'],['habitos','Hábitos','sprout'],['docs','Documentos','file'],['notas','Notas','note'],['questoes','Questões','cap'],['metas','Objetivos','target'],['datas','Datas','clock'],['links','Links','link'],['cul','Culinária','chef'],['fin','Finanças','wallet'],['ajustes','Ajustes','settings']];
 // Transição suave ao trocar de aba (o conteúdo entra deslizando de leve; sem movimento se o aparelho pedir)
 function tabAnim(dir){
   const m=$('#main');if(!m||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))return;
@@ -4078,21 +4176,22 @@ applyAppMode();
     ACT.tab({dataset:{v:TABS[j][0]}});
   },{passive:true});
 })();
+const SB_GROUPS=[['Execução',['painel','semana','tarefas']],['Estudo',['revisoes','notas','questoes','docs']],['Estratégia',['metas','habitos','datas']],['Gestão',['fin','cul']],['Sistema',['links','ajustes']]];
 function renderTabs(){
-  const bar=$('#tabs'),due=S.prefs.hideDueBadge?0:dueCardCount();if(!bar)return;
-  if(bar.dataset.built!=='1'||$$('.tab',bar).length!==TABS.length){
-    bar.innerHTML='<span class="tabind" id="tabInd" aria-hidden="true"></span>'+TABS.map(t=>'<button class="tab" data-a="tab" data-v="'+t[0]+'">'+ic(t[2],18)+'<span class="lbl">'+t[1]+'</span></button>').join('');
+  const bar=$('#sbnav');if(!bar)return;
+  const due=S.prefs.hideDueBadge?0:dueCardCount();
+  if(bar.dataset.built!=='1'){
+    bar.innerHTML=SB_GROUPS.map(g=>'<div class="sbg"><div class="sbh">'+g[0]+'</div>'+g[1].map(id=>{const t=TABS.find(x=>x[0]===id);return t?'<button class="sbi" data-a="tab" data-v="'+id+'" title="'+t[1]+'">'+ic(t[2],18)+'<span class="lbl">'+t[1]+'</span></button>':'';}).join('')+'</div>').join('');
     bar.dataset.built='1';
   }
-  TABS.forEach(t=>{
-    const b=$('.tab[data-v="'+t[0]+'"]',bar);if(!b)return;
-    b.classList.toggle('on',UI.tab===t[0]);
-    let c=$('.count',b);
-    if(t[0]==='notas'&&due){if(!c){c=document.createElement('span');c.className='count';c.title='Cards para revisar agora';b.appendChild(c);}c.textContent=due;}
-    else if(c)c.remove();
+  let rvn=0;try{const T=todayISO();rvn=reviewList(addISO(T,-6),T).filter(r=>!r.done&&r.kind==='rv').length;}catch(e){}
+  $$('.sbi',bar).forEach(b=>{
+    const id=b.dataset.v;b.classList.toggle('on',UI.tab===id);
+    const n=id==='notas'?due:id==='revisoes'?rvn:0;let c=$('.count',b);
+    if(n){if(!c){c=document.createElement('span');c.className='count';b.appendChild(c);}c.textContent=n;}else if(c)c.remove();
   });
-  const pb=$('[data-a="print"]');if(pb){const tl=(TABS.find(x=>x[0]===UI.tab)||[])[1]||'esta página';pb.title=UI.tab==='semana'?'Imprimir a semana em grade (1 página)':'Imprimir: '+tl;pb.setAttribute('aria-label',pb.title);}
-  moveTabInd();centerTab();fitTabs();
+  document.body.classList.toggle('sbc',!!S.prefs.sbCollapsed);
+  const yr=$('#ctxYear');if(yr)yr.textContent=new Date().getFullYear();
 }
 // Cabeçalho que cabe na tela: se as abas com nome não cabem, mostra só o nome da aba ativa (os ícones continuam)
 function fitTabs(){
@@ -4185,9 +4284,10 @@ function renderMain(){
   if(hostAlive())return;
   applyLook();
   const mn=$('#main');if(mn)mn.classList.toggle('wide',UI.tab==='semana'&&UI.view==='grade');
-  const map={painel:renderPainel,semana:renderSemana,tarefas:renderTarefas,revisoes:renderRevisoes,habitos:renderHabitos,docs:renderDocs,notas:renderNotas,questoes:renderQuestoes,metas:renderMetas,datas:renderDatas,links:renderLinks,saude:renderSaude,cul:renderCul,fin:renderFin,ajustes:renderAjustes};
+  const map={painel:renderPainel,semana:renderSemana,tarefas:renderTarefas,revisoes:renderRevisoes,habitos:renderHabitos,docs:renderDocs,notas:renderNotas,questoes:renderQuestoes,metas:renderMetas,datas:renderDatas,links:renderLinks,cul:renderCul,fin:renderFin,ajustes:renderAjustes};
   computeAttention();
-  $('#main').innerHTML=((UI.tab==='notas'&&(UI.nview||UI.study))||UI.tab==='questoes'?'':attnHTML())+map[UI.tab]();
+  $('#main').innerHTML=map[UI.tab]();
+  try{NC.badge();}catch(e){}
   updateBadge();afterRender();
 }
 function afterRender(){
@@ -4268,7 +4368,7 @@ function bagPickHTML(sel){
   const set=new Set(sel||[]),kits=S.items.filter(i=>i.container),loose=S.items.filter(i=>!i.container);
   const kitTxt=k=>{const n=(k.inside||[]).map(itemById).filter(Boolean).map(i=>i.name);return n.length?n.slice(0,4).join(', ')+(n.length>4?' +'+(n.length-4):''):'Defina o conteúdo em Ajustes';};
   return '<div hidden>'+S.items.map(i=>'<input type="checkbox" name="it" value="'+i.id+'" '+(set.has(i.id)?'checked':'')+'>').join('')+'</div>'+
-    (kits.length?'<div class="kits">'+kits.map(k=>'<button type="button" class="kit'+(set.has(k.id)?' on':'')+'" data-a="kit-toggle" data-id="'+k.id+'" aria-pressed="'+set.has(k.id)+'">'+ic('bag',18)+'<span><b>'+esc(k.name)+'</b><small>'+esc(kitTxt(k))+'</small></span><i class="kck">'+ic('check',13)+'</i></button>').join('')+'</div>':'')+
+    (kits.length?'<div class="kits">'+kits.map(k=>'<button type="button" class="kit'+(set.has(k.id)?' on':'')+'" data-a="kit-toggle" data-id="'+k.id+'" aria-pressed="'+set.has(k.id)+'">'+ic('bag',18)+'<span><b>'+esc(k.name)+'</b></span><i class="kck">'+ic('check',13)+'</i></button>').join('')+'</div>':'')+
     '<div id="bagsel" class="bagsel"></div>'+
     '<div class="bagadd"><input type="text" id="bagIn" list="bagList" placeholder="+ Item avulso (ex.: Livro de Fisiologia, Jaleco…)" autocomplete="off" aria-label="Adicionar item avulso"><button type="button" class="btn sm" data-a="bagx-add">'+ic('plus',14)+' Adicionar</button>'+
     '<datalist id="bagList">'+loose.map(i=>'<option value="'+esc(i.name)+'"></option>').join('')+'</datalist></div><div class="bagday muted small" id="bagday"></div>';
@@ -4413,7 +4513,7 @@ const moneyRow=m=>'<div class="mrow" data-mid="'+esc(m.id)+'"><input class="m-de
   '<input type="date" class="m-date" value="'+esc(m.date||'')+'" aria-label="Data">'+
   '<select class="m-acc" aria-label="Conta">'+S.fin.accounts.map(a=>'<option value="'+a.id+'" '+sel(a.id,m.acc)+'>'+esc(a.name)+'</option>').join('')+'</select>'+
   '<button type="button" class="icon-btn sm" data-a="money-del" aria-label="Remover">'+ic('x',14)+'</button></div>';
-function moneyBlock(list){return '<div class="f"><span>Dinheiro <small>gastos (material, lanche, almoço, compras) ou entradas; aparece em Finanças</small></span><div id="moneys">'+(list||[]).map(moneyRow).join('')+'</div><div><button type="button" class="btn sm" data-a="money-add">'+ic('plus',14)+' Adicionar valor</button></div></div>';}
+function moneyBlock(list){return '<div class="f"><span>Dinheiro</span><div id="moneys">'+(list||[]).map(moneyRow).join('')+'</div><div><button type="button" class="btn sm" data-a="money-add">'+ic('plus',14)+' Adicionar valor</button></div></div>';}
 function readMoneys(f){
   return $$('.mrow',f).map(r=>({id:r.dataset.mid||uid(),desc:$('.m-desc',r).value.trim(),amount:parseNum($('.m-amt',r).value),kind:$('.m-kind',r).value,cat:$('.m-cat',r).value,date:$('.m-date',r).value||todayISO(),acc:$('.m-acc',r).value}))
     .filter(m=>m.amount!=null&&m.amount>0);
@@ -4487,16 +4587,16 @@ function openActForm(opts){
     vinc:!!(p.taskIds.length||p.docIds.length||p.goalIds.length||p.linkIds.length||p.relId||(p.kind&&p.kind!==(S.kinds[0]||'Atividade'))),tipo:!!(p.tipoAtv||p.noArea||(p.blockType&&p.blockType!=='estudo'))};
   openModal('<form id="fAct" class="form"><div class="fh"><h2>'+(a0?'Editar atividade':(opts.heading||'Nova atividade'))+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
     (a0?'':quickRowHTML())+
-    '<div class="f"><span>Categoria <small>disciplina e eixo entram no título</small></span>'+catPickHTML('cat',p.catId)+'</div>'+
+    '<div class="f"><span>Categoria</span>'+catPickHTML('cat',p.catId)+'</div>'+
     '<div class="f"><span>Tema ou assunto</span><div class="frow" style="flex-wrap:nowrap"><input name="theme" '+(p.themeNA?'disabled':'')+' value="'+esc(p.theme)+'" autocomplete="off" style="flex:1"><label class="chip cb" title="Sem tema: o título fica só com o tipo, a disciplina e o eixo"><input type="checkbox" name="themeNA" '+(p.themeNA?'checked':'')+'><span>Sem tema</span></label></div><div class="tprev" id="tprev"></div></div>'+
     '<div class="f"><span>Horário</span><div id="slots">'+p.slots.map(slotRow).join('')+'</div><div><button type="button" class="btn sm" data-a="slot-add">'+ic('plus',14)+' Outro horário</button></div><div class="sprev" id="slotprev"></div></div>'+
     '<div class="locbox"><div class="fgrid"><label class="f">'+ic('pin',13)+' Local / sala<input name="place" list="placedl" value="'+esc(p.place)+'" placeholder="Onde vai ser" autocomplete="off"></label><label class="f">'+ic('user',13)+' Professor(a)<input name="teacher" value="'+esc(p.teacher)+'" placeholder="Quem conduz" autocomplete="off"></label></div><datalist id="placedl">'+placeList().map(n=>'<option value="'+esc(n)+'">').join('')+'</datalist><div class="profq" id="placechips"></div><div class="profq" id="profchips"></div></div>'+
     '<label class="chip cb" style="align-self:flex-start;margin:4px 0"><input type="checkbox" name="rev" '+(p.rev?'checked':'')+'><span>'+ic('repeat',13)+' Gera revisão <small>(D1, D7, D30…)</small></span></label>'+
     '<div class="optchips" id="optchips"'+(OPTS.every(o=>has[o.k])?' hidden':'')+'><span class="lbl">Adicionar</span>'+OPTS.map(o=>'<button type="button" class="chip" data-a="opt-show" data-k="'+o.k+'" '+(has[o.k]?'hidden':'')+'>'+ic(o.icon,13)+o.label+'</button>').join('')+'</div>'+
     '<div class="opt" data-opt="link" '+(has.link?'':'hidden')+'><label class="f">Link útil<input name="link" inputmode="url" value="'+esc(p.link)+'" autocomplete="off"></label></div>'+
-    '<div class="opt" data-opt="obj" '+(has.obj?'':'hidden')+'><label class="f">Objetivos da Atividade <small>um por linha; cada linha vira um item numerado</small><textarea name="doWhat" rows="3">'+esc(p.doWhat)+'</textarea></label></div>'+
-    '<div class="opt" data-opt="met" '+(has.met?'':'hidden')+'><label class="f">Metodologia <small>uma etapa por linha; cada linha vira um item numerado</small><textarea name="where" rows="3">'+esc(p.where)+'</textarea></label></div>'+
-    '<div class="opt" data-opt="bag" '+(has.bag?'':'hidden')+'><div class="f"><span>O que levar <small>vale para todos os eventos do mesmo dia</small></span>'+bagPickHTML(p.itemIds)+'</div>'+
+    '<div class="opt" data-opt="obj" '+(has.obj?'':'hidden')+'><label class="f">Objetivos da Atividade<textarea name="doWhat" rows="3">'+esc(p.doWhat)+'</textarea></label></div>'+
+    '<div class="opt" data-opt="met" '+(has.met?'':'hidden')+'><label class="f">Metodologia<textarea name="where" rows="3">'+esc(p.where)+'</textarea></label></div>'+
+    '<div class="opt" data-opt="bag" '+(has.bag?'':'hidden')+'><div class="f"><span>O que levar</span>'+bagPickHTML(p.itemIds)+'</div>'+
     '<details class="bagmore"'+(p.bring||Object.keys(p.plan||{}).length?' open':'')+'><summary>'+ic('settings',14)+' Aplicativos e observações</summary><div id="planbox"></div>'+
     '<label class="f">Observações / quando arrumar<textarea name="bring" rows="2" placeholder="Um item por linha">'+esc(p.bring)+'</textarea></label></details></div>'+
     '<div class="opt" data-opt="money" '+(has.money?'':'hidden')+'>'+moneyBlock(p.moneys)+'</div>'+
@@ -4507,7 +4607,7 @@ function openActForm(opts){
     '<div class="f"><span>Documentos</span>'+pickerHTML('docs',S.docs.map(d=>({id:d.id,label:d.title})),p.docIds,'Selecionar documentos')+'</div></div>'+
     '<div class="f"><span>Objetivos maiores</span>'+pickerHTML('goals',goalItems(),p.goalIds,'Em qual objetivo se encaixa')+'</div>'+
     '<div class="f"><span>Links salvos</span>'+pickerHTML('links',linkItems(),p.linkIds,'Citar links da aba Links')+'</div></div>'+
-    '<div class="opt" data-opt="tipo" '+(has.tipo?'':'hidden')+'><div class="fgrid"><label class="f">Tipo de atividade <small>(início do título)</small><select name="tipoAtv"><option value="">Automático (pela categoria)</option>'+tipos.map(k=>'<option '+sel(k,p.tipoAtv)+'>'+esc(k)+'</option>').join('')+'</select></label>'+
+    '<div class="opt" data-opt="tipo" '+(has.tipo?'':'hidden')+'><div class="fgrid"><label class="f">Tipo de atividade<select name="tipoAtv"><option value="">Automático (pela categoria)</option>'+tipos.map(k=>'<option '+sel(k,p.tipoAtv)+'>'+esc(k)+'</option>').join('')+'</select></label>'+
     '<label class="f">Tipo de bloco<select name="blockType">'+BLOCKS.map(b=>'<option value="'+b.id+'" '+sel(b.id,p.blockType)+'>'+esc(b.label)+'</option>').join('')+'</select></label></div>'+
     '<label class="chip cb" style="align-self:flex-start;margin-top:8px"><input type="checkbox" name="noArea" '+(p.noArea?'checked':'')+'><span>Título curto: sem o eixo</span></label></div>'+
     '<div class="ff">'+(a0?'<button type="button" class="btn danger" data-a="del-act" data-aid="'+a0.id+'">Excluir</button><button type="button" class="btn" data-a="dup-act" data-aid="'+a0.id+'">'+ic('copy',14)+' Duplicar</button>':'')+'<span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
@@ -4557,10 +4657,10 @@ function openTaskForm(opts){
     '<label class="f">Descrição / o que falta<textarea name="notes" rows="2">'+esc(p.notes)+'</textarea></label>'+
     '<div class="fgrid"><label class="f">Grupo <small>ex.: TCC, Estágio</small><input name="group" list="tgroups" value="'+esc(p.group||'')+'" autocomplete="off"><datalist id="tgroups">'+[...new Set(S.tasks.map(t=>t.group).filter(Boolean))].map(g=>'<option value="'+esc(g)+'">').join('')+'</datalist></label>'+
     '<label class="f">Subtarefas <small>uma por linha</small><textarea name="subs" rows="2">'+esc((p.subs||[]).map(x=>x.t).join('\n'))+'</textarea></label></div>'+
-    '<label class="f">Metodologia <small>uma etapa por linha</small><textarea name="where" rows="2">'+esc(p.where)+'</textarea></label>'+
-    '<div class="f"><span>O que levar / usar <small>aplicativos só para itens eletrônicos</small></span>'+itemsPickHTML(p.itemIds)+'</div><div id="planbox"></div>'+
-    '<div class="fgrid"><div class="f"><span>Prazo próprio <small>hora limite opcional</small></span><div class="frow" style="flex-wrap:nowrap"><input type="date" name="deadline" value="'+esc(p.deadline)+'" style="flex:1"><input type="time" name="deadlineTime" value="'+esc(p.deadlineTime||'')+'" style="width:110px"></div><div class="quick"><button type="button" class="chip" data-a="quick-due" data-v="0">Hoje</button><button type="button" class="chip" data-a="quick-due" data-v="1">Amanhã</button><button type="button" class="chip" data-a="quick-due" data-v="7">+7 dias</button><button type="button" class="chip" data-a="quick-due" data-v="">Sem prazo</button></div></div>'+
-    '<div class="f"><span>Datas e prazos ligados <small>sem prazo próprio, vale a data mais próxima</small></span>'+pickerHTML('dates',dateItems(),p.dateIds,'Ligar a datas / prazos')+'<span class="hint" style="font-size:12px;color:var(--mut2)">Crie datas na aba Datas.</span></div></div>'+
+    '<label class="f">Metodologia<textarea name="where" rows="2">'+esc(p.where)+'</textarea></label>'+
+    '<div class="f"><span>O que levar / usar</span>'+itemsPickHTML(p.itemIds)+'</div><div id="planbox"></div>'+
+    '<div class="fgrid"><div class="f"><span>Prazo próprio</span><div class="frow" style="flex-wrap:nowrap"><input type="date" name="deadline" value="'+esc(p.deadline)+'" style="flex:1"><input type="time" name="deadlineTime" value="'+esc(p.deadlineTime||'')+'" style="width:110px"></div><div class="quick"><button type="button" class="chip" data-a="quick-due" data-v="0">Hoje</button><button type="button" class="chip" data-a="quick-due" data-v="1">Amanhã</button><button type="button" class="chip" data-a="quick-due" data-v="7">+7 dias</button><button type="button" class="chip" data-a="quick-due" data-v="">Sem prazo</button></div></div>'+
+    '<div class="f"><span>Datas e prazos ligados</span>'+pickerHTML('dates',dateItems(),p.dateIds,'Ligar a datas / prazos')+'<span class="hint" style="font-size:12px;color:var(--mut2)">Crie datas na aba Datas.</span></div></div>'+
     '<div class="fgrid"><label class="f">Documento relacionado<select name="docId"><option value="">Nenhum</option>'+S.docs.map(d=>'<option value="'+d.id+'" '+sel(d.id,p.docId)+'>'+esc(d.title)+'</option>').join('')+'</select></label>'+
     '<div class="f"><span>Objetivos maiores</span>'+pickerHTML('goals',goalItems(),p.goalIds,'Em qual objetivo se encaixa')+'</div></div>'+
     '<div class="f"><span>Categoria</span>'+catPickHTML('cat',p.catId)+'</div>'+
@@ -4598,7 +4698,7 @@ function openDocForm(opts){
     '<label class="f"><span id="dlinkLbl">Link</span><input name="link" inputmode="url" value="'+esc(p.link)+'" placeholder="Google Docs ou Drive" autocomplete="off"></label>'+
     '<div class="f"><span>Tipo de arquivo</span><div class="dxrow"><span id="dxIcon"></span><select name="ext" aria-label="Tipo de arquivo"><option value="">Automático (pelo link ou nome)</option>'+Object.keys(FX).map(k=>'<option value="'+k+'" '+sel(k,p.ext)+'>'+esc(FX[k].nome)+'</option>').join('')+'</select></div><small id="dxHint" class="muted"></small></div>'+
     '<div class="f"><span>Ações pendentes</span><div class="frow">'+DEFAULT_TODO.map(l=>'<label class="chip cb"><input type="checkbox" name="dt" value="'+l+'" '+(checked.indexOf(l)>=0?'checked':'')+'><span>'+l+'</span></label>').join('')+'</div></div>'+
-    '<label class="f">Outras ações <small>separe por vírgula</small><input name="extra" value="'+esc(extras.join(', '))+'" autocomplete="off"></label>'+
+    '<label class="f">Outras ações<input name="extra" value="'+esc(extras.join(', '))+'" autocomplete="off"></label>'+
     '<label class="f">Notas<textarea name="notes" rows="2">'+esc(p.notes)+'</textarea></label>'+
     '<div class="f"><span>Objetivos</span>'+pickerHTML('goals',goalItems(),p.goalIds,'Em qual objetivo se encaixa')+'</div>'+
     '<div class="f"><span>Links salvos</span>'+pickerHTML('links',linkItems(),p.linkIds,'Citar links da aba Links')+'</div>'+
@@ -4672,12 +4772,12 @@ function openCatForm(id){
   const root=!c.parentId,eff=catColor(c.id),curIcon=c.icon||ICON_DEF[c.name]||'tag';
   openModal('<form id="fCat" class="form" data-id="'+c.id+'" data-inherit="'+(c.color?'':'1')+'" data-icon="'+esc(c.icon||'')+'"><div class="fh"><h2>Editar categoria</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<label class="f">Nome<input name="name" required value="'+esc(c.name)+'" autocomplete="off"></label>'+
-    '<div class="f"><span>Cor <small>seletor, código HEX (#RRGGBB) ou uma das cores prontas</small></span><div class="colrow"><input type="color" name="cpick" value="'+eff+'" aria-label="Seletor de cor"><input type="text" name="hex" value="'+(c.color||'')+'" placeholder="'+eff+'" maxlength="7" autocomplete="off" aria-label="Código HEX">'+
+    '<div class="f"><span>Cor</span><div class="colrow"><input type="color" name="cpick" value="'+eff+'" aria-label="Seletor de cor"><input type="text" name="hex" value="'+(c.color||'')+'" placeholder="'+eff+'" maxlength="7" autocomplete="off" aria-label="Código HEX">'+
     (root?'':'<button type="button" class="btn sm" data-a="cat-inherit">Herdar da categoria acima</button>')+'<small id="inhint" class="muted">'+(c.color||root?'':'Herdando a cor da categoria acima')+'</small></div>'+
     '<div class="sw" style="margin-top:6px">'+PAL.map(x=>'<button type="button" style="background:'+x+'" data-a="cat-swatch" data-v="'+x+'" aria-label="Cor '+x+'"></button>').join('')+'</div></div>'+
-    '<div class="f"><span>Disciplina no título</span><label class="chip cb"><input type="checkbox" name="disc" '+(c.disc?'checked':'')+'><span>Esta categoria é uma disciplina</span></label><small>Ex.: Tutoria, Morfofuncional, Habilidades Profissionais. O nome vai na terceira parte do título.</small></div>'+
+    '<div class="f"><span>Disciplina no título</span><label class="chip cb"><input type="checkbox" name="disc" '+(c.disc?'checked':'')+'><span>Esta categoria é uma disciplina</span></label></div>'+
     '<label class="f">Nome curto no título <small>(opcional)</small><input name="short" value="'+esc(c.short||'')+'" autocomplete="off"></label>'+
-    '<div class="f"><span>Aparece no título</span><label class="chip cb"><input type="checkbox" name="showtitle" '+(c.hideTitle?'':'checked')+'><span>Mostrar esta categoria no título</span></label><small>Desmarque para omitir, por exemplo, "Universidade".</small></div>'+
+    '<div class="f"><span>Aparece no título</span><label class="chip cb"><input type="checkbox" name="showtitle" '+(c.hideTitle?'':'checked')+'><span>Mostrar esta categoria no título</span></label></div>'+
     (root?'':'<div class="f"><span>Tipo de atividade</span><label class="chip cb"><input type="checkbox" name="tipo" '+(c.isTipo?'checked':'')+'><span>Esta categoria define o tipo (Rodízio, Aula, Trilha…)</span></label></div>')+
     (root?'<div class="f"><span>Ícone da área</span><div class="icons">'+ICON_CHOICES.map(n=>'<button type="button" class="ibtn '+(curIcon===n?'on':'')+'" data-a="cat-icon" data-v="'+n+'" aria-label="Ícone '+n+'">'+ic(n,18)+'</button>').join('')+'</div></div>':'')+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
@@ -4702,11 +4802,11 @@ function openDateForm(opts){
   openModal('<form id="fDate" class="form"><div class="fh"><h2>'+(d0?'Editar data / prazo':'Nova data / prazo')+'</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<label class="f">Título<input name="title" required value="'+esc(p.title)+'" autocomplete="off"></label>'+
     '<div class="fgrid"><label class="f">Data<input type="date" name="date" required value="'+esc(p.date)+'"></label><label class="f">Hora <small>(opcional)</small><input type="time" name="time" value="'+esc(p.time||'')+'"></label></div>'+
-    '<div class="f"><span>Categoria <small>crie categorias e subcategorias aqui mesmo</small></span>'+dcatPickHTML(p.catId)+'</div>'+
+    '<div class="f"><span>Categoria</span>'+dcatPickHTML(p.catId)+'</div>'+
     '<label class="f">Tipo<select name="cat">'+Object.keys(DATE_CATS).map(k=>'<option '+sel(k,p.cat)+'>'+k+'</option>').join('')+'</select></label>'+
-    '<div class="f"><span>Tarefas pendentes ligadas a esta data <small>escolha quantas quiser</small></span>'+pickerHTML('tasks',S.tasks.slice().sort((a,b)=>(a.done-b.done)).map(t=>({id:t.id,label:t.title,sub:t.done?'concluída':''})),p.taskIds,'Selecionar tarefas')+'</div>'+
-    '<div class="f"><span>Baralhos desta prova <small>o app calcula quantos cards revisar por dia até a data</small></span>'+pickerHTML('decks',S.decks.map(k=>({id:k.id,label:k.name||'Baralho'})),p.deckIds,'Selecionar baralhos')+'</div>'+
-    '<div class="fgrid"><label class="f">Itens que ainda faltam <small>(opcional)</small><input type="number" min="0" name="qtd" value="'+(p.qtd||'')+'" placeholder="Ex.: 300"></label><label class="f">O que são<input name="qlabel" value="'+esc(p.qlabel||'')+'" placeholder="questões, páginas, aulas…" autocomplete="off"></label></div>'+
+    '<div class="f"><span>Tarefas pendentes ligadas a esta data</span>'+pickerHTML('tasks',S.tasks.slice().sort((a,b)=>(a.done-b.done)).map(t=>({id:t.id,label:t.title,sub:t.done?'concluída':''})),p.taskIds,'Selecionar tarefas')+'</div>'+
+    '<div class="f"><span>Baralhos desta prova</span>'+pickerHTML('decks',S.decks.map(k=>({id:k.id,label:k.name||'Baralho'})),p.deckIds,'Selecionar baralhos')+'</div>'+
+    '<div class="fgrid"><label class="f">Itens que ainda faltam <small>(opcional)</small><input type="number" min="0" name="qtd" value="'+(p.qtd||'')+'"></label><label class="f">O que são<input name="qlabel" value="'+esc(p.qlabel||'')+'" placeholder="questões, páginas, aulas…" autocomplete="off"></label></div>'+
     '<label class="f">Observações<textarea name="notes" rows="2">'+esc(p.notes)+'</textarea></label>'+
     '<div class="ff">'+(d0?'<button type="button" class="btn danger" data-a="del-date" data-id="'+d0.id+'">Excluir</button>':'')+'<span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
   $$('.dcatpick',$('#fDate')).forEach(renderDcatPick);
@@ -4987,7 +5087,7 @@ function nCreateHTML(){
     '<div class="ntm" data-m="ncr"><button class="btn primary ntmb splitc" data-a="ntm" data-m="ncr" aria-haspopup="true" aria-label="Criar outro tipo">'+ic('chevD',15)+'</button><div class="ntmp right ncrmenu" role="menu">'+
     hd('Escrever')+mi('n-new','note','Nota')+mi('n-new-q','help','Questão')+mi('n-new-caso','pulse','Caso clínico')+mi('n-new-bula','pill','Bulário','Medicamento ou classe')+mi('n-new-fluxo','grid','Fluxograma')+
     hd('Estudar')+mi('deck-new','cards','Baralho')+mi('qt-open','play','Treino de questões','Certa ou errada, sem saber qual é qual')+
-    hd('Importar')+mi('pdf-open-file','file','PDF do computador')+mi('pdf-open-drive','cloud','PDF do Drive')+mi('sl-new','monitor','Nova apresentação','Editor e apresentador DeckCraft')+mi('sl-import','upload','Apresentação (.pptx)','Abre um arquivo do computador')+
+    hd('Importar')+mi('pdf-open-file','file','PDF do computador')+mi('sl-new','monitor','Nova apresentação','Editor e apresentador DeckCraft')+mi('sl-import','upload','Apresentação (.pptx)','Abre um arquivo do computador')+
     '</div></div></div>'+(UI.ntype==='questao'?'<button class="btn" data-a="qt-open">'+ic('play',15)+' Treinar questões</button>':'')+'</div>';
 }
 
@@ -5187,7 +5287,7 @@ function bulaBodyHTML(n,edit,ed){
   let h='';
   if(edit){
     h+='<div class="frow" style="margin:6px 0 12px">'+[['med','Medicamento'],['classe','Classe']].map(k=>'<button type="button" class="chip '+(n.kind===k[0]?'on':'')+'" data-a="bula-kind" data-v="'+k[0]+'">'+k[1]+'</button>').join('')+'</div>';
-    if(!isC)h+='<label class="f">Classe<input id="bcls" list="bclsdl" value="'+esc(n.cls)+'" placeholder="Ex.: Inibidores da ECA" autocomplete="off"><datalist id="bclsdl">'+bulaClasses().map(c=>'<option value="'+esc(c.title)+'">').join('')+'</datalist></label>';
+    if(!isC)h+='<label class="f">Classe<input id="bcls" list="bclsdl" value="'+esc(n.cls)+'" autocomplete="off"><datalist id="bclsdl">'+bulaClasses().map(c=>'<option value="'+esc(c.title)+'">').join('')+'</datalist></label>';
     else h+='<div class="obj bmlist"><div class="obj-h">Medicações da classe</div>'+(n.meds.length?n.meds.map(m=>'<div class="bmrow"><input data-bmn="'+m.id+'" value="'+esc(m.name)+'" placeholder="Nome do medicamento" autocomplete="off" aria-label="Medicamento"><button type="button" class="icon-btn sm" data-a="bula-mdel" data-id="'+m.id+'" aria-label="Remover medicamento">'+ic('x',14)+'</button></div>').join(''):'<div class="muted small">Adicione os medicamentos desta classe: cada um ganha um campo próprio em todos os tópicos abaixo.</div>')+'<button type="button" class="btn sm" data-a="bula-madd">'+ic('plus',14)+' Medicamento</button></div>';
   }else{
     if(!isC&&n.cls){const c=bulaClasses().find(x=>x.title.toLowerCase()===n.cls.toLowerCase());h+='<div class="bcls" data-sec="meds">Classe: '+(c?'<a href="#" data-a="n-open" data-k="bula" data-id="'+c.id+'">'+esc(n.cls)+'</a>':esc(n.cls))+'</div>';}
@@ -5467,8 +5567,8 @@ function gifUrl(u){
 function openGifDialog(){
   saveRange();
   openModal('<form id="fGif" class="form"><div class="fh"><h2>Inserir GIF</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
-    '<div class="f"><span>Do aparelho <small>até 3 MB, a animação é mantida</small></span><div><button type="button" class="btn" data-a="gif-file">'+ic('upload',15)+' Escolher GIF</button></div></div>'+
-    '<label class="f"><span>Ou por link <small>Giphy, Tenor ou endereço terminado em .gif</small></span><input name="u" inputmode="url" placeholder="https://giphy.com/gifs/…" autocomplete="off"></label>'+
+    '<div class="f"><span>Do aparelho</span><div><button type="button" class="btn" data-a="gif-file">'+ic('upload',15)+' Escolher GIF</button></div></div>'+
+    '<label class="f"><span>Ou por link</span><input name="u" inputmode="url" placeholder="https://giphy.com/gifs/…" autocomplete="off"></label>'+
     '<div class="gifprev" id="gifPrev"></div>'+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Inserir</button></div></form>');
   const f=$('#fGif'),inp=f.elements.u,pv=$('#gifPrev');
@@ -6261,7 +6361,7 @@ function openFnDialog(el){
   UI.fnEl=el||null;const k=el?(el.getAttribute('data-k')==='ref'?'ref':'exp'):'exp',tx=el?(el.getAttribute('data-t')||''):'';
   openModal('<form id="fFn" class="form"><div class="fh"><h2>'+(el?'Editar nota de rodapé':'Nova nota de rodapé')+'</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<div class="f"><span>Tipo</span><div class="seg" id="fnKind"><button type="button" class="'+(k==='exp'?'on':'')+'" data-a="fn-kind" data-v="exp">Explicação</button><button type="button" class="'+(k==='ref'?'on':'')+'" data-a="fn-kind" data-v="ref">Referência</button></div></div>'+
-    '<label class="f"><span>Texto da nota <small>aparece numerada no fim da nota</small></span><textarea name="t" rows="4" maxlength="800" required>'+esc(tx)+'</textarea></label>'+
+    '<label class="f"><span>Texto da nota</span><textarea name="t" rows="4" maxlength="800" required>'+esc(tx)+'</textarea></label>'+
     '<div class="ff">'+(el?'<button type="button" class="btn danger" data-a="fn-del">Remover</button>':'')+'<button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary" type="submit">Salvar</button></div></form>');
   $('#fFn').dataset.k=k;
   $('#fFn').addEventListener('submit',ev=>{
@@ -6346,7 +6446,6 @@ function gsBuild(){
   S.cards.forEach(c=>{const dk=deckById(c.deckId);if(dk)P('deck',dk.id,'Cards de estudo','cards',gsPlain(c.front||c.text||'')||'Card',[gsPlain(c.back),gsPlain(c.extra)].join(' '),dk.name);});
   S.recipes.forEach(r=>P('recipe',r.id,'Receitas','chef',r.title,[r.steps,r.area,r.momento].join(' '),''));
   S.habits.forEach(h=>P('habit',h.id,'Hábitos','sprout',hbStep(h),[h.big,h.reward,h.steps.join(' '),hbAnchorText(h)].join(' '),'Hábito'));
-  S.health.forEach(h=>{const b=[h.note,h.act,h.session,h.type].join(' ');if(b.trim())P('health',h.id,'Saúde','pulse',h.act||h.type||'Registro',b,h.date?fmtDM(h.date):'');});
   return out;
 }
 function gsSnip(it,terms){
@@ -6398,7 +6497,7 @@ function gsResultsHTML(q){
     h+='<div class="cite-g">'+esc(g)+'</div>';
     by[g].slice(0,12).forEach(it=>{
       const sn=it.tn.indexOf(r.terms[0])<0||r.terms.some(t=>it.tn.indexOf(t)<0)?gsSnip(it,r.terms):'';
-      h+='<button class="gs-i'+(n===GS_SEL?' sel':'')+'" data-a="gs-go" data-i="'+GS_IDX.indexOf(it)+'">'+ic(it.icon,15)+'<span class="gs-t"><b>'+gsMark(it.title||'Sem título',r.terms)+'</b>'+(sn?'<small>'+gsMark(sn,r.terms)+'</small>':'')+'</span>'+(it.sub?'<span class="gs-s">'+esc(it.sub)+'</span>':'')+'</button>';
+      h+='<button class="gs-i'+(n===GS_SEL?' sel':'')+'" data-a="gs-go" data-i="'+GS_IDX.indexOf(it)+'">'+ic(it.icon,15)+'<span class="gs-t"><b>'+gsMark(it.title||'Sem título',r.terms)+'</b>'+(sn?'':'')+'</span>'+(it.sub?'<span class="gs-s">'+esc(it.sub)+'</span>':'')+'</button>';
       n++;
     });
   });
@@ -6421,7 +6520,6 @@ function gsOpen(it){
   if(it.k==='tab'){ACT.tab({dataset:{v:it.id}});return;}
   if(it.k==='recipe'){ACT['rc-open']({dataset:{id:it.id}});return;}
   if(it.k==='habit'){ACT.tab({dataset:{v:'habitos'}});return;}
-  if(it.k==='health'){flushNote();pdfLeave();slLeave();studyStop();UI.tab='saude';renderTabs();renderMain();window.scrollTo(0,0);return;}
   openRef(it.k+':'+it.id);
 }
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='gsq'){clearTimeout(GS_TIMER);GS_TIMER=setTimeout(gsRefresh,e.isTrusted===false?0:120);}});
@@ -6605,7 +6703,7 @@ function noteColor(c){
   document.execCommand('foreColor',false,c);
   onNoteInput();
 }
-// Imagens: reduz o tamanho antes de guardar, para não pesar a planilha
+// Imagens: reduz o tamanho antes de guardar, para não pesar a nuvem
 function compressImage(file,o){
   return new Promise((res,rej)=>{
     const url=URL.createObjectURL(file),im=new Image();
@@ -6623,7 +6721,7 @@ function compressImage(file,o){
     im.src=url;
   });
 }
-const GIF_MAX=3*1024*1024; // GIFs são guardados como estão (mantêm a animação); acima disso pesam demais na planilha
+const GIF_MAX=3*1024*1024; // GIFs são guardados como estão (mantêm a animação); acima disso pesam demais na nuvem
 function fileToDataURL(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(new Error('Não consegui ler o arquivo.'));r.readAsDataURL(file);});}
 function imageNaturalWidth(src){return new Promise(res=>{const im=new Image();im.onload=()=>res(im.naturalWidth||im.width||480);im.onerror=()=>res(480);im.src=src;});}
 async function insertImageFile(file){
@@ -6726,13 +6824,7 @@ const PdfDB={db:null,
 };
 function b64ToBuf(b){const bin=atob(b),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u.buffer;}
 function bufToB64(buf){let s='';const u=new Uint8Array(buf),ch=0x8000;for(let i=0;i<u.length;i+=ch)s+=String.fromCharCode.apply(null,u.subarray(i,i+ch));return btoa(s);}
-async function fetchDriveBytes(id){
-  if(!WEB_APP_URL)throw new Error('Link do Apps Script não configurado.');
-  const r=await fetch(WEB_APP_URL+'?action=getfile&id='+encodeURIComponent(id));const j=await r.json();
-  if(!j||!j.ok)throw new Error((j&&j.error)||'Não foi possível ler o arquivo do Drive.');
-  return b64ToBuf(j.b64);
-}
-// qual versão enviada ao Drive (mid) a cópia deste aparelho tem; só vale neste aparelho, por isso fica fora dos dados sincronizados
+// qual versão enviada ao Storage (mid) a cópia deste aparelho tem; só vale neste aparelho, por isso fica fora dos dados sincronizados
 const LMID={m:(function(){try{return JSON.parse(localStorage.getItem('rotina_lmid')||'{}');}catch(e){return {};}})(),
   get(k){return this.m[k]||'';},set(k,v){this.m[k]=v;try{localStorage.setItem('rotina_lmid',JSON.stringify(this.m));}catch(e){}}};
 async function pdfBytes(p){
@@ -6747,31 +6839,29 @@ async function pdfBytes(p){
     }
     PdfMem[p.id]=b;return b;
   }
-  if(p.driveId){b=await fetchDriveBytes(p.driveId);PdfMem[p.id]=b;PdfDB.put(p.id,b.slice(0));return b;}
   if(p.mid){b=await pdfPull(p);if(b){PdfMem[p.id]=b;PdfDB.put(p.id,b.slice(0));LMID.set(p.id,p.mid);return b;}}
   return null;
 }
-/* ----- PDFs enviados em Notas em todos os aparelhos: o arquivo vai ao Drive pelo mesmo caminho das imagens (Media) ----- */
+/* ----- PDFs enviados em Notas em todos os aparelhos: o arquivo vai ao Storage pelo mesmo caminho das imagens (Media) ----- */
 const PDF_SYNC_MAX=40*1048576; // acima disso o PDF fica só neste aparelho
 const pdfWatch={};
-async function pdfPull(p){ // baixa o PDF que outro aparelho enviou
-  if(!WEB_APP_URL||(navigator.onLine===false))return null;
+async function pdfPull(p){ // baixa o arquivo que outro aparelho enviou
+  if(!RF.ok()||(navigator.onLine===false))return null;
   try{
-    let d=Media.cache[p.mid];
-    if(!d){const r=await fetch(WEB_APP_URL+'?action=getmedia&name='+encodeURIComponent(p.mid)+'&t='+Date.now()),j=await r.json();d=j&&j.ok&&j.d;}
+    let d=Media.cache[p.mid]||await RF.get(p.mid);
     const i=d?d.indexOf('base64,'):-1;
     return i>=0?b64ToBuf(d.slice(i+7)):null;
   }catch(e){return null;}
 }
 function pdfSyncState(p){
-  if(!WEB_APP_URL)return 'off';
+  if(!RF.ok())return 'off';
   if(p.syncBig)return 'big';
-  if(p.mid)return 'ok'; // confirmado pelo Drive (neste ou em outro aparelho)
+  if(p.mid)return 'ok'; // confirmado pelo Storage (neste ou em outro aparelho)
   const w=pdfWatch[p.id];if(w&&w.fail)return 'fail';
   return w?'sending':'local';
 }
-function pdfPush(p,buf,mime){ // coloca o PDF na fila de envio; p.mid só é gravado quando o Drive confirma
-  if(!WEB_APP_URL||!buf)return;
+function pdfPush(p,buf,mime){ // coloca o PDF na fila de envio; p.mid só é gravado quando o Storage confirma
+  if(!RF.ok()||!buf)return;
   if(buf.byteLength>PDF_SYNC_MAX){p.syncBig=true;save();pdfSyncPaint(p);return;}
   p.syncBig=false;
   const url='data:'+(mime||'application/pdf')+';base64,'+bufToB64(buf),id=Media.hash(url);
@@ -6792,7 +6882,7 @@ function pdfSyncPaint(p){
 }
 // PDFs que já estavam só neste aparelho sobem sozinhos, um de cada vez
 function pdfBackfill(){
-  if(!WEB_APP_URL||pdfBackfill.on)return;pdfBackfill.on=true;
+  if(!RF.ok()||pdfBackfill.on)return;pdfBackfill.on=true;
   (async()=>{
     for(const p of S.pdfs.slice()){
       if(p.mid||p.syncBig||pdfWatch[p.id]||!S.pdfs.includes(p))continue;
@@ -6807,9 +6897,7 @@ setTimeout(()=>{try{pdfBackfill();}catch(e){}},12000);
 /* ----- Leitor de PDF: o PdfCraft (pdfcraft/, compilado do projeto storytold/pdfcraft) roda num iframe da mesma origem e fala com a página por mensagens ----- */
 const PDFCRAFT_URL='pdfcraft/index.html';
 function pdfViewHTML(p){
-  const gas=!!(window.google&&window.google.script&&window.google.script.run);
   return '<div class="nhead"><button class="btn sm ghost" data-a="n-back">'+ic('chevL',14)+' Notas</button><span class="sp"></span><span id="pdfSync" class="pdfsync"></span>'+
-    (gas&&p.src==='local'?'<button class="btn sm" data-a="pdf-todrive" title="Guardar uma cópia no Drive para abrir em qualquer aparelho">'+ic('cloud',14)+' Salvar no Drive</button>':'')+
     '<button class="icon-btn" data-a="pdf-info" title="Nome, pasta e categoria" aria-label="Editar informações">'+ic('edit',19)+'</button><button class="icon-btn" data-a="n-del" title="Excluir" aria-label="Excluir">'+ic('trash',18)+'</button></div>'+
     '<h2 class="vt" id="pdfTitle" style="margin:0 0 6px">'+esc(p.title)+'</h2><div class="muted small" id="pdfStatus" style="margin-bottom:8px">Carregando o PdfCraft…</div>'+
     '<div class="hostbox" id="pdfHost"></div>';
@@ -6859,7 +6947,7 @@ window.addEventListener('message',async e=>{
       const buf=d.bytes;PdfMem[p.id]=buf;PV.buf=buf;p.updated=Date.now();
       await PdfDB.put(p.id,buf.slice(0));pdfPush(p,buf);save();
       if(d.saveAs)downloadBuf(buf,(d.name||p.title+'.pdf'),'application/pdf');
-      PV.dirty=false;toast('PDF salvo.');hostStatus(WEB_APP_URL?'Salvo. Enviando para os outros aparelhos…':'Salvo neste aparelho (sincronização desligada).');
+      PV.dirty=false;toast('PDF salvo.');hostStatus(RF.ok()?'Salvo. Enviando para os outros aparelhos…':'Salvo neste aparelho (sincronização desligada).');
     }else if(d.type==='pdfcraft:failed'){
       const s=$('#pdfStatus');if(s)s.innerHTML='O PdfCraft não conseguiu iniciar'+(d.error?' ('+esc(String(d.error).slice(0,120))+')':'')+'. <button class="btn sm" data-a="pdf-download">Baixar o PDF</button>';
     }
@@ -6884,19 +6972,6 @@ Object.assign(ACT,{
   },
   'pdf-open-file'(){UI.pdfAttach=null;const f=$('#pdfFile');f.value='';f.click();},
   'pdf-reattach'(){UI.pdfAttach=UI.nview&&UI.nview.id;const f=$('#pdfFile');f.value='';f.click();},
-  'pdf-open-drive'(){
-    askText('Cole o link ou o ID do arquivo no Drive','',async v=>{
-      const m=String(v).match(/[-\w]{25,}/);if(!m){toast('Não encontrei o ID do arquivo nesse link.');return;}
-      toast('Buscando no Drive…');
-      try{
-        const buf=await fetchDriveBytes(m[0]);
-        const p={id:uid(),title:'PDF do Drive',folderId:(UI.nf&&UI.nf!=='__none')?UI.nf:'',catId:'',src:'drive',driveId:m[0],name:'',annots:[],created:Date.now(),updated:Date.now()};
-        S.pdfs.push(p);PdfMem[p.id]=buf;PdfDB.put(p.id,buf.slice(0));save();pdfPush(p,buf);
-        UI.nview={type:'pdf',id:p.id,edit:false};renderMain();window.scrollTo(0,0);
-        askText('Nome do PDF',p.title,nm=>{p.title=nm;save();const h=$('#pdfTitle');if(h)h.textContent=nm;});
-      }catch(e){toast(e.message||'Não foi possível abrir do Drive.');}
-    });
-  },
   'pdf-download'(){const p=pdfById(UI.nview&&UI.nview.id);if(!p)return;pdfBytes(p).then(b=>{if(b)downloadBuf(b,(p.name||p.title+'.pdf'),'application/pdf');else toast('O arquivo não está neste aparelho.');});},
   'pdf-info'(){
     const p=pdfById(UI.nview.id);if(!p)return;UI.pinfo=p.id;
@@ -6905,14 +6980,6 @@ Object.assign(ACT,{
       '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
     const f=$('#fPdf');mountCatPicks(f);
     f.addEventListener('submit',ev=>{ev.preventDefault();p.title=f.elements.title.value.trim()||p.title;p.folderId=f.elements.folder.value;p.catId=$('[data-catpick="pcat"]',f).dataset.value||'';p.updated=Date.now();save();closeModal();const h=$('#pdfTitle');if(h)h.textContent=p.title;});
-  },
-  'pdf-todrive'(){
-    const p=pdfById(UI.nview.id);if(!p||!(window.google&&window.google.script&&window.google.script.run))return;
-    pdfBytes(p).then(buf=>{
-      if(!buf){toast('Abra o arquivo neste aparelho primeiro.');return;}
-      toast('Enviando para o Drive…');
-      window.google.script.run.withSuccessHandler(id=>{p.driveId=id;p.src='drive';save();toast('PDF salvo no Drive. Já abre em qualquer aparelho.');rerender();}).withFailureHandler(err=>toast('Falha ao enviar: '+(err&&err.message?err.message:err))).uploadPdf((p.name||p.title+'.pdf'),bufToB64(buf));
-    });
   }
 });
 
@@ -6942,6 +7009,10 @@ function computeAttention(){
     return {t:e.t,reasons:rs,hasDl:!!e.dl,stamp:Object.keys(e.byAct).map(k=>e.byAct[k].stamp).sort().pop()||''};
   }).filter(x=>S.dismissed['att-'+x.t.id]!==today).sort((a,b)=>(a.hasDl?0:1)-(b.hasDl?0:1)||(a.stamp<b.stamp?1:-1));
   ATTMAP={};ATTN.forEach(x=>{ATTMAP[x.t.id]=true;});
+}
+function attnCardsHTML(){
+  return ATTN.map(x=>'<div class="acard"><div class="at1"><b>'+esc(x.t.title)+'</b>'+dueChip(x.t)+'</div>'+x.reasons.map(r=>'<div class="small muted">'+esc(r)+'</div>').join('')+
+    '<div class="aact"><button class="btn sm primary" data-a="att-done" data-id="'+x.t.id+'">'+ic('check',13)+' Concluir</button><button class="btn sm" data-a="view-task" data-id="'+x.t.id+'">Ver</button><button class="btn sm" data-a="att-plus1" data-id="'+x.t.id+'">Prazo +1 dia</button><button class="btn sm" data-a="sched-task" data-id="'+x.t.id+'">Reagendar</button><button class="btn sm ghost" data-a="att-snooze" data-id="'+x.t.id+'">Hoje não</button></div></div>').join('');
 }
 function attnHTML(){
   if(!ATTN.length)return '';
@@ -7087,7 +7158,7 @@ function notifHTML(){
     return '<div class="ntrow'+(v.on?'':' off')+'"><label class="sw"><input type="checkbox" data-a="nt-kind" data-k="'+x.k+'" '+(v.on?'checked':'')+'> <b>'+x.l+'</b></label><div class="muted small">'+x.d+'</div>'+
       (v.on?'<div class="kinds">'+opts.map(o=>'<button type="button" class="chip '+(v.lead.indexOf(o)>=0?'on':'')+'" data-a="nt-lead" data-k="'+x.k+'" data-v="'+o+'">'+ntLeadTxt(x.unit,o)+'</button>').join('')+'</div>'+
         (x.unit==='day'||x.unit==='none'||x.k==='habit'?'<label class="f ntt"><span>'+(x.k==='habit'?'Horário para hábitos sem hora':'Horário do aviso')+'</span><input type="time" data-ntt="'+x.k+'" value="'+v.time+'"></label>':''):'')+'</div>';};
-  return '<div class="card sec"><h3>Revisões e Notificações</h3><label class="sw" style="margin-bottom:10px"><input type="checkbox" data-a="rv-on" '+(rvCfg().on?'checked':'')+'> <b>Sugerir revisões em 1, 7 e 30 dias</b></label><div class="muted small" style="margin-bottom:12px">Cada aula, tutoria ou plantão gera uma revisão leve na semana e no painel.</div><h3>Notificações</h3><p>Permissão: <b>'+esc(ntPermTxt())+'</b></p>'+
+  return '<div class="card sec"><h3>Revisões e Notificações</h3><label class="sw" style="margin-bottom:10px"><input type="checkbox" data-a="rv-on" '+(rvCfg().on?'checked':'')+'> <b>Sugerir revisões em 1, 7 e 30 dias</b></label><div class="muted small" style="margin-bottom:12px">Cada aula, tutoria ou plantão gera uma revisão leve na semana e no painel.</div><h3>Notificações</h3>'+
     '<div class="addrow"><button class="btn primary" data-a="notif">'+ic('bell',15)+' Permitir Notificações</button><button class="btn" data-a="nt-test">Enviar Teste</button></div>'+
     '<label class="sw" style="margin-top:10px"><input type="checkbox" data-a="nt-master" '+(c.on?'checked':'')+'> <b>Receber notificações</b></label>'+
     '<label class="sw" style="margin-top:10px"><input type="checkbox" data-a="due-badge" '+(S.prefs.hideDueBadge?'':'checked')+'> <b>Mostrar o número de cards a revisar na aba Notas</b></label>'+
@@ -7213,8 +7284,7 @@ function hoursHTML(){
   const pct=D.total?Math.round(D.done/D.total*100):0;
   h+='<div class="hcards"><div class="hcard"><span class="hl">Planejadas</span><b>'+hm(D.total)+'</b><span class="muted small">'+D.occ.length+(D.occ.length===1?' Atividade':' Atividades')+'</span></div>'+
     '<div class="hcard"><span class="hl">Concluídas</span><b>'+hm(D.done)+'</b><span class="muted small">'+pct+'% do planejado</span></div>'+
-    '<div class="hcard"><span class="hl">Pendentes</span><b>'+hm(D.total-D.done)+'</b><span class="muted small">Ainda não marcadas</span></div>'+
-    '<div class="hcard"><span class="hl">Exercício (Saúde)</span><b>'+hm(sumK(wk,'min'))+'</b><span class="muted small">'+f1(sumK(wk,'km'))+' km · '+Math.round(sumK(wk,'kcal'))+' kcal</span></div></div>';
+    '<div class="hcard"><span class="hl">Pendentes</span><b>'+hm(D.total-D.done)+'</b><span class="muted small">Ainda não marcadas</span></div></div>';
   [['Por área maior',D.byArea],['Por categoria',D.bySub],['Por tipo de atividade',D.byTipo],['Por tipo de bloco',D.byBloco]].forEach(s=>{h+='<div class="card sec"><h3>'+s[0]+'</h3>'+hbars(s[1],mx(s[1]))+'</div>';});
   if(D.byWeek.length>1)h+='<div class="card sec"><h3>Por semana</h3>'+hbars(D.byWeek.sort((a,b)=>a.k<b.k?-1:1).map(r=>({k:'Semana de '+fmtDM(r.k),p:r.p,d:r.d,c:'#CBD2DE'})),mx(D.byWeek))+'</div>';
   return h;
@@ -7243,134 +7313,8 @@ function recForm(o){
   });
 }
 
-/* ==========================================================================
-   28. SAÚDE E FITNESS (Samsung Health) + atividades físicas do cronograma
-   ========================================================================== */
-const D_=(extra)=>[{k:'date',l:'Data',t:'date',req:1},{k:'time',l:'Hora',t:'time'}].concat(extra);
-const NOTE_={k:'note',l:'Observações',t:'text',w:'full'};
-const HSCHEMA={
-  treino:{label:'Atividade física',icon:'pulse',fields:D_([{k:'act',l:'Atividade',t:'text',req:1,list:['Corrida','Academia','Caminhada','Ciclismo','Natação','Funcional','Outra']},{k:'session',l:'Sessão da academia',t:'select',opts:[['A','A'],['B','B'],['C','C']]},{k:'min',l:'Duração',u:'min',t:'number'},{k:'km',l:'Distância',u:'km',t:'number'},{k:'kcal',l:'Calorias gastas',u:'kcal',t:'number'},{k:'hr',l:'FC média',u:'bpm',t:'number'},{k:'hrmax',l:'FC máxima',u:'bpm',t:'number'},{k:'steps',l:'Passos',t:'number'},NOTE_])},
-  sono:{label:'Sono',icon:'moon',fields:[{k:'date',l:'Data ao acordar',t:'date',req:1},{k:'bed',l:'Dormiu às',t:'time'},{k:'wake',l:'Acordou às',t:'time'},{k:'awake',l:'Acordado',u:'min',t:'number'},{k:'rem',l:'REM',u:'min',t:'number'},{k:'light',l:'Sono leve',u:'min',t:'number'},{k:'deep',l:'Sono profundo',u:'min',t:'number'},{k:'score',l:'Pontuação do sono',u:'0–100',t:'number'},{k:'spo2',l:'SpO2 médio',u:'%',t:'number'},{k:'hr',l:'FC média',u:'bpm',t:'number'},NOTE_]},
-  pa:{label:'Pressão arterial',icon:'heart',fields:D_([{k:'sys',l:'Sistólica',u:'mmHg',t:'number',req:1},{k:'dia',l:'Diastólica',u:'mmHg',t:'number',req:1},{k:'pulse',l:'Pulso',u:'bpm',t:'number'},{k:'arm',l:'Braço',t:'select',opts:[['E','Esquerdo'],['D','Direito']]},NOTE_])},
-  comp:{label:'Composição corporal',icon:'layers',fields:D_([{k:'weight',l:'Peso',u:'kg',t:'number',req:1},{k:'fat',l:'Gordura corporal',u:'%',t:'number'},{k:'muscle',l:'Massa muscular esquelética',u:'kg',t:'number'},{k:'water',l:'Água corporal',u:'%',t:'number'},{k:'visceral',l:'Gordura visceral',u:'nível',t:'number'},{k:'bmr',l:'Taxa metabólica basal',u:'kcal',t:'number'},NOTE_])},
-  dia:{label:'Diário do dia',icon:'sun',fields:[{k:'date',l:'Data',t:'date',req:1},{k:'steps',l:'Passos',t:'number'},{k:'kcalAct',l:'Calorias ativas',u:'kcal',t:'number'},{k:'hrRest',l:'FC de repouso',u:'bpm',t:'number'},{k:'hrAvg',l:'FC média',u:'bpm',t:'number'},{k:'spo2',l:'SpO2',u:'%',t:'number'},{k:'stress',l:'Estresse',u:'0–100',t:'number'},{k:'temp',l:'Temperatura corporal',u:'°C',t:'number'},{k:'water',l:'Água',u:'ml',t:'number'},{k:'glu',l:'Glicemia',u:'mg/dL',t:'number'},{k:'energy',l:'Energia',u:'1–5',t:'number'},NOTE_]}
-};
-const hList=type=>S.health.filter(e=>e.type===type).sort((a,b)=>(b.date+(b.time||''))>(a.date+(a.time||''))?1:-1);
-function paClass(s,d){
-  if(s>=180||d>=110)return ['HAS estágio 3','late'];if(s>=160||d>=100)return ['HAS estágio 2','late'];
-  if(s>=140||d>=90)return ['HAS estágio 1','soon'];if(s>120||d>80)return ['Pré-hipertensão','soon'];return ['Normal',''];
-}
-function sleepDur(e){
-  if(e.bed&&e.wake){let m=tmin(e.wake)-tmin(e.bed);if(m<=0)m+=1440;return Math.max(0,m-(e.awake||0));}
-  const s=(e.rem||0)+(e.light||0)+(e.deep||0);return s||null;
-}
-function spark(vals,color){
-  const v=vals.filter(x=>x!=null&&!isNaN(x));
-  if(v.length<2)return '<div class="muted small">Registre mais medidas para ver a tendência.</div>';
-  const mn=Math.min.apply(null,v),mx=Math.max.apply(null,v),r=(mx-mn)||1;
-  return '<svg class="spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="'+v.map((x,i)=>(i/(v.length-1)*100).toFixed(1)+','+(28-((x-mn)/r)*26).toFixed(1)).join(' ')+'" fill="none" stroke="'+color+'" stroke-width="1.8" vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-}
-function hRowBody(e){
-  const pair=(l,v,u)=>v==null||v===''?'':'<span class="hv"><i>'+l+'</i>'+f1(v)+(u?' '+u:'')+'</span>';
-  if(e.type==='treino'){const pace=e.km&&e.min?(e.min/e.km):null;return '<b>'+esc(e.act||'Atividade')+(e.session?' · Sessão '+esc(e.session):'')+'</b>'+(e.auto&&!e.touched?'<span class="hbadge">do cronograma · faltam detalhes</span>':e.auto?'<span class="hbadge">do cronograma</span>':'')+'<div class="hvs">'+pair('Tempo',e.min?hm(e.min):null)+pair('Distância',e.km,'km')+pair('Kcal',e.kcal)+(pace?'<span class="hv"><i>Ritmo</i>'+Math.floor(pace)+':'+pad(Math.round((pace%1)*60)%60)+'/km</span>':'')+pair('FC',e.hr,'bpm')+pair('FC máx',e.hrmax,'bpm')+pair('Passos',e.steps)+'</div>';}
-  if(e.type==='sono'){
-    const tot=(e.awake||0)+(e.rem||0)+(e.light||0)+(e.deep||0),seg=(k,c,l)=>e[k]?'<i style="width:'+e[k]/tot*100+'%;background:'+c+'" title="'+l+' '+e[k]+' min"></i>':'';
-    return '<b>'+hm(e.dur||sleepDur(e)||0)+' de sono</b><div class="hvs">'+(e.bed&&e.wake?'<span class="hv"><i>Horário</i>'+e.bed+' → '+e.wake+'</span>':'')+pair('Pontuação',e.score)+pair('SpO2',e.spo2,'%')+pair('FC',e.hr,'bpm')+'</div>'+
-      (tot?'<div class="stk">'+seg('awake','#F2C48D','Acordado')+seg('rem','#B8A7E3','REM')+seg('light','#9FC5EC','Leve')+seg('deep','#5D7EC0','Profundo')+'</div><div class="muted small">Acordado '+(e.awake||0)+' · REM '+(e.rem||0)+' · Leve '+(e.light||0)+' · Profundo '+(e.deep||0)+' min</div>':'');}
-  if(e.type==='pa'){const c=paClass(e.sys,e.dia);return '<b>'+e.sys+'/'+e.dia+' mmHg</b> <span class="due '+c[1]+'">'+c[0]+'</span><div class="hvs">'+pair('Pulso',e.pulse,'bpm')+(e.arm?'<span class="hv"><i>Braço</i>'+(e.arm==='E'?'esquerdo':'direito')+'</span>':'')+'</div>';}
-  if(e.type==='comp'){const h=Number(S.hprefs.heightCm),bmi=h?e.weight/Math.pow(h/100,2):null;return '<b>'+f1(e.weight)+' kg</b><div class="hvs">'+pair('Gordura',e.fat,'%')+pair('Músculo',e.muscle,'kg')+pair('Água',e.water,'%')+pair('Visceral',e.visceral)+pair('TMB',e.bmr,'kcal')+(bmi?pair('IMC',bmi):'')+'</div>';}
-  return '<div class="hvs">'+pair('Passos',e.steps)+pair('Kcal ativas',e.kcalAct)+pair('FC repouso',e.hrRest,'bpm')+pair('FC média',e.hrAvg,'bpm')+pair('SpO2',e.spo2,'%')+pair('Estresse',e.stress)+pair('Temp.',e.temp,'°C')+pair('Água',e.water,'ml')+pair('Glicemia',e.glu,'mg/dL')+pair('Energia',e.energy)+'</div>';
-}
-function healthList(type){
-  const l=hList(type);
-  if(!l.length)return '<div class="empty">Nenhum registro de '+HSCHEMA[type].label.toLowerCase()+' ainda.<br><button class="btn primary" data-a="h-new" data-t="'+type+'">'+ic('plus',15)+' Registrar</button></div>';
-  return '<div class="card">'+l.slice(0,120).map(e=>'<div class="hrow"><div class="hd"><b>'+fmtDM(e.date)+'</b><span class="muted small">'+(e.time||WD[parseISO(e.date).getDay()])+'</span></div><div class="hbody">'+hRowBody(e)+(e.note?'<div class="small muted">'+esc(e.note)+'</div>':'')+'</div>'+
-    '<div class="tact"><button class="icon-btn sm" data-a="h-edit" data-id="'+e.id+'" aria-label="Editar">'+ic('edit',15)+'</button><button class="icon-btn sm" data-a="h-del" data-id="'+e.id+'" aria-label="Excluir">'+ic('trash',15)+'</button></div></div>').join('')+'</div>';
-}
-function healthSummary(){
-  const today=todayISO(),ws=mondayOf(today),we=addISO(ws,6),hp=S.hprefs,d7=addISO(today,-6);
-  const wk=hList('treino').filter(e=>e.date>=ws&&e.date<=we),wmin=sumK(wk,'min');
-  const sl=hList('sono'),sl7=sl.filter(e=>e.date>=d7),avgDur=sl7.length?sl7.reduce((s,e)=>s+(e.dur||sleepDur(e)||0),0)/sl7.length:null;
-  const scores=sl7.filter(e=>e.score!=null);
-  const pa=hList('pa'),pa7=pa.filter(e=>e.date>=d7),lp=pa[0];
-  const cp=hList('comp'),lc=cp[0],old=cp.find(e=>e.date<=addISO(today,-30)),h=Number(hp.heightCm),bmi=lc&&h?lc.weight/Math.pow(h/100,2):null;
-  const dayE=hList('dia').find(e=>e.date===today);
-  const days=[];for(let i=0;i<7;i++){const d=addISO(ws,i);days.push(sumK(wk.filter(e=>e.date===d),'min'));}
-  const mxd=Math.max.apply(null,days.concat([1]));
-  const goal=Number(hp.weeklyMin)||0,gp=goal?Math.min(100,wmin/goal*100):0,sg=Number(hp.sleepH)||0;
-  let h_='<div class="opts">'+Object.keys(HSCHEMA).map(t=>'<button class="btn sm" data-a="h-new" data-t="'+t+'">'+ic('plus',13)+' '+HSCHEMA[t].label+'</button>').join('')+'</div>';
-  h_+='<div class="hcards big">'+
-    '<div class="hcard"><span class="hl">Exercício na semana</span><b>'+hm(wmin)+(goal?' <small>de '+hm(goal)+'</small>':'')+'</b><div class="bar"><i style="width:'+gp+'%"></i></div><span class="muted small">'+f1(sumK(wk,'km'))+' km · '+Math.round(sumK(wk,'kcal'))+' kcal · '+wk.length+' Sessões</span><div class="dbars">'+days.map((m,i)=>'<span title="'+WD[(i+1)%7]+': '+m+' min"><i style="height:'+(m/mxd*100)+'%"></i><em>'+WD[(i+1)%7][0]+'</em></span>').join('')+'</div></div>'+
-    '<div class="hcard"><span class="hl">Sono (7 dias)</span><b>'+(avgDur!=null?hm(avgDur):'—')+(sg?' <small>Meta '+sg+'h</small>':'')+'</b><span class="muted small">'+(scores.length?'Pontuação média '+Math.round(scores.reduce((s,e)=>s+e.score,0)/scores.length):'Sem pontuação')+' · '+sl7.length+' Noites</span>'+spark(sl.slice(0,14).reverse().map(e=>e.dur||sleepDur(e)),'#7E91C7')+'</div>'+
-    '<div class="hcard"><span class="hl">Pressão arterial</span><b>'+(lp?lp.sys+'/'+lp.dia:'—')+(lp?' <span class="due '+paClass(lp.sys,lp.dia)[1]+'">'+paClass(lp.sys,lp.dia)[0]+'</span>':'')+'</b><span class="muted small">'+(pa7.length?'Média 7 dias '+Math.round(sumK(pa7,'sys')/pa7.length)+'/'+Math.round(sumK(pa7,'dia')/pa7.length)+' ('+pa7.length+' medidas)':'Sem medidas na semana')+'</span>'+spark(pa.slice(0,14).reverse().map(e=>e.sys),'#D98C8C')+'</div>'+
-    '<div class="hcard"><span class="hl">Composição corporal</span><b>'+(lc?f1(lc.weight)+' kg':'—')+'</b><span class="muted small">'+(lc?(lc.fat!=null?'Gordura '+f1(lc.fat)+'% · ':'')+(lc.muscle!=null?'Músculo '+f1(lc.muscle)+' kg · ':'')+(bmi?'IMC '+f1(bmi):''):'Sem registros')+(old&&lc?' · '+(lc.weight-old.weight>=0?'+':'')+f1(lc.weight-old.weight)+' kg em 30 dias':'')+'</span>'+spark(cp.slice(0,14).reverse().map(e=>e.weight),'#6FA68B')+'</div>'+
-    '<div class="hcard"><span class="hl">Hoje</span><b>'+(dayE&&dayE.steps!=null?Math.round(dayE.steps).toLocaleString('pt-BR')+' <small>passos</small>':'—')+'</b><span class="muted small">'+(dayE?[dayE.hrRest!=null?'FC repouso '+dayE.hrRest:'',dayE.spo2!=null?'SpO2 '+dayE.spo2+'%':'',dayE.water!=null?'Água '+dayE.water+' ml':'',dayE.energy!=null?'Energia '+dayE.energy+'/5':''].filter(Boolean).join(' · '):'Nenhum diário registrado hoje')+'</span></div></div>';
-  h_+='<div class="card sec" style="margin-top:12px"><h3>Metas e dados de base</h3><div class="opts"><label class="f" style="width:170px">Exercício por semana (min)<input type="text" inputmode="decimal" data-hpref="weeklyMin" value="'+esc(hp.weeklyMin)+'"></label><label class="f" style="width:150px">Sono por noite (h)<input type="text" inputmode="decimal" data-hpref="sleepH" value="'+esc(hp.sleepH)+'"></label><label class="f" style="width:120px">Altura (cm)<input type="text" inputmode="decimal" data-hpref="heightCm" value="'+esc(hp.heightCm)+'"></label></div></div>';
-  return h_;
-}
-function renderSaude(){
-  const tabs=[['resumo','Resumo'],['treino','Atividade física'],['sono','Sono'],['pa','Pressão'],['comp','Composição'],['dia','Diário']];
-  let h='<div class="toolbar"><div class="seg">'+tabs.map(t=>'<button class="'+(UI.hTab===t[0]?'on':'')+'" data-a="set" data-k="hTab" data-v="'+t[0]+'">'+t[1]+'</button>').join('')+'</div>'+
-    (UI.hTab!=='resumo'?'<button class="btn primary" data-a="h-new" data-t="'+UI.hTab+'">'+ic('plus',15)+' Registrar</button>':'')+'</div>';
-  h+=UI.hTab==='resumo'?healthSummary():healthList(UI.hTab);
-  return h+'<p class="muted small" style="margin-top:14px">Atividades físicas marcadas como concluídas no cronograma entram sozinhas em "Atividade física". Os demais registros são manuais, copiados do Samsung Health. A classificação da pressão segue a diretriz brasileira e não substitui avaliação médica.</p>';
-}
-function openHealthForm(type,id){
-  const sc=HSCHEMA[type],e0=id?S.health.find(x=>x.id===id):null,d=Object.assign({date:todayISO()},e0||{});
-  recForm({title:(e0?'Editar: ':'Registrar: ')+sc.label.toLowerCase(),fields:sc.fields,data:d,
-    onDelete:e0?()=>{S.health=S.health.filter(x=>x!==e0);save();rerender();}:null,
-    onSave:o=>{if(type==='sono')o.dur=sleepDur(o);if(e0){Object.assign(e0,o);e0.touched=true;}else S.health.push(Object.assign({id:uid(),type:type},o));save();rerender();toast('Registro salvo.');}});
-}
-// Atividade física concluída no cronograma -> vai para a aba Saúde
-function isFisica(a){return a.blockType==='fisica'||catPath(a.catId).some(c=>/atividade f[ií]sica/i.test(c.name));}
-function fisicaGuess(a){
-  const txt=norm(aT(a)+' '+catPath(a.catId).map(c=>c.name).join(' ')+' '+(a.theme||''));
-  if(/corrida|correr/.test(txt))return 'Corrida';if(/academia|muscula|treino/.test(txt))return 'Academia';
-  if(/caminhada/.test(txt))return 'Caminhada';if(/ciclismo|bicicleta/.test(txt))return 'Ciclismo';if(/natacao/.test(txt))return 'Natação';if(/funcional/.test(txt))return 'Funcional';
-  return '';
-}
-function healthFromOcc(a,key){
-  const p=key.split('|'),date=p[1],s=a.slots.find(x=>x.id===p[0]);if(!s)return null;
-  const src=a.id+'|'+key;let e=S.health.find(x=>x.src===src);
-  if(!e){e={id:uid(),type:'treino',date:date,time:s.start,act:fisicaGuess(a)||'Atividade física',min:Math.max(0,tmin(s.end)-tmin(s.start)),km:null,kcal:null,hr:null,hrmax:null,steps:null,session:'',note:'',src:src,auto:true,touched:false};S.health.push(e);}
-  return e;
-}
-function maybeHealth(a,key){ // chamado ao marcar como concluída
-  if(!isFisica(a))return;
-  const e=healthFromOcc(a,key);if(!e)return;save();openHealthPrompt(e);
-}
-function unlinkHealth(a,key){ // ao desmarcar a conclusão
-  const src=a.id+'|'+key,e=S.health.find(x=>x.src===src);if(!e)return;
-  const filled=e.touched&&(e.kcal||e.km||e.hr||e.hrmax||e.steps||e.session);
-  if(!filled){S.health=S.health.filter(x=>x!==e);toast('Registro removido da aba Saúde.');return;}
-  e.src='';
-  askConfirm('Remover também da Saúde?','Você já preencheu detalhes deste treino na aba Saúde. Quer apagar esse registro?',()=>{S.health=S.health.filter(x=>x.id!==e.id);save();closeModal();rerender();},'Remover');
-}
-function openHealthPrompt(e){
-  const h=Math.floor((e.min||0)/60),mi=(e.min||0)%60,mod=FIS_TIPOS.indexOf(e.act)>=0?e.act:(e.act?'Outra':'Corrida');
-  openModal('<form id="fHP" class="form"><div class="fh"><h2>Enviar para a aba Saúde</h2><button type="button" class="icon-btn" data-a="hp-skip" aria-label="Preencher depois">'+ic('x')+'</button></div>'+
-    '<p class="muted" style="margin:0">Treino concluído registrado. Complete só o que quiser agora; o resto pode ser editado depois na aba Saúde.</p>'+
-    '<div class="fgrid"><label class="f">O que foi<select name="mod">'+FIS_TIPOS.map(t=>'<option '+sel(t,mod)+'>'+t+'</option>').join('')+'</select></label>'+
-    '<div class="f"><span>Duração</span><div class="frow" style="flex-wrap:nowrap"><input name="h" inputmode="numeric" value="'+h+'" aria-label="Horas" style="width:70px"><span class="muted">h</span><input name="m" inputmode="numeric" value="'+mi+'" aria-label="Minutos" style="width:70px"><span class="muted">min</span></div></div></div>'+
-    '<div class="fgrid"><label class="f">Calorias gastas <small>kcal</small><input name="kcal" inputmode="decimal" value="'+(e.kcal!=null?esc(String(e.kcal)):'')+'"></label>'+
-    '<label class="f hp-run">Distância <small>km</small><input name="km" inputmode="decimal" value="'+(e.km!=null?esc(String(e.km).replace('.',',')):'')+'"></label>'+
-    '<label class="f hp-gym">Sessão da academia<select name="session"><option value="">—</option>'+['A','B','C'].map(s=>'<option '+sel(s,e.session)+'>'+s+'</option>').join('')+'</select></label></div>'+
-    '<div class="fgrid"><label class="f">FC média <small>bpm</small><input name="hr" inputmode="numeric" value="'+(e.hr!=null?e.hr:'')+'"></label><label class="f">FC máxima <small>bpm</small><input name="hrmax" inputmode="numeric" value="'+(e.hrmax!=null?e.hrmax:'')+'"></label></div>'+
-    '<div class="fgrid"><label class="f">Passos<input name="steps" inputmode="numeric" value="'+(e.steps!=null?e.steps:'')+'"></label><label class="f">Observações<input name="note" value="'+esc(e.note||'')+'" autocomplete="off"></label></div>'+
-    '<div class="ff"><button type="button" class="btn" data-a="hp-skip">Preencher depois</button><button class="btn primary">Salvar na Saúde</button></div></form>');
-  const f=$('#fHP');f.dataset.id=e.id;hpToggle();
-  f.addEventListener('submit',ev=>{
-    ev.preventDefault();const E=f.elements,en=S.health.find(x=>x.id===f.dataset.id);if(!en)return;
-    en.act=E.mod.value;en.min=(parseNum(E.h.value)||0)*60+(parseNum(E.m.value)||0);en.kcal=parseNum(E.kcal.value);en.km=E.mod.value==='Corrida'||E.mod.value==='Caminhada'||E.mod.value==='Ciclismo'?parseNum(E.km.value):null;
-    en.session=E.mod.value==='Academia'?E.session.value:'';en.hr=parseNum(E.hr.value);en.hrmax=parseNum(E.hrmax.value);en.steps=parseNum(E.steps.value);en.note=E.note.value.trim();en.touched=true;
-    save();closeModal();rerender();toast('Treino salvo na aba Saúde.');
-  });
-}
-function hpToggle(){
-  const f=$('#fHP');if(!f)return;const m=f.elements.mod.value;
-  $$('.hp-run',f).forEach(x=>x.hidden=!(m==='Corrida'||m==='Caminhada'||m==='Ciclismo'));
-  $$('.hp-gym',f).forEach(x=>x.hidden=m!=='Academia');
-}
+/* A aba Saúde foi removida; os registros antigos continuam nos dados, sem aparecer. */
+const HSCHEMA={},hList=()=>[],maybeHealth=()=>{},unlinkHealth=()=>{};
 
 /* ==========================================================================
    29. FINANÇAS: saldo, cartões, contas, dívidas, entradas e dinheiro de eventos
@@ -7436,7 +7380,7 @@ function finMoneyCard(){
   if(!ev.length)return '';
   const by={};let total=0;
   ev.forEach(e=>{const c=(e.sub||'').split(' · ')[0]||'Outro',v=e.kind==='in'?e.amount:-e.amount;by[c]=(by[c]||0)+v;total+=v;});
-  return '<div class="card sec" style="margin-top:12px"><h3>Dinheiro de atividades e tarefas neste mês</h3><p>Valores lançados dentro de eventos e tarefas (material, lanche, almoço, compras).</p>'+
+  return '<div class="card sec" style="margin-top:12px"><h3>Dinheiro de atividades e tarefas neste mês</h3>'+
     Object.keys(by).sort((a,b)=>by[a]-by[b]).map(k=>'<div class="mv"><b class="'+(by[k]<0?'mout':'min')+'">'+(by[k]<0?'−':'+')+money(Math.abs(by[k]))+'</b><span>'+esc(k)+'</span></div>').join('')+
     '<div class="mv" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--line)"><b class="'+(total<0?'mout':'min')+'">'+(total<0?'−':'+')+money(Math.abs(total))+'</b><span>Total do mês</span></div></div>';
 }
@@ -7540,7 +7484,7 @@ function openSpendForm(id){
 }
 function finSpendCard(){
   const ym=todayISO().slice(0,7),list=S.fin.spends.filter(s=>s.date.slice(0,7)===ym);
-  if(!list.length)return '<div class="card sec" style="margin-top:12px"><h3>Saídas rápidas</h3><p>Lance um gasto em segundos: crédito (vai para a fatura) ou débito (sai da conta), com categoria.</p><button class="btn primary sm" data-a="spend-new">'+ic('plus',13)+' Nova saída</button></div>';
+  if(!list.length)return '<div class="card sec" style="margin-top:12px"><h3>Saídas rápidas</h3><button class="btn primary sm" data-a="spend-new">'+ic('plus',13)+' Nova saída</button></div>';
   const by={};list.forEach(s=>{by[s.cat||'Outros']=(by[s.cat||'Outros']||0)+s.amount;});
   const top=Object.keys(by).sort((a,b)=>by[b]-by[a]).slice(0,3);
   return '<div class="card sec" style="margin-top:12px"><div class="dh"><h3 style="margin:0">Saídas neste mês</h3><span><button class="btn sm" data-a="spend-new">'+ic('plus',13)+' Nova saída</button> <button class="btn sm ghost" data-a="set" data-k="fTab" data-v="saidas">Ver todas</button></span></div>'+
@@ -7741,11 +7685,11 @@ let CARDF=null,OCCD=null;
 function cardFormHTML(c0){
   const t=CARDF.type,v=k=>esc(c0?(c0[k]||''):'');
   const ed=(id,f,ph,val)=>'<div id="'+id+'" class="ned editing cf-ed" contenteditable="true" spellcheck="true" data-f="'+f+'" data-ph="'+ph+'">'+(val?richHTML(val):'')+'</div>';
-  const extra=(first)=>'<div class="f"><span>Extra <small>aparece depois de mostrar a resposta; aceita negrito, itálico e imagens</small></span>'+(first?cardToolbarHTML():'')+ed('cf-extra','extra','Explicação, mnemônico, exemplo…',c0&&c0.extra)+'</div>';
+  const extra=(first)=>'<div class="f"><span>Extra</span>'+(first?cardToolbarHTML():'')+ed('cf-extra','extra','Explicação, mnemônico, exemplo…',c0&&c0.extra)+'</div>';
   let body='';
   if(t==='basic')body='<label class="f">Frente<textarea id="cf-front" rows="3" placeholder="Pergunta ou termo">'+v('front')+'</textarea></label><div class="cf-img" id="cfi-front"></div>'+
-    '<div class="f"><span>Verso <small>aceita negrito, itálico e imagens</small></span>'+cardToolbarHTML()+ed('cf-back','back','Resposta',c0&&c0.back)+'</div><div class="cf-img" id="cfi-back"></div>'+extra(false);
-  else if(t==='cloze')body='<div class="f"><span>Texto com lacunas <small>selecione a palavra ou o trecho e use os botões. Formato: {{c1::resposta}} ou {{c1::resposta::dica}}</small></span><textarea id="cf-text" rows="5" placeholder="Use {{c1::resposta}} para ocultar uma parte">'+v('text')+'</textarea>'+
+    '<div class="f"><span>Verso</span>'+cardToolbarHTML()+ed('cf-back','back','Resposta',c0&&c0.back)+'</div><div class="cf-img" id="cfi-back"></div>'+extra(false);
+  else if(t==='cloze')body='<div class="f"><span>Texto com lacunas</span><textarea id="cf-text" rows="5" placeholder="Use {{c1::resposta}} para ocultar uma parte">'+v('text')+'</textarea>'+
     '<div class="frow"><button type="button" class="btn sm" data-a="cl-wrap" data-m="new">Ocultar seleção (nova lacuna)</button><button type="button" class="btn sm" data-a="cl-wrap" data-m="same">Ocultar junto (mesma lacuna)</button></div></div><div class="tprev" id="cf-prev"></div>'+extra(true);
   else body='<div class="seg" role="group" aria-label="Tipo de oclusão"><button type="button" class="'+(CARDF.okind==='image'?'on':'')+'" data-a="occ-kind" data-k="image">Imagem</button><button type="button" class="'+(CARDF.okind==='table'?'on':'')+'" data-a="occ-kind" data-k="table">Tabela</button></div><div id="occEd"></div>'+extra(true);
   return '<form id="fCard" class="form"><div class="fh"><h2>'+(c0?'Editar card':'Novo card')+' · '+CARD_TYPES[t]+'</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+body+
@@ -7903,7 +7847,7 @@ function stFace(c,idx){
 }
 function studyHomeHTML(){
   const now=Date.now(),decks=S.decks.slice().sort((a,b)=>(a.name||'').localeCompare(b.name||'')),all=dueCardCount();
-  let h='<div class="toolbar"><div><b style="font-size:17px">Estudar</b><div class="muted small">Cards voltam conforme a sua classificação: muito difícil em menos de 1 min, difícil em 3 min, normal em 10 min e fácil em 1 dia.</div></div>'+
+  let h='<div class="toolbar"><div><b style="font-size:17px">Estudar</b></div>'+
     '<button class="btn primary" data-a="st-start" '+(all?'':'disabled')+'>'+ic('play',14)+' Estudar tudo pendente'+(all?' ('+all+')':'')+'</button></div>';
   if(!decks.length)return nSubBar()+h+'<div class="empty">Você ainda não tem baralhos.<br><button class="btn primary" data-a="deck-new">'+ic('plus',15)+' Criar baralho</button></div>';
   return nSubBar()+h+'<div class="card">'+decks.map(d=>{
@@ -8338,11 +8282,10 @@ Object.assign(ACT,{
   'f-clear'(){UI.filters={q:'',roots:[],blocks:[],kinds:[],status:'all'};renderFilters();renderMain();},
   print(){printContext();},
   'sync-now'(){toast('Sincronizando…');if(Cloud.hold){Cloud.asked='';Cloud.askHold();return;}if(Cloud.dirty)Cloud.push();else Cloud.pull();},
-  'fb-off'(){FB.setOn(false).then(()=>{Cloud.ready=false;Cloud.setStatus('syncing');Cloud.pull();toast('Firebase desligado neste aparelho. Usando a planilha.');});},
+  'fb-off'(){FB.setOn(false).then(()=>{Cloud.ready=false;Cloud.setStatus('syncing');Cloud.pull();toast('Firebase desligado neste aparelho. Usando a nuvem.');});},
   'fb-on'(){FB.setOn(true).then(()=>{if(!FB.active()){toast(FB.err||'Não consegui conectar.');return;}Cloud.ready=false;Cloud.lastSeen=0;Cloud.hold=null;Cloud.asked='';Cloud.setStatus('syncing');Cloud.pull();toast('Firebase ligado. Sincronizando…');});},
-  'fb-mirror'(el){LS.set('rotina_fbmirror',el.checked?'1':'0');},
-  'sync-up'(){askConfirm('Enviar este aparelho para a planilha?','O que está na planilha será substituído pelo que está aqui ('+hasData(S)+' itens). A versão da planilha fica guardada em "Restaurar versão anterior".',()=>{closeModal();Cloud.forceUp();},'Enviar');},
-  'sync-down'(){askConfirm('Baixar os dados da planilha?','O que está neste aparelho será substituído pelo que está na planilha. A versão deste aparelho fica guardada em "Restaurar versão anterior".',()=>{closeModal();Cloud.forceDown();},'Baixar');},
+  'sync-up'(){askConfirm('Enviar este aparelho para a nuvem?','O que está na nuvem será substituído pelo que está aqui ('+hasData(S)+' itens). A versão da nuvem fica guardada em "Restaurar versão anterior".',()=>{closeModal();Cloud.forceUp();},'Enviar');},
+  'sync-down'(){askConfirm('Baixar os dados da nuvem?','O que está neste aparelho será substituído pelo que está na nuvem. A versão deste aparelho fica guardada em "Restaurar versão anterior".',()=>{closeModal();Cloud.forceDown();},'Baixar');},
   'cf-cloud'(){Cloud.resolve(true);},
   'cf-merge'(){Cloud.resolve('merge');},
   'cf-local'(){Cloud.resolve(false);},
@@ -8623,9 +8566,6 @@ Object.assign(ACT,{
   'hr-range'(el){UI.hr.range=el.dataset.v;renderMain();},
   'aj-tab'(el){UI.ajTab=el.dataset.v;renderMain();},
   /* saúde e finanças */
-  'h-new'(el){openHealthForm(el.dataset.t);},
-  'h-edit'(el){const e=S.health.find(x=>x.id===el.dataset.id);if(e)openHealthForm(e.type,e.id);},
-  'h-del'(el){const e=S.health.find(x=>x.id===el.dataset.id);if(!e)return;askConfirm('Excluir registro?','O registro de '+fmtDM(e.date)+' será removido.',()=>{S.health=S.health.filter(x=>x!==e);save();closeModal();rerender();});},
   'hp-skip'(){closeModal();rerender();toast('Treino enviado para a aba Saúde. Complete os detalhes quando quiser.');},
   'rec-del'(){const f=$('#fRec');if(f&&f._del){const fn=f._del;askConfirm('Excluir?','Esta ação não pode ser desfeita.',()=>{closeModal();fn();});}},
   'fin-new'(el){openFinForm(el.dataset.t,null,el.dataset.card?{card:el.dataset.card}:null);},
@@ -8644,10 +8584,10 @@ Object.assign(ACT,{
   },
   import(){$('#fileImport').click();},
   sample(){loadSample();toast('Exemplos adicionados.');},
-  reset(){askConfirm('Apagar todos os dados?','Tudo volta ao padrão, inclusive na planilha. Exporte um backup antes se precisar.',()=>{S=defaultState();Cloud.force=true;save();UI.filters={q:'',roots:[],blocks:[],kinds:[],status:'all'};UI.nview=null;rerender();toast('Dados reiniciados.');},'Apagar tudo');},
+  reset(){askConfirm('Apagar todos os dados?','Tudo volta ao padrão, inclusive na nuvem. Exporte um backup antes se precisar.',()=>{S=defaultState();Cloud.force=true;save();UI.filters={q:'',roots:[],blocks:[],kinds:[],status:'all'};UI.nview=null;rerender();toast('Dados reiniciados.');},'Apagar tudo');},
   'restore-prev'(){
     const raw0=LS.get(PREV_KEY),raw=raw0&&raw0.replace(/media:(m[0-9a-z]+)/g,(x,id)=>Media.cache[id]||x);if(!raw){toast('Não há versão anterior guardada neste aparelho.');return;}
-    askConfirm('Restaurar a versão anterior?','Volta ao que este aparelho tinha antes da última atualização vinda da planilha. O estado atual será substituído.',()=>{
+    askConfirm('Restaurar a versão anterior?','Volta ao que este aparelho tinha antes da última atualização vinda da nuvem. O estado atual será substituído.',()=>{
       try{const prev=normalize(JSON.parse(raw));LS.set(PREV_KEY,JSON.stringify(S));S=prev;Cloud.force=true;save();closeModal();rerender();toast('Versão anterior restaurada.');}catch(e){toast('Não consegui restaurar.');}
     },'Restaurar');
   },
@@ -8685,7 +8625,6 @@ document.addEventListener('change',e=>{
   else if(t.matches('[data-topt]')){const k=t.dataset.topt;S.prefs.title=Object.assign({tipo:true,area:true},S.prefs.title);S.prefs.title[k]=t.checked;save();rerender();}
   else if(t.matches('#fAct [name=themeNA]')){const f=t.form;f.elements.theme.disabled=t.checked;updTitlePrev();}
   else if(t.matches('#fHP [name=mod]')){hpToggle();}
-  else if(t.matches('[data-hpref]')){const v=parseNum(t.value);S.hprefs[t.dataset.hpref]=v==null?'':v;save();renderMain();}
   else if(t.matches('[data-hr]')){UI.hr[t.dataset.hr]=t.value;renderMain();}
   else if(t.matches('#fAct [name=kind],#fAct [name=noArea],#fAct [name=tipoAtv],#fAct [name=blockType]')){updTitlePrev();}
   else if(t.matches('.dcatpick select')){
@@ -9185,7 +9124,7 @@ function openIngForm(id){
     '<label class="f">Nome<input name="name" required value="'+esc(i?i.name:'')+'" autocomplete="off"></label>'+
     '<div class="fgrid"><label class="f">Unidade<select name="unit">'+UNITS.map(u=>'<option value="'+u[0]+'" '+(i&&u[0]===i.unit?'selected':'')+'>'+u[1]+'</option>').join('')+'</select></label>'+
     '<div class="f"><span>Valor médio</span><div class="frow" style="flex-wrap:nowrap"><span class="muted">R$</span><input name="price" inputmode="decimal" value="'+(i?esc(String(i.price).replace('.',',')):'')+'" placeholder="0,00" style="flex:1"><span class="muted">por</span><input name="pack" inputmode="decimal" value="'+(i?esc(String(i.pack)):'1000')+'" style="width:84px"></div></div></div>'+
-    '<label class="f">Estoque mínimo <small>em pacotes; abaixo disso o item entra na lista de mercado</small><input name="minPk" inputmode="decimal" value="'+(i&&i.minPk?esc(String(i.minPk).replace('.',',')):'')+'" placeholder="0 = não avisar"></label>'+
+    '<label class="f">Estoque mínimo<input name="minPk" inputmode="decimal" value="'+(i&&i.minPk?esc(String(i.minPk).replace('.',',')):'')+'" placeholder="0 = não avisar"></label>'+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="ig-manage">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
   const f=$('#fIng');
   f.addEventListener('submit',e=>{
@@ -9225,8 +9164,8 @@ function openRecipeForm(st){
     '<div class="fgrid"><label class="f">Categoria por momento<select name="momento"><option value="">—</option>'+MOMENTOS.map(m=>'<option '+(m===st.momento?'selected':'')+'>'+m+'</option>').join('')+'</select></label>'+
     '<label class="f">Categoria por área<select name="area"><option value="">—</option>'+AREAS.map(m=>'<option '+(m===st.area?'selected':'')+'>'+m+'</option>').join('')+'</select></label></div>'+
     '<label class="f">Porções que a receita rende<input name="servings" type="number" min="1" step="1" value="'+(st.servings||2)+'"></label>'+
-    '<div class="f"><span>Ingredientes necessários <small>escolha um já cadastrado ou digite um novo; o valor médio dos novos é pedido ao salvar</small></span><div id="rcIngs">'+rows.map(rowHTML).join('')+'</div><div><button type="button" class="btn sm" data-a="rc-ing-add">'+ic('plus',14)+' Ingrediente</button></div></div>'+
-    '<label class="f">Modo de preparo <small>uma etapa por linha; cada linha vira um item numerado</small><textarea name="steps" rows="6">'+esc(st.steps||'')+'</textarea></label>'+
+    '<div class="f"><span>Ingredientes necessários</span><div id="rcIngs">'+rows.map(rowHTML).join('')+'</div><div><button type="button" class="btn sm" data-a="rc-ing-add">'+ic('plus',14)+' Ingrediente</button></div></div>'+
+    '<label class="f">Modo de preparo<textarea name="steps" rows="6">'+esc(st.steps||'')+'</textarea></label>'+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Salvar receita</button></div></form>',true);
   renderRecPhoto();
   $('#fRec').addEventListener('submit',e=>{
@@ -9313,7 +9252,7 @@ function openMeal(id){
     '<div class="frow" style="align-items:center">'+mstChip(l)+(r&&!fora?'<button type="button" class="pillx" data-a="rc-open" data-id="'+r.id+'">'+ic('book',13)+'Ver receita</button>':'')+(act?'<button type="button" class="pillx" data-a="view-act" data-aid="'+act.id+'">'+ic('link',13)+'Evento: '+esc(aT(act))+'</button>':'')+'</div>'+
     '<div class="fgrid"><label class="f">Dia<select name="date">'+days.map(d=>'<option value="'+d.iso+'" '+(d.iso===m.date?'selected':'')+'>'+d.wd+' '+fmtDM(d.iso)+'</option>').join('')+'</select></label>'+
     '<label class="f">Momento<select name="slot">'+SLOTS.map(s=>'<option value="'+s.k+'" '+(s.k===m.slot?'selected':'')+'>'+esc(s.l)+'</option>').join('')+'</select></label></div>'+
-    (fora?'<label class="f">Quanto custou <small>R$, informe ao concluir</small><input name="amount" inputmode="decimal" value="'+(m.amount?esc(String(m.amount).replace('.',',')):'')+'" placeholder="0,00"></label>'
+    (fora?'<label class="f">Quanto custou<input name="amount" inputmode="decimal" value="'+(m.amount?esc(String(m.amount).replace('.',',')):'')+'" placeholder="0,00"></label>'
       :'<label class="f">Porções<input name="sv" type="number" min="1" step="1" value="'+m.servings+'" '+(m.st?'disabled':'')+'></label><div class="f"><span>Ingredientes</span>'+mealRowsHTML(m)+'</div>')+
     '<div class="frow" style="margin-top:4px">'+btns+'</div>'+
     '<div class="ff"><button type="button" class="btn danger" data-a="ml-del" data-id="'+id+'">'+ic('trash',14)+' Remover</button><span class="sp"></span><button type="button" class="btn" data-a="cancel">Fechar</button><button class="btn primary">Salvar</button></div></form>');
@@ -9349,7 +9288,7 @@ function openUseForm(pid){
   const pk=Number(i.pack)||1;
   openModal('<form id="fUse" class="form"><div class="fh"><h2>Registrar consumo</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<p style="margin:0"><b>'+esc(i.name)+'</b> · em estoque '+fmtQty(Number(p.qty)||0,i.unit,p.gosto)+(ingMin(i)>0?' · mínimo '+fmtQty(ingMin(i),i.unit):'')+'</p>'+
-    '<label class="f">Quanto foi consumido <small>em '+esc(i.unit)+'</small><input name="qty" inputmode="decimal" required value="'+esc(String(pk>1&&pk<=(Number(p.qty)||0)?pk/4:1).replace('.',','))+'" autocomplete="off"></label>'+
+    '<label class="f">Quanto foi consumido<input name="qty" inputmode="decimal" required value="'+esc(String(pk>1&&pk<=(Number(p.qty)||0)?pk/4:1).replace('.',','))+'" autocomplete="off"></label>'+
     (pk>1?'<div class="frow"><button type="button" class="chip" data-a="use-fill" data-v="'+pk/4+'">¼ pacote</button><button type="button" class="chip" data-a="use-fill" data-v="'+pk/2+'">½ pacote</button><button type="button" class="chip" data-a="use-fill" data-v="'+pk+'">1 pacote</button></div>':'')+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Registrar</button></div></form>');
   const f=$('#fUse');
@@ -9402,8 +9341,8 @@ function openShopDone(a,k){
   openModal('<form id="fShop" class="form"><div class="fh"><h2>Compra realizada</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+ingDatalist()+
     '<p class="hint">Estimativa de mercado: <b>'+money(a.shop.est)+'</b>. Informe o valor real e o que você comprou.</p>'+
     '<div class="fgrid"><label class="f">Valor real gasto <small>R$</small><input name="real" inputmode="decimal" required placeholder="0,00"></label><label class="f">Conta<select name="acc">'+S.fin.accounts.map(c=>'<option value="'+c.id+'">'+esc(c.name)+'</option>').join('')+'</select></label></div>'+
-    (items.length?'<div class="f"><span>O que você comprou <small>desmarque o que não comprou: continua na lista de faltas; reduza a quantidade se comprou menos</small></span><div id="shopRows">'+items.map(shopRowHTML).join('')+'</div></div>':'')+
-    '<div class="f"><span>Comprou algo a mais? <small>vira ingrediente novo ou soma ao estoque</small></span><div id="shopExtra"></div><div><button type="button" class="btn sm" data-a="sh-extra">'+ic('plus',14)+' Ingrediente</button></div></div>'+
+    (items.length?'<div class="f"><span>O que você comprou</span><div id="shopRows">'+items.map(shopRowHTML).join('')+'</div></div>':'')+
+    '<div class="f"><span>Comprou algo a mais?</span><div id="shopExtra"></div><div><button type="button" class="btn sm" data-a="sh-extra">'+ic('plus',14)+' Ingrediente</button></div></div>'+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Concluir compra</button></div></form>');
   const f=$('#fShop');
   f.addEventListener('submit',e=>{
@@ -9903,10 +9842,7 @@ function renderHabitos(){
   const T=todayISO(),list=hbToday(T),done=list.filter(x=>x.h.log.indexOf(T)>=0).length,all=list.length&&done===list.length;
   let h='<div class="toolbar"><div class="wlabel"><b>Hábitos</b><span class="muted small">Pequenos o bastante para acontecer todo dia</span></div><button class="btn primary" data-a="hb-new">'+ic('plus',15)+' Novo hábito</button></div>';
   if(!S.habits.length){
-    return h+'<div class="hbintro"><div class="hbi">'+ic('anchor',20)+'<div><b>Gatilho</b><p>Ligue a micro-ação a algo que já está na sua agenda: depois de um evento, antes dele ou em um horário.</p></div></div>'+
-      '<div class="hbi">'+ic('sprout',20)+'<div><b>Micro-ação</b><p>Reduza até não custar energia. O degrau seguinte só vem quando o primeiro ficar fácil.</p></div></div>'+
-      '<div class="hbi">'+ic('sparkle',20)+'<div><b>Recompensa na hora</b><p>Cada micro-ação concluída ganha uma resposta visual imediata.</p></div></div>'+
-      '<div class="hbi">'+ic('road',20)+'<div><b>Rodovia</b><p>Os dias praticados mostram a trilha virando estrada e, por fim, rodovia.</p></div></div>'+
+    return h+''+
       '<div><button class="btn primary" data-a="hb-new">'+ic('plus',15)+' Criar o primeiro hábito</button></div></div>';
   }
   const prev=UI.hbRing==null?0:UI.hbRing,ratio=list.length?done/list.length:0;
@@ -9954,19 +9890,19 @@ function openHabitForm(opts){
     return '<option value="'+a.id+'" '+sel(a.id,p.anchor.actId)+'>'+esc(clip([pt.tipo,pt.theme||pt.disc].filter(Boolean).join(' | ')||aT(a),52)+(sl?' · '+sl:''))+'</option>';};
   const order=[1,2,3,4,5,6,0],k=p.anchor.kind;
   openModal('<form id="fHabit" class="form" data-k="'+k+'" data-min="'+p.min+'"><div class="fh"><h2>'+(h0?'Editar hábito':'Novo hábito')+'</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
-    '<div class="f"><span>Micro-ação <small>tão pequena que dá para fazer no pior dia</small></span><input name="step" required value="'+esc(hbStep(p)&&h0?hbStep(p):(opts.prefill&&opts.prefill.step)||'')+'" autocomplete="off">'+
+    '<div class="f"><span>Micro-ação</span><input name="step" required value="'+esc(hbStep(p)&&h0?hbStep(p):(opts.prefill&&opts.prefill.step)||'')+'" autocomplete="off">'+
     '<div class="frow" id="hbmin"><span class="muted small">Leva</span>'+[1,2,5].map(m=>'<button type="button" class="chip '+(p.min===m?'on':'')+'" data-a="hb-min" data-v="'+m+'">'+m+' min</button>').join('')+'</div></div>'+
-    '<div class="f"><span>Gatilho <small>o que na agenda dispara a micro-ação</small></span><div class="seg" id="hbkind">'+[['event','Evento'],['time','Horário'],['text','Momento']].map(x=>'<button type="button" class="'+(k===x[0]?'on':'')+'" data-a="hb-kind" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>'+
+    '<div class="f"><span>Gatilho</span><div class="seg" id="hbkind">'+[['event','Evento'],['time','Horário'],['text','Momento']].map(x=>'<button type="button" class="'+(k===x[0]?'on':'')+'" data-a="hb-kind" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>'+
     '<div class="hbk hbk-event"><div class="fgrid"><select name="when" aria-label="Quando"><option value="after" '+sel('after',p.anchor.when)+'>Depois de</option><option value="before" '+sel('before',p.anchor.when)+'>Antes de</option></select>'+
     '<select name="actId" aria-label="Evento"><option value="">'+(acts.length?'Escolha o evento':'Nenhum evento criado')+'</option>'+acts.map(optAct).join('')+'</select></div></div>'+
     '<div class="hbk hbk-time"><input type="time" name="time" value="'+esc(p.anchor.time||'')+'"></div>'+
     '<div class="hbk hbk-text"><input name="text" value="'+esc(p.anchor.text||'')+'" placeholder="Descreva o momento" autocomplete="off"></div></div>'+
-    '<div class="f"><span>Dias <small>nenhum marcado = todos os dias</small></span><div class="frow">'+order.map(d=>'<label class="chip cb"><input type="checkbox" name="hd" value="'+d+'" '+(p.days.indexOf(d)>=0?'checked':'')+'><span>'+WD[d]+'</span></label>').join('')+'</div></div>'+
+    '<div class="f"><span>Dias</span><div class="frow">'+order.map(d=>'<label class="chip cb"><input type="checkbox" name="hd" value="'+d+'" '+(p.days.indexOf(d)>=0?'checked':'')+'><span>'+WD[d]+'</span></label>').join('')+'</div></div>'+
     '<div class="tprev" id="hbprev"></div>'+
     '<details class="more" '+((p.big||p.reward||p.steps.length>p.lv+1)?'open':'')+'><summary>Objetivo, recompensa e degraus</summary>'+
-    '<label class="f">Objetivo maior <small>para onde essa micro-ação leva</small><input name="big" value="'+esc(p.big)+'" autocomplete="off"></label>'+
-    '<label class="f">Recompensa ao concluir <small>aparece na comemoração</small><input name="reward" value="'+esc(p.reward)+'" autocomplete="off"></label>'+
-    '<label class="f">Próximos degraus <small>um por linha, do menor ao maior</small><textarea name="next" rows="3">'+esc(p.steps.slice(p.lv+1).join('\n'))+'</textarea></label></details>'+
+    '<label class="f">Objetivo maior<input name="big" value="'+esc(p.big)+'" autocomplete="off"></label>'+
+    '<label class="f">Recompensa ao concluir<input name="reward" value="'+esc(p.reward)+'" autocomplete="off"></label>'+
+    '<label class="f">Próximos degraus<textarea name="next" rows="3">'+esc(p.steps.slice(p.lv+1).join('\n'))+'</textarea></label></details>'+
     '<div class="ff">'+(h0?'<button type="button" class="btn danger" data-a="hb-del" data-id="'+h0.id+'">Excluir</button>':'')+'<span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
   const f=$('#fHabit');hbPrev();
   f.addEventListener('submit',ev=>{
@@ -10021,7 +9957,7 @@ function openQuestionOrigin(){
     '<label class="f">Prova de origem<input name="prova" required list="qprovas" value="" placeholder="Nome da prova ou do processo seletivo" autocomplete="off"><datalist id="qprovas">'+qProvas().map(x=>'<option value="'+esc(x)+'">').join('')+'</datalist></label>'+
     '<div class="fgrid"><div class="f"><span>Nível</span><div class="frow">'+['R1','R+'].map((v,i)=>'<label class="chip cb"><input type="radio" name="nivel" value="'+v+'" '+(((last.nivel||'R1')===v)?'checked':'')+'><span>'+v+'</span></label>').join('')+'</div></div>'+
     '<label class="f">Ano<input name="ano" required inputmode="numeric" maxlength="4" pattern="[0-9]{4}" value="'+esc(last.ano||yr)+'" autocomplete="off"></label></div>'+
-    '<label class="f">Grupo de questões <small>opcional; agrupa questões do mesmo assunto</small><input name="grp" list="qgroups" value="'+esc(UI.qgrp&&UI.qgrp!=='__none'?UI.qgrp:'')+'" autocomplete="off"><datalist id="qgroups">'+qGroups().map(x=>'<option value="'+esc(x)+'">').join('')+'</datalist></label>'+
+    '<label class="f">Grupo de questões<input name="grp" list="qgroups" value="'+esc(UI.qgrp&&UI.qgrp!=='__none'?UI.qgrp:'')+'" autocomplete="off"><datalist id="qgroups">'+qGroups().map(x=>'<option value="'+esc(x)+'">').join('')+'</datalist></label>'+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Criar questão</button></div></form>');
   const f=$('#fQo');
   f.addEventListener('submit',e=>{
@@ -10080,7 +10016,7 @@ function qtSummary(){
   const t=UI.qt,ok=t.res.filter(r=>r.ok).length,miss=t.res.filter(r=>!r.ok);
   openModal('<div class="fh"><h2>Resultado do treino</h2><button type="button" class="icon-btn" data-a="qt-stop" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<p style="font-size:22px;margin:4px 0"><b>'+ok+' de '+t.res.length+'</b> '+(t.res.length?'('+Math.round(100*ok/t.res.length)+'%)':'')+'</p>'+
-    (miss.length?'<div class="sechead">Para rever</div>'+miss.map(r=>{const q=noteById(r.id);return q?'<button type="button" class="gs-i" data-a="qt-open-q" data-id="'+q.id+'">'+ic('help',15)+'<span class="gs-t"><b>'+esc(q.title||noteText(q).slice(0,70)||'Questão')+'</b><small>'+esc(qOrigin(q))+'</small></span></button>':'';}).join(''):'<p class="okt">Acertou todas.</p>')+
+    (miss.length?'<div class="sechead">Para rever</div>'+miss.map(r=>{const q=noteById(r.id);return q?'<button type="button" class="gs-i" data-a="qt-open-q" data-id="'+q.id+'">'+ic('help',15)+'<span class="gs-t"><b>'+esc(q.title||noteText(q).slice(0,70)||'Questão')+'</b></span></button>':'';}).join(''):'<p class="okt">Acertou todas.</p>')+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="qt-open">Treinar de novo</button><button type="button" class="btn primary" data-a="qt-stop">Concluir</button></div>',true);
 }
 
@@ -10466,7 +10402,7 @@ function pmHTML(){
     '<div class="pmdial"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" class="bg"/><circle id="pmRing" cx="60" cy="60" r="54" class="fg" transform="rotate(-90 60 60)" style="stroke-dasharray:'+circ.toFixed(1)+';stroke-dashoffset:'+(circ*(1-(tot-left)/tot)).toFixed(1)+'"/></svg><div class="pmt"><b id="pmTime">'+pmFmt(left)+'</b><span>'+PM_PHASES.find(x=>x[0]===c.phase)[1]+'</span></div></div>'+
     '<div class="addrow pmbtns"><button class="btn primary" data-a="pm-toggle">'+(c.running?'Pausar':(left<tot?'Continuar':'Iniciar'))+'</button><button class="btn" data-a="pm-reset">Reiniciar</button><button class="btn" data-a="pm-skip">Pular</button></div>'+
     '<label class="f"><span>Tarefa em foco</span><select data-pm="task"><option value="">Foco livre (sem tarefa)</option>'+tasks.map(t=>'<option value="'+t.id+'" '+(t.id===c.taskId?'selected':'')+'>'+esc(t.title)+'</option>').join('')+'</select></label>'+
-    (c.taskId?'':'<label class="f"><span>No que vou focar?</span><input type="text" data-pm="title" value="'+esc(c.title)+'" placeholder="Ex.: resumo de cardiologia" autocomplete="off"></label>')+
+    (c.taskId?'':'<label class="f"><input type="text" data-pm="title" value="'+esc(c.title)+'" placeholder="Foco livre" aria-label="Foco" autocomplete="off"></label>')+
     '<div class="pmsubs"><div class="sechead" style="margin:6px 0">Subtarefas <span class="count">'+dn+'/'+subs.length+'</span></div>'+
     subs.map(s=>'<div class="pmsub '+(s.done?'done':'')+'"><button class="chk sm '+(s.done?'on':'')+'" data-a="pm-sub" data-id="'+s.id+'" aria-label="Concluir subtarefa">'+ic('check',12)+'</button><span>'+esc(s.t)+'</span><button class="icon-btn sm" data-a="pm-subdel" data-id="'+s.id+'" aria-label="Remover subtarefa">'+ic('x',13)+'</button></div>').join('')+
     '<div class="addrow"><input type="text" id="pmSubNew" placeholder="Nova subtarefa" autocomplete="off"><button class="btn sm primary" data-a="pm-addsub">'+ic('plus',14)+' Adicionar</button></div>'+
@@ -10474,6 +10410,9 @@ function pmHTML(){
     '<details class="pmcfg"><summary>Ajustar Tempos</summary><div class="pmcfgg">'+[['focus','Foco (min)'],['short','Pausa Curta (min)'],['long','Pausa Longa (min)'],['every','Pausa Longa a Cada (ciclos)']].map(x=>'<label class="f"><span>'+x[1]+'</span><input type="number" min="1" max="180" data-pmc="'+x[0]+'" value="'+p.cfg[x[0]]+'"></label>').join('')+'</div></details></section>';
 }
 Object.assign(ACT,{
+  'sum-toggle'(el){S.prefs.sumC=S.prefs.sumC||{};S.prefs.sumC[el.dataset.k]=!S.prefs.sumC[el.dataset.k];save();renderMain();},
+  'sb-toggle'(){S.prefs.sbCollapsed=!S.prefs.sbCollapsed;save();renderTabs();},
+  'sb-open'(){document.body.classList.toggle('sb-open');},
   'attn-toggle'(){S.prefs.attnHide=!S.prefs.attnHide;save();renderMain();},
   'pm-toggle'(){const p=pmGet(),c=p.cur;if(c.running){c.left=pmLeft(p);c.running=false;c.endsAt=0;}else{if(c.left<=0)c.left=pmDur(p,c.phase);c.running=true;c.endsAt=Date.now()+c.left*1000;}save();renderMain();},
   'pm-reset'(){const p=pmGet(),c=p.cur;c.running=false;c.endsAt=0;c.left=pmDur(p,c.phase);save();renderMain();},
@@ -10491,53 +10430,11 @@ document.addEventListener('change',e=>{const t=e.target;if(!t||!t.dataset)return
 });
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&e.target.id==='pmSubNew'){e.preventDefault();ACT['pm-addsub']();}});
 
-/* ----- árvore: cada atividade concluída faz a árvore crescer ----- */
-const GM_TREE=40,GM_STAGES=[[0,'Semente'],[4,'Broto'],[10,'Muda'],[18,'Árvore Jovem'],[26,'Árvore Adulta'],[34,'Árvore Florida']];
-const GM_W={evento:3,tarefa:3,habito:2,pomodoro:2,sub:1};
-function gmXP(){
-  const T=todayISO();let tot=0,today=0,parts={evento:0,tarefa:0,habito:0,pomodoro:0,sub:0};
-  const add=(k,d)=>{const n=GM_W[k];tot+=n;parts[k]+=n;if(d===T)today+=n;};
-  const dOf=ts=>{const n=Number(ts);return n>1e11?toISO(new Date(n)):'';};
-  S.acts.forEach(a=>{if(quickOf(a))return;Object.keys(a.done||{}).forEach(k=>add('evento',dOf(a.done[k])));});
-  S.tasks.forEach(t=>{if(t.done)add('tarefa',dOf(t.doneAt));});
-  S.habits.forEach(h=>(h.log||[]).forEach(d=>add('habito',d)));
-  const p=pmGet();p.log.forEach(e=>add('pomodoro',e.d));
-  Object.keys(p.subs).forEach(k=>p.subs[k].forEach(s=>{if(s.done)add('sub',dOf(s.doneAt));}));
-  S.tasks.forEach(t=>(t.subs||[]).forEach(s=>{if(s.done)add('sub',dOf(s.doneAt));}));
-  return {tot:tot,today:today,parts:parts};
-}
-function gmStage(inTree){let s=0;GM_STAGES.forEach((x,i)=>{if(inTree>=x[0])s=i;});return s;}
-function treeSVG(stage,mini){
-  const g=(n,x,y,r,c)=>'<circle cx="'+x+'" cy="'+y+'" r="'+r+'" class="'+c+'"/>';
-  let h='<svg class="tree'+(mini?' mini':'')+'" viewBox="0 0 200 210" role="img" aria-label="Árvore, fase '+stage+'"><ellipse cx="100" cy="190" rx="70" ry="10" class="tr-soil"/>';
-  const trunk=[0,26,48,72,92,104][Math.min(stage,5)];
-  if(stage===0)h+='<ellipse cx="100" cy="182" rx="9" ry="6" class="tr-seed"/>';
-  else{
-    h+='<g class="tr-grow"><path d="M100 190 L100 '+(190-trunk)+'" class="tr-trunk" style="stroke-width:'+(5+stage*2.2)+'"/>';
-    if(stage===1)h+='<ellipse cx="90" cy="'+(190-trunk-2)+'" rx="12" ry="6" transform="rotate(-25 90 '+(190-trunk-2)+')" class="tr-leaf"/><ellipse cx="110" cy="'+(190-trunk-4)+'" rx="12" ry="6" transform="rotate(25 110 '+(190-trunk-4)+')" class="tr-leaf2"/>';
-    if(stage===2)h+=g(0,100,190-trunk-6,20,'tr-leaf')+g(0,84,190-trunk+8,14,'tr-leaf2')+g(0,116,190-trunk+8,14,'tr-leaf2');
-    if(stage>=3){const cy=190-trunk,R=[0,0,0,30,38,44][Math.min(stage,5)];
-      h+=g(0,100,cy-R*.35,R,'tr-leaf')+g(0,100-R*.7,cy+R*.2,R*.7,'tr-leaf2')+g(0,100+R*.7,cy+R*.2,R*.7,'tr-leaf2');
-      if(stage>=4)h+=g(0,100-R*.4,cy-R*.9,R*.55,'tr-leaf3')+g(0,100+R*.45,cy-R*.8,R*.5,'tr-leaf3');
-      if(stage>=5)[[-.5,-.2],[.4,-.5],[.1,.35],[-.15,-.8],[.65,.1],[-.75,.25]].forEach(f=>{h+=g(0,100+f[0]*R*1.3,cy+f[1]*R*1.1,4.2,'tr-fruit');});}
-    h+='</g>';
-  }
-  return h+'</svg>';
-}
-function gmTreeHTML(){
-  const x=gmXP(),k=Math.floor(x.tot/GM_TREE),inT=x.tot%GM_TREE,st=gmStage(inT),nxt=GM_STAGES[st+1],need=(nxt?nxt[0]:GM_TREE)-inT;
-  const seen=S.prefs.gmSeen,key=k*GM_STAGES.length+st;
-  if(seen===undefined||seen===null){S.prefs.gmSeen=key;}
-  else if(key>seen){S.prefs.gmSeen=key;save();setTimeout(()=>toast(st===0?'Uma árvore completa! Nasceu uma nova semente.':'Sua árvore cresceu: '+GM_STAGES[st][1]+'.'),300);}
-  else if(key<seen){S.prefs.gmSeen=key;}
-  const forest=k?'<div class="forest" title="'+k+(k===1?' árvore completa':' árvores completas')+'">'+Array.from({length:Math.min(k,12)},()=>treeSVG(5,true)).join('')+(k>12?'<span class="muted small">+'+(k-12)+'</span>':'')+'</div>':'';
-  const pr=x.parts;
-  return '<section class="card gmc"><div class="phead"><h3>'+ic('sprout',17)+' Minha Árvore</h3><span class="muted small">+'+x.today+' XP Hoje</span></div>'+
-    '<div class="gmtree" data-st="'+st+'">'+treeSVG(st)+'</div>'+
-    '<div class="gmname"><b>'+GM_STAGES[st][1]+'</b><span class="muted small"> · Árvore Nº '+(k+1)+'</span></div>'+
-    '<div class="bar" style="margin:8px 0 4px"><i style="width:'+(inT/GM_TREE*100).toFixed(1)+'%"></i></div>'+
-    '<div class="muted small">'+inT+' de '+GM_TREE+' XP · faltam '+need+' XP '+(nxt?'para '+nxt[1]:'para completar a árvore')+'</div>'+forest+
-    '<details class="pmcfg"><summary>Como a árvore cresce</summary><div class="small muted" style="line-height:1.6">Evento concluído: +3 XP ('+pr.evento+')<br>Tarefa concluída: +3 XP ('+pr.tarefa+')<br>Hábito feito: +2 XP ('+pr.habito+')<br>Pomodoro de foco: +2 XP ('+pr.pomodoro+')<br>Subtarefa concluída: +1 XP ('+pr.sub+')<br>A cada '+GM_TREE+' XP uma árvore fica completa e vai para a sua floresta.</div></details></section>';
+/* ----- Painel: revisões de hoje (no lugar da árvore) ----- */
+function rvWidgetHTML(){
+  const T=todayISO(),l=reviewList(addISO(T,-6),T).filter(r=>!r.done&&r.kind==='rv'),mn=l.reduce((a,r)=>a+r.min,0);
+  return '<section class="card gmc"><div class="phead"><h3>'+ic('repeat',17)+' Revisões de hoje</h3><span class="muted small">'+(l.length?l.length+(l.length===1?' pendente · ':' pendentes · ')+mn+' min':'em dia')+'</span></div>'+
+    (l.length?l.slice(0,6).map(r=>'<div class="rwrow"><button class="chk sm" data-a="rv-done" data-k="'+esc(r.key)+'" aria-label="Marcar como feita">'+ic('check',12)+'</button><span class="rwn">D+'+r.n+'</span><b>'+esc(r.theme)+'</b><span class="muted small">'+r.min+' min</span></div>').join('')+(l.length>6?'<button class="btn sm ghost" data-a="tab" data-v="revisoes">Ver todas ('+l.length+')</button>':''):'<div class="muted small" style="padding:8px 0">Nenhuma revisão pendente.</div>')+'</section>';
 }
 
 function renderPainel(){
@@ -10547,10 +10444,8 @@ function renderPainel(){
   const low=lowStock();
   const bills=finEvents(addISO(t,-30),end).filter(e=>e.kind==='out'&&!e.paid);
   const sec=(ico,title,n,body)=>'<section class="card" style="padding:14px 16px;margin-bottom:14px"><div class="phead" style="margin-bottom:6px"><h3>'+ic(ico,17)+' '+title+'</h3><span class="mst s-buy">'+n+'</span></div>'+body+'</section>';
-  const rvs=reviewList(addISO(t,-6),t).filter(r=>!r.done);
   const paces=S.dates.map(d=>({d:d,p:paceFor(d)})).filter(x=>x.p&&x.p.days<=90).sort((a,b)=>a.d.date<b.d.date?-1:1);
   if(paces.length)H.push(sec('target','Ritmo para as provas',paces.length,paces.map(x=>'<div class="pacerow" data-a="view-date" data-id="'+x.d.id+'" role="button" tabindex="0"><b>'+esc(x.d.title)+'</b><span class="muted small">'+esc(x.p.text)+'</span></div>').join('')));
-  if(rvs.length)H.push(sec('repeat','Revisões',rvs.length,rvs.map(r=>rvRow(r)).join('')+'<div class="muted small" style="margin-top:6px">Vem dos eventos marcados com “Gera revisão”. <a href="#" data-a="tab" data-v="revisoes">Abrir Revisões</a></div>'));
   const mss=missList();
   if(mss.length)H.push(sec('clock','Eventos pendentes',mss.length,mss.slice(0,5).map(pendRowHTML).join('')+(mss.length>5?'<button class="btn sm ghost" data-a="pend-open">Ver todos ('+mss.length+')</button>':'')));
   if(tasks.length)H.push(sec('tasks','Tarefas de hoje',tasks.length,tasks.map(taskRow).join('')));
@@ -10558,15 +10453,15 @@ function renderPainel(){
   if(low.length)H.push(sec('bag','Estoque crítico',low.length,low.map(x=>{const p=pantryOf(x.ing.id);return '<div class="crow"><span class="lki">'+ic('bag',16)+'</span><div class="cprev"><b>'+esc(x.ing.name)+'</b><span class="muted small">restam '+fmtQty(x.qty,x.ing.unit)+' · mínimo '+fmtQty(x.min,x.ing.unit)+'</span></div>'+(p?'<button class="icon-btn sm" data-a="pa-use" data-id="'+p.id+'" aria-label="Registrar consumo" title="Registrar consumo">'+ic('minus',15)+'</button>':'')+'</div>';}).join('')+'<div style="margin-top:8px"><button class="btn sm primary" data-a="goto-mercado">'+ic('cart',14)+' Abrir lista de mercado</button></div>'));
   if(bills.length)H.push(sec('wallet','Contas que vencem nesta semana',bills.length,bills.map(e=>finRow(e)).join('')));
   const d=parseISO(t);
-  return '<div class="painel"><h2 class="vt" style="margin:0 0 4px">Hoje, '+WDL[d.getDay()]+' '+fmtDM(t)+'</h2><p class="muted small" style="margin:0 0 14px">Só o que pede ação agora.</p>'+NC.cardHTML()+
-    '<div class="pmgrid">'+pmHTML()+gmTreeHTML()+'</div>'+
+  return '<div class="painel"><h2 class="vt" style="margin:0 0 4px">Hoje, '+WDL[d.getDay()]+' '+fmtDM(t)+'</h2>'+NC.cardHTML()+
+    '<div class="pmgrid">'+pmHTML()+rvWidgetHTML()+'</div>'+
     (H.length?H.join(''):'<div class="empty">Nada exige ação agora.<br><button class="btn" data-a="tab" data-v="semana">'+ic('calendar',15)+' Ver a semana</button></div>')+'</div>';
 }
 
 /* ==========================================================================
    37. RESUMO DA SEMANA PARA COLAR EM UMA IA (seções escolhidas, texto pronto)
    ========================================================================== */
-const IA_SECS=[['fixos','Eventos fixos (faculdade e saúde)'],['rot','Rotinas, locomoção e compromissos'],['tar','Tarefas pendentes'],['docs','Documentos e o que falta fazer neles'],['hab','Hábitos'],['obj','Objetivos de curto, médio e longo prazo'],['datas','Datas e prazos'],['saude','Saúde'],['cul','Alimentação: estoque, receitas, valores e compras'],['fin','Finanças: contas, dívidas, cartões e entradas'],['itens','Objetos salvos']];
+const IA_SECS=[['fixos','Eventos fixos (faculdade e saúde)'],['rot','Rotinas, locomoção e compromissos'],['tar','Tarefas pendentes'],['docs','Documentos e o que falta fazer neles'],['hab','Hábitos'],['obj','Objetivos de curto, médio e longo prazo'],['datas','Datas e prazos'],['cul','Alimentação: estoque, receitas, valores e compras'],['fin','Finanças: contas, dívidas, cartões e entradas'],['itens','Objetos salvos']];
 const IA_HELP=['Planejamento alimentar conectado ao financeiro','Quando estudar e o que estudar, e de que forma estudar','Quando me locomover, quando acordar, quando me arrumar e o que comer','Metodologia de cada evento, seja ele faltante ou antigo','O que levar em cada dia','Planejamento financeiro: o que pagar, quanto e quando','Tarefas, seus objetivos, quando fazer, metodologia e links úteis','Objetivos de vida, da tarefa e do evento','Auxílio para cumprir os hábitos ou criar hábitos novos','Quando ir para onde (considerando meu endereço e a faculdade)','Quando fazer atividade física e quais fazer','Quando descansar e o que fazer nesse momento','O que comprar no mercado e quando comprar'];
 const IA_ADDR='Santarém (PA), Rua Ipiranga 552, Santana. Faculdade: UEPA Santarém.';
 const IA_INTRO='Atue como gestor e assistente pessoal. Enviei abaixo o resumo da minha semana e sua função é me auxiliar a delimitar quais atividades devo fazer em quais momentos, de que modo, quando estudar e o que estudar, de que forma estudar, quando me arrumar, o que comprar de mercado e quando comprar, o que fazer de alimentação e quando fazer, quando consumir, quando fazer atividades físicas e quais devo fazer, quando descansar e o que fazer nesse momento, o que pagar e quanto pagar, tudo isso focado nos objetivos de curto, médio e longo prazo. Cada item traz todas as informações que tenho cadastradas; onde faltar algo, está escrito que não há informação e você deve delimitar conforme as demais informações.';
@@ -10681,20 +10576,6 @@ function iaDatas(){
     return '- '+fmtDMY(d.date)+(d.time?' às '+d.time:' (sem horário)')+': '+d.title+(d.catId?' ('+dcatChain(d.catId).map(c=>c.name).join(' › ')+')':(d.cat?' ('+d.cat+')':''))+(d.notes?' - '+d.notes:'')+(ts.length?' [tarefas: '+ts.join(', ')+']':'');
   }).join('\n')||'Nenhuma data cadastrada.';
 }
-function iaSaude(ws,we){
-  const hp=S.hprefs,L=[],wk=hList('treino').filter(e=>e.date>=ws&&e.date<=we);
-  L.push('- Exercício nesta semana: '+hm(sumK(wk,'min'))+' em '+wk.length+' sessão(ões)'+(Number(hp.weeklyMin)?' (meta: '+hm(Number(hp.weeklyMin))+')':''));
-  wk.forEach(e=>L.push('  - '+fmtDM(e.date)+': '+hm(e.min||0)+[e.name,e.tipo,e.kind,e.note].filter(Boolean).map(x=>' · '+x).join('')));
-  const sl=hList('sono').filter(e=>e.date>=addISO(todayISO(),-6));
-  const avg=sl.length?sl.reduce((s,e)=>s+(e.dur||sleepDur(e)||0),0)/sl.length:null;
-  L.push('- Sono (últimos 7 dias): '+(avg!=null?'média de '+hm(avg):iaMiss('o sono dos últimos dias'))+(Number(hp.sleepH)?' (meta: '+hp.sleepH+'h)':''));
-  const c=hList('comp')[0];
-  if(c)L.push('- Último peso: '+f1(c.weight)+' kg'+(c.fat!=null?', gordura '+f1(c.fat)+'%':'')+(c.muscle!=null?', músculo '+f1(c.muscle)+' kg':'')+(Number(hp.heightCm)?', altura '+hp.heightCm+' cm, IMC '+f1(c.weight/Math.pow(Number(hp.heightCm)/100,2)):'')+' ('+fmtDM(c.date)+')');
-  else L.push('- Composição corporal: '+iaMiss('o peso e a composição corporal'));
-  const pa=hList('pa')[0];
-  L.push('- Última pressão arterial: '+(pa?pa.sys+'/'+pa.dia+' mmHg ('+paClass(pa.sys,pa.dia)[0]+') em '+fmtDM(pa.date):iaMiss('a pressão arterial')));
-  return L.join('\n');
-}
 function iaCulinaria(ws,we){
   const L=[],all=[0,1,2,3,4,5,6].map(i=>addISO(ws,i)),unit=i=>i&&i.unit||'';
   const est=S.pantry.filter(p=>p.qty>0||p.gosto).map(p=>{const i=ingById(p.ingId);if(!i)return '';return '  - '+i.name+': '+fmtQty(p.qty,i.unit,false)+' em estoque'+(p.gosto?' (quando der vontade)':'');}).filter(Boolean);
@@ -10755,7 +10636,6 @@ function iaBuild(pr){
   if(on('hab'))add('Os meus hábitos, com gatilhos, micro-ações, recompensas e degraus, são:',iaHabitos());
   if(on('obj'))add('Os meus objetivos de vida são (do longo ao curto prazo, cada um contribuindo para o maior):',iaObjetivos());
   if(on('datas'))add('As datas e prazos importantes são:',iaDatas());
-  if(on('saude'))add('Sobre a minha saúde atual, os dados são:',iaSaude(ws,we));
   if(on('cul'))add('Sobre a minha alimentação, estoque, valores e compras:',iaCulinaria(ws,we));
   if(on('fin'))add('Sobre as minhas finanças:',iaFin(ws,we));
   if(on('itens'))add('Os meus objetos que tenho salvo são:',iaItens());
@@ -10788,7 +10668,7 @@ function openIaForm(){
     '<p class="muted small" style="margin:0">Semana de '+fmtDM(ws)+' a '+fmtDM(addISO(ws,6))+'. Escolha o que entra no texto; ele é copiado pronto para colar numa IA.</p>'+
     '<div class="f"><span>O que compartilhar</span>'+pickerHTML('iasec',IA_SECS.map(s=>({id:s[0],label:s[1]})),pr.secs,'Informações')+all('iasec')+'</div>'+
     '<div class="f"><span>Em que quero ajuda</span>'+pickerHTML('iahelp',IA_HELP.map((h,i)=>({id:String(i),label:h})),pr.help.map(String),'Assuntos')+all('iahelp')+'</div>'+
-    '<label class="f">Resumo do que tenho que fazer nesta semana <small>a IA define os melhores horários</small><textarea name="brief" rows="4" placeholder="Escreva em poucas linhas o que precisa acontecer esta semana">'+esc(pr.brief)+'</textarea></label>'+
+    '<label class="f">Resumo do que tenho que fazer nesta semana<textarea name="brief" rows="4" placeholder="Escreva em poucas linhas o que precisa acontecer esta semana">'+esc(pr.brief)+'</textarea></label>'+
     '<label class="chip cb" style="align-self:flex-start"><input type="checkbox" name="pdf" '+(pr.pdf?'checked':'')+'><span>Vou anexar um PDF com as atividades</span></label>'+
     '<p class="muted small" style="margin:0">Para gerar o PDF, use o botão de imprimir da Semana e escolha salvar como PDF.</p>'+
     '<label class="chip cb" style="align-self:flex-start"><input type="checkbox" name="fmt" '+(pr.fmt?'checked':'')+'><span>Pedir a resposta num formato que eu possa colar no site</span></label>'+
@@ -10858,7 +10738,7 @@ const NC={
   snoozed(){try{return JSON.parse(LS.get(this.SKEY)||'[]').filter(x=>x.at>Date.now()-3*36e5);}catch(e){return [];}},
   snooze(x){const l=this.snoozed();l.push(x);LS.set(this.SKEY,JSON.stringify(l.slice(-30)));PUSH.sync(true).catch(()=>{});},
   badge(){
-    const n=this.unread(),b=$('#ncbadge');
+    const n=this.unread()+(typeof ATTN!=='undefined'?ATTN.length:0),b=$('#ncbadge');
     if(b){b.hidden=!n;b.textContent=n>9?'9+':n;}
     try{if(navigator.setAppBadge){n?navigator.setAppBadge(n):navigator.clearAppBadge();}}catch(e){}
   },
@@ -10871,10 +10751,11 @@ const NC={
     const now=Date.now(),soon=ntItems().filter(i=>i.at>now&&i.at<now+864e5).sort((a,b)=>a.at-b.at).slice(0,8),h=this.hist();
     const when=ts=>{const m=Math.round((ts-now)/60000),a=Math.abs(m);const t=a<60?a+' min':a<1440?Math.round(a/60)+' h':Math.round(a/1440)+' d';return m>=0?'em '+t:'há '+t;};
     const ico=k=>({ev:'calendar',pp:'bag',tk:'tasks',dt:'clock',ml:'utensils',hb:'sprout',bl:'wallet'}[String(k).split('|')[0]]||'bell');
-    const row=(x,ts,unread)=>'<button class="ncrow'+(unread?' new':'')+'" data-a="nc-go" data-u="'+esc(x.u||ntUrl(x.k||x.key))+'">'+ic(ico(x.k||x.key),17)+'<span class="nct"><b>'+esc(x.t||x.title)+'</b>'+((x.b||x.body)?'<small>'+esc(String(x.b||x.body).split('\n')[0])+'</small>':'')+'</span><time>'+when(ts)+'</time></button>';
+    const row=(x,ts,unread)=>'<button class="ncrow'+(unread?' new':'')+'" data-a="nc-go" data-u="'+esc(x.u||ntUrl(x.k||x.key))+'">'+ic(ico(x.k||x.key),17)+'<span class="nct"><b>'+esc(x.t||x.title)+'</b>'+((x.b||x.body)?'':'')+'</span><time>'+when(ts)+'</time></button>';
     const perm=window.Notification?Notification.permission:'none';
     openModal('<div class="fh"><h2>Central de avisos</h2><button class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
       (perm!=='granted'?'<div class="ncon">'+ic('bell',18)+'<span>'+(perm==='denied'?'As notificações estão bloqueadas neste navegador. Libere nas configurações do site.':'Ative os avisos para receber lembretes de eventos, tarefas e hábitos.')+'</span>'+(perm==='default'?'<button class="btn primary sm" data-a="nc-enable">Ativar</button>':'')+'</div>':'')+
+      (ATTN.length?'<h5 class="nch">Pendências em destaque</h5><div class="attn-row">'+attnCardsHTML()+'</div>':'')+
       '<h5 class="nch">Próximas 24 horas</h5>'+(soon.length?soon.map(x=>row(x,x.at)).join(''):'<p class="muted small">Nenhum aviso programado.</p>')+
       '<h5 class="nch">Recentes</h5>'+(h.length?h.slice(0,20).map(x=>row(x,x.at,!x.r)).join(''):'<p class="muted small">Nada por aqui ainda.</p>')+
       '<div class="ff"><button class="btn ghost sm" data-a="nc-clear">Limpar histórico</button><span class="sp"></span><button class="btn sm" data-a="nc-settings">'+ic('settings',14)+' Ajustar avisos</button></div>');
@@ -10999,10 +10880,10 @@ function appHTML(){
     '<div class="addrow" style="margin-top:10px">'+(inst?'':'<button class="btn primary" data-a="pwa-install">'+ic('download',15)+' Instalar o app</button>')+(perm!=='granted'?'<button class="btn" data-a="nc-enable">'+ic('bell',15)+' Ativar avisos</button>':'')+'<button class="btn" data-a="nc-open">'+ic('bell',15)+' Central de avisos</button></div>'+
     (PWA.isIOS()&&!inst?'<p class="muted small">No iPhone: abra no Safari, toque em <b>Compartilhar</b> e depois em <b>Adicionar à Tela de Início</b>. Os avisos com o app fechado só funcionam depois disso.</p>':'')+
     '<p class="muted small">Segure o ícone do app na tela inicial para ver os atalhos: Painel, Semana, Tarefas, Hábitos e Notas.</p></div>'+
-    '<div class="card sec"><h3>Widgets nativos no Android</h3><p>Instale o app <b>Rotina Widgets</b> para ter widgets de verdade na tela inicial (Hoje, Semana, Tarefas, Hábitos, Notas e Finanças). Ele lê o resumo que este site grava no Firebase, então mantenha o Firebase conectado em Ajustes › Dados.</p>'+
+    '<div class="card sec"><h3>Widgets nativos no Android</h3>'+
     '<div class="addrow"><a class="btn primary" href="https://github.com/jdibdijdk/site-pessoal/releases/latest/download/rotina-widgets.apk">'+ic('download',15)+' Baixar o app (APK)</a></div>'+
     '<p class="muted small">No celular, permita instalar apps desta fonte quando o Android pedir. Depois segure um espaço vazio da tela inicial › Widgets › Rotina Widgets.</p></div>'+
-    '<div class="card sec"><h3>Widgets da tela inicial</h3><p>Cada frente tem um mini-app minimalista que pode ficar na tela inicial do celular como um ícone próprio. Abra o widget e escolha <b>Instalar</b> (Android) ou <b>Adicionar à Tela de Início</b> (iPhone). Ele mostra o resumo salvo neste aparelho e se atualiza sempre que o app é aberto.</p>'+
+    '<div class="card sec"><h3>Widgets da tela inicial</h3>'+
     '<div class="wglist">'+WG_FRONTS.map(f=>'<a class="wgi" href="'+esc(base+'w/'+f[0]+'/')+'" target="_blank" rel="noopener">'+ic(f[2],20)+'<span><b>'+f[1]+'</b><small>'+f[3]+'</small></span>'+ic('external',15)+'</a>').join('')+'</div>'+
     '<p class="muted small">No Windows 11, os widgets Hoje, Tarefas e Hábitos aparecem no painel de widgets depois de instalar o app pelo Edge.</p></div>';
 }
@@ -11061,7 +10942,7 @@ function mfNote(q,kind,folderId,catId){
   if(kind==='caso'){
     return normNote(Object.assign(base,{type:'caso',title:q.foco||('Caso · '+q.instituicao+' '+q.ano),
       html:enun+'<h3>Alternativas</h3>'+q.alternativas.map(alt).join('')+'<h3>Gabarito: '+esc(q.gabarito||'—')+(q.anulada?' (anulada)':'')+'</h3>'+mfTxt(q.comentario)+
-        '<div style="margin-top:12px"><small>'+esc([q.instituicao+' '+q.ano,'Questão '+q.numero].join(' · '))+'</small></div>',
+        '<div style="margin-top:12px"></div>',
       hyp:ok?[ok.texto]:[],est:[[q.area,q.subarea,q.foco].filter(Boolean).join(' › ')].filter(Boolean)}));
   }
   return normNote(Object.assign(base,{type:'questao',title:'Q'+q.numero+' · '+q.instituicao+' '+q.ano,
@@ -11258,7 +11139,7 @@ function openTplForm(id,catId){
   openModal('<form id="fTpl" class="form"><div class="fh"><h2>'+(id?'Editar modelo':'Novo modelo')+'</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<p class="muted small" style="margin:0">Cole o link de um Google Docs, Planilhas ou Apresentações que sirva de modelo. Ao usar, o Google cria uma cópia na sua conta.</p>'+
     '<label class="f">Link do modelo<input name="url" required inputmode="url" value="'+esc(t.url)+'" placeholder="https://docs.google.com/document/d/…" autocomplete="off"></label>'+
-    '<label class="f">Nome<input name="name" required value="'+esc(t.name)+'" placeholder="Ex.: Relatório de estágio" autocomplete="off"></label>'+
+    '<label class="f">Nome<input name="name" required value="'+esc(t.name)+'" autocomplete="off"></label>'+
     '<div class="fgrid"><div class="f"><span>Categoria</span>'+catPickHTML('tplcat',t.catId)+'</div><label class="f">Pasta dos novos documentos<select name="folder">'+dfolderOptions(t.folderId)+'</select></label></div>'+
     '<label class="chip cb" style="align-self:flex-start"><input type="checkbox" name="pin" '+(t.pinned?'checked':'')+'><span>Fixar em Documentos</span></label>'+
     '<div class="ff">'+(id?'<button type="button" class="btn danger" data-a="tpl-del" data-id="'+id+'">Excluir</button><a class="btn" href="'+esc(normUrl(t.url))+'" target="_blank" rel="noopener">'+ic('external',14)+' Abrir modelo</a>':'')+'<span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
@@ -11347,14 +11228,14 @@ async function slMount(x){
   const box=$('#slHost');if(!box)return;
   let buf=null;
   try{buf=x.fileId?await SLF.get(x.fileId):null;}catch(e){}
-  // salva em outro aparelho: o arquivo (identificado pelo hash) ainda não está aqui, mas já foi enviado ao Drive
+  // salva em outro aparelho: o arquivo (identificado pelo hash) ainda não está aqui, mas já foi enviado ao Storage
   if(x.fileId&&!buf&&x.mid){
     $('#slStatus').textContent='Baixando a apresentação dos outros aparelhos…';
     const n=await pdfPull(x);
     if(n){await SLF.put(x.fileId,n);buf=n;}
   }
   if(!$('#slHost'))return;
-  if(x.fileId&&!buf){$('#slStatus').innerHTML=(WEB_APP_URL&&!x.mid?'O outro aparelho ainda está enviando esta apresentação. <button class="btn sm" data-a="sl-retry">Tentar de novo</button> ':'O arquivo desta apresentação não está neste aparelho. ')+'<button class="btn sm primary" data-a="sl-file">'+ic('upload',14)+' Escolher o .pptx</button>';return;}
+  if(x.fileId&&!buf){$('#slStatus').innerHTML=(RF.ok()&&!x.mid?'O outro aparelho ainda está enviando esta apresentação. <button class="btn sm" data-a="sl-retry">Tentar de novo</button> ':'O arquivo desta apresentação não está neste aparelho. ')+'<button class="btn sm primary" data-a="sl-file">'+ic('upload',14)+' Escolher o .pptx</button>';return;}
   if(buf&&x.fileId&&!x.mid&&!pdfWatch[x.id])pdfPush(x,buf,PPTX_MIME);
   pdfSyncPaint(x);
   slLeave();
@@ -11376,7 +11257,7 @@ async function slHostMessage(d){
     await SLF.put(id,buf);
     if(old&&old!==id&&!S.slides.some(y=>y!==x&&y.fileId===old))SLF.del(old);
     x.fileId=id;SL.buf=buf;x.n=pptxSlideCount(buf)||x.n;x.updated=Date.now();x.thumb='';x.mid='';delete pdfWatch[x.id];save();pdfPush(x,buf,PPTX_MIME);
-    SL.dirty=false;toast('Apresentação salva.');hostStatus(WEB_APP_URL?'Salva. Enviando para os outros aparelhos…':'Salva neste aparelho (sincronização desligada).');
+    SL.dirty=false;toast('Apresentação salva.');hostStatus(RF.ok()?'Salva. Enviando para os outros aparelhos…':'Salva neste aparelho (sincronização desligada).');
   }
 }
 Object.assign(ACT,{
@@ -11466,6 +11347,8 @@ Object.assign(ACT,{
   }
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.nselOn&&$('#modal').hidden){UI.nselOn=false;UI.nsel.clear();renderMain();}});
+
+(function(){const tab0=ACT.tab;ACT.tab=function(el,e){document.body.classList.remove('sb-open');return tab0.call(this,el,e);};})();
 
 /* ==========================================================================
    35. INICIALIZAÇÃO

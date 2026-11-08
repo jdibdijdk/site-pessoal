@@ -1,0 +1,12 @@
+// Regras do Firebase Storage para o site. Publique em: console do Firebase > Storage > Regras.
+// Os arquivos ficam em rotina/<chave>/<id>; só quem conhece a chave consegue ler ou gravar, e não é possível listar a pasta.
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /rotina/hRM2z3YEF6yPtTwKQyFMIAQs551d6Jwh/{file} {
+      allow get: if true;
+      allow create, update: if request.resource.size < 60 * 1024 * 1024;
+      allow list, delete: if false;
+    }
+  }
+}
