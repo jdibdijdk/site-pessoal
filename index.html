@@ -2191,7 +2191,7 @@ html[data-theme="dark"] .inkscroll{background:#2A2E39}
 .inkpage canvas.ink{touch-action:none;cursor:crosshair}
 .inkpage canvas.ilaser,.inkpage .iimgs{pointer-events:none}
 .inkpage .iimgs{position:absolute;inset:0}
-.inkpage.th-dark{background:#1B1E26;--ln:#363D4D}.inkpage.th-sepia{background:#F4ECD8;--ln:#D9CDB0}
+.inkpage.th-dark{background-color:#1B1E26;--ln:#434B5E}.inkpage.th-sepia{background-color:#F4ECD8;--ln:#D2C4A3}
 .th-dark .ibg{filter:invert(.92) hue-rotate(180deg)}.th-sepia .ibg{filter:sepia(.4)}
 .bg-lines{background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--g) - 1px),var(--ln) calc(var(--g) - 1px),var(--ln) var(--g))}
 .bg-grid{background-image:linear-gradient(var(--ln) 1px,transparent 1px),linear-gradient(90deg,var(--ln) 1px,transparent 1px);background-size:var(--g) var(--g)}
@@ -12290,12 +12290,13 @@ function inkViewHTML(x){
     '<button class="ikb" data-a="ink-undo" title="Desfazer" aria-label="Desfazer">'+ic('undo',19)+'</button><button class="ikb" data-a="ink-redo" title="Refazer" aria-label="Refazer">'+ic('redo',19)+'</button><span class="iksep"></span>'+
     '<button class="ikb" data-a="ink-zoom" data-d="-1" title="Diminuir" aria-label="Diminuir">'+ic('zoomOut',19)+'</button><button class="ikz" data-a="ink-zoom100" id="inkZl" title="Voltar a 100%">100%</button><button class="ikb" data-a="ink-zoom" data-d="1" title="Ampliar" aria-label="Ampliar">'+ic('zoomIn',19)+'</button>'+
     '<button class="ikb" data-a="ink-fit" title="Ajustar à largura" aria-label="Ajustar à largura">'+ic('fit',18)+'</button><span class="iksep"></span>'+
-    '<button class="ikm" data-a="ink-mode" id="inkModeB"></button>'+
+    '<button class="ikb" data-a="ink-print" title="Imprimir ou salvar em PDF" aria-label="Imprimir ou salvar em PDF">'+ic('printer',19)+'</button><button class="ikm" data-a="ink-mode" id="inkModeB"></button>'+
     (x.pdf?'':'<button class="ikb" data-a="ink-addpage" title="Nova página" aria-label="Nova página">'+ic('filePlus',19)+'</button>')+
     '<span class="inkmw"><button class="ikb" data-a="ink-menu" title="Mais opções" aria-label="Mais opções">'+ic('more',20)+'</button><div class="inkmenu" id="inkMenu" hidden>'+
       '<label>Tema da página<select data-ink="theme">'+Object.keys(INK_THEMES).map(k=>'<option value="'+k+'" '+(x.theme===k?'selected':'')+'>'+INK_THEMES[k].n+'</option>').join('')+'</select></label>'+
       (x.pdf?'':'<label>Fundo da página<select data-ink="bg">'+INK_BGS.map(b=>'<option value="'+b[0]+'">'+b[1]+'</option>').join('')+'</select></label>')+
       '<button class="btn sm" data-a="ink-fit">'+ic('fit',14)+' Ajustar à largura</button><button class="btn sm" data-a="ink-finger" id="inkFing"></button>'+
+      '<button class="btn sm" data-a="ink-print">'+ic('printer',14)+' Imprimir / salvar em PDF</button>'+
       '<button class="btn sm" data-a="ink-info">'+ic('tag',14)+' Pasta, categoria e assuntos</button>'+
       '<button class="btn sm danger" data-a="ink-del">'+ic('trash',14)+' Excluir caderno</button></div></span></div>'+
     '<div class="inktools" id="inkTools">'+INK_TOOLS.map(tb).join('')+'<span class="iksep"></span><button class="ikb" id="inkRulerB" data-a="ink-ruler" title="Régua" aria-label="Régua">'+ic('igRuler',19)+'</button></div>'+
@@ -12405,9 +12406,16 @@ function inkVarStroke(ctx,s){ // largura variável: um trecho por ponto, curvas 
   }
   ctx.lineWidth=inkPW(s,p[(n-1)*3+2]);ctx.beginPath();ctx.moveTo(mx,my);ctx.lineTo(p[(n-1)*3],p[(n-1)*3+1]);ctx.stroke();
 }
+function inkCol(c,t,th){ // tinta preta no fundo escuro vira clara (e vice-versa), só na exibição
+  const m=/^#([0-9a-f]{6})$/i.exec(c||'');if(!m||t==='hl')return c;
+  const n=parseInt(m[1],16),l=(.299*((n>>16)&255)+.587*((n>>8)&255)+.114*(n&255))/255;
+  if(th==='dark'&&l<.25)return '#F2F2F2';
+  if(th!=='dark'&&l>.9)return '#16181D';
+  return c;
+}
 function inkStroke(ctx,s,th){ // o contexto já está na escala da página
-  const p=s.p;if(!p.length)return;
-  ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=s.c;ctx.fillStyle=s.c;
+  const p=s.p;if(!p.length)return;const col=inkCol(s.c,s.t,th);
+  ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=col;ctx.fillStyle=col;
   if(s.t==='hl'){ctx.globalAlpha=.38;ctx.lineCap='butt';ctx.lineWidth=s.w;if(th!=='dark')ctx.globalCompositeOperation='multiply';inkPathSmooth(ctx,p);ctx.stroke();}
   else if(s.t==='pencil'){
     ctx.globalAlpha=.62;ctx.lineWidth=s.w;inkPathSmooth(ctx,p,s.sh);ctx.stroke();
@@ -12653,6 +12661,10 @@ function inkPinchMove(){
     inkZoomAt(q.z,q.cx,q.cy);sc.scrollLeft-=q.dx;sc.scrollTop-=q.dy;INK.pages.forEach((P,i)=>inkWindow(i,false));inkSelPos();
   });
 }
+const inkPenBtn=e=>e.pointerType==='pen'&&((e.buttons&2)||(e.buttons&32)||e.button===5);
+function inkTmpUI(on){INK.tmpErase=on;$$('#inkRoot .inkt').forEach(b=>b.classList.toggle('on',on?b.dataset.t==='erase':b.dataset.t===INK.tool));const sc=$('#inkScroll');if(sc)sc.dataset.tool=INK.mode==='view'?'hand':(on?'erase':INK.tool);}
+function inkEndErase(){const er=INK.er;if(!er)return;INK.er=null;if(er.tmp)inkTmpUI(false);if(er.del.length){INK.undo.push({k:'multi',list:er.del.map(d=>({k:'stroke',t:'del',i:er.i,s:d.s,at:d.at}))});INK.redo=[];inkDirty();}}
+document.addEventListener('contextmenu',e=>{if(INK.x&&e.target.closest&&e.target.closest('#inkStage'))e.preventDefault();});
 document.addEventListener('pointerdown',e=>{
   if(!INK.x)return;const t=e.target;if(!t||!t.closest)return;
   const edit=INK.mode==='edit';
@@ -12669,9 +12681,10 @@ document.addEventListener('pointerdown',e=>{
   }
   const pan=!edit||INK.tool==='hand'||(e.pointerType==='touch'&&(!INK.fing||Date.now()-INK.penAt<2500));
   if(pan){const sc=$('#inkScroll');INK.scr={x:e.clientX,y:e.clientY,l:sc.scrollLeft,t:sc.scrollTop};try{cv.setPointerCapture(e.pointerId);}catch(er){}return;}
-  if(INK.tool==='img'){inkPickImage(i);return;}
+  if(INK.tool==='img'&&!inkPenBtn(e)){inkPickImage(i);return;}
   e.preventDefault();try{cv.setPointerCapture(e.pointerId);}catch(er){}
   const pt=inkPos(e,P);
+  if(inkPenBtn(e)&&INK.tool!=='erase'){INK.er={i:i,del:[],tmp:true,pid:e.pointerId};inkTmpUI(true);inkErase(i,pt);return;} // botão da S Pen: borracha enquanto apertado
   if(INK.tool==='laser'){INK.trail=[{x:pt[0],y:pt[1],t:Date.now(),i:i}];INK.lz={i:i};INK.laserOn=true;inkLaserLoop();return;}
   if(INK.tool==='erase'){INK.er={i:i,del:[]};inkErase(i,pt);return;}
   if(INK.tool==='sel'||INK.tool==='lasso'){inkSelClear();INK.sm={i:i,mode:INK.tool==='sel'?'rect':'lasso',a:pt,b:pt,pts:[pt],pid:e.pointerId};return;}
@@ -12685,6 +12698,14 @@ document.addEventListener('pointerdown',e=>{
 });
 document.addEventListener('pointermove',e=>{
   if(!INK.x)return;
+  if(e.pointerType==='pen'&&INK.mode==='edit'){
+    const held=!!inkPenBtn(e);
+    if(held&&!INK.er&&INK.cur&&e.pointerId===INK.cur.pid){ // apertou o botão no meio do traço: descarta o traço e apaga
+      const c=INK.cur,P0=INK.pages[c.i];INK.cur=null;if(P0&&P0.win){P0.lctx.setTransform(1,0,0,1,0,0);P0.lctx.clearRect(0,0,P0.lz.width,P0.lz.height);inkDraw(c.i);}
+      INK.er={i:c.i,del:[],tmp:true,pid:e.pointerId};inkTmpUI(true);
+    }
+    if(INK.er&&INK.er.tmp&&!held){inkEndErase();return;} // soltou o botão: a caneta volta
+  }
   if(e.pointerType==='touch'&&INK.tp.has(e.pointerId)){INK.tp.set(e.pointerId,{x:e.clientX,y:e.clientY});}
   if(INK.pinch&&INK.tp.size>=2){inkPinchMove();return;}
   if(INK.pinchHold&&e.pointerType==='touch')return;
@@ -12712,7 +12733,7 @@ document.addEventListener('pointermove',e=>{
     const p=c.s.p;p.push(q(x),q(y),pr);drew=true;
     if(c.s.t==='hl'||c.s.t==='pencil')return;
     const n=p.length/3;
-    inkTf(P,ctx);ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=c.s.c;
+    inkTf(P,ctx);ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=inkCol(c.s.c,c.s.t,INK.x.theme);
     while(c.j+1<=n-2){const j=c.j+1,nx=(p[j*3]+p[j*3+3])/2,ny=(p[j*3+1]+p[j*3+4])/2;ctx.lineWidth=inkPW(c.s,p[j*3+2]);ctx.beginPath();ctx.moveTo(c.m[0],c.m[1]);ctx.quadraticCurveTo(p[j*3],p[j*3+1],nx,ny);ctx.stroke();c.m=[nx,ny];c.j=j;}
     ctx.restore();
   });
@@ -12738,7 +12759,7 @@ function inkUp(e){
     return;
   }
   if(INK.lz){INK.lz=null;return;}
-  if(INK.er){const er=INK.er;INK.er=null;if(er.del.length){INK.undo.push({k:'multi',list:er.del.map(d=>({k:'stroke',t:'del',i:er.i,s:d.s,at:d.at}))});INK.redo=[];inkDirty();}return;}
+  if(INK.er){const er=INK.er;INK.er=null;if(er.tmp)inkTmpUI(false);if(er.del.length){INK.undo.push({k:'multi',list:er.del.map(d=>({k:'stroke',t:'del',i:er.i,s:d.s,at:d.at}))});INK.redo=[];inkDirty();}return;}
   const c=INK.cur;if(!c||!INK.x)return;INK.cur=null;
   if(e.pointerId!==c.pid)return;
   const pg=INK.x.pages[c.i];pg.strokes=pg.strokes||[];pg.strokes.push(c.s);
@@ -12805,13 +12826,74 @@ document.addEventListener('keydown',e=>{
     else if(e.key==='+'||e.key==='='){e.preventDefault();ACT['ink-zoom']({dataset:{d:'1'}});}
     else if(e.key==='-'){e.preventDefault();ACT['ink-zoom']({dataset:{d:'-1'}});}
     else if(e.key==='0'){e.preventDefault();ACT['ink-zoom100']();}
+    else if(e.key==='p'||e.key==='P'){e.preventDefault();ACT['ink-print']();}
     return;
   }
   if((e.key==='Delete'||e.key==='Backspace')&&INK.sel){e.preventDefault();ACT['ink-seldel']();}
   else if(e.key==='Escape'&&INK.sel)inkSelClear();
 });
 window.addEventListener('resize',()=>{if(INK.x)INK.pages.forEach((P,i)=>inkWindow(i,true));});
+const INK_PRINT_CSS=`#print-root{display:none}
+@media print{
+@page{size:A4;margin:0}
+html,body{background:#fff!important}
+body>*:not(#print-root){display:none!important}
+body>#print-root{display:block!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#print-root .ipg{width:210mm;height:297mm;overflow:hidden;break-after:page;page-break-after:always;background:var(--pbg,#fff)}
+#print-root .ipg:last-child{break-after:auto;page-break-after:auto}
+#print-root .ipg img{display:block;width:100%;height:100%;object-fit:contain}
+}`;
+async function inkRenderPage(i,th,pautas){
+  const x=INK.x,pg=x.pages[i],K=2,W=INK_W,H=inkPH(x,pg),cv=document.createElement('canvas');cv.width=W*K;cv.height=Math.round(H*K);
+  const ctx=cv.getContext('2d'),T=INK_THEMES[th]||INK_THEMES.light;
+  ctx.fillStyle=T.bg;ctx.fillRect(0,0,cv.width,cv.height);
+  if(pg.bg==='pdf'&&INK.pdfDoc){
+    try{
+      const page=await INK.pdfDoc.getPage(pg.pn),vp=page.getViewport({scale:W*K/page.getViewport({scale:1}).width}),tmp=document.createElement('canvas');tmp.width=Math.round(vp.width);tmp.height=Math.round(vp.height);
+      await page.render({canvasContext:tmp.getContext('2d'),viewport:vp}).promise;
+      if(th==='dark'||th==='sepia'){
+        if('filter' in ctx){ctx.filter=th==='dark'?'invert(.92) hue-rotate(180deg)':'sepia(.4)';ctx.drawImage(tmp,0,0,cv.width,cv.height);ctx.filter='none';}
+        else{const d=tmp.getContext('2d'),id=d.getImageData(0,0,tmp.width,tmp.height),a=id.data;if(th==='dark')for(let k=0;k<a.length;k+=4){a[k]=255-a[k];a[k+1]=255-a[k+1];a[k+2]=255-a[k+2];}d.putImageData(id,0,0);ctx.drawImage(tmp,0,0,cv.width,cv.height);}
+      }else ctx.drawImage(tmp,0,0,cv.width,cv.height);
+    }catch(e){}
+  }else if(pautas&&pg.bg&&pg.bg!=='blank'){
+    ctx.setTransform(K,0,0,K,0,0);const g=26;ctx.strokeStyle=T.line;ctx.fillStyle=T.line;ctx.lineWidth=1;
+    if(pg.bg==='lines'){ctx.beginPath();for(let y=g;y<=H;y+=g){ctx.moveTo(0,y-.5);ctx.lineTo(W,y-.5);}ctx.stroke();}
+    else if(pg.bg==='grid'){ctx.beginPath();for(let y=g;y<=H;y+=g){ctx.moveTo(0,y-.5);ctx.lineTo(W,y-.5);}for(let xx=g;xx<=W;xx+=g){ctx.moveTo(xx-.5,0);ctx.lineTo(xx-.5,H);}ctx.stroke();}
+    else if(pg.bg==='dots'){for(let y=g;y<=H;y+=g)for(let xx=g;xx<=W;xx+=g){ctx.beginPath();ctx.arc(xx,y,1.3,0,7);ctx.fill();}}
+  }
+  ctx.setTransform(K,0,0,K,0,0);
+  for(const m of (pg.imgs||[])){
+    try{const im=await new Promise((res,rej)=>{const q=new Image();q.onload=()=>res(q);q.onerror=rej;q.src=m.src;});ctx.drawImage(im,m.x,m.y,m.w,m.w*im.naturalHeight/im.naturalWidth);}catch(e){}
+  }
+  (pg.strokes||[]).forEach(s=>inkStroke(ctx,s,th));
+  return cv;
+}
+async function inkPrint(o){
+  const x=INK.x;if(!x)return;toast('Preparando a impressão…');
+  const th=o.tema==='auto'?(x.theme||'light'):o.tema,T=INK_THEMES[th]||INK_THEMES.light,idx=o.so==='atual'?[inkCurPage()]:x.pages.map((_,i)=>i),urls=[];
+  for(const i of idx){const cv=await inkRenderPage(i,th,o.pautas);const b=await new Promise(r=>cv.toBlob(r,'image/png'));urls.push(URL.createObjectURL(b));}
+  const old=document.getElementById('print-root');if(old)old.remove();
+  let st=document.getElementById('ink-print-css');if(!st){st=document.createElement('style');st.id='ink-print-css';document.head.appendChild(st);}st.textContent=INK_PRINT_CSS;
+  const raiz=document.createElement('div');raiz.id='print-root';raiz.style.setProperty('--pbg',T.bg);
+  raiz.innerHTML=urls.map(u=>'<div class="ipg"><img src="'+u+'" alt=""></div>').join('');document.body.appendChild(raiz);
+  await Promise.all([...raiz.querySelectorAll('img')].map(im=>im.decode().catch(()=>{})));
+  const limpar=()=>{window.removeEventListener('afterprint',limpar);raiz.remove();urls.forEach(u=>URL.revokeObjectURL(u));};
+  window.addEventListener('afterprint',limpar);
+  await new Promise(r=>setTimeout(r,60));window.print();
+}
 Object.assign(ACT,{
+  'ink-print'(){
+    const x=INK.x;if(!x)return;const m=$('#inkMenu');if(m)m.hidden=true;const n=x.pages.length;
+    openModal('<form id="fInkPrint" class="form"><div class="fh"><h2>Imprimir ou salvar em PDF</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
+      '<label class="f">Tema da impressão<select name="tema"><option value="auto">Igual ao caderno ('+esc((INK_THEMES[x.theme||'light']||INK_THEMES.light).n)+')</option><option value="light">Modo claro (fundo branco)</option><option value="dark">Modo escuro (fundo escuro)</option></select></label>'+
+      '<label class="f">Páginas<select name="so"><option value="todas">Todas ('+n+')</option><option value="atual">Só a página que estou vendo</option></select></label>'+
+      '<label class="chip cb"><input type="checkbox" name="pautas" checked><span>Incluir pautas, quadriculado ou pontos</span></label>'+
+      '<p class="muted small">Na tela de impressão, escolha a impressora ou "Salvar como PDF". Ative "Gráficos de plano de fundo" se o navegador perguntar.</p>'+
+      '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">'+ic('printer',14)+' Continuar</button></div></form>');
+    const f=$('#fInkPrint');
+    f.addEventListener('submit',ev=>{ev.preventDefault();const E=f.elements,o={tema:E.tema.value,so:E.so.value,pautas:E.pautas.checked};closeModal();setTimeout(()=>inkPrint(o).catch(e=>toast('Não consegui preparar a impressão: '+((e&&e.message)||e))),180);});
+  },
   'ink-new'(){const x=inkNew();S.inks.push(x);save();INK.mode='edit';UI.tab='notas';UI.nview={type:'ink',id:x.id};renderTabs();renderMain();window.scrollTo(0,0);},
   'ink-pdf'(){const f=$('#inkPdfFile');f.value='';f.click();},
   'ink-back'(){inkLeave();INK.mode='edit';UI.nview=null;renderMain();},
