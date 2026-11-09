@@ -797,7 +797,7 @@ a.ref[data-k=note],a.ref[data-k=pdf]{background:#E1F3F6;color:#1F7A8C}
 .ntb .cs{width:20px;height:20px;border-radius:50%;border:2px solid var(--card);box-shadow:0 0 0 1px var(--line3);padding:0;align-self:center;transition:transform .15s}
 .ntb .cs:hover{transform:scale(1.25)}
 .ntb input[type=color]{width:30px;height:30px;padding:1px;border:1px solid var(--line3);border-radius:8px;background:var(--card);align-self:center;cursor:pointer}
-.ned img{max-width:100%;height:auto;border-radius:8px;margin:6px 0;display:inline-block;vertical-align:bottom}
+.ned img{max-width:100%;height:auto;border-radius:14px;margin:6px 0;display:inline-block;vertical-align:bottom}
 .ned.editing img{cursor:pointer}
 .ned img.imgL{float:left;margin:4px 14px 8px 0;display:block}
 .ned img.imgR{float:right;margin:4px 0 8px 14px;display:block}
@@ -2416,6 +2416,21 @@ html[data-theme="dark"] mark.hl{background:color-mix(in srgb,var(--c) 45%,transp
 .prn .prh-row h1{flex:1;min-width:0;margin:0}
 .prn .prh-logo{flex:none;display:flex;align-items:center;gap:2mm;font-weight:800;font-size:10pt;color:var(--pd,#1E3A6B);letter-spacing:-.01em;line-height:1}
 .prn .prh-logo svg{width:8mm;height:8mm}
+
+.ned figure.nfig{display:inline-block;vertical-align:bottom;margin:6px 0;max-width:100%;text-align:center}
+.ned figure.nfig img{display:block;width:100%;margin:0;float:none}
+.ned figure.nfig figcaption{font-size:.8em;line-height:1.35;color:var(--mut);margin-top:5px;text-align:center}
+.ned figure.imgL{float:left;margin:4px 14px 8px 0}.ned figure.imgR{float:right;margin:4px 0 8px 14px}
+.ned figure.imgC{float:none;display:block;margin:10px auto}
+.ned figure.imgF{float:none;display:block;margin:10px 0;width:100%!important}
+.ned figure.nfig img.sel{outline:2px solid var(--em);outline-offset:2px}
+@media(max-width:560px){.ned figure.imgL,.ned figure.imgR{float:none;display:block;margin:10px auto}}
+.prn.pk .ned img.imgF{display:block;margin:0 auto;width:100%}
+.prn.pk .ned figure.nfig{float:none;display:block;margin:.5em auto;max-width:100%;break-inside:avoid}
+.prn.pk .ned figure.nfig.imgF,.prn.pk .ned figure.nfig.imgC{width:100%!important}
+.prn.pk .ned figure.nfig img{border-radius:14px}
+.prn.pk .ned figure.nfig figcaption{font-size:.78em;color:#6b7280;margin-top:.35em;text-align:center}
+.prn.pk .pfull{text-align:center}.prn.pk .pfull figure.nfig{margin:0 auto}
 </style>
 </head>
 <body>
@@ -5387,8 +5402,8 @@ function folderOptions(sel,skip){
   walk('',0);return out.join('');
 }
 // Limpa o HTML das notas: só formatação simples (cor e tamanho do texto, imagens), sem scripts
-const STYLE_TAGS={SPAN:1,IMG:1,P:1,DIV:1,H1:1,H2:1,H3:1,H4:1,LI:1,UL:1,OL:1,BLOCKQUOTE:1,TD:1,TH:1,TABLE:1},CSS_COLOR=/^(#[0-9a-f]{3,8}|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(,\s*[\d.]+\s*)?\))$/,BLK_RE=/^(P|DIV|H1|H2|H3|H4|LI|UL|OL|BLOCKQUOTE)$/;
-const OK_TAGS={B:1,STRONG:1,I:1,EM:1,U:1,UL:1,OL:1,LI:1,P:1,DIV:1,BR:1,SPAN:1,A:1,H1:1,H2:1,H3:1,H4:1,MARK:1,HR:1,BLOCKQUOTE:1,IMG:1,TABLE:1,THEAD:1,TBODY:1,TR:1,TD:1,TH:1,SUP:1};
+const STYLE_TAGS={SPAN:1,IMG:1,FIGURE:1,P:1,DIV:1,H1:1,H2:1,H3:1,H4:1,LI:1,UL:1,OL:1,BLOCKQUOTE:1,TD:1,TH:1,TABLE:1},CSS_COLOR=/^(#[0-9a-f]{3,8}|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(,\s*[\d.]+\s*)?\))$/,BLK_RE=/^(P|DIV|H1|H2|H3|H4|LI|UL|OL|BLOCKQUOTE)$/;
+const OK_TAGS={B:1,STRONG:1,I:1,EM:1,U:1,UL:1,OL:1,LI:1,P:1,DIV:1,BR:1,SPAN:1,A:1,H1:1,H2:1,H3:1,H4:1,MARK:1,HR:1,BLOCKQUOTE:1,IMG:1,FIGURE:1,FIGCAPTION:1,TABLE:1,THEAD:1,TBODY:1,TR:1,TD:1,TH:1,SUP:1};
 function cleanStyle(tag,text){
   const out=[],blk=BLK_RE.test(tag);
   String(text||'').split(';').forEach(d=>{
@@ -5396,7 +5411,7 @@ function cleanStyle(tag,text){
     const k=d.slice(0,i).trim().toLowerCase(),v=d.slice(i+1).trim().toLowerCase();
     if(tag==='SPAN'&&k==='color'&&/^(#[0-9a-f]{3,8}|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(,\s*[\d.]+\s*)?\))$/.test(v))out.push('color:'+v);
     else if(tag==='SPAN'&&k==='font-size'&&/^\d{1,2}(\.\d)?px$/.test(v)&&parseFloat(v)>=8&&parseFloat(v)<=72)out.push('font-size:'+v);
-    else if(tag==='IMG'&&k==='width'&&/^\d{2,4}px$/.test(v))out.push('width:'+v);
+    else if((tag==='IMG'||tag==='FIGURE')&&k==='width'&&/^\d{2,4}px$/.test(v))out.push('width:'+v);
     else if(blk&&k==='text-align'&&/^(left|right|center|justify)$/.test(v))out.push('text-align:'+v);
     else if(blk&&k==='line-height'&&/^\d(\.\d{1,2})?$/.test(v)&&parseFloat(v)>=0.8&&parseFloat(v)<=4)out.push('line-height:'+v);
     else if((blk||tag==='IMG')&&(k==='margin-top'||k==='margin-bottom')&&/^\d{1,3}(\.\d{1,2})?px$/.test(v)&&parseFloat(v)<=200)out.push(k+':'+v);
@@ -5444,12 +5459,14 @@ function cleanHTML(html,opt){
         if(t==='A'&&(n==='data-ref'||n==='data-k'||n==='contenteditable'||n==='target'||n==='rel'))keep=true;
         if(t==='A'&&n==='href'&&/^https?:/i.test(at.value))keep=true;
         if(t==='IMG'&&(n==='src'||n==='alt'))keep=true;
+        if(t==='FIGURE'&&n==='class'){const cl=at.value.split(/\s+/).filter(c=>c==='nfig'||c==='imgL'||c==='imgR'||c==='imgC'||c==='imgF');if(cl.length)ch.setAttribute('class',cl.join(' '));else ch.removeAttribute('class');return;}
         if(t==='IMG'&&n==='class'){{const cl=at.value.split(/\s+/).filter(c=>c==='gif'||c==='imgL'||c==='imgR'||c==='imgC'||c==='imgF');if(cl.length)ch.setAttribute('class',cl.join(' '));else ch.removeAttribute('class');}return;}
         if(n==='style'&&STYLE_TAGS[t]&&!opt.plain){const st=cleanStyle(t,at.value);if(st){ch.setAttribute('style',st);}else ch.removeAttribute('style');return;}
         if(!keep)ch.removeAttribute(n);
       });
       if(ch.tagName==='A'&&ch.getAttribute('href')){ch.setAttribute('target','_blank');ch.setAttribute('rel','noopener');}
       if(objH)ch.setAttribute('contenteditable','false');
+      if(ch.tagName==='FIGURE'&&!opt.plain)ch.setAttribute('contenteditable','false');
       if(ch.tagName==='SUP'){if(ch.hasAttribute('data-t')){ch.setAttribute('class','fnm');ch.setAttribute('contenteditable','false');if(!ch.hasAttribute('data-k'))ch.setAttribute('data-k','exp');}else{while(ch.firstChild)node.insertBefore(ch.firstChild,ch);ch.remove();}}
     });
   };
@@ -5735,7 +5752,7 @@ function noteViewHTML(n){
       '<div class="f"><span>Contagem regressiva <small>data e nome</small></span><div class="frow" style="flex-wrap:nowrap"><input type="date" id="ncd" value="'+esc((n.cd&&n.cd.date)||'')+'" style="flex:1"><input id="ncdl" value="'+esc((n.cd&&n.cd.label)||'')+'" style="flex:1" autocomplete="off"><button type="button" class="icon-btn sm" data-a="n-cd-clear" title="Remover contagem" aria-label="Remover contagem">'+ic('x',14)+'</button></div></div></div>'+
       (isQ?qEditMetaHTML(n):'')+(isF?'':noteToolbarHTML());
   }else{
-    h+='<h2 class="vt" style="margin-top:4px">'+nkBadge(n,20)+esc(n.title||(isQ?'Questão':isC?'Caso clínico':isF?'Fluxograma':isB?'Bulário':'Sem título'))+'</h2><div class="nmetarow" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px;align-items:center">'+(isQ?'<span class="tag outline">Questão</span>':isC?'<span class="tag outline">Caso clínico</span>':isF?'<span class="tag outline">Fluxograma</span>':isB?'<span class="tag outline">'+(n.kind==='classe'?'Classe':'Medicamento')+'</span>':'')+(isQ?qMetaChips(n):'')+(n.catId?tagHTML(n.catId):'')+cdChipHTML(n.cd)+noteTags(n).map(tagChip).join('')+(n.folderId?'<span class="meta mi" style="font-size:13px;color:var(--mut)">'+ic('folder',13)+esc(folderPath(n.folderId).join(' › '))+'</span>':'')+'<span class="muted small">Atualizada '+(n.updated?fmtDM(toISO(new Date(n.updated))):'')+'</span></div>';
+    h+='<h2 class="vt" style="margin-top:4px">'+nkBadge(n,20)+esc(n.title||(isQ?'Questão':isC?'Caso clínico':isF?'Fluxograma':isB?'Bulário':'Sem título'))+'</h2><div class="nmetarow" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px;align-items:center">'+(isQ?'<span class="tag outline">Questão</span>':isC?'<span class="tag outline">Caso clínico</span>':isF?'<span class="tag outline">Fluxograma</span>':isB?'<span class="tag outline">'+(n.kind==='classe'?'Classe':'Medicamento')+'</span>':'')+(isQ?qMetaChips(n):'')+(n.catId?tagHTML(n.catId):'')+(typeof focoChips==='function'&&focoIdsOf(n).length?'<span class="nfocos" style="display:inline-flex;gap:6px;flex-wrap:wrap">'+focoChips(n)+'</span>':'')+cdChipHTML(n.cd)+noteTags(n).map(tagChip).join('')+(n.folderId?'<span class="meta mi" style="font-size:13px;color:var(--mut)">'+ic('folder',13)+esc(folderPath(n.folderId).join(' › '))+'</span>':'')+'<span class="muted small">Atualizada '+(n.updated?fmtDM(toISO(new Date(n.updated))):'')+'</span></div>';
   }
   const ed=(f,id,ph)=>{
     const dec=edit?null:noteDecorate(n[f]||'',UI.prOpt);
@@ -7258,14 +7275,32 @@ function selectImg(im){
   IMGSEL=im||null;if(!im)return;
   im.classList.add('sel');
   const bar=document.createElement('div');bar.id='imgbar';
-  bar.innerHTML=[25,50,75,100].map(p=>'<button data-a="img-w" data-p="'+p+'" title="'+p+'% da largura">'+p+'%</button>').join('')+'<span class="sepv"></span><button data-a="img-step" data-d="-1" title="Menor" aria-label="Menor">−</button><button data-a="img-step" data-d="1" title="Maior" aria-label="Maior">+</button><span class="sepv"></span>'+[['imgL','Imagem à esquerda, texto à direita','alignL'],['imgR','Imagem à direita, texto à esquerda','alignR'],['imgC','Centralizada, sem texto ao lado','alignC'],['','Em linha com o texto','minus'],['imgF','Largura total','alignJ']].map(x=>'<button data-a="img-pos" data-v="'+x[0]+'" title="'+x[1]+'" aria-label="'+x[1]+'">'+ic(x[2],15)+'</button>').join('')+'<span class="sepv"></span><button data-a="img-del" title="Remover imagem" aria-label="Remover imagem">'+ic('trash',15)+'</button>';
+  bar.innerHTML=[25,50,75,100].map(p=>'<button data-a="img-w" data-p="'+p+'" title="'+(p===100?'100%: inteira e centralizada (na impressão ocupa a largura toda)':p+'% da largura')+'">'+p+'%</button>').join('')+'<span class="sepv"></span><button data-a="img-step" data-d="-1" title="Menor" aria-label="Menor">−</button><button data-a="img-step" data-d="1" title="Maior" aria-label="Maior">+</button><span class="sepv"></span>'+[['imgL','Imagem à esquerda, texto à direita','alignL'],['imgR','Imagem à direita, texto à esquerda','alignR'],['imgC','Centralizada, sem texto ao lado','alignC'],['','Em linha com o texto','minus'],['imgF','Largura total','alignJ']].map(x=>'<button data-a="img-pos" data-v="'+x[0]+'" title="'+x[1]+'" aria-label="'+x[1]+'">'+ic(x[2],15)+'</button>').join('')+'<span class="sepv"></span><button data-a="img-cap" title="Legenda abaixo da imagem (opcional)" aria-label="Legenda">'+ic('msg',15)+' Legenda</button><button data-a="img-del" title="Remover imagem" aria-label="Remover imagem">'+ic('trash',15)+'</button>';
   const h=document.createElement('div');h.id='imgh';h.title='Arraste para redimensionar';
   document.body.appendChild(bar);document.body.appendChild(h);posImgUI();
 }
+const imgHost=im=>im.closest('figure.nfig')||im;
 function imgWidth(px){
-  if(!IMGSEL)return;const maxW=((IMGSEL.closest('.ned')||{}).clientWidth||600)-4;
-  IMGSEL.style.width=Math.max(40,Math.min(maxW,Math.round(px)))+'px';IMGSEL.removeAttribute('width');
+  if(!IMGSEL)return;const maxW=((IMGSEL.closest('.ned')||{}).clientWidth||600)-4,h=imgHost(IMGSEL);
+  h.classList.remove('imgF');h.style.width=Math.max(40,Math.min(maxW,Math.round(px)))+'px';IMGSEL.removeAttribute('width');
   posImgUI();onNoteInput();
+}
+function imgCaption(im,text){ // legenda opcional: a imagem vira <figure class="nfig"> (posição e largura passam para a figure)
+  text=String(text||'').trim();let fig=im.closest('figure.nfig');const POS=['imgL','imgR','imgC','imgF'];
+  if(text){
+    if(!fig){
+      fig=document.createElement('figure');fig.className='nfig';fig.setAttribute('contenteditable','false');
+      POS.forEach(c=>{if(im.classList.contains(c)){fig.classList.add(c);im.classList.remove(c);}});
+      if(im.style.width){fig.style.width=im.style.width;im.style.width='';}
+      im.replaceWith(fig);fig.append(im,document.createElement('figcaption'));
+    }
+    fig.querySelector('figcaption').textContent=text;
+  }else if(fig){
+    POS.forEach(c=>{if(fig.classList.contains(c))im.classList.add(c);});
+    if(fig.style.width)im.style.width=fig.style.width;
+    fig.replaceWith(im);
+  }
+  selectImg(im);onNoteInput();
 }
 document.addEventListener('click',e=>{
   if(!e.target.closest)return;
@@ -7306,10 +7341,21 @@ Object.assign(ACT,{
   'n-size'(el){noteSize(Number(el.dataset.d));},
   'n-color'(el){noteColor(el.dataset.c);},
   'n-img'(){saveRange();$('#imgFile').click();},
-  'img-pos'(el){if(!IMGSEL)return;['imgL','imgR','imgC','imgF'].forEach(c=>IMGSEL.classList.remove(c));if(el.dataset.v)IMGSEL.classList.add(el.dataset.v);if(el.dataset.v==='imgF')IMGSEL.style.width='';posImgUI();onNoteInput();},
-  'img-w'(el){if(IMGSEL)imgWidth(((((IMGSEL.closest('.ned')||{}).clientWidth)||600)-4)*Number(el.dataset.p)/100);},
+  'img-pos'(el){if(!IMGSEL)return;const h=imgHost(IMGSEL);['imgL','imgR','imgC','imgF'].forEach(c=>h.classList.remove(c));if(el.dataset.v)h.classList.add(el.dataset.v);if(el.dataset.v==='imgF')h.style.width='';posImgUI();onNoteInput();},
+  'img-cap'(){
+    if(!IMGSEL)return;const im=IMGSEL,fig=im.closest('figure.nfig'),cur=fig?(fig.querySelector('figcaption')||{}).textContent||'':'';
+    openModal('<form id="fImgCap" class="form"><div class="fh"><h2>Legenda da imagem</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div><label class="f"><span>Texto abaixo da imagem <small>(opcional)</small></span><input name="v" value="'+esc(cur)+'" autocomplete="off" maxlength="200"></label><div class="ff">'+(cur?'<button type="button" class="btn danger" id="capDel">Retirar legenda</button>':'')+'<span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
+    const f=$('#fImgCap');f.addEventListener('submit',e=>{e.preventDefault();const v=f.elements.v.value;closeModal();imgCaption(im,v);});
+    const d=$('#capDel');if(d)d.addEventListener('click',()=>{closeModal();imgCaption(im,'');});
+    setTimeout(()=>{const i=$('#fImgCap input');if(i)i.focus();},40);
+  },
+  'img-w'(el){
+    if(!IMGSEL)return;const p=Number(el.dataset.p),h=imgHost(IMGSEL);
+    if(p>=100){['imgL','imgR','imgC'].forEach(c=>h.classList.remove(c));h.classList.add('imgF');h.style.width='';IMGSEL.removeAttribute('width');posImgUI();onNoteInput();return;}
+    imgWidth(((((IMGSEL.closest('.ned')||{}).clientWidth)||600)-4)*p/100);
+  },
   'img-step'(el){if(IMGSEL)imgWidth(IMGSEL.getBoundingClientRect().width*(1+0.15*Number(el.dataset.d)));},
-  'img-del'(){if(!IMGSEL)return;const im=IMGSEL;selectImg(null);im.remove();onNoteInput();}
+  'img-del'(){if(!IMGSEL)return;const im=IMGSEL,h=imgHost(im);selectImg(null);h.remove();onNoteInput();}
 });
 
 /* ==========================================================================
@@ -8697,7 +8743,11 @@ function printNote(id){ // abre as opções de impressão
 function prUnits(n,o){
   const d=noteDecorate(n.html||'',o),bx=document.createElement('div');bx.innerHTML=d.html;
   if(!o.img)$$('img',bx).forEach(e=>e.remove());
-  Array.from(bx.children).forEach(k=>{if(k.tagName==='TABLE'||k.tagName==='FIGURE'||(k.querySelector&&k.querySelector('img')&&!(k.textContent||'').trim()))k.classList.add('pfull');});
+  if(!o.img)$$('figure.nfig',bx).forEach(e=>e.remove());
+  Array.from(bx.children).forEach(k=>{
+    const full=k.matches&&(k.matches('figure.nfig.imgF')||(k.querySelector&&k.querySelector('img.imgF')&&!(k.textContent||'').trim()));
+    if(k.tagName==='TABLE'||full)k.classList.add('pfull');
+  });
   const units=[];let cur=null;
   Array.from(bx.childNodes).forEach(k=>{
     if(k.nodeType===3&&!k.textContent.trim())return;
