@@ -2188,6 +2188,7 @@ html[data-theme="dark"] .inkscroll{background:#2A2E39}
 #inkPages{display:flex;flex-direction:column;align-items:center;width:max-content;min-width:100%;box-sizing:border-box}
 .inkpage{position:relative;flex:none;box-shadow:var(--sh2);overflow:hidden;--ln:#C7D2E8;background:#fff}
 .inkpage canvas{position:absolute;display:none}
+.inkpage canvas.ink,.inkpage canvas.ilaser{background:transparent}
 .inkpage canvas.ink{touch-action:none;cursor:crosshair}
 .inkpage canvas.ilaser,.inkpage .iimgs{pointer-events:none}
 .inkpage .iimgs{position:absolute;inset:0}
@@ -12331,7 +12332,7 @@ function inkBuild(){
     el.innerHTML='<canvas class="ibg"></canvas><div class="iimgs"></div><canvas class="ink"></canvas><canvas class="ilaser"></canvas>'+(x.pdf?'':'<button class="pgdel" data-a="ink-delpage" data-i="'+i+'" title="Remover esta página" aria-label="Remover esta página">'+ic('trash',14)+'</button>');
     host.appendChild(el);
     const cv=el.querySelector('.ink'),lz=el.querySelector('.ilaser');
-    INK.pages[i]={el:el,bg:el.querySelector('.ibg'),cv:cv,lz:lz,ctx:cv.getContext('2d',{desynchronized:true})||cv.getContext('2d'),lctx:lz.getContext('2d'),imgs:el.querySelector('.iimgs'),win:null,dpr:inkDpr()};
+    INK.pages[i]={el:el,bg:el.querySelector('.ibg'),cv:cv,lz:lz,ctx:cv.getContext('2d'),lctx:lz.getContext('2d'),imgs:el.querySelector('.iimgs'),win:null,dpr:inkDpr()};
   });
   INK.pages.forEach((P,i)=>inkLayout(i));
   INK.pages.forEach((P,i)=>inkWindow(i,true));
