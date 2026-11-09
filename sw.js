@@ -1,15 +1,15 @@
-// Service worker da Rotina de Estudos: guarda o app para abrir sem internet, mostra os avisos enviados pelo
+// Service worker do Site do Luís | Organização: guarda o app para abrir sem internet, mostra os avisos enviados pelo
 // servidor (Web Push), trata os botões das notificações e entrega os dados dos widgets.
 const PROJECT = 'site-pessoal-b4b19';
 const API_KEY = 'AIzaSyBU4owCJwloUlcfTP-cOeHjEo5hyzMH2tU';
 const FB_KEY = 'hRM2z3YEF6yPtTwKQyFMIAQs551d6Jwh';
 const BASE = 'https://firestore.googleapis.com/v1/projects/' + PROJECT + '/databases/(default)/documents/rotina/';
 
-const VERSION = 'v22';
+const VERSION = 'v23';
 const CACHE = 'rotina-app-' + VERSION;
 const META = 'rotina-meta'; // dados dos widgets e avisos recebidos com o app fechado
 const FRONTS = ['painel', 'semana', 'tarefas', 'habitos', 'notas', 'fin'];
-const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'favicon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png', 'icons/badge-96.png',
+const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'favicon.svg', 'icons/favicon-light.svg', 'icons/favicon-dark.svg', 'icons/favicon-32.png', 'icons/favicon-32-dark.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png', 'icons/badge-96.png',
   'w/widget.css', 'w/widget.js', 'w/card.json'].concat(FRONTS.map((f) => 'w/' + f + '/'));
 
 self.addEventListener('install', (e) => e.waitUntil((async () => {
@@ -76,7 +76,7 @@ async function widgetData(tag) {
   if (tag === 'tarefas') (s.tasks || []).slice(0, 5).forEach((t) => rows.push({ text: t.t, sub: t.d ? (t.d === T ? 'Hoje' : t.d.split('-').reverse().slice(0, 2).join('/')) : '' }));
   else if (tag === 'habitos') (s.habits || []).filter((h) => h.d === T).slice(0, 5).forEach((h) => rows.push({ text: (h.ok ? '✓ ' : '○ ') + h.t, sub: h.s || '' }));
   else (s.ev || []).filter((x) => x.d === T && !x.ok).slice(0, 5).forEach((x) => rows.push({ text: x.t, sub: x.s + '–' + x.e }));
-  const title = { painel: 'Hoje', tarefas: 'Tarefas', habitos: 'Hábitos' }[tag] || 'Rotina';
+  const title = { painel: 'Hoje', tarefas: 'Tarefas', habitos: 'Hábitos' }[tag] || 'Site do Luís';
   return { title: title, rows: rows.length ? rows : [{ text: 'Nada pendente', sub: '' }], url: './?tab=' + (tag === 'painel' ? 'painel' : tag) };
 }
 async function updateWinWidgets() {
@@ -129,7 +129,7 @@ self.addEventListener('push', (e) => e.waitUntil((async () => {
     }
   } catch (err) { /* sem rede: cai no aviso genérico */ }
   if (!shown) {
-    await self.registration.showNotification('Rotina de Estudos', { body: 'Você tem avisos pendentes.', tag: 'geral', icon: 'icons/icon-192.png', badge: 'icons/badge-96.png', data: { u: './' } });
+    await self.registration.showNotification('Site do Luís', { body: 'Você tem avisos pendentes.', tag: 'geral', icon: 'icons/icon-192.png', badge: 'icons/badge-96.png', data: { u: './' } });
   }
   if (got.length) { await keepHistory(got); await broadcast({ type: 'pushed' }); }
   try { if (self.navigator.setAppBadge && got.length) await self.navigator.setAppBadge(got.length); } catch (err) { /* sem selo */ }
