@@ -61,7 +61,7 @@
     } else if (F === 'notas') {
       h = s.notes.length ? s.notes.slice(0, 6).map((x) => '<a class="row" href="' + APP + '?nota=' + encodeURIComponent(x.id) + '">' + li(x.t, x.u ? dm(iso(new Date(x.u))) : '', dot()) + '</a>').join('') : '<div class="empty">Nenhuma nota ainda.</div>';
     } else if (F === 'fin') {
-      h = s.bills.length ? s.bills.slice(0, 6).map((x) => li(x.t, dayLbl(x.d, T) + ' · ' + x.v, dot())).join('') : '<div class="empty">Nenhuma conta nos próximos dias.</div>';
+      h = s.bills.length ? s.bills.slice(0, 6).map((x) => li(x.t, dayLbl(x.d, T) + ' | ' + x.v, dot())).join('') : '<div class="empty">Nenhuma conta nos próximos dias.</div>';
     }
     return { h: h, sub: sub, bar: bar };
   }
