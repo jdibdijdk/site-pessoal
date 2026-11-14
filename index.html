@@ -2468,6 +2468,31 @@ html[data-theme="dark"] mark.hl{background:color-mix(in srgb,var(--c) 45%,transp
 .cfpop input[type=color]{width:24px;height:24px;border:0;padding:0;background:none}
 .cfrev{margin-top:6px}.cfrev small{display:block;color:var(--mut);font-size:11.5px}
 .cf-ed[data-f=front]{min-height:56px}
+
+/* baralhos: linhas compactas, ícones e seletor */
+.emo{display:inline-grid;place-items:center;line-height:1;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif}
+.dklist{overflow:hidden}
+.dkt{display:flex;align-items:center;gap:6px;min-height:38px;padding:2px 8px 2px calc(6px + var(--lv,0)*16px);border-bottom:1px solid var(--line2)}
+.dkt:last-child{border-bottom:0}.dkt:hover{background:var(--soft)}
+.dkt .dktog{flex:none;width:26px;height:26px}.dkt .fico{flex:none}
+.dkn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;font-size:14px;cursor:pointer;color:var(--tx)}
+.dkn small{display:block;font-weight:400;font-size:11.5px;color:var(--mut)}
+.dkt.cozy{min-height:52px}
+.dkc{display:inline-flex;gap:3px;flex:none}
+.dkc b{min-width:24px;text-align:center;font-size:12px;font-weight:600;border-radius:7px;padding:1px 5px;background:var(--soft)}
+.dkc b.cn{color:#2547D0}.dkc b.cl{color:#C2410C}.dkc b.cr{color:#15803D}.dkc b.z{opacity:.35;font-weight:400}
+.dkact{display:inline-flex;align-items:center;gap:2px;flex:none}
+.dkgo{padding:0 9px;height:28px;gap:4px}.dkgo span{font-size:12.5px;font-weight:600}
+.dkbar{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:2px 0 8px}
+.dkfab{display:none}
+.dkvt{display:flex;align-items:center;gap:10px}
+.icotabs{display:flex;gap:4px;flex-wrap:wrap;margin:6px 0}.icotabs button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:3px 11px;font-size:12.5px;color:var(--mut)}.icotabs button.on{background:var(--ink);color:var(--onink);border-color:var(--ink)}
+.icogrid{max-height:190px;overflow:auto;padding:2px}.icogrid .ibtn{width:38px;height:38px}
+@media (max-width:640px){
+  .dkc b{min-width:20px;padding:1px 3px;font-size:11.5px}.dkt{gap:4px;padding-right:4px}.dklook{display:none}
+  .dkbk{display:none}.dkhead .btn,.dkhead .icon-btn{flex:none}.dkhead{gap:4px}
+  .dkfab{display:inline-flex;align-items:center;gap:6px;position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:40;border:0;border-radius:999px;background:var(--ink);color:var(--onink);padding:13px 18px;font-weight:600;font-size:14px;box-shadow:0 6px 18px rgba(16,24,40,.28)}
+}
 </style>
 </head>
 <body>
@@ -2881,7 +2906,7 @@ function normalize(o){
     habits:arr('habits').map(normHabit),
     dateCats:arr('dateCats').filter(c=>c&&c.id&&c.name).map(c=>Object.assign({parentId:'',color:''},c,{name:String(c.name)})),
     notes:arr('notes').map(n=>normNote(Object.assign({deckIds:[],type:'nota',title:'',html:'',wrong:'',right:'',just:'',folderId:'',catId:'',cd:null,created:0,updated:0},n))),
-    decks:arr('decks').map(d=>Object.assign({name:'',folderId:'',catId:'',goalId:'',actId:'',noteId:'',parentId:'',focoIds:[],ret:0,newPd:0,revPd:0,created:0,updated:0},d)),
+    decks:arr('decks').map(d=>Object.assign({name:'',folderId:'',catId:'',goalId:'',actId:'',noteId:'',parentId:'',focoIds:[],icon:'',color:'',ret:0,newPd:0,revPd:0,created:0,updated:0},d)),
     cards:arr('cards').map(c=>Object.assign({deckId:'',type:'basic',front:'',back:'',frontImg:'',backImg:'',text:'',extra:'',okind:'image',image:'',rects:[],table:[],occ:[],hdr:true,s:{},rl:[],created:0,updated:0},c)),
     ingr:arr('ingr').map(i=>Object.assign({name:'',unit:'g',price:0,pack:1000,minPk:0},i)),
     pantry:arr('pantry').map(p=>Object.assign({ingId:'',qty:0,gosto:false,loc:''},p)),
@@ -4260,6 +4285,76 @@ function docRow(d){
 }
 /* ----- aparência das pastas: ícone e cor pastel (estilo MedWay), à escolha ou seguindo um eixo (categoria) ----- */
 const FOLDER_ICONS=['folder','book','heart','pulse','steth','lungs','thyroid','uterus','pregnant','pill','clinic','microscope','flask','cap','star','users','home','briefcase','sun','dumbbell','cards','note','file','target'];
+
+/* ----- mais ícones (traço 24×24, mesmo estilo) e grupos para o seletor ----- */
+Object.assign(ICONS,{
+ syringe:'<path d="M18 2l4 4M20 4l-3 3M15 7L6 16l-1 4 4-1 9-9z"/><path d="M14 8l2 2M9 13l2 2M3 21l3-3"/>',
+ bandage:'<rect x="2" y="9" width="20" height="6" rx="3" transform="rotate(-45 12 12)"/><path d="M10.5 10.5h.01M13.5 13.5h.01M10.5 13.5h.01M13.5 10.5h.01"/>',
+ hospital:'<path d="M4 21V5a1 1 0 011-1h14a1 1 0 011 1v16M2 21h20"/><path d="M12 8v6M9 11h6"/><path d="M10 21v-4h4v4"/>',
+ ambulance:'<path d="M2 16V7h11v9M13 10h4l3 3v3h-2M2 16h2"/><circle cx="7" cy="17" r="2"/><circle cx="16" cy="17" r="2"/><path d="M7.5 9v4M5.5 11h4"/>',
+ tooth:'<path d="M7 3c-3 0-4 3-3 6s1 5 2 8c.5 2 2 4 3 1l1-4h2l1 4c1 3 2.5 1 3-1 1-3 1-5 2-8s0-6-3-6c-2 0-3 1-5 1S9 3 7 3z"/>',
+ ear:'<path d="M7 9a5 5 0 0110 0c0 3-2 4-3 6s-1 4-3.5 4S7 17 7 15"/><path d="M10 9a2 2 0 014 0"/>',
+ dna:'<path d="M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9s10 4 10 9"/><path d="M9 6h6M8 12h8M9 18h6"/>',
+ virus:'<circle cx="12" cy="12" r="5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/><path d="M10 11h.01M14 13h.01"/>',
+ mask:'<path d="M4 8c3-2 13-2 16 0v5c0 3-3 5-8 5s-8-2-8-5z"/><path d="M4 10H2M20 10h2M8 12h8M8 15h8"/>',
+ testtube:'<path d="M9 3h6M10 3v14a2 2 0 004 0V3M10 12h4"/>',
+ thermometer:'<path d="M14 14V5a2 2 0 00-4 0v9a4 4 0 104 0z"/><path d="M12 9v7"/>',
+ cross:'<path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"/>',
+ shieldPlus:'<path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/><path d="M12 9v6M9 12h6"/>',
+ stretcher:'<rect x="5" y="9" width="14" height="5" rx="2"/><path d="M2 14h20M4 14v3M20 14v3"/>',
+ bulb:'<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 00-4 10.5c1 1 1 2 1 3h6c0-1 0-2 1-3A6 6 0 0012 3z"/>',
+ calculator:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h.01M12 19h4"/>',
+ bookmark:'<path d="M6 3h12v18l-6-4-6 4z"/>',
+ clipboard:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 11h6M9 15h4"/>',
+ globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+ chart:'<path d="M4 20V4M4 20h17"/><path d="M8 16v-5M12 16V8M16 16v-8"/>',
+ hourglass:'<path d="M6 3h12M6 21h12M7 3c0 5 5 6 5 9s-5 4-5 9M17 3c0 5-5 6-5 9s5 4 5 9"/>',
+ trophy:'<path d="M8 4h8v6a4 4 0 01-8 0zM8 6H4c0 3 1 5 4 5M16 6h4c0 3-1 5-4 5M12 14v4M8 21h8M10 18h4"/>',
+ flag:'<path d="M5 21V4M5 4h12l-2 4 2 4H5"/>',
+ rocket:'<path d="M12 2c4 2 6 6 5 11l-3 3h-4l-3-3C6 8 8 4 12 2z"/><circle cx="12" cy="9" r="1.5"/><path d="M7 14l-3 1 1 3 3-2M17 14l3 1-1 3-3-2M10 20l2 2 2-2"/>',
+ medal:'<circle cx="12" cy="15" r="5"/><path d="M9 3l3 6 3-6M12 13v4"/>',
+ library:'<path d="M4 4v16M9 4v16M14 6l4 14M2 20h20"/>',
+ quote:'<path d="M6 10h4v6H5v-4c0-3 1-5 4-6M15 10h4v6h-5v-4c0-3 1-5 4-6"/>',
+ leaf:'<path d="M5 19c0-9 5-14 15-14 0 10-5 15-14 15"/><path d="M5 19l8-8"/>',
+ shield:'<path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/>',
+ key:'<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M14 9l2 2"/>',
+ gift:'<rect x="3" y="9" width="18" height="12" rx="1"/><path d="M12 9v12M2 9h20M12 9C9 9 7 7.5 8 5.5S12 5 12 9c0 0 3-4 4-3.5S15 9 12 9z"/>',
+ coffee:'<path d="M4 8h13v6a5 5 0 01-5 5H9a5 5 0 01-5-5z"/><path d="M17 10h2a2 2 0 010 4h-2M7 2v3M11 2v3M15 2v3"/>',
+ music:'<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+ camera:'<path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13" r="4"/>',
+ code:'<path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/>',
+ map:'<path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>',
+ plane:'<path d="M3 13l18-9-4 17-5-6-4 3v-5z"/>',
+ paw:'<circle cx="7" cy="10" r="1.8"/><circle cx="11" cy="6" r="1.8"/><circle cx="15" cy="6" r="1.8"/><circle cx="19" cy="10" r="1.8"/><path d="M12 11c-3 0-6 4-5 7 1 2 3 1 5 1s4 1 5-1c1-3-2-7-5-7z"/>',
+ tree:'<path d="M12 21v-5M12 3l6 8h-3l4 6H5l4-6H6z"/>',
+ lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/>',
+ mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+ phone:'<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+ crown:'<path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/>',
+ gem:'<path d="M6 4h12l4 5-10 12L2 9z"/><path d="M2 9h20M9 4l-2 5 5 12 5-12-2-5"/>',
+ umbrella:'<path d="M3 12a9 9 0 0118 0z"/><path d="M12 12v7a2 2 0 004 0"/>',
+ bike:'<circle cx="6" cy="16" r="4"/><circle cx="18" cy="16" r="4"/><path d="M6 16l4-8h5l3 8M10 8H8M13 12l-3 4"/>',
+ headphones:'<path d="M4 15v-3a8 8 0 0116 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/>',
+ gamepad:'<rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 10v5M4.5 12.5h5M16 11h.01M18 14h.01"/>',
+ smile:'<circle cx="12" cy="12" r="9"/><path d="M8 14c1 2 7 2 8 0M9 9.5h.01M15 9.5h.01"/>',
+ snow:'<path d="M12 2v20M3 7l18 10M21 7L3 17"/>',
+ mountain:'<path d="M3 20l6-12 4 7 3-4 5 9z"/>',
+ hash:'<path d="M5 9h15M4 15h15M10 3L8 21M16 3l-2 18"/>',
+ compass:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
+ ruler2:'<path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/>',
+ atom:'<circle cx="12" cy="12" r="1.5"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/>',
+ award:'<circle cx="12" cy="9" r="6"/><path d="M8.5 14L7 22l5-3 5 3-1.5-8"/>',
+ newspaper:'<path d="M4 5h13v14a2 2 0 01-2 2H6a2 2 0 01-2-2zM17 9h3v10a2 2 0 01-2 2"/><path d="M7 9h7M7 13h7M7 17h4"/>',
+ palette2:'<path d="M12 3a9 9 0 000 18c1.5 0 2-1 1.5-2.2-.5-1.2.3-2.3 1.6-2.3H17a4 4 0 004-4c0-5-4-9.5-9-9.5z"/><path d="M7.5 11h.01M10 7.5h.01M14.5 7.5h.01"/>'
+});
+const ICON_SETS=[
+ ['Saúde',[['steth','estetoscópio'],['heart','coração cardio'],['pulse','batimento ecg'],['igBrain','cérebro neuro'],['lungs','pulmão pneumo'],['igKidney','rim nefro'],['igBone','osso ortopedia'],['tooth','dente odonto'],['eye','olho oftalmo'],['ear','ouvido otorrino'],['uterus','útero ginecologia'],['pregnant','gestante obstetrícia'],['igBaby','bebê pediatria'],['thyroid','tireoide endócrino'],['dna','dna genética'],['virus','vírus infecto'],['igBug','bactéria micro'],['pill','remédio fármaco'],['syringe','seringa vacina'],['bandage','curativo'],['hospital','hospital'],['ambulance','ambulância urgência'],['mask','máscara'],['testtube','exame laboratório'],['thermometer','febre termômetro'],['cross','cruz'],['shieldPlus','proteção prevenção'],['stretcher','maca'],['igXray','raio x radiologia'],['igScalpel','bisturi cirurgia'],['microscope','microscópio'],['clinic','clínica'],['bed','leito internação'],['drop','sangue gota'],['petsaude','saúde'],['atom','átomo física']]],
+ ['Estudo',[['book','livro'],['cap','formatura'],['cards','cartões baralho'],['note','nota'],['file','arquivo'],['bulb','ideia'],['calculator','calculadora'],['bookmark','marcador'],['clipboard','prancheta'],['globe','mundo'],['chart','gráfico'],['hourglass','tempo ampulheta'],['trophy','troféu'],['medal','medalha'],['award','prêmio'],['flag','bandeira'],['rocket','foguete'],['library','biblioteca'],['quote','citação'],['target','alvo'],['flask','química'],['pen','caneta'],['edit','lápis'],['table','tabela'],['list','lista'],['tasks','tarefas'],['calendar','calendário'],['clock','relógio'],['puzzle','quebra-cabeça'],['level1','níveis'],['newspaper','artigo jornal'],['ruler2','régua']]],
+ ['Geral',[['star','estrela'],['users','pessoas'],['user','pessoa'],['home','casa'],['briefcase','trabalho'],['sun','sol'],['moon','lua'],['dumbbell','academia treino'],['wallet','carteira'],['dollar','dinheiro'],['cart','compras'],['car','carro'],['bag','mochila'],['key','chave'],['gift','presente'],['coffee','café'],['music','música'],['headphones','fone'],['camera','câmera'],['code','código'],['map','mapa'],['plane','avião viagem'],['lock','cadeado'],['mail','e-mail'],['phone','celular'],['crown','coroa'],['gem','joia'],['umbrella','guarda-chuva'],['bike','bicicleta'],['gamepad','jogo'],['smile','sorriso'],['compass','bússola'],['hash','hashtag'],['anchor','âncora'],['chef','cozinha'],['utensils','refeição'],['image','imagem'],['bell','sino'],['link','link'],['pin','local'],['tag','etiqueta'],['layers','camadas'],['folder','pasta'],['monitor','tela'],['cloud','nuvem'],['sparkle','brilho'],['zap','raio'],['palette2','arte pintura']]],
+ ['Natureza',[['flame','fogo'],['leaf','folha'],['tree','árvore'],['sprout','broto'],['drop','água'],['paw','animais'],['snow','neve frio'],['mountain','montanha'],['sun','sol'],['moon','lua'],['cloud','nuvem'],['road','estrada']]]
+];
+// ícone guardado como nome do conjunto ou como emoji ("e:🫀")
+const icoHTML=(n,size)=>{size=size||16;return /^e:/.test(n||'')?'<span class="emo" style="font-size:'+Math.round(size*.95)+'px;width:'+size+'px;height:'+size+'px" aria-hidden="true">'+esc(String(n).slice(2))+'</span>':ic(n,size);};
 const FOLDER_PASTEL=['#F2A7A7','#F6C28B','#F3DE8A','#A9DDB0','#8FD6CC','#9CCBF2','#B6B4F2','#D8B4F0','#F2B0D2','#C9CED6'];
 function hexHS(hex){ // matiz e saturação (0–100) de uma cor
   const n=parseInt(String(hex||'#C9CED6').replace('#','').padEnd(6,'0').slice(0,6),16),r=((n>>16)&255)/255,g=((n>>8)&255)/255,b=(n&255)/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn,l=(mx+mn)/2;
@@ -4272,34 +4367,58 @@ function folderLook(f){
   const hs=col?hexHS(col):[215,10],sat=col?Math.max(28,Math.min(58,hs[1])):8; // sempre pastel: saturação contida
   return {icon:icon,style:'--fh:'+hs[0]+';--fs:'+sat+'%',axis:ax,col:col};
 }
-const folderIcon=(f,size)=>{const L=folderLook(f);return '<span class="fico" style="'+L.style+'">'+ic(L.icon,size||16)+'</span>';};
+const folderIcon=(f,size)=>{const L=folderLook(f);return '<span class="fico" style="'+L.style+'">'+icoHTML(L.icon,size||16)+'</span>';};
 function folderTileHTML(f,k,act,sub,acts){
   const L=folderLook(f);
-  return '<div class="ftile pst" style="'+L.style+'" data-a="'+act+'" data-id="'+f.id+'" role="button" tabindex="0" title="'+esc(f.name)+'"><span class="fti">'+ic(L.icon,22)+'</span><span class="ftn">'+esc(f.name)+'</span><span class="ftc">'+esc(sub)+'</span>'+
+  return '<div class="ftile pst" style="'+L.style+'" data-a="'+act+'" data-id="'+f.id+'" role="button" tabindex="0" title="'+esc(f.name)+'"><span class="fti">'+icoHTML(L.icon,22)+'</span><span class="ftn">'+esc(f.name)+'</span><span class="ftc">'+esc(sub)+'</span>'+
     '<span class="ftact">'+acts+'<button class="icon-btn sm" data-a="folder-look" data-k="'+k+'" data-id="'+f.id+'" title="Ícone e cor" aria-label="Ícone e cor da pasta">'+ic('palette',14)+'</button></span></div>';
 }
+function deckLook(d){ // ícone e cor do baralho (herdados do pai quando vazios)
+  let ic0='',co='',x=d,g=0;while(x&&g++<20){if(!ic0&&x.icon)ic0=x.icon;if(!co&&x.color)co=x.color;x=x.parentId?deckById(x.parentId):null;}
+  const L=folderLook({color:co,icon:ic0||'cards'});return {icon:ic0||'cards',style:L.style,col:co};
+}
+const deckIco=(d,size)=>{const L=deckLook(d);return '<span class="fico" style="'+L.style+'">'+icoHTML(L.icon,size||16)+'</span>';};
+function iconGridHTML(st,def,q){
+  const nq=norm(q||''),seen={};let out='';
+  ICON_SETS.forEach(g=>{
+    const items=g[1].filter(x=>ICONS[x[0]]&&(!nq||norm(x[1]+' '+x[0]).indexOf(nq)>=0)&&(nq||UI.icoTab===g[0]||(!UI.icoTab&&g===ICON_SETS[0])||false));
+    items.forEach(x=>{if(seen[x[0]])return;seen[x[0]]=1;out+='<button type="button" class="ibtn lki'+((st.icon||def)===x[0]?' on':'')+'" data-i="'+x[0]+'" title="'+esc(x[1].split(' ')[0])+'" aria-label="'+esc(x[1].split(' ')[0])+'">'+ic(x[0],18)+'</button>';});
+  });
+  return out||'<span class="muted small">Nenhum ícone encontrado.</span>';
+}
 function openFolderLook(k,id){
-  const f=folderObj(k,id);if(!f)return;
-  const st={color:f.color||'',icon:f.icon||'',axis:f.axis&&catById(f.axis)?f.axis:''};
-  const hasSubs=(k==='d'?S.dfolders:S.folders).some(x=>x.parentId===f.id);
-  const prev=()=>{const L=folderLook(Object.assign({},f,st));return '<span class="ftile pst fprev" style="'+L.style+'"><span class="fti">'+ic(L.icon,22)+'</span><span class="ftn">'+esc(f.name)+'</span></span>';};
-  openModal('<form id="fLook" class="form"><div class="fh"><h2>Aparência da pasta</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
+  const isDeck=k==='k',f=isDeck?deckById(id):folderObj(k,id);if(!f)return;
+  const def=isDeck?'cards':'folder',st={color:f.color||'',icon:f.icon||'',axis:!isDeck&&f.axis&&catById(f.axis)?f.axis:''};
+  const subsOf=isDeck?deckKids(f.id):(k==='d'?S.dfolders:S.folders).filter(x=>x.parentId===f.id),hasSubs=subsOf.length>0;
+  UI.icoTab=UI.icoTab||ICON_SETS[0][0];
+  const look=()=>isDeck?(()=>{const L=folderLook({color:st.color,icon:st.icon||def});return {icon:st.icon||def,style:L.style};})():(()=>{const L=folderLook(Object.assign({},f,st));return L;})();
+  const prev=()=>{const L=look();return '<span class="ftile pst fprev" style="'+L.style+'"><span class="fti">'+icoHTML(L.icon,22)+'</span><span class="ftn">'+esc(f.name)+'</span></span>';};
+  openModal('<form id="fLook" class="form"><div class="fh"><h2>'+(isDeck?'Aparência do baralho':'Aparência da pasta')+'</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<div id="lkPrev">'+prev()+'</div>'+
-    '<label class="f"><span>Seguir um eixo</span><select name="axis"><option value="">Nenhum: escolho a cor e o ícone</option>'+catTreeOpts(st.axis)+'</select></label>'+
-    '<div class="f" id="lkCol"><span>Cor</span><div class="lkcols"><button type="button" class="lkc none'+(st.color?'':' on')+'" data-c="" aria-label="Padrão"></button>'+FOLDER_PASTEL.map(c=>'<button type="button" class="lkc'+(st.color===c?' on':'')+'" data-c="'+c+'" style="background:'+c+'" aria-label="Cor '+c+'"></button>').join('')+'<input type="color" name="pick" value="'+(st.color||'#9CCBF2')+'" aria-label="Outra cor"></div></div>'+
-    '<div class="f"><span>Ícone</span><div class="icons">'+FOLDER_ICONS.map(n=>'<button type="button" class="ibtn lki'+((st.icon||'folder')===n?' on':'')+'" data-i="'+n+'" aria-label="Ícone '+n+'">'+ic(n,18)+'</button>').join('')+'</div></div>'+
-    (hasSubs?'<label class="chip cb" style="align-self:flex-start"><input type="checkbox" name="subs" checked><span>Aplicar também às subpastas</span></label>':'')+
+    (isDeck?'':'<label class="f"><span>Seguir um eixo</span><select name="axis"><option value="">Nenhum: escolho a cor e o ícone</option>'+catTreeOpts(st.axis)+'</select></label>')+
+    '<div class="f" id="lkCol"><span>Cor</span><div class="lkcols"><button type="button" class="lkc none'+(st.color?'':' on')+'" data-c="" aria-label="Padrão"></button>'+FOLDER_PASTEL.map(c=>'<button type="button" class="lkc'+(st.color===c?' on':'')+'" data-c="'+c+'" style="background:'+c+'" aria-label="Cor '+c+'"></button>').join('')+'<input type="color" name="pick" value="'+(st.color||'#9CCBF2')+'" aria-label="Outra cor" title="Outra cor"></div></div>'+
+    '<div class="f"><span>Ícone</span><input type="search" id="icoQ" placeholder="Buscar ícone (ex.: coração, livro, rim)" autocomplete="off"><div class="icotabs" id="icoTabs">'+ICON_SETS.map(g=>'<button type="button" data-g="'+g[0]+'" class="'+(UI.icoTab===g[0]?'on':'')+'">'+g[0]+'</button>').join('')+'</div><div class="icons icogrid" id="icoGrid">'+iconGridHTML(st,def,'')+'</div></div>'+
+    '<label class="f"><span>ou um emoji como ícone <small>cole ou digite</small></span><input name="emo" maxlength="8" placeholder="🫀 📚 🧠" value="'+esc(/^e:/.test(st.icon)?st.icon.slice(2):'')+'" autocomplete="off" style="max-width:160px"></label>'+
+    (hasSubs?'<label class="chip cb" style="align-self:flex-start"><input type="checkbox" name="subs" checked><span>Aplicar também '+(isDeck?'aos subbaralhos':'às subpastas')+'</span></label>':'')+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
-  const form=$('#fLook'),paint=()=>{$('#lkPrev').innerHTML=prev();$$('.lkc',form).forEach(b=>b.classList.toggle('on',b.dataset.c===st.color));$$('.lki',form).forEach(b=>b.classList.toggle('on',b.dataset.i===(st.icon||'folder')));$('#lkCol').classList.toggle('off',!!st.axis);};
-  form.addEventListener('click',e=>{const c=e.target.closest('.lkc'),i=e.target.closest('.lki');if(c){st.color=c.dataset.c;paint();}else if(i){st.icon=i.dataset.i==='folder'?'':i.dataset.i;paint();}});
-  form.elements.axis.addEventListener('change',e=>{st.axis=e.target.value;paint();});
+  const form=$('#fLook'),grid=()=>{$('#icoGrid').innerHTML=iconGridHTML(st,def,$('#icoQ').value);$$('#icoTabs button',form).forEach(b=>b.classList.toggle('on',b.dataset.g===UI.icoTab&&!$('#icoQ').value));};
+  const paint=()=>{$('#lkPrev').innerHTML=prev();$$('.lkc',form).forEach(b=>b.classList.toggle('on',b.dataset.c===st.color));$$('.lki',form).forEach(b=>b.classList.toggle('on',b.dataset.i===(st.icon||def)));if(!isDeck)$('#lkCol').classList.toggle('off',!!st.axis);};
+  form.addEventListener('click',e=>{
+    const c=e.target.closest('.lkc'),i=e.target.closest('.lki'),t=e.target.closest('#icoTabs button');
+    if(c){st.color=c.dataset.c;paint();}
+    else if(i){st.icon=i.dataset.i===def?'':i.dataset.i;form.elements.emo.value='';paint();}
+    else if(t){UI.icoTab=t.dataset.g;$('#icoQ').value='';grid();}
+  });
+  $('#icoQ').addEventListener('input',grid);
+  form.elements.emo.addEventListener('input',e=>{const v=e.target.value.trim();st.icon=v?'e:'+v:'';paint();});
+  if(form.elements.axis)form.elements.axis.addEventListener('change',e=>{st.axis=e.target.value;paint();});
   form.elements.pick.addEventListener('input',e=>{st.color=e.target.value;paint();});
   paint();
   form.addEventListener('submit',ev=>{
     ev.preventDefault();const ids=[f.id];
-    if(form.elements.subs&&form.elements.subs.checked)(k==='d'?dfolderDesc(f.id):folderDesc(f.id)).forEach(x=>{if(ids.indexOf(x)<0)ids.push(x);});
-    ids.forEach(x=>{const o=folderObj(k,x);if(!o)return;['color','icon','axis'].forEach(p=>{if(st[p])o[p]=st[p];else delete o[p];});});
-    save();closeModal();renderMain();toast('Pasta atualizada.');
+    if(form.elements.subs&&form.elements.subs.checked)(isDeck?deckTree(f.id):(k==='d'?dfolderDesc(f.id):folderDesc(f.id))).forEach(x=>{if(ids.indexOf(x)<0)ids.push(x);});
+    ids.forEach(x=>{const o=isDeck?deckById(x):folderObj(k,x);if(!o)return;(isDeck?['color','icon']:['color','icon','axis']).forEach(p=>{if(st[p])o[p]=st[p];else delete o[p];});if(isDeck)o.updated=Date.now();});
+    save();closeModal();renderMain();toast(isDeck?'Baralho atualizado.':'Pasta atualizada.');
   });
 }
 Object.assign(ACT,{'folder-look'(el,e){if(e)e.stopPropagation();openFolderLook(el.dataset.k,el.dataset.id);}});
@@ -5588,7 +5707,7 @@ function nCardHTML(it){
   const foot='<div class="tags" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">'+focoChips(o)+(it.k==='questao'?qMetaChips(o):'')+(o.catId?tagHTML(o.catId):'')+(isNoteK(it.k)?cdChipHTML(o.cd):'')+(fp?'<span class="meta mi" style="font-size:12px;color:var(--mut)">'+ic('folder',12)+esc(fp)+'</span>':'')+'</div>';
   if(it.k==='deck'){
     const st=deckStats(o.id,Date.now());
-    return '<div class="ncard deck" data-a="n-open" data-k="deck" data-id="'+o.id+'" style="--c:'+col+'" role="button" tabindex="0"><h3>'+ic('cards',16)+esc(o.name||'Baralho')+'<span class="tag outline" style="margin-left:auto">Baralho</span></h3>'+
+    return '<div class="ncard deck" data-a="n-open" data-k="deck" data-id="'+o.id+'" style="--c:'+col+'" role="button" tabindex="0"><h3>'+deckIco(o,17)+esc(o.name||'Baralho')+'<span class="tag outline" style="margin-left:auto">Baralho</span></h3>'+
       '<p>'+(deckKids(o.id).length?deckKids(o.id).length+(deckKids(o.id).length===1?' subbaralho | ':' subbaralhos | '):'')+st.total+(st.total===1?' item de estudo':' itens de estudo')+' | '+(st.due?'<b style="color:var(--acc)">'+st.due+' para revisar agora</b>':'em dia')+'</p>'+foot+'</div>';
   }
   const body=it.k==='fluxo'?'<div class="fxcard">'+fxThumb(o)+'</div><p>'+o.fx.nodes.length+(o.fx.nodes.length===1?' caixa':' caixas')+' | '+o.fx.edges.length+(o.fx.edges.length===1?' ligação':' ligações')+'</p>':it.k==='pdf'?'<p>PDF | '+((o.annots||[]).length)+' anotação(ões)'+(o.src==='drive'?' | no Drive':' | neste aparelho')+'</p>':objCardHTML(o)+(isNoteK(it.k)&&it.k!=='fluxo'?ncImgsHTML(o):'')+'<p>'+esc((it.k==='bula'?bulaSnippet(o):noteText(o)).slice(0,220)||'Nota vazia')+'</p>';
@@ -8313,7 +8432,7 @@ function deckMentionsHTML(d){
 function decksSection(list){
   if(!list||!list.length)return '';
   const now=Date.now();
-  return secHTML('Baralhos','<div class="pills">'+list.map(d=>{const st=deckStats(d.id,now);return '<button class="pillx" data-a="deck-open" data-id="'+d.id+'">'+ic('cards',13)+esc(deckPath(d).join(' › '))+' | '+(st.due?st.due+' p/ revisar':'em dia')+'</button>';}).join('')+'</div>');
+  return secHTML('Baralhos','<div class="pills">'+list.map(d=>{const st=deckStats(d.id,now);return '<button class="pillx" data-a="deck-open" data-id="'+d.id+'">'+deckIco(d,13)+esc(deckPath(d).join(' › '))+' | '+(st.due?st.due+' p/ revisar':'em dia')+'</button>';}).join('')+'</div>');
 }
 
 // Verso e extra aceitam negrito, itálico, cor, tamanho e imagens (cards antigos em texto simples continuam funcionando)
@@ -8357,13 +8476,14 @@ function deckViewHTML(d){
   const now=Date.now(),st=deckStats(d.id,now),own=deckStats(d.id,now,true),kids=deckKids(d.id),par=d.parentId&&deckById(d.parentId);
   const all=!!UI.dkAll&&kids.length,ids=all?st.ids:[d.id],cards=S.cards.filter(c=>ids.indexOf(c.deckId)>=0).sort((a,b)=>(a.created||0)-(b.created||0));
   const goal=d.goalId&&goalById(d.goalId),act=d.actId&&actById(d.actId),note=d.noteId&&noteById(d.noteId);
-  let h='<div class="nhead">'+(par?'<button class="btn sm ghost" data-a="deck-open" data-id="'+par.id+'">'+ic('chevL',14)+' '+esc(par.name||'Baralho')+'</button>':'<button class="btn sm ghost" data-a="n-back">'+ic('chevL',14)+' Notas</button>')+'<span class="sp"></span>'+
-    '<button class="btn primary sm" data-a="st-start" data-id="'+d.id+'">'+ic('play',13)+' Estudar'+(kids.length?' tudo':'')+(st.due?' ('+st.due+')':'')+'</button>'+
+  let h='<div class="nhead dkhead">'+(par?'<button class="btn sm ghost" data-a="deck-open" data-id="'+par.id+'">'+ic('chevL',14)+'<span class="dkbk">'+esc(par.name||'Baralho')+'</span></button>':'<button class="btn sm ghost" data-a="n-back">'+ic('chevL',14)+' Notas</button>')+'<span class="sp"></span>'+
+    '<button class="btn primary sm" data-a="st-start" data-id="'+d.id+'">'+ic('play',13)+' Estudar'+(st.due?' ('+st.due+')':'')+'</button>'+
     '<button class="btn sm" data-a="deck-sub" data-id="'+d.id+'" title="Criar um subbaralho dentro deste">'+ic('plus',13)+' Subbaralho</button>'+
-    '<button class="icon-btn" data-a="deck-edit" data-id="'+d.id+'" title="Editar baralho" aria-label="Editar baralho">'+ic('edit',19)+'</button>'+
-    '<button class="icon-btn" data-a="deck-del" data-id="'+d.id+'" title="Excluir baralho" aria-label="Excluir baralho">'+ic('trash',18)+'</button></div>';
+    '<button class="icon-btn" data-a="folder-look" data-k="k" data-id="'+d.id+'" title="Ícone e cor" aria-label="Ícone e cor">'+ic('palette',18)+'</button>'+
+    '<button class="icon-btn" data-a="deck-edit" data-id="'+d.id+'" title="Editar baralho" aria-label="Editar baralho">'+ic('edit',18)+'</button>'+
+    '<button class="icon-btn" data-a="deck-del" data-id="'+d.id+'" title="Excluir baralho" aria-label="Excluir baralho">'+ic('trash',17)+'</button></div>';
   const crumbs=deckAnc(d).reverse();
-  h+=(crumbs.length?'<div class="muted small dkcrumb">'+crumbs.map(x=>'<a data-a="deck-open" data-id="'+x.id+'">'+esc(x.name||'Baralho')+'</a>').join(' › ')+' ›</div>':'')+'<h2 class="vt" style="margin-top:4px">'+esc(d.name||'Baralho')+'</h2><div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 6px;align-items:center">'+(d.catId?tagHTML(d.catId):'')+focoChips(deckFocoObj(d))+
+  h+=(crumbs.length?'<div class="muted small dkcrumb">'+crumbs.map(x=>'<a data-a="deck-open" data-id="'+x.id+'">'+esc(x.name||'Baralho')+'</a>').join(' › ')+' ›</div>':'')+'<h2 class="vt dkvt" style="margin-top:4px">'+deckIco(d,26)+esc(d.name||'Baralho')+'</h2><div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 6px;align-items:center">'+(d.catId?tagHTML(d.catId):'')+focoChips(deckFocoObj(d))+
     (d.folderId?'<span class="meta mi" style="font-size:13px;color:var(--mut)">'+ic('folder',13)+esc(folderPath(d.folderId).join(' › '))+'</span>':'')+
     '<span class="muted small"><b class="cn">'+st.newAll+'</b> novos | <b class="cl">'+st.learn+'</b> aprendendo | <b class="cr">'+st.revAll+'</b> para revisar | '+st.total+' itens'+(kids.length?' (com subbaralhos)':'')+'</span></div>';
   const pills=[];
@@ -8372,11 +8492,7 @@ function deckViewHTML(d){
   if(note)pills.push('<button class="pillx" data-a="n-open" data-k="note" data-id="'+note.id+'">'+ic('note',13)+esc(note.title||'Nota')+'</button>');
   if(pills.length)h+='<div class="pills" style="margin:8px 0 4px">'+pills.join('')+'</div>';
   if(typeof deckMentionsHTML==='function')h+=deckMentionsHTML(d);
-  if(kids.length){
-    h+='<div class="sechead">Subbaralhos <span class="count">'+kids.length+'</span></div><div class="card">'+kids.slice().sort((a,b)=>(a.name||'').localeCompare(b.name||'','pt-BR')).map(k=>{const ks=deckStats(k.id,now);
-      return '<div class="crow"><span class="lki">'+ic('cards',16)+'</span><div class="cprev"><b>'+esc(k.name||'Baralho')+'</b><div class="muted small">'+ks.total+' itens | '+ks.newAll+' novos | '+ks.learn+' aprendendo | '+ks.revAll+' revisar'+(deckKids(k.id).length?' | '+deckKids(k.id).length+' sub':'')+'</div></div>'+
-        '<span class="tact"><button class="btn sm '+(ks.due?'primary':'')+'" data-a="st-start" data-id="'+k.id+'" '+(ks.total?'':'disabled')+'>'+ic('play',13)+' Estudar'+(ks.due?' ('+ks.due+')':'')+'</button><button class="icon-btn sm" data-a="deck-open" data-id="'+k.id+'" title="Abrir" aria-label="Abrir">'+ic('chevR',15)+'</button></span></div>';}).join('')+'</div>';
-  }
+  if(kids.length)h+='<div class="sechead">Subbaralhos <span class="count">'+kids.length+'</span></div><div class="card dklist">'+kids.slice().sort((a,b)=>(a.name||'').localeCompare(b.name||'','pt-BR')).map(k=>deckRowHTML(k,0,false)).join('')+'</div>';
   h+=deckFsrsHTML(d,st.ids);
   h+='<div class="sechead">Adicionar card</div><div class="frow" style="margin-bottom:14px">'+Object.keys(CARD_TYPES).map(t=>'<button class="btn" data-a="card-new" data-t="'+t+'" data-deck="'+d.id+'">'+ic('plus',14)+' '+CARD_TYPES[t]+'</button>').join('')+'</div>';
   if(!cards.length&&!kids.length)return h+'<div class="empty">Este baralho ainda não tem cards.<br>Adicione o primeiro acima.</div>';
@@ -8401,6 +8517,7 @@ function openDeckInfo(d,isNew){
   openModal('<form id="fDeck" class="form"><div class="fh"><h2>'+(isNew?(d.parentId?'Novo subbaralho':'Novo baralho'):'Editar baralho')+'</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<label class="f">Nome do baralho<input name="name" required value="'+esc(d.name)+'" autocomplete="off"></label>'+
     '<label class="f">Dentro de <small>baralho pai (deixe vazio para um baralho principal)</small><select name="parent">'+opt(deckParentOpts(d),d.parentId||'','Nenhum (baralho principal)')+'</select></label>'+
+    '<div class="f"><span>Ícone e cor</span><button type="button" class="btn sm" data-a="deck-look-form" style="align-self:flex-start">'+deckIco(d,18)+' Escolher ícone e cor</button></div>'+
     '<div class="fgrid"><label class="f">Pasta<select name="folder">'+folderOptions(d.folderId)+'</select></label><div class="f"><span>Categoria</span>'+catPickHTML('dcat',d.catId)+'<button type="button" class="btn sm ghost" data-a="deck-cat-new" style="align-self:flex-start;margin-top:4px">'+ic('plus',13)+' Nova categoria</button></div></div>'+
     '<div class="f"><span>Foco <small>os subbaralhos herdam o Foco do pai</small></span>'+focoPickHTML('dfoco',d.focoIds)+'</div>'+
     '<div class="f"><span>Ligar este baralho a <small>opcional</small></span><div class="fgrid">'+
@@ -8605,20 +8722,29 @@ function stFace(c,idx){
   return '<div class="flipwrap"><div id="stcard" class="flipcard st-basic"><div class="face front">'+img(c.frontImg)+'<div class="ft">'+richHTML(c.front)+'</div></div>'+
     '<div class="face back"><div class="fsmall">'+richHTML(c.front)+'</div><hr>'+img(c.backImg)+'<div class="ft">'+richHTML(c.back)+'</div>'+(!richEmpty(c.extra)?'<div class="st-extra">'+richHTML(c.extra)+'</div>':'')+'</div></div></div>';
 }
+// uma linha de baralho (árvore de Estudar e lista de subbaralhos)
+function deckRowHTML(d,lv,tree){
+  const now=Date.now(),st=deckStats(d.id,now),kids=deckKids(d.id).sort((a,b)=>(a.name||'').localeCompare(b.name||'','pt-BR')),open=!!(UI.dkOpen||{})[d.id],dense=S.prefs.dkDense!==false;
+  const num=(n,k)=>'<b class="'+k+(n?'':' z')+'">'+n+'</b>';
+  let r='<div class="dkt'+(dense?'':' cozy')+'" style="--lv:'+lv+'"><button type="button" class="icon-btn sm dktog" '+(tree&&kids.length?'data-a="dk-tog" data-id="'+d.id+'" aria-label="'+(open?'Recolher':'Expandir')+'"':'disabled style="visibility:hidden"')+'>'+ic(open?'chevD':'chevR',14)+'</button>'+
+    deckIco(d,17)+'<a class="dkn" data-a="deck-open" data-id="'+d.id+'" title="'+esc(deckPath(d).join(' › ')+' | '+st.total+' itens'+(!st.due&&st.next?' | próximo '+inTxt(st.next-now):''))+'">'+esc(d.name||'Baralho')+(dense?'':'<small>'+st.total+' itens'+(!st.due&&st.next?' | próximo '+inTxt(st.next-now):'')+'</small>')+'</a>'+
+    '<span class="dkc" title="Novos | Aprendendo | Revisar">'+num(st.fresh,'cn')+num(st.learn,'cl')+num(st.review,'cr')+'</span><span class="dkact">'+
+    '<button type="button" class="icon-btn sm" data-a="deck-sub" data-id="'+d.id+'" title="Novo subbaralho" aria-label="Novo subbaralho">'+ic('plus',15)+'</button>'+
+    '<button type="button" class="icon-btn sm dklook" data-a="folder-look" data-k="k" data-id="'+d.id+'" title="Ícone e cor" aria-label="Ícone e cor">'+ic('palette',14)+'</button>'+
+    '<button type="button" class="btn sm dkgo'+(st.due?' primary':'')+'" data-a="st-start" data-id="'+d.id+'" '+(st.total?'':'disabled')+' title="Estudar" aria-label="Estudar">'+ic('play',12)+(st.due?'<span>'+st.due+'</span>':'')+'</button></span></div>';
+  if(tree&&open)kids.forEach(k=>{r+=deckRowHTML(k,lv+1,true);});
+  return r;
+}
 function studyHomeHTML(){
-  const now=Date.now(),all=dueCardCount(),roots=deckRoots().sort((a,b)=>(a.name||'').localeCompare(b.name||'','pt-BR'));
-  let h='<div class="toolbar"><div><b style="font-size:17px">Estudar</b></div>'+
-    '<button class="btn primary" data-a="st-start" '+(all?'':'disabled')+'>'+ic('play',14)+' Estudar tudo pendente'+(all?' ('+all+')':'')+'</button></div>';
+  const now=Date.now(),all=dueCardCount(),roots=deckRoots().sort((a,b)=>(a.name||'').localeCompare(b.name||'','pt-BR')),dense=S.prefs.dkDense!==false;
+  let h='<div class="toolbar"><div><b style="font-size:17px">Estudar</b></div><span class="sp"></span>'+
+    '<button class="btn" data-a="deck-new">'+ic('plus',14)+' Novo baralho</button>'+
+    '<button class="btn primary" data-a="st-start" '+(all?'':'disabled')+'>'+ic('play',14)+' Estudar tudo'+(all?' ('+all+')':'')+'</button></div>';
   if(!roots.length)return nSubBar()+h+'<div class="empty">Você ainda não tem baralhos.<br><button class="btn primary" data-a="deck-new">'+ic('plus',15)+' Criar baralho</button></div>';
-  const row=(d,lv)=>{
-    const st=deckStats(d.id,now),kids=deckKids(d.id).sort((a,b)=>(a.name||'').localeCompare(b.name||'','pt-BR')),open=!!(UI.dkOpen||{})[d.id];
-    let r='<div class="crow dkrow" style="padding-left:'+(10+lv*22)+'px"><button class="icon-btn sm dktog" '+(kids.length?'data-a="dk-tog" data-id="'+d.id+'" aria-label="'+(open?'Recolher':'Expandir')+'"':'disabled style="visibility:hidden"')+'>'+ic(open?'chevD':'chevR',14)+'</button><span class="lki">'+ic('cards',16)+'</span><div class="cprev"><b>'+esc(d.name||'Baralho')+'</b><div class="muted small">'+
-      '<b class="cn">'+st.fresh+'</b> novos | <b class="cl">'+st.learn+'</b> aprendendo | <b class="cr">'+st.review+'</b> revisar | '+st.total+' itens'+(!st.due&&st.next?' | próximo '+inTxt(st.next-now):'')+'</div></div>'+
-      '<span class="tact"><button class="btn sm '+(st.due?'primary':'')+'" data-a="st-start" data-id="'+d.id+'" '+(st.total?'':'disabled')+'>'+ic('play',13)+' Estudar'+(st.due?' ('+st.due+')':'')+'</button><button class="icon-btn sm" data-a="deck-open" data-id="'+d.id+'" title="Abrir baralho" aria-label="Abrir baralho">'+ic('chevR',15)+'</button></span></div>';
-    if(open)kids.forEach(k=>{r+=row(k,lv+1);});
-    return r;
-  };
-  return nSubBar()+h+'<div class="card">'+roots.map(d=>row(d,0)).join('')+'</div>';
+  h+='<div class="dkbar"><span class="muted small"><b class="cn">novos</b> | <b class="cl">aprendendo</b> | <b class="cr">revisar</b></span><span class="sp"></span>'+
+    '<button class="btn sm ghost" data-a="dk-exp" data-v="1">Expandir tudo</button><button class="btn sm ghost" data-a="dk-exp" data-v="0">Recolher</button>'+
+    '<button class="btn sm ghost" data-a="dk-dense">'+(dense?'Confortável':'Compacto')+'</button></div>';
+  return nSubBar()+h+'<div class="card dklist">'+roots.map(d=>deckRowHTML(d,0,true)).join('')+'</div><button class="dkfab" data-a="deck-new" aria-label="Novo baralho">'+ic('plus',20)+'<span>Baralho</span></button>';
 }
 function studyHTML(){
   const st=UI.study;if(!st)return studyHomeHTML();
@@ -8644,7 +8770,7 @@ function studyHTML(){
 /* ----- ações ----- */
 Object.assign(ACT,{
   'deck-new'(){
-    const d={id:uid(),name:'Novo baralho',folderId:(UI.nf&&UI.nf!=='__none')?UI.nf:'',catId:'',goalId:'',actId:'',noteId:'',parentId:'',focoIds:[],ret:0,newPd:0,revPd:0,created:Date.now(),updated:Date.now()};
+    const d={id:uid(),name:'Novo baralho',folderId:(UI.nf&&UI.nf!=='__none')?UI.nf:'',catId:'',goalId:'',actId:'',noteId:'',parentId:'',focoIds:[],icon:'',color:'',ret:0,newPd:0,revPd:0,created:Date.now(),updated:Date.now()};
     S.decks.push(d);save();studyStop();UI.tab='notas';UI.nsub='notas';UI.nview={type:'deck',id:d.id};renderTabs();renderMain();window.scrollTo(0,0);openDeckInfo(d,true);
   },
   'deck-open'(el){
@@ -8653,9 +8779,12 @@ Object.assign(ACT,{
   },
   'deck-sub'(el){
     const p=deckById(el.dataset.id);if(!p)return;
-    const d={id:uid(),name:'Novo subbaralho',folderId:p.folderId||'',catId:p.catId||'',goalId:'',actId:'',noteId:'',parentId:p.id,focoIds:[],ret:0,newPd:0,revPd:0,created:Date.now(),updated:Date.now()};
-    S.decks.push(d);save();renderMain();openDeckInfo(d,true);
+    const d={id:uid(),name:'Novo subbaralho',folderId:p.folderId||'',catId:p.catId||'',goalId:'',actId:'',noteId:'',parentId:p.id,focoIds:[],icon:'',color:'',ret:0,newPd:0,revPd:0,created:Date.now(),updated:Date.now()};
+    S.decks.push(d);UI.dkOpen=UI.dkOpen||{};UI.dkOpen[p.id]=true;save();renderMain();openDeckInfo(d,true);
   },
+  'dk-dense'(){S.prefs.dkDense=S.prefs.dkDense===false;save();renderMain();},
+  'dk-exp'(el){UI.dkOpen={};if(el.dataset.v==='1')S.decks.forEach(d=>{if(deckKids(d.id).length)UI.dkOpen[d.id]=true;});renderMain();},
+  'deck-look-form'(){if(UI.dkApply)UI.dkApply();const d=deckById(UI.dkEditId);if(d){save();openFolderLook('k',d.id);}},
   'dk-all'(){UI.dkAll=!UI.dkAll;renderMain();},
   'dk-tog'(el){UI.dkOpen=UI.dkOpen||{};UI.dkOpen[el.dataset.id]=!UI.dkOpen[el.dataset.id];renderMain();},
   'deck-cat-new'(el){
