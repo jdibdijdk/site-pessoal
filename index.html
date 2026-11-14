@@ -2447,6 +2447,27 @@ html[data-theme="dark"] mark.hl{background:color-mix(in srgb,var(--c) 45%,transp
 /* subtítulos e orientações extras menores */
 .toolbar .wlabel>.muted.small,.toolbar>.muted.small,.toolbar>div>.muted.small,p.muted.small,.form p.muted,.form .muted.small,.hint.small{font-size:11.5px;line-height:1.4;opacity:.9}
 .prn .pcont{text-indent:0;margin-top:0}
+
+.stcnt{display:inline-flex;gap:10px;font-size:14px;margin-left:10px}
+.stcnt b{font-weight:700;padding:0 2px;border-bottom:2px solid transparent}.stcnt .cn{color:#2547D0}.stcnt .cl{color:#C2410C}.stcnt .cr{color:#15803D}.stcnt b.on{border-bottom-color:currentColor}
+
+.dkcrumb a{cursor:pointer;color:var(--mut)}.dkcrumb a:hover{color:var(--tx);text-decoration:underline}
+.dkrow .dktog{flex:none}.stcnt .cn,.dkrow .cn,.dkrow .cl,.dkrow .cr,.cn,.cl,.cr{font-weight:600}.cn{color:#2547D0}.cl{color:#C2410C}.cr{color:#15803D}
+.fsst{padding:12px 14px}.fsrow{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--mut)}.fsrow b{color:var(--tx);font-size:15px}
+.fsfc{display:flex;gap:8px;align-items:flex-end;margin-top:12px;height:70px}.fsfc>div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;position:relative}
+.fsfc i{display:block;width:100%;max-width:34px;background:var(--acc);border-radius:5px 5px 0 0;opacity:.85}.fsfc small{font-size:10.5px;color:var(--mut)}.fsfc em{font-style:normal;font-size:10.5px;color:var(--tx)}
+.fgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}@media(max-width:560px){.fgrid3{grid-template-columns:1fr}}
+
+#ctb{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:2px;padding:4px 6px;border:1px solid var(--line);border-radius:10px;background:var(--card);position:sticky;top:-1px;z-index:6;margin:0 0 10px;box-shadow:0 1px 0 var(--line2)}
+#ctb .icon-btn{width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;flex:none}
+#ctb .sepv{width:1px;height:18px;background:var(--line);margin:0 4px;flex:none}
+#ctb .ctbh{margin-left:auto;font-size:11px;white-space:nowrap}@media(max-width:560px){#ctb .ctbh{display:none}}
+.cfcw{position:relative;display:inline-flex}.cdot{width:16px;height:16px;border-radius:50%;background:conic-gradient(#E5383B,#F08C00,#1F9D55,#2547D0,#E5383B);display:block}
+.cfpop{position:absolute;top:34px;left:-4px;display:flex;align-items:center;gap:7px;padding:8px 10px;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:var(--sh2);z-index:8}.cfpop[hidden]{display:none}
+.cfpop .cs{width:20px;height:20px;border-radius:50%;border:2px solid var(--card);box-shadow:0 0 0 1px var(--line);padding:0;cursor:pointer}
+.cfpop input[type=color]{width:24px;height:24px;border:0;padding:0;background:none}
+.cfrev{margin-top:6px}.cfrev small{display:block;color:var(--mut);font-size:11.5px}
+.cf-ed[data-f=front]{min-height:56px}
 </style>
 </head>
 <body>
@@ -2852,16 +2873,16 @@ function normalize(o){
     links:arr('links'),
     linkCats:(Array.isArray(o.linkCats)&&o.linkCats.length)?o.linkCats:LINKCATS.slice(),
     packed:o.packed||{},revx:(o.revx&&typeof o.revx==='object'&&!Array.isArray(o.revx))?o.revx:{},bagRules:(Array.isArray(o.bagRules)?o.bagRules:[]).filter(r=>r&&r.value&&Array.isArray(r.itemIds)),health:arr('health'),hprefs:Object.assign({weeklyMin:150,sleepH:7,heightCm:''},o.hprefs||{}),fin:normFin(o.fin),
-    acts:arr('acts').map(a=>{const x=Object.assign({title:'',kind:'Atividade',tipoAtv:'',blockType:'estudo',catId:'',teacher:'',noTeacher:false,obs:'',place:'',link:'',doWhat:'',where:'',plan:{},bring:'',slots:[],done:{},miss:{},goalIds:[],docIds:[],relId:'',itemIds:[],linkIds:[],stow:{},extras:[],moneys:[],noArea:false,themeNA:false},a);if(x.theme==null)x.theme=x.title;return x;}),
-    tasks:arr('tasks').map(t=>Object.assign({title:'',notes:'',obs:'',deadline:'',catId:'',docId:'',link:'',done:false,activityIds:[],goalIds:[],linkIds:[],itemIds:[],where:'',plan:{},deadlineTime:'',dateIds:[],moneys:[],group:'',subs:[]},t)),
+    acts:arr('acts').map(a=>{const x=Object.assign({deckIds:[],title:'',kind:'Atividade',tipoAtv:'',blockType:'estudo',catId:'',teacher:'',noTeacher:false,obs:'',place:'',link:'',doWhat:'',where:'',plan:{},bring:'',slots:[],done:{},miss:{},goalIds:[],docIds:[],relId:'',itemIds:[],linkIds:[],stow:{},extras:[],moneys:[],noArea:false,themeNA:false},a);if(x.theme==null)x.theme=x.title;return x;}),
+    tasks:arr('tasks').map(t=>Object.assign({deckIds:[],title:'',notes:'',obs:'',deadline:'',catId:'',docId:'',link:'',done:false,activityIds:[],goalIds:[],linkIds:[],itemIds:[],where:'',plan:{},deadlineTime:'',dateIds:[],moneys:[],group:'',subs:[]},t)),
     docs:arr('docs').map(d=>Object.assign({title:'',catId:'',link:'',notes:'',todo:[],goalIds:[],linkIds:[],noteIds:[],folderId:'',ext:'',status:'',source:'',srcLink:'',starnote:false,driveId:'',driveMod:0},d)),
     goals:arr('goals').map(g=>Object.assign({title:'',horizon:'curto',parentId:'',done:false,linkIds:[]},g,{deadline:'',firm:false})),
     dates:arr('dates').map(d=>{const x=Object.assign({title:'',date:'',time:'',cat:'Prazo',notes:'',catId:'',deckIds:[],qtd:0,qlabel:''},d);x.deckIds=Array.isArray(x.deckIds)?x.deckIds:[];x.qtd=Math.max(0,Number(x.qtd)||0);return x;}),
     habits:arr('habits').map(normHabit),
     dateCats:arr('dateCats').filter(c=>c&&c.id&&c.name).map(c=>Object.assign({parentId:'',color:''},c,{name:String(c.name)})),
-    notes:arr('notes').map(n=>normNote(Object.assign({type:'nota',title:'',html:'',wrong:'',right:'',just:'',folderId:'',catId:'',cd:null,created:0,updated:0},n))),
-    decks:arr('decks').map(d=>Object.assign({name:'',folderId:'',catId:'',goalId:'',actId:'',noteId:'',created:0,updated:0},d)),
-    cards:arr('cards').map(c=>Object.assign({deckId:'',type:'basic',front:'',back:'',frontImg:'',backImg:'',text:'',extra:'',okind:'image',image:'',rects:[],table:[],occ:[],hdr:true,s:{},created:0,updated:0},c)),
+    notes:arr('notes').map(n=>normNote(Object.assign({deckIds:[],type:'nota',title:'',html:'',wrong:'',right:'',just:'',folderId:'',catId:'',cd:null,created:0,updated:0},n))),
+    decks:arr('decks').map(d=>Object.assign({name:'',folderId:'',catId:'',goalId:'',actId:'',noteId:'',parentId:'',focoIds:[],ret:0,newPd:0,revPd:0,created:0,updated:0},d)),
+    cards:arr('cards').map(c=>Object.assign({deckId:'',type:'basic',front:'',back:'',frontImg:'',backImg:'',text:'',extra:'',okind:'image',image:'',rects:[],table:[],occ:[],hdr:true,s:{},rl:[],created:0,updated:0},c)),
     ingr:arr('ingr').map(i=>Object.assign({name:'',unit:'g',price:0,pack:1000,minPk:0},i)),
     pantry:arr('pantry').map(p=>Object.assign({ingId:'',qty:0,gosto:false,loc:''},p)),
     recipes:arr('recipes').map(r=>Object.assign({title:'',photo:'',momento:'',area:'',servings:2,ings:[],steps:'',created:0,updated:0},r)),
@@ -3669,7 +3690,7 @@ function occDetail(o,opt){
   h+=secHTML('Dinheiro',moneyView(a));
   h+=foodSection(o);
   h+=hbSection(o);
-  h+=decksSection(S.decks.filter(d=>d.actId===a.id));
+  h+=decksSection(decksOf(a,'actId'));
   const gr=gs.map(g=>{const gd=goalDue(g);return esc(g.title)+'<span class="sub">'+esc(HNAME[g.horizon]+(gd?' | '+gd.txt:''))+'</span>';});
   h+=secHTML('Objetivos maiores',gr.length?gr.map(x=>'<p>'+x+'</p>').join(''):'');
   const tr=tasks.map(t=>'<button class="blue" data-a="view-task" data-id="'+t.id+'">'+esc(t.title)+'</button><span class="sub">'+(t.done?'Concluída':tDue(t)?dueInfo(tDue(t)).l:'Sem prazo')+'</span>');
@@ -5093,7 +5114,7 @@ function openActForm(opts){
     '<div class="f"><span>Documentos</span>'+pickerHTML('docs',S.docs.map(d=>({id:d.id,label:d.title})),p.docIds,'Selecionar documentos')+'</div></div>'+
     '<div class="f"><span>Objetivos maiores</span>'+pickerHTML('goals',goalItems(),p.goalIds,'Em qual objetivo se encaixa')+'</div>'+
     '<div class="f"><span>Foco</span>'+focoPickHTML('focos',p.focoIds)+'</div>'+
-    '<div class="f"><span>Foco</span>'+focoPickHTML('focos',p.focoIds)+'</div>'+
+    '<div class="f"><span>Baralhos <small>flashcards para estudar junto</small></span>'+pickerHTML('mdecks',deckItems(),p.deckIds||[],'Mencionar baralhos')+'</div>'+
     '</div>'+
     '<div class="opt" data-opt="tipo" '+(has.tipo?'':'hidden')+'><div class="fgrid"><label class="f">Tipo de atividade<select name="tipoAtv"><option value="">Automático (pela categoria)</option>'+tipos.map(k=>'<option '+sel(k,p.tipoAtv)+'>'+esc(k)+'</option>').join('')+'</select></label>'+
     '<input type="hidden" name="blockType" value="'+esc(p.blockType)+'"></div>'+
@@ -5124,7 +5145,7 @@ function openActForm(opts){
     const extras=FORMPACK.extras.map(x=>({id:x.id,name:x.name,type:x.type||'Outro',into:(x.into&&ids.indexOf(x.into)>=0)?x.into:''}));
     const data={rev:!!(E.rev&&E.rev.checked),theme:theme,themeNA:E.themeNA.checked,noArea:E.noArea.checked,tipoAtv:E.tipoAtv.value,stow:stow,extras:extras,kind:E.kind.value,blockType:E.blockType.value,catId:catId,
       teacher:E.noteacher.value==='1'?'':E.teacher.value.trim(),noTeacher:E.noteacher.value==='1',obs:E.obs.value.trim(),place:E.place.value.trim(),link:E.link.value.trim(),doWhat:E.doWhat.value.trim(),where:E.where.value.trim(),plan:readPlan(f),bring:E.bring.value.trim(),
-      slots:slots,docIds:pickedValues(f,'docs'),goalIds:pickedValues(f,'goals'),relId:E.relId.value,itemIds:ids,linkIds:(a0&&a0.linkIds)||[],moneys:readMoneys(f),focoIds:pickedValues(f,'focos')};
+      slots:slots,docIds:pickedValues(f,'docs'),goalIds:pickedValues(f,'goals'),relId:E.relId.value,itemIds:ids,linkIds:(a0&&a0.linkIds)||[],moneys:readMoneys(f),focoIds:pickedValues(f,'focos'),deckIds:pickedValues(f,'mdecks')};
     data.title=composeTitle(data);rememberTeachers(data.teacher);rememberPlace(data.place);
     let a=a0;
     if(a)Object.assign(a,data);else{a=Object.assign({id:uid(),done:{},miss:{},createdAt:Date.now()},data);S.acts.push(a);}
@@ -5156,6 +5177,7 @@ function openTaskForm(opts){
     '<div class="fgrid"><label class="f">Documento relacionado<select name="docId"><option value="">Nenhum</option>'+S.docs.map(d=>'<option value="'+d.id+'" '+sel(d.id,p.docId)+'>'+esc(d.title)+'</option>').join('')+'</select></label>'+
     '<div class="f"><span>Objetivos maiores</span>'+pickerHTML('goals',goalItems(),p.goalIds,'Em qual objetivo se encaixa')+'</div></div>'+
     '<div class="f"><span>Foco</span>'+focoPickHTML('focos',p.focoIds)+'</div>'+
+    '<div class="f"><span>Baralhos <small>flashcards para estudar junto</small></span>'+pickerHTML('mdecks',deckItems(),p.deckIds||[],'Mencionar baralhos')+'</div>'+
     '<div class="f"><span>Categoria</span>'+catPickHTML('cat',p.catId)+'</div>'+
     '<div class="f"><span>Atividades vinculadas</span>'+pickerHTML('acts',S.acts.map(a=>({id:a.id,label:aT(a),sub:''})),p.activityIds,'Selecionar atividades')+'</div>'+
     '<label class="f">Link útil<input name="link" inputmode="url" value="'+esc(p.link)+'" autocomplete="off"></label>'+
@@ -5166,7 +5188,7 @@ function openTaskForm(opts){
   f.addEventListener('submit',ev=>{
     ev.preventDefault();const E=f.elements;
     const data={title:E.title.value.trim(),notes:E.notes.value.trim(),obs:E.obs.value.trim(),where:E.where.value.trim(),plan:readPlan(f),itemIds:$$('input[name=it]:checked',f).map(i=>i.value),deadline:E.deadline.value,deadlineTime:E.deadlineTime.value,docId:E.docId.value,catId:$('[data-catpick="cat"]',f).dataset.value||'',
-      activityIds:pickedValues(f,'acts'),goalIds:pickedValues(f,'goals'),dateIds:pickedValues(f,'dates'),link:E.link.value.trim(),linkIds:pickedValues(f,'links'),moneys:readMoneys(f),group:E.group.value.trim(),min:Math.max(0,Math.round(Number(E.min.value)||0)),focoIds:pickedValues(f,'focos')};
+      activityIds:pickedValues(f,'acts'),goalIds:pickedValues(f,'goals'),dateIds:pickedValues(f,'dates'),link:E.link.value.trim(),linkIds:pickedValues(f,'links'),deckIds:pickedValues(f,'mdecks'),moneys:readMoneys(f),group:E.group.value.trim(),min:Math.max(0,Math.round(Number(E.min.value)||0)),focoIds:pickedValues(f,'focos')};
     const old=(t0&&t0.subs)||[],used={};data.subs=E.subs.value.split('\n').map(x=>x.trim()).filter(Boolean).map(x=>{const m=old.find(o=>o.t===x&&!used[o.id]);if(m){used[m.id]=1;return m;}return {id:uid(),t:x,done:false,doneAt:0};});
     if(t0)Object.assign(t0,data);else S.tasks.push(Object.assign({id:uid(),done:false,createdAt:Date.now()},data));
     save();finishForm();toast('Tarefa salva.');
@@ -5386,6 +5408,7 @@ function openTaskView(id){
     secHTML('Descrição',t.notes?'<p class="pre" style="white-space:pre-wrap">'+esc(t.notes)+'</p>':'')+
     secHTML('Observações',t.obs?'<p class="pre" style="white-space:pre-wrap">'+esc(t.obs)+'</p>':'')+
     secHTML('Ligada a',pills.length?'<div class="pills">'+pills.join('')+'</div>':'')+
+    decksSection(decksOf(t,''))+
     secHTML('Objetivos maiores',gs.length?gs.map(g=>'<p>'+esc(g.title)+'<span class="sub">'+esc(HNAME[g.horizon])+'</span></p>').join(''):'')+
     secHTML('Links',links.map(x=>'<div class="lk">'+x+'</div>').join(''))+
     secHTML('O que levar / usar',its.length?'<p>'+esc(its.map(i=>i.name).join(', '))+'</p>'+planLines(t):'')+
@@ -5517,7 +5540,7 @@ function qMetaChips(q){
   return (q.prova||q.nivel||q.ano?'<span class="tag outline" title="Prova de origem">'+esc(qOrigin(q))+'</span>':'')+(q.qgroup?'<span class="tag outline" title="Grupo de questões">'+ic('layers',11)+esc(q.qgroup)+'</span>':'')+(q.qs&&q.qs.n?'<span class="muted small">treino: '+q.qs.ok+'/'+q.qs.n+'</span>':'');
 }
 // Na lista de notas, os cards de estudo aparecem agrupados em baralhos (nunca soltos)
-const notaItemsAll=()=>S.notes.map(n=>({k:n.type==='questao'?'questao':n.type==='caso'?'caso':n.type==='fluxo'?'fluxo':n.type==='bula'?'bula':'note',o:n})).concat(S.pdfs.map(p=>({k:'pdf',o:p})),S.decks.map(d=>({k:'deck',o:d})),(S.slides||[]).map(x=>({k:'slides',o:x})),(S.inks||[]).map(x=>({k:'ink',o:x})));
+const notaItemsAll=()=>S.notes.map(n=>({k:n.type==='questao'?'questao':n.type==='caso'?'caso':n.type==='fluxo'?'fluxo':n.type==='bula'?'bula':'note',o:n})).concat(S.pdfs.map(p=>({k:'pdf',o:p})),deckRoots().map(d=>({k:'deck',o:d})),(S.slides||[]).map(x=>({k:'slides',o:x})),(S.inks||[]).map(x=>({k:'ink',o:x})));
 function notaItems(){
   let items=notaItemsAll();
   const ttl=i=>i.k==='deck'?i.o.name:i.o.title;
@@ -5566,7 +5589,7 @@ function nCardHTML(it){
   if(it.k==='deck'){
     const st=deckStats(o.id,Date.now());
     return '<div class="ncard deck" data-a="n-open" data-k="deck" data-id="'+o.id+'" style="--c:'+col+'" role="button" tabindex="0"><h3>'+ic('cards',16)+esc(o.name||'Baralho')+'<span class="tag outline" style="margin-left:auto">Baralho</span></h3>'+
-      '<p>'+st.total+(st.total===1?' item de estudo':' itens de estudo')+' | '+(st.due?'<b style="color:var(--acc)">'+st.due+' para revisar agora</b>':'em dia')+'</p>'+foot+'</div>';
+      '<p>'+(deckKids(o.id).length?deckKids(o.id).length+(deckKids(o.id).length===1?' subbaralho | ':' subbaralhos | '):'')+st.total+(st.total===1?' item de estudo':' itens de estudo')+' | '+(st.due?'<b style="color:var(--acc)">'+st.due+' para revisar agora</b>':'em dia')+'</p>'+foot+'</div>';
   }
   const body=it.k==='fluxo'?'<div class="fxcard">'+fxThumb(o)+'</div><p>'+o.fx.nodes.length+(o.fx.nodes.length===1?' caixa':' caixas')+' | '+o.fx.edges.length+(o.fx.edges.length===1?' ligação':' ligações')+'</p>':it.k==='pdf'?'<p>PDF | '+((o.annots||[]).length)+' anotação(ões)'+(o.src==='drive'?' | no Drive':' | neste aparelho')+'</p>':objCardHTML(o)+(isNoteK(it.k)&&it.k!=='fluxo'?ncImgsHTML(o):'')+'<p>'+esc((it.k==='bula'?bulaSnippet(o):noteText(o)).slice(0,220)||'Nota vazia')+'</p>';
   return '<div class="ncard" data-a="n-open" data-k="'+it.k+'" data-id="'+o.id+'" style="--c:'+col+'" role="button" tabindex="0"><h3>'+ic(it.k==='pdf'?'file':it.k==='questao'?'help':it.k==='caso'?'pulse':it.k==='bula'?'pill':it.k==='fluxo'?'grid':'note',16)+nkBadge(o,13)+esc(o.title||'Sem título')+(it.k==='bula'?'<span class="tag outline" style="margin-left:auto">'+(o.kind==='classe'?'Classe':'Medicamento')+'</span>':'')+(it.k==='questao'?'<span class="tag outline" style="margin-left:auto">Questão</span>':it.k==='caso'?'<span class="tag outline" style="margin-left:auto">Caso clínico</span>':it.k==='fluxo'?'<span class="tag outline" style="margin-left:auto">Fluxograma</span>':'')+'</h3>'+body+foot+'</div>';
@@ -5764,7 +5787,7 @@ function noteViewHTML(n){
     '<button class="icon-btn" data-a="n-del" title="Excluir" aria-label="Excluir">'+ic('trash',18)+'</button></div>';
   if(edit){
     h+='<input id="ntitle" class="ntitle" value="'+esc(n.title)+'" placeholder="'+(isQ?'Título da questão (opcional)':isC?'Título do caso':isF?'Título do fluxograma':isB?(n.kind==='classe'?'Nome da classe':'Nome do medicamento'):'Título da nota')+'" autocomplete="off">'+
-      '<div class="nmeta"><label class="f">Pasta<select id="nfolder">'+folderOptions(n.folderId)+'</select></label><div class="f"><span>Categoria</span>'+catPickHTML('ncat',n.catId)+'</div><label class="f">Tipo de nota<select id="nnk">'+nkOptions(n.nk)+'</select></label><div class="f"><span>Foco</span>'+focoPickHTML('nfoco',n.focoIds)+'</div>'+
+      '<div class="nmeta"><label class="f">Pasta<select id="nfolder">'+folderOptions(n.folderId)+'</select></label><div class="f"><span>Categoria</span>'+catPickHTML('ncat',n.catId)+'</div><label class="f">Tipo de nota<select id="nnk">'+nkOptions(n.nk)+'</select></label><div class="f"><span>Foco</span>'+focoPickHTML('nfoco',n.focoIds)+'</div><div class="f"><span>Baralhos</span>'+pickerHTML('ndeck',deckItems(),n.deckIds||[],'Mencionar baralhos')+'</div>'+
       '<div class="f"><span>Contagem regressiva <small>data e nome</small></span><div class="frow" style="flex-wrap:nowrap"><input type="date" id="ncd" value="'+esc((n.cd&&n.cd.date)||'')+'" style="flex:1"><input id="ncdl" value="'+esc((n.cd&&n.cd.label)||'')+'" style="flex:1" autocomplete="off"><button type="button" class="icon-btn sm" data-a="n-cd-clear" title="Remover contagem" aria-label="Remover contagem">'+ic('x',14)+'</button></div></div></div>'+
       (isQ?qEditMetaHTML(n):'')+(isF?'':noteToolbarHTML());
   }else{
@@ -5985,7 +6008,7 @@ function casoBodyHTML(n,edit,ed){
   h+='<div class="soapend">'+CASO_LISTS.map(l=>'<div data-sec="'+l[0]+'">'+objListHTML(n,l[0],l[1],l[2],edit)+'</div>').join('')+'</div>';
   return h+'<div data-sec="free">'+free('Anotações livres')+'</div>';
 }
-function noteDecksHTML(n){return decksSection(S.decks.filter(d=>d.noteId===n.id));}
+function noteDecksHTML(n){return decksSection(decksOf(n,'noteId'));}
 
 // ----- edição da nota -----
 let noteTimer=null;
@@ -7139,6 +7162,7 @@ function notasInput(e){ // campos da nota (título, nome da contagem, busca)
 }
 function notasChange(e){
   const t=e.target;
+  if(t.closest&&t.closest('[data-pick="ndeck"]')){const n=noteById(UI.nview&&UI.nview.id);if(n){n.deckIds=pickedValues(document,'ndeck');n.updated=Date.now();save();}return true;}
   if(t.closest&&t.closest('[data-pick="nfoco"]')){const n=noteById(UI.nview&&UI.nview.id);if(n){n.focoIds=pickedValues(document,'nfoco');n.updated=Date.now();save();}return true;}
   if(t.id==='nnk'){const n=noteById(UI.nview.id);if(n){n.nk=t.value;n.updated=Date.now();save();}return true;}
   if(t.id==='nfolder'){const n=noteById(UI.nview.id);if(n){n.folderId=t.value;n.updated=Date.now();save();}return true;}
@@ -7726,6 +7750,10 @@ function notifHTML(){
     '<div class="addrow"><button class="btn primary" data-a="notif">'+ic('bell',15)+' Permitir Notificações</button><button class="btn" data-a="nt-test">Enviar Teste</button></div>'+
     '<label class="sw" style="margin-top:10px"><input type="checkbox" data-a="nt-master" '+(c.on?'checked':'')+'> <b>Receber notificações</b></label>'+
     '<label class="sw" style="margin-top:10px"><input type="checkbox" data-a="due-badge" '+(S.prefs.hideDueBadge?'':'checked')+'> <b>Mostrar o número de cards a revisar na aba Notas</b></label>'+
+    '<div style="margin-top:14px"><b>Flashcards (FSRS)</b><div class="muted small" style="margin:2px 0 8px">Padrões de todos os baralhos; cada baralho pode ter os seus em Editar baralho.</div><div class="fgrid3">'+
+    '<label class="f">Retenção desejada (%)<input type="number" data-fs="fsRet" min="70" max="99" value="'+Math.round((S.prefs.fsRet||FS_DEF.ret)*100)+'"></label>'+
+    '<label class="f">Novos por dia<input type="number" data-fs="fsNew" min="1" max="999" value="'+(S.prefs.fsNew||FS_DEF.newPd)+'"></label>'+
+    '<label class="f">Revisões por dia<input type="number" data-fs="fsRev" min="1" max="9999" value="'+(S.prefs.fsRev||FS_DEF.revPd)+'"></label></div></div>'+
     '<div class="ntrows" '+(c.on?'':'style="opacity:.5;pointer-events:none"')+'>'+NT_KINDS.map(row).join('')+
     '<div class="ntrow"><label class="sw"><input type="checkbox" data-a="nt-quiet" '+(c.quiet.on?'checked':'')+'> <b>Horário de Silêncio</b></label><div class="muted small">Nada é avisado nesse intervalo.</div>'+
       (c.quiet.on?'<div class="addrow"><label class="f ntt"><span>Das</span><input type="time" data-ntq="from" value="'+c.quiet.from+'"></label><label class="f ntt"><span>Até</span><input type="time" data-ntq="to" value="'+c.quiet.to+'"></label></div>':'')+'</div></div>'+
@@ -8138,14 +8166,77 @@ function gridTapCreate(col,clientY){const s=dragSlot(gridRaw(col,clientY),gridRa
    ========================================================================== */
 const deckById=id=>S.decks.find(d=>d.id===id);
 const cardById=id=>S.cards.find(c=>c.id===id);
-const CARD_TYPES={basic:'Frente e verso',cloze:'Oclusão de palavras',occ:'Oclusão de imagem/tabela'};
-// Depois de virar o card, você classifica; a classificação define quando ele volta
+const CARD_TYPES={basic:'Frente e verso',rev:'Frente e verso invertido',cloze:'Oclusão de palavras',occ:'Oclusão de imagem/tabela'};
+// Depois de virar o card, você classifica (Errei, Difícil, Bom, Fácil); o FSRS calcula quando ele volta
 const RATES=[
-  {k:1,label:'Muito difícil',ms:30e3,txt:'menos de 1 min',cls:'r1'},
-  {k:2,label:'Difícil',ms:3*60e3,txt:'3 min',cls:'r2'},
-  {k:3,label:'Normal',ms:10*60e3,txt:'10 min',cls:'r3'},
-  {k:4,label:'Fácil',ms:864e5,txt:'1 dia',cls:'r4'}
+  {k:1,label:'Errei',cls:'r1'},
+  {k:2,label:'Difícil',cls:'r2'},
+  {k:3,label:'Bom',cls:'r3'},
+  {k:4,label:'Fácil',cls:'r4'}
 ];
+/* ----- FSRS-5 (Free Spaced Repetition Scheduler) com os pesos padrão ----- */
+const FSRS={
+  W:[0.40255,1.18385,3.173,15.69105,7.1949,0.5345,1.4604,0.0046,1.54575,0.1192,1.01925,1.9395,0.11,0.29605,2.2698,0.2315,2.9898,0.51655,0.6621],
+  DEC:-0.5,FAC:19/81,
+  cD(d){return Math.min(10,Math.max(1,d));},
+  R(t,St){return Math.pow(1+this.FAC*t/St,this.DEC);},                       // probabilidade de lembrar após t dias
+  ivl(St,r){return Math.max(1,Math.min(36500,Math.round(St/this.FAC*(Math.pow(r,1/this.DEC)-1))));}, // dias para chegar à retenção r
+  s0(g){return Math.max(.01,this.W[g-1]);},
+  d0(g){return this.cD(this.W[4]-Math.exp(this.W[5]*(g-1))+1);},
+  nD(D,g){const W=this.W,d=D-W[6]*(g-3)*(10-D)/9;return this.cD(W[7]*this.d0(4)+(1-W[7])*d);},
+  sRec(D,St,R,g){const W=this.W;return Math.max(.01,St*(1+Math.exp(W[8])*(11-D)*Math.pow(St,-W[9])*(Math.exp((1-R)*W[10])-1)*(g===2?W[15]:1)*(g===4?W[16]:1)));},
+  sFor(D,St,R){const W=this.W;return Math.max(.01,Math.min(St,W[11]*Math.pow(D,-W[12])*(Math.pow(St+1,W[13])-1)*Math.exp((1-R)*W[14])));},
+  sSame(St,g){const W=this.W;return Math.max(.01,St*Math.exp(W[17]*(g-3+W[18])));}
+};
+const DAY=864e5,LEARN_AHEAD=20*60e3,LEARN_STEPS=[1,10],RELEARN_STEPS=[10],LEECH_N=8;
+const FS_DEF={ret:.9,newPd:20,revPd:200};
+const dayStart=()=>{const d=new Date();d.setHours(0,0,0,0);return d.getTime();};
+function fuzz(iv,seed){
+  if(iv<3)return iv;let h=0;String(seed).split('').forEach(ch=>{h=(h*31+ch.charCodeAt(0))|0;});
+  const r=((Math.abs(h)%1000)/1000-.5)*2,amp=Math.max(1,Math.round(iv*.05));return Math.max(1,Math.round(iv+r*amp));
+}
+// uma resposta g (1 Errei, 2 Difícil, 3 Bom, 4 Fácil) sobre o estado s do item
+function fsrsOne(s,g,now,rd,seed){
+  const n={st:s.st,S:s.S,D:s.D,reps:(s.reps||0)+1,lapses:s.lapses||0,lr:now,step:s.step||0,last:g,due:now},min=m=>now+m*60e3;
+  const grad=()=>{n.st=2;n.step=0;n.ivd=fuzz(FSRS.ivl(n.S,rd),seed);n.due=now+n.ivd*DAY;};
+  if(s.st===2){
+    const R=FSRS.R(Math.max(0,(now-s.lr)/DAY),s.S);n.D=FSRS.nD(s.D,g);
+    if(g===1){n.lapses++;n.S=FSRS.sFor(s.D,s.S,R);n.st=3;n.step=0;n.due=min(RELEARN_STEPS[0]);}
+    else{n.S=FSRS.sRec(s.D,s.S,R,g);grad();}
+    return n;
+  }
+  if(s.st===3){
+    if(g===1){n.step=0;n.due=min(RELEARN_STEPS[0]);}
+    else if(g===2)n.due=min(RELEARN_STEPS[Math.min(n.step,RELEARN_STEPS.length-1)]);
+    else if(g===3){n.step++;if(n.step>=RELEARN_STEPS.length)grad();else n.due=min(RELEARN_STEPS[n.step]);}
+    else grad();
+    return n;
+  }
+  const L=LEARN_STEPS,base=s.st===0?0:(s.step||0);
+  if(s.st===0){n.S=FSRS.s0(g);n.D=FSRS.d0(g);}
+  else{n.S=FSRS.sSame(s.S,g);n.D=FSRS.nD(s.D,g);}
+  n.st=1;
+  if(g===1){n.step=0;n.due=min(L[0]);}
+  else if(g===2){n.step=base;n.due=min(base===0&&L.length>1?(L[0]+L[1])/2:L[Math.min(base,L.length-1)]);}
+  else if(g===3){n.step=base+1;if(n.step>=L.length)grad();else n.due=min(L[n.step]);}
+  else grad();
+  return n;
+}
+// as quatro respostas possíveis, com Difícil < Bom < Fácil nos intervalos em dias
+function fsrsAll(s,now,rd,seed){
+  const r=[1,2,3,4].map(g=>fsrsOne(s,g,now,rd,seed));
+  let h=r[1],g=r[2],e=r[3];
+  if(h.ivd&&g.ivd&&h.ivd>g.ivd)h.ivd=g.ivd;
+  if(g.ivd&&h.ivd&&g.ivd<=h.ivd&&s.st===2)g.ivd=h.ivd+1;
+  if(e.ivd&&g.ivd&&e.ivd<=g.ivd)e.ivd=g.ivd+1;
+  [h,g,e].forEach(x=>{if(x.ivd)x.due=now+x.ivd*DAY;});
+  return r;
+}
+function ivTxt(ms){
+  if(ms<=0)return 'agora';const m=ms/60e3;if(m<1)return '< 1 min';if(m<60)return Math.round(m)+' min';
+  const h=m/60;if(h<24)return Math.round(h)+' h';const d=h/24;if(d<30)return Math.round(d)+' d';
+  if(d<365)return (Math.round(d/30*10)/10).toString().replace('.',',')+' mes';return (Math.round(d/365*10)/10).toString().replace('.',',')+' a';
+}
 const nlbr=t=>esc(t).replace(/\n/g,'<br>');
 function inTxt(ms){
   if(ms<=0)return 'agora';const s=Math.round(ms/1000);if(s<60)return 'em '+s+' s';
@@ -8158,6 +8249,7 @@ const CLOZE_RE=/\{\{(?:c(\d+)::)?([^{}]+?)(?:::([^{}]+?))?\}\}/g;
 function clozeIdx(t){const set=new Set();String(t||'').replace(CLOZE_RE,(m,n)=>{set.add(n||'1');return m;});return Array.from(set).sort((a,b)=>a-b);}
 // Cada card gera "itens de estudo": 1 (frente e verso), 1 por lacuna, 1 por área/célula ocultada
 function cardItems(c){
+  if(c.type==='rev')return ['0','r'];
   if(c.type==='cloze'){const l=clozeIdx(c.text);return l.length?l:['0'];}
   if(c.type==='occ'){
     if(c.okind==='table')return (c.occ||[]).length?c.occ.slice():['0'];
@@ -8165,19 +8257,63 @@ function cardItems(c){
   }
   return ['0'];
 }
-const sch=(c,i)=>((c.s||{})[i])||{due:0,reps:0};
-function deckStats(deckId,now){
-  let total=0,due=0,fresh=0,next=null;
-  S.cards.forEach(c=>{if(c.deckId!==deckId)return;cardItems(c).forEach(i=>{total++;const s=sch(c,i);if(s.due<=now){due++;if(!s.reps)fresh++;}else if(next===null||s.due<next)next=s.due;});});
-  return {total:total,due:due,fresh:fresh,review:due-fresh,next:next};
+// estado de um item (cards antigos, sem FSRS, são convertidos na leitura)
+function schNorm(s){
+  s=s||{};
+  if(s.st===undefined){
+    if(!(s.reps>0))return {st:0,due:0,S:0,D:0,reps:0,lapses:0,lr:0,step:0};
+    return {st:2,due:s.due||0,S:Math.max(1,Math.min(s.reps,3)),D:5,reps:s.reps,lapses:0,lr:(s.due||Date.now())-DAY,step:0,last:s.last};
+  }
+  return s;
+}
+const sch=(c,i)=>schNorm((c.s||{})[i]);
+const deckKids=id=>S.decks.filter(d=>(d.parentId||'')===id);
+const deckRoots=()=>S.decks.filter(d=>!d.parentId||!deckById(d.parentId)||d.parentId===d.id);
+function deckTree(id){const out=[],seen={};const go=x=>{if(seen[x])return;seen[x]=1;out.push(x);S.decks.forEach(d=>{if(d.parentId===x)go(d.id);});};go(id);return out;}
+function deckPath(d){const p=[];let x=d,g=0;while(x&&g++<20){p.unshift(x.name||'Baralho');x=x.parentId?deckById(x.parentId):null;}return p;}
+function deckAnc(d){const out=[];let x=d&&d.parentId?deckById(d.parentId):null,g=0;while(x&&g++<20){out.push(x);x=x.parentId?deckById(x.parentId):null;}return out;}
+function deckOpt(d,k){ // opção do baralho, herdada dos pais e, por fim, das preferências
+  let x=d,g=0;while(x&&g++<20){if(typeof x[k]==='number'&&x[k]>0)return x[k];x=x.parentId?deckById(x.parentId):null;}
+  const P=S.prefs||{},m={ret:P.fsRet,newPd:P.fsNew,revPd:P.fsRev};return m[k]>0?m[k]:FS_DEF[k];
+}
+function todayDone(ids){ // novos e revisões já feitos hoje
+  const t0=dayStart(),set=new Set(ids);let nw=0,rv=0;
+  S.cards.forEach(c=>{if(!set.has(c.deckId))return;(c.rl||[]).forEach(r=>{if(r[0]<t0)return;if(r[3]===0)nw++;else if(r[3]===2)rv++;});});
+  return {nw:nw,rv:rv};
+}
+function deckStats(deckId,now,own){
+  const ids=own?[deckId]:deckTree(deckId),set=new Set(ids),d=deckById(deckId);
+  let total=0,nw=0,ln=0,rv=0,next=null;
+  S.cards.forEach(c=>{if(!set.has(c.deckId))return;cardItems(c).forEach(i=>{total++;const s=sch(c,i);
+    if(s.st===0)nw++;
+    else if(s.st===2){if(s.due<=now)rv++;else if(next===null||s.due<next)next=s.due;}
+    else{if(s.due<=now+LEARN_AHEAD)ln++;else if(next===null||s.due<next)next=s.due;}});});
+  const dn=todayDone(ids),newN=Math.min(nw,Math.max(0,deckOpt(d,'newPd')-dn.nw)),revN=Math.min(rv,Math.max(0,deckOpt(d,'revPd')-dn.rv));
+  return {total:total,fresh:newN,newAll:nw,learn:ln,review:revN,revAll:rv,due:newN+ln+revN,next:next,ids:ids};
 }
 // só conta cards cujo baralho existe (cards de baralhos excluídos, que sobraram, não aparecem no número)
 const orphanCards=()=>S.cards.filter(c=>!deckById(c.deckId));
-function dueCardCount(){const now=Date.now();let n=0;S.cards.forEach(c=>{if(!deckById(c.deckId))return;cardItems(c).forEach(i=>{if(sch(c,i).due<=now)n++;});});return n;}
+function dueCardCount(){const now=Date.now();let n=0;deckRoots().forEach(d=>{n+=deckStats(d.id,now).due;});return n;}
+const decksOf=(o,k)=>{const ids=new Set((o&&o.deckIds)||[]);return S.decks.filter(d=>ids.has(d.id)||(k&&d[k]===o.id));};
+function deckItems(){
+  const out=[],now=Date.now();
+  const go=(pid,lv)=>S.decks.filter(x=>(x.parentId||'')===pid).sort((a,b)=>(a.name||'').localeCompare(b.name||'','pt-BR')).forEach(x=>{const st=deckStats(x.id,now,true);out.push({id:x.id,label:'\u2003'.repeat(lv)+(x.name||'Baralho'),sub:st.total+' itens'});go(x.id,lv+1);});
+  go('',0);S.decks.filter(x=>x.parentId&&!deckById(x.parentId)).forEach(x=>out.push({id:x.id,label:x.name||'Baralho',sub:''}));
+  return out;
+}
+// quem cita este baralho (evento, tarefa, nota ou data)
+function deckMentionsHTML(d){
+  const has=o=>(o.deckIds||[]).indexOf(d.id)>=0,pills=[];
+  S.acts.filter(has).forEach(a=>pills.push('<button class="pillx" data-a="view-act" data-aid="'+a.id+'">'+ic('calendar',13)+esc(aT(a))+'</button>'));
+  S.tasks.filter(has).forEach(t=>pills.push('<button class="pillx" data-a="view-task" data-id="'+t.id+'">'+ic('check',13)+esc(t.title)+'</button>'));
+  S.notes.filter(has).forEach(n=>pills.push('<button class="pillx" data-a="n-open" data-k="note" data-id="'+n.id+'">'+ic('note',13)+esc(n.title||'Nota')+'</button>'));
+  S.dates.filter(has).forEach(x=>pills.push('<button class="pillx" data-a="view-date" data-id="'+x.id+'">'+ic('clock',13)+esc(x.title)+'</button>'));
+  return pills.length?secHTML('Mencionado em','<div class="pills">'+pills.join('')+'</div>'):'';
+}
 function decksSection(list){
   if(!list||!list.length)return '';
   const now=Date.now();
-  return secHTML('Baralhos','<div class="pills">'+list.map(d=>{const st=deckStats(d.id,now);return '<button class="pillx" data-a="deck-open" data-id="'+d.id+'">'+ic('cards',13)+esc(d.name)+' | '+(st.due?st.due+' p/ revisar':'em dia')+'</button>';}).join('')+'</div>');
+  return secHTML('Baralhos','<div class="pills">'+list.map(d=>{const st=deckStats(d.id,now);return '<button class="pillx" data-a="deck-open" data-id="'+d.id+'">'+ic('cards',13)+esc(deckPath(d).join(' › '))+' | '+(st.due?st.due+' p/ revisar':'em dia')+'</button>';}).join('')+'</div>');
 }
 
 // Verso e extra aceitam negrito, itálico, cor, tamanho e imagens (cards antigos em texto simples continuam funcionando)
@@ -8187,60 +8323,102 @@ const richText=t=>{const d=document.createElement('div');d.innerHTML=richHTML(t)
 const richEmpty=h=>!richText(h)&&!/<img/i.test(h||'');
 function edVal(sel){const el=$(sel);if(!el)return '';const h=cleanHTML(el.innerHTML);return richEmpty(h)?'':h;}
 function cardToolbarHTML(){
-  const ib=(cmd,i,t)=>'<button class="icon-btn" data-a="n-cmd" data-cmd="'+cmd+'" title="'+t+'" aria-label="'+t+'">'+ic(i,17)+'</button>';
-  return '<div class="ntb ctb" id="ctb">'+ib('bold','bold','Negrito')+ib('italic','italic','Itálico')+ib('underline','underline','Sublinhado')+'<span class="sepv"></span>'+
-    '<button class="icon-btn tsz" data-a="n-size" data-d="-2" title="Diminuir o texto selecionado" aria-label="Diminuir texto">A−</button><button class="icon-btn tsz" data-a="n-size" data-d="2" title="Aumentar o texto selecionado" aria-label="Aumentar texto" style="font-size:16px">A+</button><span class="sepv"></span>'+
-    NOTE_COLORS.slice(0,5).map(c=>'<button class="cs" data-a="n-color" data-c="'+c[0]+'" style="background:'+c[0]+'" title="Cor do texto: '+c[1]+'" aria-label="Cor '+c[1]+'"></button>').join('')+
-    '<input type="color" id="ncolorPick" value="#2547D0" title="Outra cor" aria-label="Outra cor"><span class="sepv"></span>'+ib('ul','list','Marcadores')+ib('mark','marker','Destaque')+
-    '<button class="btn sm" data-a="n-img" title="Inserir imagem (ou cole/arraste uma imagem aqui)">'+ic('image',15)+' Imagem</button></div>';
+  const ib=(cmd,i,t)=>'<button type="button" class="icon-btn" data-a="n-cmd" data-cmd="'+cmd+'" title="'+t+'" aria-label="'+t+'">'+ic(i,17)+'</button>';
+  return '<div class="ctb" id="ctb" role="toolbar" aria-label="Formatação do texto">'+ib('bold','bold','Negrito')+ib('italic','italic','Itálico')+ib('underline','underline','Sublinhado')+'<span class="sepv"></span>'+
+    '<button type="button" class="icon-btn tsz" data-a="n-size" data-d="-2" title="Diminuir o texto selecionado" aria-label="Diminuir texto">A−</button><button type="button" class="icon-btn tsz" data-a="n-size" data-d="2" title="Aumentar o texto selecionado" aria-label="Aumentar texto" style="font-size:16px">A+</button><span class="sepv"></span>'+
+    '<span class="cfcw"><button type="button" class="icon-btn" data-a="cf-col" title="Cor do texto" aria-label="Cor do texto"><span class="cdot"></span></button><div class="cfpop" hidden>'+
+    NOTE_COLORS.slice(0,5).map(c=>'<button type="button" class="cs" data-a="cf-color" data-c="'+c[0]+'" style="background:'+c[0]+'" title="'+c[1]+'" aria-label="Cor '+c[1]+'"></button>').join('')+
+    '<input type="color" id="ncolorPick" value="#2547D0" title="Outra cor" aria-label="Outra cor"></div></span>'+ib('ul','list','Marcadores')+ib('mark','marker','Destaque')+
+    '<button type="button" class="icon-btn" data-a="n-img" title="Inserir imagem no campo selecionado (ou cole/arraste uma imagem)" aria-label="Inserir imagem">'+ic('image',17)+'</button>'+
+    '<span class="muted ctbh">Vale para o campo em que você está escrevendo</span></div>';
 }
 function cardPreview(c){
   if(c.type==='cloze')return String(c.text||'').replace(CLOZE_RE,(m,n,a)=>'['+a+']');
   if(c.type==='occ')return c.okind==='table'?'Tabela '+((c.table||[]).length)+'×'+((((c.table||[])[0])||[]).length)+' | '+(c.occ||[]).length+' célula(s) oculta(s)':'Imagem | '+(c.rects||[]).length+' área(s) oculta(s)';
-  return c.front||'(só imagem)';
+  return richText(c.front)||'(só imagem)';
 }
 
 /* ----- visão do baralho: lista de cards, adicionar, editar ----- */
+const deckFocoObj=d=>({focoIds:Array.from(new Set(deckAnc(d).reverse().reduce((a,x)=>a.concat(focoIdsOf(x)),[]).concat(focoIdsOf(d))))});
+function deckFsrsHTML(d,ids){
+  const set=new Set(ids),now=Date.now();let c0=0,c1=0,c2=0,c3=0,rs=0,rn=0,ok=0,tot=0,leech=0;const fc=[0,0,0,0,0,0,0];
+  S.cards.forEach(c=>{if(!set.has(c.deckId))return;if(c.leech)leech++;
+    cardItems(c).forEach(i=>{const s=sch(c,i);if(s.st===0)c0++;else if(s.st===1)c1++;else if(s.st===2)c2++;else c3++;
+      if(s.st===2){rs+=FSRS.R(Math.max(0,(now-s.lr)/DAY),s.S);rn++;const k=Math.floor((s.due-dayStart())/DAY);if(k>=0&&k<7)fc[k]++;else if(s.due<=now)fc[0]++;}});
+    (c.rl||[]).forEach(r=>{if(r[3]===2){tot++;if(r[2]>1)ok++;}});});
+  if(!(c1+c2+c3))return '';
+  const mx=Math.max(1,Math.max.apply(null,fc)),wd=['Hoje','Amanhã'];
+  return '<div class="sechead">Memória (FSRS)</div><div class="card sec fsst"><div class="fsrow"><span><b>'+c0+'</b> novos</span><span><b>'+(c1+c3)+'</b> aprendendo</span><span><b>'+c2+'</b> em revisão</span>'+
+    (rn?'<span title="Probabilidade média de lembrar agora"><b>'+Math.round(rs/rn*100)+'%</b> lembrança média</span>':'')+(tot?'<span title="Respostas diferentes de Errei nas revisões"><b>'+Math.round(ok/tot*100)+'%</b> retenção real ('+tot+')</span>':'')+
+    '<span>Meta <b>'+Math.round(deckOpt(d,'ret')*100)+'%</b></span>'+(leech?'<span class="neg"><b>'+leech+'</b> sanguessuga'+(leech>1?'s':'')+'</span>':'')+'</div>'+
+    '<div class="fsfc" aria-label="Revisões previstas nos próximos 7 dias">'+fc.map((n,k)=>'<div title="'+(k<2?wd[k]:'Em '+k+' dias')+': '+n+'"><i style="height:'+Math.round(n/mx*36+2)+'px"></i><small>'+(k<2?wd[k]:k+'d')+'</small><em>'+n+'</em></div>').join('')+'</div></div>';
+}
 function deckViewHTML(d){
-  const now=Date.now(),st=deckStats(d.id,now),cards=S.cards.filter(c=>c.deckId===d.id).sort((a,b)=>(a.created||0)-(b.created||0));
+  const now=Date.now(),st=deckStats(d.id,now),own=deckStats(d.id,now,true),kids=deckKids(d.id),par=d.parentId&&deckById(d.parentId);
+  const all=!!UI.dkAll&&kids.length,ids=all?st.ids:[d.id],cards=S.cards.filter(c=>ids.indexOf(c.deckId)>=0).sort((a,b)=>(a.created||0)-(b.created||0));
   const goal=d.goalId&&goalById(d.goalId),act=d.actId&&actById(d.actId),note=d.noteId&&noteById(d.noteId);
-  let h='<div class="nhead"><button class="btn sm ghost" data-a="n-back">'+ic('chevL',14)+' Notas</button><span class="sp"></span>'+
-    '<button class="btn primary sm" data-a="st-start" data-id="'+d.id+'">'+ic('play',13)+' Estudar'+(st.due?' ('+st.due+')':'')+'</button>'+
-    '<button class="icon-btn" data-a="deck-edit" data-id="'+d.id+'" title="Renomear e editar informações" aria-label="Editar baralho">'+ic('edit',19)+'</button>'+
+  let h='<div class="nhead">'+(par?'<button class="btn sm ghost" data-a="deck-open" data-id="'+par.id+'">'+ic('chevL',14)+' '+esc(par.name||'Baralho')+'</button>':'<button class="btn sm ghost" data-a="n-back">'+ic('chevL',14)+' Notas</button>')+'<span class="sp"></span>'+
+    '<button class="btn primary sm" data-a="st-start" data-id="'+d.id+'">'+ic('play',13)+' Estudar'+(kids.length?' tudo':'')+(st.due?' ('+st.due+')':'')+'</button>'+
+    '<button class="btn sm" data-a="deck-sub" data-id="'+d.id+'" title="Criar um subbaralho dentro deste">'+ic('plus',13)+' Subbaralho</button>'+
+    '<button class="icon-btn" data-a="deck-edit" data-id="'+d.id+'" title="Editar baralho" aria-label="Editar baralho">'+ic('edit',19)+'</button>'+
     '<button class="icon-btn" data-a="deck-del" data-id="'+d.id+'" title="Excluir baralho" aria-label="Excluir baralho">'+ic('trash',18)+'</button></div>';
-  h+='<h2 class="vt" style="margin-top:4px">'+esc(d.name||'Baralho')+'</h2><div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 6px;align-items:center">'+(d.catId?tagHTML(d.catId):'')+
+  const crumbs=deckAnc(d).reverse();
+  h+=(crumbs.length?'<div class="muted small dkcrumb">'+crumbs.map(x=>'<a data-a="deck-open" data-id="'+x.id+'">'+esc(x.name||'Baralho')+'</a>').join(' › ')+' ›</div>':'')+'<h2 class="vt" style="margin-top:4px">'+esc(d.name||'Baralho')+'</h2><div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 6px;align-items:center">'+(d.catId?tagHTML(d.catId):'')+focoChips(deckFocoObj(d))+
     (d.folderId?'<span class="meta mi" style="font-size:13px;color:var(--mut)">'+ic('folder',13)+esc(folderPath(d.folderId).join(' › '))+'</span>':'')+
-    '<span class="muted small">'+st.total+' itens | '+st.fresh+' novos | '+st.review+' para revisar</span></div>';
+    '<span class="muted small"><b class="cn">'+st.newAll+'</b> novos | <b class="cl">'+st.learn+'</b> aprendendo | <b class="cr">'+st.revAll+'</b> para revisar | '+st.total+' itens'+(kids.length?' (com subbaralhos)':'')+'</span></div>';
   const pills=[];
   if(goal)pills.push('<button class="pillx" data-a="view-goal" data-id="'+goal.id+'">'+ic('target',13)+esc(goal.title)+'</button>');
   if(act)pills.push('<button class="pillx" data-a="view-act" data-aid="'+act.id+'">'+ic('calendar',13)+esc(aT(act))+'</button>');
   if(note)pills.push('<button class="pillx" data-a="n-open" data-k="note" data-id="'+note.id+'">'+ic('note',13)+esc(note.title||'Nota')+'</button>');
   if(pills.length)h+='<div class="pills" style="margin:8px 0 4px">'+pills.join('')+'</div>';
+  if(typeof deckMentionsHTML==='function')h+=deckMentionsHTML(d);
+  if(kids.length){
+    h+='<div class="sechead">Subbaralhos <span class="count">'+kids.length+'</span></div><div class="card">'+kids.slice().sort((a,b)=>(a.name||'').localeCompare(b.name||'','pt-BR')).map(k=>{const ks=deckStats(k.id,now);
+      return '<div class="crow"><span class="lki">'+ic('cards',16)+'</span><div class="cprev"><b>'+esc(k.name||'Baralho')+'</b><div class="muted small">'+ks.total+' itens | '+ks.newAll+' novos | '+ks.learn+' aprendendo | '+ks.revAll+' revisar'+(deckKids(k.id).length?' | '+deckKids(k.id).length+' sub':'')+'</div></div>'+
+        '<span class="tact"><button class="btn sm '+(ks.due?'primary':'')+'" data-a="st-start" data-id="'+k.id+'" '+(ks.total?'':'disabled')+'>'+ic('play',13)+' Estudar'+(ks.due?' ('+ks.due+')':'')+'</button><button class="icon-btn sm" data-a="deck-open" data-id="'+k.id+'" title="Abrir" aria-label="Abrir">'+ic('chevR',15)+'</button></span></div>';}).join('')+'</div>';
+  }
+  h+=deckFsrsHTML(d,st.ids);
   h+='<div class="sechead">Adicionar card</div><div class="frow" style="margin-bottom:14px">'+Object.keys(CARD_TYPES).map(t=>'<button class="btn" data-a="card-new" data-t="'+t+'" data-deck="'+d.id+'">'+ic('plus',14)+' '+CARD_TYPES[t]+'</button>').join('')+'</div>';
-  if(!cards.length)return h+'<div class="empty">Este baralho ainda não tem cards.<br>Adicione o primeiro acima.</div>';
-  h+='<div class="sechead">Cards <span class="count">'+cards.length+'</span></div><div class="card">'+cards.map(c=>{
-    const items=cardItems(c),dueN=items.filter(i=>sch(c,i).due<=now).length,nxt=items.map(i=>sch(c,i).due).filter(x=>x>now).sort((a,b)=>a-b)[0];
-    return '<div class="crow"><span class="tag outline">'+CARD_TYPES[c.type]+'</span><div class="cprev">'+esc(cardPreview(c)).slice(0,160)+'</div><span class="muted small">'+(dueN?dueN+(dueN===1?' pendente':' pendentes'):(nxt?'volta '+inTxt(nxt-now):'—'))+'</span>'+
-      '<span class="tact"><button class="icon-btn sm" data-a="card-edit" data-id="'+c.id+'" aria-label="Editar card" title="Editar">'+ic('edit',15)+'</button><button class="icon-btn sm" data-a="card-dup" data-id="'+c.id+'" aria-label="Duplicar" title="Duplicar">'+ic('copy',15)+'</button><button class="icon-btn sm" data-a="card-del" data-id="'+c.id+'" aria-label="Excluir" title="Excluir">'+ic('trash',15)+'</button></span></div>';
+  if(!cards.length&&!kids.length)return h+'<div class="empty">Este baralho ainda não tem cards.<br>Adicione o primeiro acima.</div>';
+  if(!cards.length)return h;
+  h+='<div class="sechead">Cards <span class="count">'+cards.length+'</span>'+(kids.length?'<button class="btn sm ghost" data-a="dk-all" style="margin-left:10px">'+(all?'Só deste baralho':'Incluir subbaralhos')+'</button>':'')+'</div><div class="card">'+cards.map(c=>{
+    const items=cardItems(c),dueN=items.filter(i=>{const x=sch(c,i);return x.st===0?false:x.due<=now;}).length,newN=items.filter(i=>sch(c,i).st===0).length,nxt=items.map(i=>sch(c,i)).filter(x=>x.st!==0&&x.due>now).map(x=>x.due).sort((a,b)=>a-b)[0];
+    const dk=c.deckId!==d.id?deckById(c.deckId):null;
+    return '<div class="crow"><span class="tag outline">'+CARD_TYPES[c.type]+'</span><div class="cprev">'+esc(cardPreview(c)).slice(0,160)+(dk?'<div class="muted small">'+esc(dk.name||'')+'</div>':'')+'</div>'+(c.leech?'<span class="tag" style="--c:#B91C1C;--ct:#7F1D1D" title="Errado muitas vezes">sanguessuga</span>':'')+'<span class="muted small">'+(dueN?dueN+(dueN===1?' pendente':' pendentes'):(newN===items.length?(newN===1?'novo':newN+' novos'):(nxt?'volta '+inTxt(nxt-now):'—')))+'</span>'+
+      '<span class="tact"><button class="icon-btn sm" data-a="card-edit" data-id="'+c.id+'" aria-label="Editar card" title="Editar">'+ic('edit',15)+'</button><button class="icon-btn sm" data-a="card-dup" data-id="'+c.id+'" aria-label="Duplicar" title="Duplicar">'+ic('copy',15)+'</button><button class="icon-btn sm" data-a="card-del" data-id="'+c.id+'" aria-label="Excluir card" title="Excluir">'+ic('trash',15)+'</button></span></div>';
   }).join('')+'</div>';
   return h;
 }
+function deckParentOpts(d){
+  const bad=new Set(deckTree(d.id));const out=[];
+  const go=(p,lv)=>S.decks.filter(x=>(x.parentId||'')===p&&!bad.has(x.id)).sort((a,b)=>(a.name||'').localeCompare(b.name||'','pt-BR')).forEach(x=>{out.push([x.id,' '.repeat(lv)+(x.name||'Baralho')]);go(x.id,lv+1);});
+  S.decks.filter(x=>x.parentId&&!deckById(x.parentId)&&!bad.has(x.id)).forEach(x=>out.push([x.id,x.name||'Baralho']));
+  go('',0);return out;
+}
 function openDeckInfo(d,isNew){
   const opt=(list,sel,ph)=>'<option value="">'+ph+'</option>'+list.map(x=>'<option value="'+x[0]+'" '+(x[0]===sel?'selected':'')+'>'+esc(x[1])+'</option>').join('');
-  openModal('<form id="fDeck" class="form"><div class="fh"><h2>'+(isNew?'Novo baralho':'Editar baralho')+'</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
+  const pc=v=>v?Math.round(v*100):'';
+  openModal('<form id="fDeck" class="form"><div class="fh"><h2>'+(isNew?(d.parentId?'Novo subbaralho':'Novo baralho'):'Editar baralho')+'</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<label class="f">Nome do baralho<input name="name" required value="'+esc(d.name)+'" autocomplete="off"></label>'+
-    '<div class="fgrid"><label class="f">Pasta<select name="folder">'+folderOptions(d.folderId)+'</select></label><div class="f"><span>Categoria</span>'+catPickHTML('dcat',d.catId)+'</div></div>'+
+    '<label class="f">Dentro de <small>baralho pai (deixe vazio para um baralho principal)</small><select name="parent">'+opt(deckParentOpts(d),d.parentId||'','Nenhum (baralho principal)')+'</select></label>'+
+    '<div class="fgrid"><label class="f">Pasta<select name="folder">'+folderOptions(d.folderId)+'</select></label><div class="f"><span>Categoria</span>'+catPickHTML('dcat',d.catId)+'<button type="button" class="btn sm ghost" data-a="deck-cat-new" style="align-self:flex-start;margin-top:4px">'+ic('plus',13)+' Nova categoria</button></div></div>'+
+    '<div class="f"><span>Foco <small>os subbaralhos herdam o Foco do pai</small></span>'+focoPickHTML('dfoco',d.focoIds)+'</div>'+
     '<div class="f"><span>Ligar este baralho a <small>opcional</small></span><div class="fgrid">'+
-    '<label class="f">Objetivo<select name="goal">'+opt(goalFlat().map(x=>[x.g.id,'\u2003'.repeat(x.d)+x.g.title]),d.goalId,'Nenhum')+'</select></label>'+
+    '<label class="f">Objetivo<select name="goal">'+opt(goalFlat().map(x=>[x.g.id,' '.repeat(x.d)+x.g.title]),d.goalId,'Nenhum')+'</select></label>'+
     '<label class="f">Evento<select name="act">'+opt(S.acts.map(a=>[a.id,aT(a)]),d.actId,'Nenhum')+'</select></label></div>'+
     '<label class="f">Nota<select name="note">'+opt(S.notes.map(n=>[n.id,n.title||'Sem título']),d.noteId,'Nenhuma')+'</select></label></div>'+
+    '<details class="adv"><summary>Opções de estudo (FSRS)</summary><div class="fgrid3"><label class="f">Retenção desejada (%)<input name="ret" type="number" min="70" max="99" step="1" value="'+pc(d.ret)+'" placeholder="'+Math.round(deckOpt(d.parentId?deckById(d.parentId):null,'ret')*100)+'"></label>'+
+    '<label class="f">Novos por dia<input name="newPd" type="number" min="0" max="999" value="'+(d.newPd||'')+'" placeholder="'+deckOpt(d.parentId?deckById(d.parentId):null,'newPd')+'"></label>'+
+    '<label class="f">Revisões por dia<input name="revPd" type="number" min="0" max="9999" value="'+(d.revPd||'')+'" placeholder="'+deckOpt(d.parentId?deckById(d.parentId):null,'revPd')+'"></label></div><p class="muted small" style="margin:6px 0 0">Vazio = herda do baralho pai ou de Ajustes. Quanto maior a retenção, mais revisões.</p></details>'+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
   const f=$('#fDeck');mountCatPicks(f);
-  f.addEventListener('submit',ev=>{
-    ev.preventDefault();const E=f.elements;
-    d.name=E.name.value.trim()||'Baralho';d.folderId=E.folder.value;d.catId=$('[data-catpick="dcat"]',f).dataset.value||'';d.goalId=E.goal.value;d.actId=E.act.value;d.noteId=E.note.value;d.updated=Date.now();
-    save();closeModal();rerender();renderMain();toast('Baralho salvo.');
-  });
+  UI.dkEditId=d.id;
+  UI.dkApply=()=>{
+    const E=f.elements,num=(k,mn,mx)=>{const v=Number(E[k].value);return v>=mn&&v<=mx?v:0;};
+    d.name=E.name.value.trim()||'Baralho';d.parentId=E.parent.value;d.folderId=E.folder.value;d.catId=$('[data-catpick="dcat"]',f).dataset.value||'';d.focoIds=pickedValues(f,'dfoco');d.goalId=E.goal.value;d.actId=E.act.value;d.noteId=E.note.value;
+    d.ret=num('ret',70,99)/100;d.newPd=num('newPd',1,999);d.revPd=num('revPd',1,9999);d.updated=Date.now();
+  };
+  f.addEventListener('submit',ev=>{ev.preventDefault();UI.dkApply();save();closeModal();rerender();renderMain();toast('Baralho salvo.');});
   setTimeout(()=>{const i=$('#fDeck [name=name]');if(i){i.focus();i.select();}},40);
 }
 
@@ -8249,14 +8427,15 @@ let CARDF=null,OCCD=null;
 function cardFormHTML(c0){
   const t=CARDF.type,v=k=>esc(c0?(c0[k]||''):'');
   const ed=(id,f,ph,val)=>'<div id="'+id+'" class="ned editing cf-ed" contenteditable="true" spellcheck="true" data-f="'+f+'" data-ph="'+ph+'">'+(val?richHTML(val):'')+'</div>';
-  const extra=(first)=>'<div class="f"><span>Extra</span>'+(first?cardToolbarHTML():'')+ed('cf-extra','extra','Explicação, mnemônico, exemplo…',c0&&c0.extra)+'</div>';
+  const extra='<div class="f"><span>Extra <small>aparece junto da resposta</small></span>'+ed('cf-extra','extra','Explicação, mnemônico, exemplo…',c0&&c0.extra)+'</div>';
   let body='';
-  if(t==='basic')body='<label class="f">Frente<textarea id="cf-front" rows="3" placeholder="Pergunta ou termo">'+v('front')+'</textarea></label><div class="cf-img" id="cfi-front"></div>'+
-    '<div class="f"><span>Verso</span>'+cardToolbarHTML()+ed('cf-back','back','Resposta',c0&&c0.back)+'</div><div class="cf-img" id="cfi-back"></div>'+extra(false);
+  if(t==='basic'||t==='rev')body='<div class="f"><span>Frente</span>'+ed('cf-front','front','Pergunta ou termo',c0&&c0.front)+'</div><div class="cf-img" id="cfi-front"></div>'+
+    '<div class="f"><span>Verso</span>'+ed('cf-back','back','Resposta',c0&&c0.back)+'</div><div class="cf-img" id="cfi-back"></div>'+extra+
+    '<label class="chip cb cfrev"><input type="checkbox" id="cf-rev" '+(t==='rev'?'checked':'')+'><span>Também perguntar ao contrário <small>cria 2 cartões em um: frente → verso e verso → frente</small></span></label>';
   else if(t==='cloze')body='<div class="f"><span>Texto com lacunas</span><textarea id="cf-text" rows="5" placeholder="Use {{c1::resposta}} para ocultar uma parte">'+v('text')+'</textarea>'+
-    '<div class="frow"><button type="button" class="btn sm" data-a="cl-wrap" data-m="new">Ocultar seleção (nova lacuna)</button><button type="button" class="btn sm" data-a="cl-wrap" data-m="same">Ocultar junto (mesma lacuna)</button></div></div><div class="tprev" id="cf-prev"></div>'+extra(true);
-  else body='<div class="seg" role="group" aria-label="Tipo de oclusão"><button type="button" class="'+(CARDF.okind==='image'?'on':'')+'" data-a="occ-kind" data-k="image">Imagem</button><button type="button" class="'+(CARDF.okind==='table'?'on':'')+'" data-a="occ-kind" data-k="table">Tabela</button></div><div id="occEd"></div>'+extra(true);
-  return '<form id="fCard" class="form"><div class="fh"><h2>'+(c0?'Editar card':'Novo card')+' | '+CARD_TYPES[t]+'</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+body+
+    '<div class="frow"><button type="button" class="btn sm" data-a="cl-wrap" data-m="new">Ocultar seleção (nova lacuna)</button><button type="button" class="btn sm" data-a="cl-wrap" data-m="same">Ocultar junto (mesma lacuna)</button></div></div><div class="tprev" id="cf-prev"></div>'+extra;
+  else body='<div class="seg" role="group" aria-label="Tipo de oclusão"><button type="button" class="'+(CARDF.okind==='image'?'on':'')+'" data-a="occ-kind" data-k="image">Imagem</button><button type="button" class="'+(CARDF.okind==='table'?'on':'')+'" data-a="occ-kind" data-k="table">Tabela</button></div><div id="occEd"></div>'+extra;
+  return '<form id="fCard" class="form"><div class="fh"><h2>'+(c0?'Editar card':'Novo card')+' | '+CARD_TYPES[t==='rev'?'rev':t]+'</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+cardToolbarHTML()+body+
     '<div class="ff">'+(c0?'':'<button type="button" class="btn" data-a="card-save-more">Salvar e adicionar outro</button>')+'<span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Salvar</button></div></form>';
 }
 function openCardForm(o){
@@ -8268,6 +8447,7 @@ function openCardForm(o){
   renderCardImgs();renderOccEditor();cardPrev();
   $('#fCard').addEventListener('submit',e=>{e.preventDefault();saveCardForm(false);});
   const first=$('#cf-front')||$('#cf-text');if(first&&!c0)setTimeout(()=>first.focus(),40);
+  $('#fCard').addEventListener('change',e=>{if(e.target.id==='cf-rev'&&CARDF)CARDF.type=e.target.checked?'rev':'basic';});
 }
 function renderCardImgs(){
   ['front','back'].forEach(w=>{
@@ -8295,11 +8475,11 @@ function cardPrev(){
 }
 function saveCardForm(more){
   if(!CARDF||!$('#fCard'))return;const t=CARDF.type,now=Date.now(),data={type:t};
-  if(t==='basic'){
-    const fr=$('#cf-front').value.trim(),bk=edVal('#cf-back');
+  if(t==='basic'||t==='rev'){
+    const fr=edVal('#cf-front'),bk=edVal('#cf-back');
     if(!fr&&!CARDF.frontImg){toast('Escreva a frente do card.');return;}
     if(!bk&&!CARDF.backImg){toast('Escreva o verso do card.');return;}
-    Object.assign(data,{front:fr,back:bk,extra:edVal('#cf-extra'),frontImg:CARDF.frontImg,backImg:CARDF.backImg});
+    Object.assign(data,{type:($('#cf-rev')&&$('#cf-rev').checked)?'rev':'basic',front:fr,back:bk,extra:edVal('#cf-extra'),frontImg:CARDF.frontImg,backImg:CARDF.backImg});
   }else if(t==='cloze'){
     const tx=$('#cf-text').value;if(!clozeIdx(tx).length){toast('Oculte ao menos uma palavra: selecione o trecho e use o botão.');return;}
     Object.assign(data,{text:tx,extra:edVal('#cf-extra')});
@@ -8317,7 +8497,7 @@ function saveCardForm(more){
   else{c=Object.assign({id:uid(),deckId:CARDF.deckId,s:{},created:now,updated:now,front:'',back:'',frontImg:'',backImg:'',text:'',extra:'',okind:'image',image:'',rects:[],table:[],occ:[],hdr:true},data);S.cards.push(c);}
   const d=deckById(CARDF.deckId);if(d)d.updated=now;
   save();
-  if(more){openCardForm({deckId:CARDF.deckId,type:t});toast('Card salvo. Adicione o próximo.');}
+  if(more){openCardForm({deckId:CARDF.deckId,type:data.type||t});toast('Card salvo. Adicione o próximo.');}
   else{closeModal();toast('Card salvo.');}
   renderMain();
 }
@@ -8353,23 +8533,38 @@ document.addEventListener('input',e=>{
   if(t.classList.contains('occin'))CARDF.table[+t.dataset.r][+t.dataset.c]=t.value;
   if(t.id==='cf-hdr'){CARDF.hdr=t.checked;syncTableInputs();renderOccEditor();}
 });
+document.addEventListener('change',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.fs){const k=t.dataset.fs,v=Number(t.value);
+  if(k==='fsRet')S.prefs.fsRet=(v>=70&&v<=99?v:90)/100;else S.prefs[k]=v>=1?Math.round(v):(k==='fsNew'?FS_DEF.newPd:FS_DEF.revPd);save();renderTabs();}});
 document.addEventListener('change',e=>{if(CARDF&&e.target.id==='cf-hdr'){syncTableInputs();CARDF.hdr=e.target.checked;renderOccEditor();}});
 
 /* ----- estudo: o card vira (ou a lacuna/célula aparece) com Enter ----- */
 function studyPool(deckIds){
   const out=[];
-  S.cards.forEach(c=>{if(deckIds.indexOf(c.deckId)<0)return;cardItems(c).forEach(i=>{const s=sch(c,i);out.push({c:c,i:i,due:s.due||0,reps:s.reps||0});});});
+  S.cards.forEach(c=>{if(deckIds.indexOf(c.deckId)<0)return;cardItems(c).forEach(i=>{const s=sch(c,i);out.push({c:c,i:i,s:s,due:s.due||0,reps:s.reps||0});});});
   return out;
 }
+// listas do estudo: aprendendo (vencidos), revisões e novos, respeitando os limites do dia
+function studyLists(st,now){
+  const pool=studyPool(st.deckIds),root=deckById(st.root),dn=todayDone(st.deckIds),seen=st.seen||{};
+  const nl=Math.max(0,deckOpt(root,'newPd')-dn.nw),rl=Math.max(0,deckOpt(root,'revPd')-dn.rv),byDue=(a,b)=>a.due-b.due||((a.c.created||0)-(b.c.created||0));
+  const lrn=pool.filter(x=>(x.s.st===1||x.s.st===3)&&x.due<=now).sort(byDue);
+  const soon=pool.filter(x=>(x.s.st===1||x.s.st===3)&&x.due>now).sort(byDue);
+  let rv=pool.filter(x=>x.s.st===2&&x.due<=now).sort(byDue).slice(0,rl);
+  let nw=pool.filter(x=>x.s.st===0).sort((a,b)=>((a.c.created||0)-(b.c.created||0))||String(a.i).localeCompare(String(b.i))).slice(0,nl);
+  return {lrn:lrn,soon:soon,rv:rv,nw:nw,seen:seen};
+}
 function studyPick(){
-  const st=UI.study,now=Date.now(),pool=studyPool(st.deckIds),due=pool.filter(x=>x.due<=now);
-  if(due.length){
-    due.sort((a,b)=>((b.reps>0)-(a.reps>0))||(a.due-b.due)||((a.c.created||0)-(b.c.created||0)));
-    let p=due[0];if(st.cur&&due.length>1&&p.c.id===st.cur.cardId&&p.i===st.cur.idx)p=due[1];
-    return {kind:'card',cardId:p.c.id,idx:p.i};
-  }
-  const fut=pool.filter(x=>x.due>now&&x.due-now<=30*60*1000).sort((a,b)=>a.due-b.due)[0];
-  return fut?{kind:'wait',until:fut.due}:{kind:'done'};
+  const st=UI.study,now=Date.now(),L=studyLists(st,now),cur=st.cur;
+  const notCur=a=>a.filter(x=>!(cur&&x.c.id===cur.cardId&&x.i===cur.idx));
+  const fresh=a=>a.filter(x=>!L.seen[x.c.id]); // irmãos (outro lado ou outra lacuna do mesmo card) ficam para depois
+  const mk=p=>({kind:'card',cardId:p.c.id,idx:p.i});
+  let a=notCur(L.lrn);if(a.length)return mk(a[0]);
+  a=notCur(fresh(L.rv));if(a.length)return mk(a[0]);
+  a=notCur(fresh(L.nw));if(a.length)return mk(a[0]);
+  a=notCur(L.rv.concat(L.nw));if(a.length)return mk(a[0]);
+  if(L.lrn.length)return mk(L.lrn[0]);
+  if(L.soon.length&&L.soon[0].due-now<=LEARN_AHEAD)return {kind:'wait',until:L.soon[0].due};
+  return {kind:'done'};
 }
 function studyAdvance(){
   const st=UI.study;if(!st)return;clearInterval(st.timer);st.timer=null;st.revealed=false;
@@ -8386,6 +8581,7 @@ function studyAdvance(){
 }
 function studyStop(){if(UI.study&&UI.study.timer)clearInterval(UI.study.timer);UI.study=null;}
 function stFace(c,idx){
+  if(c.type==='rev'&&idx==='r')c=Object.assign({},c,{front:c.back,back:c.front,frontImg:c.backImg,backImg:c.frontImg,type:'basic',frontRich:true});
   const img=u=>u?'<img class="st-img" src="'+u+'" alt="">':'';
   const extra=!richEmpty(c.extra)?'<div class="st-extra revealed-only">'+richHTML(c.extra)+'</div>':'';
   if(c.type==='cloze'){
@@ -8406,35 +8602,40 @@ function stFace(c,idx){
     }
     return '<div id="stcard" class="stplain st-occ">'+body+extra+'</div>';
   }
-  return '<div class="flipwrap"><div id="stcard" class="flipcard st-basic"><div class="face front">'+img(c.frontImg)+'<div class="ft">'+nlbr(c.front)+'</div></div>'+
-    '<div class="face back"><div class="fsmall">'+nlbr(c.front)+'</div><hr>'+img(c.backImg)+'<div class="ft">'+richHTML(c.back)+'</div>'+(!richEmpty(c.extra)?'<div class="st-extra">'+richHTML(c.extra)+'</div>':'')+'</div></div></div>';
+  return '<div class="flipwrap"><div id="stcard" class="flipcard st-basic"><div class="face front">'+img(c.frontImg)+'<div class="ft">'+richHTML(c.front)+'</div></div>'+
+    '<div class="face back"><div class="fsmall">'+richHTML(c.front)+'</div><hr>'+img(c.backImg)+'<div class="ft">'+richHTML(c.back)+'</div>'+(!richEmpty(c.extra)?'<div class="st-extra">'+richHTML(c.extra)+'</div>':'')+'</div></div></div>';
 }
 function studyHomeHTML(){
-  const now=Date.now(),decks=S.decks.slice().sort((a,b)=>(a.name||'').localeCompare(b.name||'')),all=dueCardCount();
+  const now=Date.now(),all=dueCardCount(),roots=deckRoots().sort((a,b)=>(a.name||'').localeCompare(b.name||'','pt-BR'));
   let h='<div class="toolbar"><div><b style="font-size:17px">Estudar</b></div>'+
     '<button class="btn primary" data-a="st-start" '+(all?'':'disabled')+'>'+ic('play',14)+' Estudar tudo pendente'+(all?' ('+all+')':'')+'</button></div>';
-  if(!decks.length)return nSubBar()+h+'<div class="empty">Você ainda não tem baralhos.<br><button class="btn primary" data-a="deck-new">'+ic('plus',15)+' Criar baralho</button></div>';
-  return nSubBar()+h+'<div class="card">'+decks.map(d=>{
-    const st=deckStats(d.id,now);
-    return '<div class="crow"><span class="lki">'+ic('cards',16)+'</span><div class="cprev"><b>'+esc(d.name||'Baralho')+'</b><div class="muted small">'+st.total+' itens | '+st.fresh+' novos | '+st.review+' para revisar'+(!st.due&&st.next?' | próximo '+inTxt(st.next-now):'')+'</div></div>'+
+  if(!roots.length)return nSubBar()+h+'<div class="empty">Você ainda não tem baralhos.<br><button class="btn primary" data-a="deck-new">'+ic('plus',15)+' Criar baralho</button></div>';
+  const row=(d,lv)=>{
+    const st=deckStats(d.id,now),kids=deckKids(d.id).sort((a,b)=>(a.name||'').localeCompare(b.name||'','pt-BR')),open=!!(UI.dkOpen||{})[d.id];
+    let r='<div class="crow dkrow" style="padding-left:'+(10+lv*22)+'px"><button class="icon-btn sm dktog" '+(kids.length?'data-a="dk-tog" data-id="'+d.id+'" aria-label="'+(open?'Recolher':'Expandir')+'"':'disabled style="visibility:hidden"')+'>'+ic(open?'chevD':'chevR',14)+'</button><span class="lki">'+ic('cards',16)+'</span><div class="cprev"><b>'+esc(d.name||'Baralho')+'</b><div class="muted small">'+
+      '<b class="cn">'+st.fresh+'</b> novos | <b class="cl">'+st.learn+'</b> aprendendo | <b class="cr">'+st.review+'</b> revisar | '+st.total+' itens'+(!st.due&&st.next?' | próximo '+inTxt(st.next-now):'')+'</div></div>'+
       '<span class="tact"><button class="btn sm '+(st.due?'primary':'')+'" data-a="st-start" data-id="'+d.id+'" '+(st.total?'':'disabled')+'>'+ic('play',13)+' Estudar'+(st.due?' ('+st.due+')':'')+'</button><button class="icon-btn sm" data-a="deck-open" data-id="'+d.id+'" title="Abrir baralho" aria-label="Abrir baralho">'+ic('chevR',15)+'</button></span></div>';
-  }).join('')+'</div>';
+    if(open)kids.forEach(k=>{r+=row(k,lv+1);});
+    return r;
+  };
+  return nSubBar()+h+'<div class="card">'+roots.map(d=>row(d,0)).join('')+'</div>';
 }
 function studyHTML(){
   const st=UI.study;if(!st)return studyHomeHTML();
-  const now=Date.now(),dueN=studyPool(st.deckIds).filter(x=>x.due<=now).length,names=st.deckIds.map(id=>{const d=deckById(id);return d?d.name:'';}).filter(Boolean).slice(0,3).join(', ');
-  let h='<div class="nhead"><button class="btn sm ghost" data-a="st-exit">'+ic('chevL',14)+' Sair do estudo</button><span class="sp"></span><span class="muted small">'+esc(names)+' | pendentes: <b>'+dueN+'</b> | revisados: <b>'+st.done+'</b></span></div>';
+  const now=Date.now(),L=studyLists(st,now),rd=st.root&&deckById(st.root)?deckPath(deckById(st.root)).join(' › '):'Todos os pendentes';
+  const cu=st.cur?(st.cur.cardId+'|'+st.cur.idx):'',kc=(a,k)=>'<b class="'+k+(cu&&a.some(x=>x.c.id+'|'+x.i===cu)?' on':'')+'">'+a.length+'</b>';
+  let h='<div class="nhead"><button class="btn sm ghost" data-a="st-exit">'+ic('chevL',14)+' Sair do estudo</button><span class="sp"></span><span class="muted small">'+esc(rd)+'</span><span class="stcnt" title="Novos | Aprendendo | Revisar">'+kc(L.nw,'cn')+kc(L.lrn.concat(L.soon.filter(x=>x.due-now<=LEARN_AHEAD)),'cl')+kc(L.rv,'cr')+'</span><span class="muted small">revisados: <b>'+st.done+'</b></span></div>';
   if(st.cur){
     const c=cardById(st.cur.cardId);if(!c){studyAdvance();return studyHTML();}
     h+='<div class="stwrap '+(st.revealed?'is-rev':'')+'">'+stFace(c,st.cur.idx)+
       '<div class="st-actions"><button class="btn primary big" id="stshow" data-a="st-reveal" '+(st.revealed?'hidden':'')+'>'+(c.type==='basic'?'Virar o card':'Mostrar')+' <kbd>Enter</kbd></button>'+
-      '<div id="strate" class="st-rate" '+(st.revealed?'':'hidden')+'>'+RATES.map(r=>'<button class="rate '+r.cls+'" data-a="st-rate" data-r="'+r.k+'"><b>'+r.label+'</b><span>'+r.txt+'</span><kbd>'+r.k+'</kbd></button>').join('')+'</div>'+
-      '<button class="btn sm ghost" data-a="st-edit" data-id="'+c.id+'">'+ic('edit',13)+' Editar este card</button></div></div>';
+      '<div id="strate" class="st-rate" '+(st.revealed?'':'hidden')+'>'+(()=>{const rs=fsrsAll(sch(c,st.cur.idx),now,deckOpt(deckById(c.deckId),'ret'),c.id+st.cur.idx+(sch(c,st.cur.idx).reps||0));return RATES.map((r,k)=>'<button class="rate '+r.cls+'" data-a="st-rate" data-r="'+r.k+'"><b>'+r.label+'</b><span>'+ivTxt(rs[k].due-now)+'</span><kbd>'+r.k+'</kbd></button>').join('');})()+'</div>'+
+      '<div class="frow" style="justify-content:center"><button class="btn sm ghost" data-a="st-edit" data-id="'+c.id+'">'+ic('edit',13)+' Editar este card</button>'+((st.undo||[]).length?'<button class="btn sm ghost" data-a="st-undo" title="Desfazer a última resposta (Ctrl+Z)">'+ic('undo',13)+' Desfazer</button>':'')+'</div></div></div>';
     if(st.revealed)setTimeout(()=>{const sc=$('#stcard');if(sc)sc.classList.add('revealed');},0);
   }else if(st.wait){
-    h+='<div class="stwrap"><div class="panel-wait"><h3>Próximo card em <b id="stcount">'+clock(st.wait-now)+'</b></h3><p class="muted">Você classificou algo como difícil: ele volta em instantes.</p><button class="btn primary" data-a="st-skip">Mostrar agora <kbd>Enter</kbd></button></div></div>';
+    h+='<div class="stwrap"><div class="panel-wait"><h3>Próximo card em <b id="stcount">'+clock(st.wait-now)+'</b></h3><p class="muted">Um card em aprendizado volta em instantes.</p><button class="btn primary" data-a="st-skip">Mostrar agora <kbd>Enter</kbd></button></div></div>';
   }else{
-    const next=studyPool(st.deckIds).filter(x=>x.due>now).sort((a,b)=>a.due-b.due)[0];
+    const next=studyPool(st.deckIds).filter(x=>x.s.st!==0&&x.due>now).sort((a,b)=>a.due-b.due)[0];
     h+='<div class="stwrap"><div class="panel-wait"><h3>Tudo revisado por enquanto</h3><p class="muted">'+st.done+(st.done===1?' card revisado':' cards revisados')+' nesta sessão.'+(next?' O próximo volta '+inTxt(next.due-now)+'.':'')+'</p><button class="btn primary" data-a="st-exit">Concluir</button></div></div>';
   }
   return h;
@@ -8443,19 +8644,44 @@ function studyHTML(){
 /* ----- ações ----- */
 Object.assign(ACT,{
   'deck-new'(){
-    const d={id:uid(),name:'Novo baralho',folderId:(UI.nf&&UI.nf!=='__none')?UI.nf:'',catId:'',goalId:'',actId:'',noteId:'',created:Date.now(),updated:Date.now()};
+    const d={id:uid(),name:'Novo baralho',folderId:(UI.nf&&UI.nf!=='__none')?UI.nf:'',catId:'',goalId:'',actId:'',noteId:'',parentId:'',focoIds:[],ret:0,newPd:0,revPd:0,created:Date.now(),updated:Date.now()};
     S.decks.push(d);save();studyStop();UI.tab='notas';UI.nsub='notas';UI.nview={type:'deck',id:d.id};renderTabs();renderMain();window.scrollTo(0,0);openDeckInfo(d,true);
   },
   'deck-open'(el){
     const id=el.dataset.id;if(!deckById(id)){toast('Este baralho não existe mais.');return;}
     flushNote();pdfLeave();slLeave();studyStop();closeModal();UI.tab='notas';UI.nsub='notas';UI.nview={type:'deck',id:id};renderTabs();renderMain();window.scrollTo(0,0);
   },
+  'deck-sub'(el){
+    const p=deckById(el.dataset.id);if(!p)return;
+    const d={id:uid(),name:'Novo subbaralho',folderId:p.folderId||'',catId:p.catId||'',goalId:'',actId:'',noteId:'',parentId:p.id,focoIds:[],ret:0,newPd:0,revPd:0,created:Date.now(),updated:Date.now()};
+    S.decks.push(d);save();renderMain();openDeckInfo(d,true);
+  },
+  'dk-all'(){UI.dkAll=!UI.dkAll;renderMain();},
+  'dk-tog'(el){UI.dkOpen=UI.dkOpen||{};UI.dkOpen[el.dataset.id]=!UI.dkOpen[el.dataset.id];renderMain();},
+  'deck-cat-new'(el){
+    const f=el.closest('form'),cp=$('[data-catpick="dcat"]',f);if(!cp)return;const parent=cp.dataset.value||null;if(UI.dkApply)UI.dkApply();
+    askText(parent?'Nova subcategoria (dentro de "'+((S.cats.find(c=>c.id===parent)||{}).name||'')+'")':'Nova categoria','',v=>{
+      const c={id:uid(),name:v,parentId:parent,color:null,isTipo:false};S.cats.push(c);save();
+      // askText fecha o formulário do baralho: reabre com a nova categoria já escolhida
+      const d=deckById(UI.dkEditId);if(d){d.catId=c.id;d.updated=Date.now();save();openDeckInfo(d,false);}
+    });
+  },
   'deck-edit'(el){const d=deckById(el.dataset.id);if(d)openDeckInfo(d,false);},
   'deck-del'(el){
-    const d=deckById(el.dataset.id);if(!d)return;const n=S.cards.filter(c=>c.deckId===d.id).length;
-    askConfirm('Excluir o baralho "'+d.name+'"?',n?'Os '+n+' cards dele também serão excluídos.':'O baralho está vazio.',()=>{
-      S.cards=S.cards.filter(c=>c.deckId!==d.id);S.decks=S.decks.filter(x=>x!==d);UI.nview=null;save();closeModal();renderTabs();renderMain();
-    });
+    const d=deckById(el.dataset.id);if(!d)return;const ids=deckTree(d.id),n=S.cards.filter(c=>ids.indexOf(c.deckId)>=0).length,kids=deckKids(d.id);
+    if(!kids.length){askConfirm('Excluir o baralho "'+d.name+'"?',n?'Os '+n+' cards dele também serão excluídos.':'O baralho está vazio.',()=>{
+      S.cards=S.cards.filter(c=>c.deckId!==d.id);S.decks=S.decks.filter(x=>x!==d);UI.nview=d.parentId&&deckById(d.parentId)?{type:'deck',id:d.parentId}:null;save();closeModal();renderTabs();renderMain();});return;}
+    UI.dkDel=d.id;
+    openModal('<div class="fh"><h2>Excluir "'+esc(d.name)+'"?</h2></div><p class="muted" style="margin:0 0 10px">Este baralho tem '+kids.length+(kids.length===1?' subbaralho':' subbaralhos')+' ('+n+' cards no total).</p><div class="ff" style="flex-wrap:wrap"><button class="btn" data-a="close">Cancelar</button><span class="sp"></span><button class="btn" data-a="deck-del-up">Excluir só este (subbaralhos sobem)</button><button class="btn danger" data-a="deck-del-all">Excluir tudo</button></div>');
+  },
+  'deck-del-up'(){
+    const d=deckById(UI.dkDel);if(!d)return;const up=d.parentId&&deckById(d.parentId)?d.parentId:'';
+    deckKids(d.id).forEach(k=>{k.parentId=up;});S.cards=S.cards.filter(c=>c.deckId!==d.id);S.decks=S.decks.filter(x=>x!==d);
+    UI.nview=up?{type:'deck',id:up}:null;save();closeModal();renderTabs();renderMain();
+  },
+  'deck-del-all'(){
+    const d=deckById(UI.dkDel);if(!d)return;const ids=deckTree(d.id),up=d.parentId&&deckById(d.parentId)?d.parentId:'';
+    S.cards=S.cards.filter(c=>ids.indexOf(c.deckId)<0);S.decks=S.decks.filter(x=>ids.indexOf(x.id)<0);UI.nview=up?{type:'deck',id:up}:null;save();closeModal();renderTabs();renderMain();
   },
   'view-goal'(el){openGoalView(el.dataset.id);},
   'card-new'(el){openCardForm({deckId:el.dataset.deck,type:el.dataset.t});},
@@ -8463,6 +8689,8 @@ Object.assign(ACT,{
   'card-del'(el){const c=cardById(el.dataset.id);if(!c)return;askConfirm('Excluir este card?','Ele será removido do baralho.',()=>{S.cards=S.cards.filter(x=>x!==c);save();closeModal();renderMain();});},
   'card-dup'(el){const c=cardById(el.dataset.id);if(!c)return;const n=JSON.parse(JSON.stringify(c));n.id=uid();n.s={};n.created=Date.now();n.updated=n.created;S.cards.push(n);save();renderMain();toast('Card duplicado.');},
   'card-save-more'(){saveCardForm(true);},
+  'cf-col'(el){const p=$('.cfpop',el.closest('#ctb'));if(p)p.hidden=!p.hidden;},
+  'cf-color'(el){noteColor(el.dataset.c);const p=$('.cfpop',el.closest('#ctb'));if(p)p.hidden=true;},
   'card-img'(el){if(!CARDF)return;CARDF.imgTarget=el.dataset.t;$('#cardImgFile').click();},
   'card-img-del'(el){if(!CARDF)return;CARDF[el.dataset.t+'Img']='';renderCardImgs();},
   'cl-wrap'(el){
@@ -8484,10 +8712,11 @@ Object.assign(ACT,{
     renderOccEditor();
   },
   'st-start'(el){
-    const ids=el&&el.dataset&&el.dataset.id?[el.dataset.id]:S.decks.filter(d=>deckStats(d.id,Date.now()).due>0).map(d=>d.id);
-    if(!ids.length){toast('Não há cards pendentes agora.');return;}
+    const one=el&&el.dataset&&el.dataset.id?el.dataset.id:'',roots=one?[]:deckRoots().filter(d=>deckStats(d.id,Date.now()).due>0);
+    const ids=one?deckTree(one):roots.reduce((a,d)=>a.concat(deckTree(d.id)),[]);
+    if(!ids.length||(one&&!deckStats(one,Date.now()).due&&!deckStats(one,Date.now()).total)){toast('Não há cards pendentes agora.');return;}
     studyStop();flushNote();pdfLeave();slLeave();UI.tab='notas';UI.nsub='estudar';UI.nview=null;
-    UI.study={deckIds:ids,cur:null,revealed:false,done:0,wait:null,timer:null};studyAdvance();renderTabs();renderMain();window.scrollTo(0,0);
+    UI.study={deckIds:ids,root:one,cur:null,revealed:false,done:0,wait:null,timer:null,seen:{},undo:[]};studyAdvance();renderTabs();renderMain();window.scrollTo(0,0);
   },
   'st-exit'(){studyStop();renderTabs();renderMain();},
   'st-reveal'(){
@@ -8499,14 +8728,24 @@ Object.assign(ACT,{
   },
   'st-rate'(el){
     const st=UI.study;if(!st||!st.cur||!st.revealed)return;
-    const r=RATES.find(x=>String(x.k)===String(el.dataset.r)),c=cardById(st.cur.cardId);if(!r||!c)return;
-    c.s=c.s||{};const prev=sch(c,st.cur.idx);
-    c.s[st.cur.idx]={due:Date.now()+r.ms,reps:(prev.reps||0)+1,last:r.k};c.updated=Date.now();
+    const g=Number(el.dataset.r),c=cardById(st.cur.cardId);if(!(g>=1&&g<=4)||!c)return;
+    const idx=st.cur.idx,now=Date.now(),prev=sch(c,idx),rd=deckOpt(deckById(c.deckId),'ret');
+    const res=fsrsOne(prev,g,now,rd,c.id+idx+(prev.reps||0));delete res.ivd;
+    st.undo=st.undo||[];st.undo.push({cardId:c.id,idx:idx,old:(c.s||{})[idx],rl:(c.rl||[]).length,seen:!!st.seen[c.id],upd:c.updated,leech:!!c.leech});if(st.undo.length>30)st.undo.shift();
+    c.s=c.s||{};c.s[idx]=res;c.rl=c.rl||[];c.rl.push([now,idx,g,prev.st,Math.round((prev.S||0)*100)/100,Math.round((prev.D||0)*100)/100]);if(c.rl.length>200)c.rl.splice(0,c.rl.length-200);
+    c.updated=now;st.seen[c.id]=1;
+    if(res.st===3&&res.lapses>=LEECH_N&&!c.leech){c.leech=true;toast('Card sanguessuga: errado '+res.lapses+' vezes. Vale reescrevê-lo.');}
     save();st.done++;studyAdvance();renderTabs();renderMain();
+  },
+  'st-undo'(){
+    const st=UI.study;if(!st||!(st.undo||[]).length)return;const u=st.undo.pop(),c=cardById(u.cardId);if(!c)return;
+    c.s=c.s||{};if(u.old===undefined)delete c.s[u.idx];else c.s[u.idx]=u.old;
+    if(c.rl)c.rl.length=Math.min(c.rl.length,u.rl);c.updated=u.upd;c.leech=u.leech;if(!u.seen)delete st.seen[c.id];
+    save();st.done=Math.max(0,st.done-1);clearInterval(st.timer);st.timer=null;st.wait=null;st.cur={cardId:u.cardId,idx:u.idx};st.revealed=false;renderTabs();renderMain();
   },
   'st-skip'(){
     const st=UI.study;if(!st)return;
-    const p=studyPool(st.deckIds).filter(x=>x.due>Date.now()).sort((a,b)=>a.due-b.due)[0];
+    const p=studyPool(st.deckIds).filter(x=>(x.s.st===1||x.s.st===3)&&x.due>Date.now()).sort((a,b)=>a.due-b.due)[0];
     if(p){clearInterval(st.timer);st.timer=null;st.cur={cardId:p.c.id,idx:p.i};st.wait=null;st.revealed=false;renderMain();}
   },
   'st-edit'(el){openCardForm({id:el.dataset.id});}
@@ -9082,7 +9321,7 @@ Object.assign(ACT,{
   },
   'dup-act'(el){
     const a=actById(el.dataset.aid);if(!a)return;const c=JSON.parse(JSON.stringify(a));
-    const pre=['theme','title','themeNA','noArea','tipoAtv','kind','blockType','catId','teacher','noTeacher','obs','place','link','doWhat','where','plan','bring','itemIds','stow','docIds','goalIds','relId','linkIds'].reduce((o,k)=>{o[k]=c[k];return o;},{});
+    const pre=['theme','title','themeNA','noArea','tipoAtv','kind','blockType','catId','teacher','noTeacher','obs','place','link','doWhat','where','plan','bring','itemIds','stow','docIds','goalIds','relId','linkIds','deckIds','focoIds'].reduce((o,k)=>{o[k]=c[k];return o;},{});
     pre.extras=(c.extras||[]).map(x=>Object.assign({},x,{id:uid()}));
     pre.moneys=(c.moneys||[]).map(x=>Object.assign({},x,{id:uid()}));
     pre.taskIds=S.tasks.filter(t=>(t.activityIds||[]).includes(a.id)).map(t=>t.id);
@@ -9435,6 +9674,7 @@ document.addEventListener('keydown',e=>{
   if(UI.study&&UI.tab==='notas'&&UI.nsub==='estudar'&&$('#modal').hidden&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName||'')){
     if(e.key==='Enter'||e.key===' '){e.preventDefault();ACT['st-reveal']();return;}
     if(/^[1-4]$/.test(e.key)&&UI.study.revealed){e.preventDefault();ACT['st-rate']({dataset:{r:e.key}});return;}
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();ACT['st-undo']();return;}
   }
   if(e.key==='Escape'){const pop=$('#pdfPop');if(pop){pop.remove();return;}if(!$('#modal').hidden){closeModal();return;}}
   if(e.key==='Enter'&&e.target.id==='newGoal'){e.preventDefault();ACT['add-goal']();return;}
@@ -13423,7 +13663,7 @@ const focoPickHTML=(name,sel)=>pickerHTML(name,focoItems(),sel||[],'Foco');
 function focoLinked(f){
   const has=o=>focoIdsOf(o).indexOf(f.id)>=0;
   return {tasks:S.tasks.filter(has),acts:S.acts.filter(has),notes:S.notes.filter(has),
-    files:[].concat(S.docs.filter(has).map(o=>({k:'doc',o:o})),S.pdfs.filter(has).map(o=>({k:'pdf',o:o})),(S.slides||[]).filter(has).map(o=>({k:'slides',o:o})),(S.inks||[]).filter(has).map(o=>({k:'ink',o:o})))};
+    files:[].concat(S.decks.filter(has).map(o=>({k:'deck',o:o})),S.docs.filter(has).map(o=>({k:'doc',o:o})),S.pdfs.filter(has).map(o=>({k:'pdf',o:o})),(S.slides||[]).filter(has).map(o=>({k:'slides',o:o})),(S.inks||[]).filter(has).map(o=>({k:'ink',o:o})))};
 }
 function focoProg(f){
   const L=focoLinked(f),tdone=L.tasks.filter(t=>t.done).length;
@@ -13459,7 +13699,7 @@ function focoModalHTML(f,tab){
   let body='';
   if(tab==='tarefas')body=L.tasks.map(t=>'<div class="ftit"><button class="chk sm '+(t.done?'on':'')+'" data-a="toggle-task" data-id="'+t.id+'" aria-label="Concluir">'+ic('check',12)+'</button><span class="'+(t.done?'done':'')+'" data-a="view-task" data-id="'+t.id+'">'+esc(t.title)+'</span><small>'+(tDue(t)?fmtDM(tDue(t)):'')+'</small></div>').join('')+'<button class="btn sm ghost" data-a="ft-add" data-w="task" data-id="'+f.id+'">'+ic('plus',13)+' Tarefa deste foco</button>';
   else if(tab==='eventos')body=L.acts.map(a=>'<div class="ftit"><span data-a="view-act" data-aid="'+a.id+'">'+esc(aT(a))+'</span><small>'+esc(a.slots[0]?(a.slots[0].mode==='date'?fmtDM(a.slots[0].date):'semanal'):'')+'</small></div>').join('')+'<button class="btn sm ghost" data-a="ft-add" data-w="act" data-id="'+f.id+'">'+ic('plus',13)+' Evento deste foco</button>';
-  else if(tab==='arquivos')body=L.files.map(x=>'<div class="ftit"><span data-a="n-goto" data-k="'+x.k+'" data-id="'+x.o.id+'">'+esc(x.o.title||x.o.name||'Arquivo')+'</span><small>'+({doc:'Documento',pdf:'PDF',slides:'Apresentação',ink:'Caderno'}[x.k])+'</small></div>').join('');
+  else if(tab==='arquivos')body=L.files.map(x=>'<div class="ftit"><span data-a="n-goto" data-k="'+x.k+'" data-id="'+x.o.id+'">'+esc(x.o.title||x.o.name||'Arquivo')+'</span><small>'+({doc:'Documento',pdf:'PDF',slides:'Apresentação',ink:'Caderno',deck:'Baralho'}[x.k])+'</small></div>').join('');
   else body=L.notes.map(n=>'<div class="ftit"><span data-a="n-goto" data-k="note" data-id="'+n.id+'">'+esc(n.title||'Sem título')+'</span><small>'+esc({questao:'Questão',caso:'Caso clínico',bula:'Bulário',fluxo:'Fluxograma'}[n.type]||'Nota')+'</small></div>').join('')+'<button class="btn sm ghost" data-a="ft-add" data-w="note" data-id="'+f.id+'">'+ic('plus',13)+' Nota deste foco</button>';
   if(!body.replace(/<button[^>]*>.*?<\/button>/g,'').trim())body='<div class="muted small" style="padding:8px 0">Nada vinculado ainda.</div>'+body;
   return '<div class="form"><div class="fh"><div style="min-width:0">'+focoPill(f)+'<h2 style="margin-top:6px">'+esc(f.name)+'</h2></div><span class="sp"></span><button class="icon-btn" data-a="ft-edit" data-id="'+f.id+'" aria-label="Editar">'+ic('edit',18)+'</button><button class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
