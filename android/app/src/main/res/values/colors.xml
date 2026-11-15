@@ -2,7 +2,10 @@
 <resources>
     <color name="w_bg">#FFFFFFFF</color>
     <color name="w_tx">#FF16181D</color>
-    <color name="w_mut">#FF6B7280</color>
-    <color name="w_line">#FFE6E8EC</color>
+    <color name="w_mut">#FF5F6776</color>
+    <color name="w_line">#FFE7E9EE</color>
     <color name="w_acc">#FF2547D0</color>
+    <color name="w_chip">#FFEEF1FC</color>
+    <color name="w_pgb">#FF946C4A</color>
+    <color name="w_pge">#FFFFFFFF</color>
 </resources>

@@ -13,5 +13,7 @@
     <string name="d_habitos">Hábitos de hoje</string>
     <string name="d_notas">Notas recentes</string>
     <string name="d_fin">Contas que vencem em breve</string>
+    <string name="w_pingado">Luís · Pingado</string>
+    <string name="d_pingado">Atalho para chamar o assistente Pingado</string>
     <string name="carregando">Carregando…</string>
 </resources>

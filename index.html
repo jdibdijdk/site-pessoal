@@ -12057,6 +12057,8 @@ Object.assign(ACT,{
 });
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()==='j'&&$('#pgPanel')!==undefined&&!/INPUT|TEXTAREA|SELECT/.test((e.target&&e.target.tagName)||'')){e.preventDefault();pgOpen();}});
 document.addEventListener('DOMContentLoaded',()=>pgDefs());
+// atalho do widget do Pingado (?pg=1): abre o assistente ao carregar
+if(/[?&]pg=1(&|$)/.test(location.search))setTimeout(()=>{try{PG.mode='';pgOpen(true);}catch(e){}},1600);
 if(document.readyState!=='loading')pgDefs();
 (()=>{const b=document.getElementById('pgBtnIco');if(b)b.innerHTML=pgMascot('idle',24);})();
 
