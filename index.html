@@ -11556,7 +11556,7 @@ const PG_KEY='pg_chat_v1',PG_TOK='pg_token';
 const pgCfg=()=>{const c=Object.assign({on:false,model:'',read:{},write:{}},S.prefs.pg||{});return c;};
 const pgCan=(dom,kind)=>pgCfg()[kind][dom]!==false;
 const pgApi=()=>String(S.prefs.pgApi||S.prefs.titleApi||'').trim().replace(/\/+$/,'');
-const pgTok=()=>LS.get(PG_TOK)||'';
+const pgTok=()=>LS.get(PG_TOK)||(S.prefs.pgSync?String(S.prefs.pgTok||''):'');
 const pgReady=()=>!!(pgCfg().on&&pgApi()&&pgTok()&&pgCfg().model);
 const PG={open:false,busy:false,ui:[],contents:[],abort:null,models:null,plans:{},att:[]};
 
@@ -11850,7 +11850,8 @@ function pgSettingsHTML(){
   return '<div class="card sec pgset"><div class="pgsh">'+pgMascot('idle',64)+'<div><h3 style="margin:0">Pingado | Assistente com Gemini</h3><div class="muted small">Lê seus dados e só muda algo com a sua aprovação, quando você o chama.</div></div></div>'+
     '<label class="sw" style="margin:12px 0"><input type="checkbox" data-pg="on" '+(c.on?'checked':'')+'> <b>Pingado ligado</b></label>'+
     '<label class="f">Endereço do Worker<input data-pg="api" value="'+esc(S.prefs.pgApi||S.prefs.titleApi||'')+'" placeholder="https://…workers.dev" autocomplete="off"></label>'+
-    '<label class="f">Senha do Pingado (PINGADO_TOKEN) <small>fica só neste aparelho</small><input data-pg="tok" type="password" value="'+esc(pgTok())+'" placeholder="a mesma cadastrada no Worker" autocomplete="off"></label>'+
+    '<label class="f">Senha do Pingado (PINGADO_TOKEN) <small>'+(S.prefs.pgSync?'sincronizada entre seus aparelhos':'fica só neste aparelho')+'</small><input data-pg="tok" type="password" value="'+esc(pgTok())+'" placeholder="a mesma cadastrada no Worker" autocomplete="off"></label>'+
+    '<label class="sw" style="margin:0 0 10px"><input type="checkbox" data-pg="sync" '+(S.prefs.pgSync?'checked':'')+'> <b>Sincronizar a senha entre meus aparelhos</b></label><div class="muted small" style="margin:-4px 0 10px">Assim você digita uma vez só. Em troca, a senha vai junto com os dados do site na nuvem: quem conseguir ler esses dados poderia usar sua cota do Gemini. Desligado, cada aparelho guarda a sua.</div>'+
     '<div class="frow" style="align-items:flex-end"><label class="f" style="flex:1;min-width:220px">Modelo<select data-pg="model">'+(models.length?'':'<option value="">Teste a conexão para listar</option>')+models.map(m=>'<option value="'+esc(m.id)+'" '+(m.id===c.model?'selected':'')+'>'+esc(m.id+(m.name?' | '+m.name:''))+'</option>').join('')+'</select></label><button type="button" class="btn" data-a="pg-test">'+ic('zap',14)+' Testar conexão</button></div>'+
     '<label class="f">Ou digite o id do modelo<input data-pg="modelIn" value="" placeholder="ex.: gemini-2.5-flash" autocomplete="off"></label><div id="pgTest" class="muted small"></div>'+
     '<div class="sechead" style="margin-top:14px">O que o Pingado pode fazer</div><div class="pgperm"><span></span><b>Ler</b><b>Propor mudanças</b>'+
@@ -11861,7 +11862,8 @@ document.addEventListener('change',e=>{
   const t=e.target;if(!t||!t.dataset)return;
   if(t.dataset.pgp){const a=t.dataset.pgp.split(':'),c=pgCfg();c[a[0]]=Object.assign({},c[a[0]],{[a[1]]:t.checked});S.prefs.pg=c;save();return;}
   const k=t.dataset.pg;if(!k)return;
-  if(k==='tok'){try{localStorage.setItem(PG_TOK,t.value.trim());}catch(err){}return;}
+  if(k==='tok'){try{localStorage.setItem(PG_TOK,t.value.trim());}catch(err){}if(S.prefs.pgSync){S.prefs.pgTok=t.value.trim();save();}return;}
+  if(k==='sync'){S.prefs.pgSync=t.checked;if(t.checked)S.prefs.pgTok=pgTok();else delete S.prefs.pgTok;save();renderMain();return;}
   if(k==='api'){S.prefs.pgApi=t.value.trim();save();return;}
   const c=pgCfg();
   if(k==='on')c.on=t.checked;else if(k==='model')c.model=t.value;else if(k==='modelIn'){if(t.value.trim()){c.model=t.value.trim();PG.models=(PG.models||[]).filter(m=>m.id!==c.model).concat([{id:c.model,name:''}]);}}
