@@ -40,5 +40,9 @@
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/w_fin" />
         </receiver>
+        <receiver android:name=".PingadoWidget" android:exported="false" android:label="@string/w_pingado">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/w_pingado" />
+        </receiver>
     </application>
 </manifest>

@@ -58,6 +58,17 @@ public abstract class BaseWidget extends AppWidgetProvider {
         for (int i = 0; i < TODOS.length; i++) desenhar(c, TODOS[i], f[i]);
     }
 
+    static int icone(String f) {
+        switch (f) {
+            case "semana": return R.drawable.ic_h_semana;
+            case "tarefas": return R.drawable.ic_h_tarefas;
+            case "habitos": return R.drawable.ic_h_habitos;
+            case "notas": return R.drawable.ic_h_notas;
+            case "fin": return R.drawable.ic_h_fin;
+            default: return R.drawable.ic_h_hoje;
+        }
+    }
+
     private static PendingIntent abrir(Context c, String url, int req) {
         Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -77,6 +88,7 @@ public abstract class BaseWidget extends AppWidgetProvider {
         v.setOnClickPendingIntent(R.id.refresh, PendingIntent.getBroadcast(c, base, atu, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
 
         if (s == null) {
+            v.setImageViewResource(R.id.ico, icone(frente));
             v.setTextViewText(R.id.title, "Rotina");
             v.setTextViewText(R.id.sub, "");
             v.setTextViewText(R.id.empty, "Abra o site da Rotina com o Firebase conectado para preparar o widget.");
@@ -90,6 +102,7 @@ public abstract class BaseWidget extends AppWidgetProvider {
             return;
         }
 
+        v.setImageViewResource(R.id.ico, icone(frente));
         Frente f = Frente.montar(frente, s);
         v.setTextViewText(R.id.title, f.nome);
         v.setTextViewText(R.id.sub, f.sub);

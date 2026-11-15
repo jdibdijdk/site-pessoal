@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="w_bg">#FF16181D</color>
-    <color name="w_tx">#FFECEEF2</color>
-    <color name="w_mut">#FF9AA1AE</color>
-    <color name="w_line">#FF262A33</color>
-    <color name="w_acc">#FF7C98FF</color>
+    <color name="w_bg">#FF1A1D25</color>
+    <color name="w_tx">#FFE7E9EF</color>
+    <color name="w_mut">#FFA3ABBB</color>
+    <color name="w_line">#FF2A2E39</color>
+    <color name="w_acc">#FF6C8BFF</color>
+    <color name="w_chip">#FF222B4D</color>
+    <color name="w_pgb">#FFC9996C</color>
+    <color name="w_pge">#FF1B120B</color>
 </resources>
