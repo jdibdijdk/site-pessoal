@@ -1,0 +1,415 @@
+diff --git a/apps/deckcraft-web/index.html b/apps/deckcraft-web/index.html
+index ca570df..55fa67c 100644
+--- a/apps/deckcraft-web/index.html
++++ b/apps/deckcraft-web/index.html
+@@ -3,7 +3,7 @@
+ <head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+-  <title>DeckCraft</title>
++  <title>Presentation</title>
+   <link data-trunk rel="rust" data-bin="deckcraft-web" data-wasm-opt="z" data-weak-refs />
+   <link data-trunk rel="icon" href="../../assets/app-icon/deckcraft.ico" />
+   <style>
+@@ -15,6 +15,6 @@
+ </head>
+ <body>
+   <canvas id="deckcraft_canvas"></canvas>
+-  <div id="deckcraft_loading">Loading DeckCraft&hellip;</div>
++  <div id="deckcraft_loading">Loading&hellip;</div>
+ </body>
+ </html>
+diff --git a/apps/deckcraft-web/src/web.rs b/apps/deckcraft-web/src/web.rs
+index 51269d0..0f68b78 100644
+--- a/apps/deckcraft-web/src/web.rs
++++ b/apps/deckcraft-web/src/web.rs
+@@ -67,14 +67,14 @@ pub fn start() {
+                     if let Some(b) = &bridge {
+                         b.post_ready();
+                     }
+-                    Ok(Box::new(WebShell { app, inbox, host_requests, bridge, dirty: false }))
++                    Ok(Box::new(WebShell { app, inbox, host_requests, bridge, dirty: false, dirty_at: None }))
+                 }),
+             )
+             .await;
+         if let Some(el) = document.get_element_by_id(LOADING_ID) {
+             match result {
+                 Ok(()) => el.remove(),
+-                Err(e) => el.set_inner_html(&format!("<p>DeckCraft failed to start: {e:?}</p><p>A browser with WebGPU or WebGL2 is required.</p>")),
++                Err(e) => el.set_inner_html(&format!("<p>The editor failed to start: {e:?}</p><p>A browser with WebGPU or WebGL2 is required.</p>")),
+             }
+         }
+     });
+@@ -92,6 +92,8 @@ struct WebShell {
+     host_requests: HostRequests,
+     bridge: Option<host::Bridge>,
+     dirty: bool,
++    /// When unsaved work first appeared (ms); the hosted window saves by itself shortly after.
++    dirty_at: Option<f64>,
+ }
+ 
+ /// What the embedding page asked for, queued by the message listener and applied on the next frame.
+@@ -105,12 +107,33 @@ impl eframe::App for WebShell {
+     /// Delegate one eframe logic pass to the wrapped application.
+     fn logic(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+         self.app.logic(ctx);
++        let mut autosave = false;
+         if let Some(b) = &self.bridge {
+             let dirty = self.app.session.documents().iter().any(|d| d.is_dirty());
+             if dirty != self.dirty {
+                 self.dirty = dirty;
+                 b.post_dirty(dirty);
+             }
++            // Embedded in a host page: save on its own 2.5 s after changes appear, with no Ctrl+S.
++            if dirty {
++                let now = js_sys::Date::now();
++                match self.dirty_at {
++                    None => {
++                        self.dirty_at = Some(now);
++                        ctx.request_repaint_after(std::time::Duration::from_millis(2600));
++                    }
++                    Some(t) if now - t >= 2500.0 => {
++                        self.dirty_at = None;
++                        autosave = true;
++                    }
++                    Some(_) => ctx.request_repaint_after(std::time::Duration::from_millis(700)),
++                }
++            } else {
++                self.dirty_at = None;
++            }
++        }
++        if autosave {
++            self.app.save();
+         }
+     }
+ 
+diff --git a/crates/engine/src/cmd/insert/album.rs b/crates/engine/src/cmd/insert/album.rs
+index bb2f349..8b0e34f 100644
+--- a/crates/engine/src/cmd/insert/album.rs
++++ b/crates/engine/src/cmd/insert/album.rs
+@@ -634,7 +634,7 @@ fn album_seed(s: &Session) -> Result<Value> {
+     let st = s.doc()?;
+     let slides: Vec<&deckcraft_model::Slide> =
+         ids.iter().filter_map(|sid| u32::try_from(*sid).ok()).filter_map(|n| st.doc.slide(deckcraft_model::SlideId(n))).collect();
+-    let theme_now = st.doc.masters.first().map(|m| m.theme.name.clone()).filter(|n| !n.is_empty()).unwrap_or_else(|| "DeckCraft".into());
++    let theme_now = st.doc.masters.first().map(|m| m.theme.name.clone()).filter(|n| !n.is_empty()).unwrap_or_else(|| "Default".into());
+     let inferred = infer_album(&slides, &theme_now);
+     let mark = slides.first().and_then(|sl| sl.raw_ext.as_deref().and_then(parse_album_mark));
+     let (layout, frame, captions, grayscale, theme) = if let Some(mark) = mark {
+diff --git a/crates/engine/src/sample.rs b/crates/engine/src/sample.rs
+index 80c11ca..c0655aa 100644
+--- a/crates/engine/src/sample.rs
++++ b/crates/engine/src/sample.rs
+@@ -15,7 +15,7 @@ fn last_id(v: &Value) -> u64 {
+ 
+ /// Open the sample presentation in a new document.
+ pub fn open_sample(s: &mut Session) -> Result<()> {
+-    run(s, "file.new", json!({"theme": "DeckCraft"}))?;
++    run(s, "file.new", json!({"theme": "Default"}))?;
+     let st = s.doc()?;
+     let title = st.current_slide().and_then(|x| x.shapes.first()).map(|x| x.id.0).unwrap_or(0);
+     let sub = st.current_slide().and_then(|x| x.shapes.get(1)).map(|x| x.id.0).unwrap_or(0);
+diff --git a/crates/model/src/theme.rs b/crates/model/src/theme.rs
+index 870a8bb..1312133 100644
+--- a/crates/model/src/theme.rs
++++ b/crates/model/src/theme.rs
+@@ -68,8 +68,8 @@ pub struct Theme {
+ impl Default for Theme {
+     fn default() -> Self {
+         builtin_themes().into_iter().next().unwrap_or_else(|| Theme {
+-            name: "DeckCraft".into(),
+-            colors: ColorScheme { name: "DeckCraft".into(), colors: [Rgba::BLACK; 12] },
++            name: "Default".into(),
++            colors: ColorScheme { name: "Default".into(), colors: [Rgba::BLACK; 12] },
+             fonts: FontScheme::default(),
+             format: FormatScheme::default(),
+             raw_extra: None,
+@@ -118,7 +118,7 @@ pub fn default_format() -> FormatScheme {
+         })
+     };
+     FormatScheme {
+-        name: "DeckCraft".into(),
++        name: "Default".into(),
+         fills: vec![Fill::solid(ph()), grad(110000, 92000), grad(105000, 80000)],
+         lines: vec![Line::solid(ph(), 0.75), Line::solid(ph(), 1.0), Line::solid(ph(), 1.5)],
+         effects: vec![
+@@ -189,9 +189,9 @@ pub fn builtin_themes() -> Vec<Theme> {
+     };
+     vec![
+         t(
+-            "DeckCraft",
++            "Default",
+             scheme(
+-                "DeckCraft",
++                "Default",
+                 ["000000", "FFFFFF", "1E2B3C", "EDEBE7", "2E6FD8", "F26B1D", "2EA36F", "8A5CD8", "D83F6B", "E3B21C", "2E6FD8", "7A5BA6"],
+             ),
+             "Inter",
+diff --git a/crates/ui-egui/src/app/files.rs b/crates/ui-egui/src/app/files.rs
+index 5f81ab7..4d1b1bc 100644
+--- a/crates/ui-egui/src/app/files.rs
++++ b/crates/ui-egui/src/app/files.rs
+@@ -63,7 +63,7 @@ fn command_for(purpose: FilePurpose, name: &str, bytes: &[u8]) -> Result<&'stati
+         FilePurpose::Open => open_command(name),
+         FilePurpose::Infer => infer_command(name, bytes),
+     };
+-    cmd.ok_or_else(|| format!("{name}: DeckCraft can't open this kind of file"))
++    cmd.ok_or_else(|| format!("{name}: This editor can't open this kind of file"))
+ }
+ 
+ impl SlideApp {
+@@ -139,7 +139,7 @@ impl SlideApp {
+             "deckcraft" => ("deckcraft", "deckcraft", false),
+             "gif" => ("gif", "gif", false),
+             other => {
+-                self.set_status(format!("DeckCraft can't export “{other}”"));
++                self.set_status(format!("This editor can't export “{other}”"));
+                 return false;
+             }
+         };
+diff --git a/crates/ui-egui/src/backstage/files.rs b/crates/ui-egui/src/backstage/files.rs
+index 4b7cec6..2c31ba7 100644
+--- a/crates/ui-egui/src/backstage/files.rs
++++ b/crates/ui-egui/src/backstage/files.rs
+@@ -55,7 +55,7 @@ fn new_tiles(app: &mut SlideApp, ui: &mut Ui, query: &str, limit: usize, blank:
+             shown += 1;
+         }
+         if sample && shown < limit {
+-            let th = deckcraft_model::theme::builtin_themes().into_iter().find(|t| t.name == "DeckCraft");
++            let th = deckcraft_model::theme::builtin_themes().into_iter().find(|t| t.name == "Default");
+             if tile(ui, "Sample deck: Northern Lights", th.as_ref(), false).clicked()
+                 && let Err(e) = deckcraft_engine::sample::open_sample(&mut app.session)
+             {
+@@ -210,7 +210,7 @@ pub(super) fn home(app: &mut SlideApp, ui: &mut Ui, bs: &mut Backstage, out: &mu
+     ui.horizontal(|ui| {
+         let (r, _) = ui.allocate_exact_size(vec2(36.0, 36.0), Sense::hover());
+         crate::dialogs::paint_logo(ui.painter(), r);
+-        ui.label(RichText::new("DeckCraft").font(theme::bold(24.0)).color(t.text));
++        ui.label(RichText::new("Presentations").font(theme::bold(24.0)).color(t.text));
+     });
+     ui.add_space(18.0);
+     ui.horizontal(|ui| {
+diff --git a/crates/ui-egui/src/backstage/info.rs b/crates/ui-egui/src/backstage/info.rs
+index 690e552..9512d8b 100644
+--- a/crates/ui-egui/src/backstage/info.rs
++++ b/crates/ui-egui/src/backstage/info.rs
+@@ -4,7 +4,7 @@ use super::{Backstage, Icon, Outcome, Page, RichText, Sense, SlideApp, Tokens, U
+ /// Save As and Change File Type: (id for [`SlideApp::export_as`], label, detail).
+ pub const SAVE_TYPES: [(&str, &str, &str); 7] = [
+     ("pptx", "PowerPoint Presentation (*.pptx)", "Opens in PowerPoint and other presentation apps"),
+-    ("deckcraft", "DeckCraft Presentation (*.deckcraft)", "DeckCraft's own format: everything is kept"),
++    ("deckcraft", "Native Presentation (*.deckcraft)", "The native format: everything is kept"),
+     ("pdf", "PDF (*.pdf)", "A fixed copy that keeps its layout on any device"),
+     ("outline", "Outline (*.txt)", "The slide titles and bullet text as plain text"),
+     ("rtf", "Outline/RTF (*.rtf)", "The slide titles and bullet text for word processors"),
+@@ -212,7 +212,7 @@ pub(super) fn account(app: &mut SlideApp, ui: &mut Ui) {
+                 .widget_info(|| egui::WidgetInfo::labeled(egui::Role::ComboBox, true, "Appearance"));
+             ui.add_space(16.0);
+             heading(ui, "User Information");
+-            dim(ui, "DeckCraft has no accounts: there is nothing to sign in to, and your presentations stay on your device.");
++            dim(ui, "There are no accounts: there is nothing to sign in to, and your presentations stay on your device.");
+         });
+         ui.add_space(40.0);
+         ui.vertical(|ui| {
+@@ -220,7 +220,7 @@ pub(super) fn account(app: &mut SlideApp, ui: &mut Ui) {
+             ui.horizontal(|ui| {
+                 let (r, _) = ui.allocate_exact_size(vec2(40.0, 40.0), Sense::hover());
+                 crate::dialogs::paint_logo(ui.painter(), r);
+-                ui.label(RichText::new("DeckCraft").font(theme::bold(24.0)).color(t.text));
++                ui.label(RichText::new("Presentations").font(theme::bold(24.0)).color(t.text));
+             });
+             dim(ui, &crate::dialogs::version_line());
+             dim(ui, "Open source under MIT OR Apache-2.0. Not affiliated with Microsoft.");
+@@ -228,8 +228,8 @@ pub(super) fn account(app: &mut SlideApp, ui: &mut Ui) {
+             if task(
+                 ui,
+                 Icon::Help,
+-                "About DeckCraft",
+-                "About DeckCraft",
++                "About this editor",
++                "About this editor",
+                 "The version, the people and models who built it, and where to find us.",
+                 true,
+             ) {
+diff --git a/crates/ui-egui/src/backstage/print.rs b/crates/ui-egui/src/backstage/print.rs
+index 612ecaf..c92419d 100644
+--- a/crates/ui-egui/src/backstage/print.rs
++++ b/crates/ui-egui/src/backstage/print.rs
+@@ -84,9 +84,9 @@ pub(super) fn print(app: &mut SlideApp, ui: &mut Ui, bs: &mut Backstage) {
+             dim(
+                 ui,
+                 if app.services.pick_save.is_some() {
+-                    "DeckCraft prints through a PDF: it opens in your PDF viewer, where you choose the printer."
++                    "Printing goes through a PDF: it opens in your PDF viewer, where you choose the printer."
+                 } else {
+-                    "DeckCraft prints through a PDF: it downloads, ready to print from your browser or PDF viewer."
++                    "Printing goes through a PDF: it downloads, ready to print from your browser or PDF viewer."
+                 },
+             );
+             ui.add_space(14.0);
+diff --git a/crates/ui-egui/src/dialogs.rs b/crates/ui-egui/src/dialogs.rs
+index ed33b9c..e7dfed5 100644
+--- a/crates/ui-egui/src/dialogs.rs
++++ b/crates/ui-egui/src/dialogs.rs
+@@ -48,7 +48,7 @@ fn title(id: &str) -> &'static str {
+         "paragraph" => "Paragraph",
+         "tabs" => "Tabs",
+         "font" => "Font",
+-        "about" => "About DeckCraft",
++        "about" => "About this editor",
+         "preferences" => "Preferences",
+         "autocorrect" => "AutoCorrect",
+         "gridOptions" => "Grid Options",
+@@ -70,10 +70,10 @@ fn title(id: &str) -> &'static str {
+         "smartart" => "Choose a SmartArt Graphic",
+         "bullets" => "Bullets and Numbering",
+         "action" => "Action Settings",
+-        "quit" => "DeckCraft",
++        "quit" => "Presentation",
+         "themeColors" => "Create New Theme Colors",
+         "themeFonts" => "Create New Theme Fonts",
+-        _ => "DeckCraft",
++        _ => "Presentation",
+     }
+ }
+ 
+diff --git a/crates/ui-egui/src/dialogs/about.rs b/crates/ui-egui/src/dialogs/about.rs
+index 03c6629..e8541ef 100644
+--- a/crates/ui-egui/src/dialogs/about.rs
++++ b/crates/ui-egui/src/dialogs/about.rs
+@@ -20,7 +20,7 @@ pub fn about(_app: &mut SlideApp, ui: &mut Ui) {
+     ui.vertical_centered(|ui| {
+         let (r, _) = ui.allocate_exact_size(vec2(64.0, 64.0), Sense::hover());
+         paint_logo(ui.painter(), r);
+-        ui.label(egui::RichText::new("DeckCraft").font(theme::bold(22.0)));
++        ui.label(egui::RichText::new("Presentations").font(theme::bold(22.0)));
+         ui.label(egui::RichText::new(version_line()).color(t.text_dim));
+         ui.add_space(6.0);
+         ui.label("Presentations and slide shows, rebuilt from scratch in pure Rust.");
+diff --git a/crates/ui-egui/src/dialogs/find.rs b/crates/ui-egui/src/dialogs/find.rs
+index c702db9..6ba593c 100644
+--- a/crates/ui-egui/src/dialogs/find.rs
++++ b/crates/ui-egui/src/dialogs/find.rs
+@@ -49,7 +49,7 @@ pub(super) fn find_dialog(app: &mut SlideApp, ui: &mut Ui, d: &mut Dialog) -> bo
+                 p["with"] = json!(d.get("with", ""));
+                 let msg = match app.session.execute("text.replace", &p) {
+                     Ok(v) => format!("Replaced {} occurrence(s).", v.get("replaced").and_then(Value::as_u64).unwrap_or(0)),
+-                    Err(_) => format!("DeckCraft can't find “{text}”."),
++                    Err(_) => format!("Can't find “{text}”."),
+                 };
+                 d.fields.insert("status".into(), msg);
+                 d.fields.remove("cur");
+@@ -64,7 +64,7 @@ pub(super) fn find_dialog(app: &mut SlideApp, ui: &mut Ui, d: &mut Dialog) -> bo
+     if find_next {
+         let list = app.session.execute("text.find", &q).ok().and_then(|v| v.as_array().cloned()).unwrap_or_default();
+         if list.is_empty() {
+-            d.fields.insert("status".into(), format!("DeckCraft can't find “{text}”."));
++            d.fields.insert("status".into(), format!("Can't find “{text}”."));
+             d.fields.remove("cur");
+         } else {
+             let n = d.get("next", "0").parse::<usize>().unwrap_or(0) % list.len();
+diff --git a/crates/ui-egui/src/dialogs/photo_album.rs b/crates/ui-egui/src/dialogs/photo_album.rs
+index 340e583..054730a 100644
+--- a/crates/ui-egui/src/dialogs/photo_album.rs
++++ b/crates/ui-egui/src/dialogs/photo_album.rs
+@@ -85,7 +85,7 @@ fn album_choice(ui: &mut Ui, d: &mut Dialog, id: &str, name: &str, key: &str, de
+     });
+ }
+ 
+-const ALBUM_THEMES: &[&str] = &["DeckCraft", "Harbor", "Ember", "Meadow", "Nocturne", "Paper", "Coral Reef", "Slate"];
++const ALBUM_THEMES: &[&str] = &["Default", "Harbor", "Ember", "Meadow", "Nocturne", "Paper", "Coral Reef", "Slate"];
+ 
+ fn current_theme(app: &SlideApp) -> String {
+     app.session
+@@ -93,7 +93,7 @@ fn current_theme(app: &SlideApp) -> String {
+         .and_then(|d| d.doc.masters.first())
+         .map(|m| m.theme.name.clone())
+         .filter(|n| !n.is_empty())
+-        .unwrap_or_else(|| "DeckCraft".into())
++        .unwrap_or_else(|| "Default".into())
+ }
+ 
+ fn album_json_id(v: &Value) -> Option<u64> {
+@@ -278,7 +278,7 @@ pub(super) fn photo_album_dialog(app: &mut SlideApp, ui: &mut Ui, d: &mut Dialog
+         check(ui, d, "Captions under pictures", "captions", false);
+         check(ui, d, "ALL pictures black and white", "grayscale", false);
+         ui.label("Album theme");
+-        album_choice(ui, d, "album_theme", "Album theme", "theme", "DeckCraft", &ALBUM_THEMES.iter().map(|n| (*n, *n)).collect::<Vec<_>>());
++        album_choice(ui, d, "album_theme", "Album theme", "theme", "Default", &ALBUM_THEMES.iter().map(|n| (*n, *n)).collect::<Vec<_>>());
+     });
+     let captions = d.fields.get("captions").is_some_and(|v| v == "1");
+     let grayscale = d.fields.get("grayscale").is_some_and(|v| v == "1");
+@@ -295,7 +295,7 @@ pub(super) fn photo_album_dialog(app: &mut SlideApp, ui: &mut Ui, d: &mut Dialog
+         }
+         let layout = d.get("layout", "1");
+         let frame = d.get("frame", "rect");
+-        let theme = d.get("theme", "DeckCraft");
++        let theme = d.get("theme", "Default");
+         let theme_was = d.fields.get("themeWas").cloned().unwrap_or_default();
+         let mut payload = json!({"pictures": list, "layout": layout, "frame": frame, "captions": captions, "grayscale": grayscale});
+         if theme != theme_was
+diff --git a/crates/ui-egui/src/dialogs/updates_ui.rs b/crates/ui-egui/src/dialogs/updates_ui.rs
+index 1b65dcb..8619879 100644
+--- a/crates/ui-egui/src/dialogs/updates_ui.rs
++++ b/crates/ui-egui/src/dialogs/updates_ui.rs
+@@ -41,7 +41,7 @@ pub(crate) fn tick(app: &mut SlideApp, ctx: &egui::Context) {
+     }
+     rt.updater.tick(ctx);
+     let outcome = match rt.updater.status() {
+-        Status::UpToDate => Some(format!("DeckCraft {VERSION} is up to date.")),
++        Status::UpToDate => Some(format!("Version {VERSION} is up to date.")),
+         Status::Failed(e) => Some(format!("Could not check for updates: {e}")),
+         Status::Idle | Status::Checking => None,
+     };
+diff --git a/crates/ui-egui/src/lib.rs b/crates/ui-egui/src/lib.rs
+index 30b5a0c..2adc381 100644
+--- a/crates/ui-egui/src/lib.rs
++++ b/crates/ui-egui/src/lib.rs
+@@ -121,7 +121,7 @@ pub const UI_COMMANDS: &[(&str, &str, Option<&str>, &str)] = &[
+         Some("Cmd+P"),
+         "{layout?, perPage?, slides?, includeHidden?, frame?, paper?: letter|a4|legal|a3, orientation?: portrait|landscape}",
+     ),
+-    ("app.about", "About DeckCraft", None, "{}"),
++    ("app.about", "About this editor", None, "{}"),
+     ("app.checkUpdates", "Check for Updates…", None, "{}"),
+     ("app.palette", "Command Palette", Some("Cmd+Shift+P"), "{}"),
+     ("app.preferences", "Preferences…", Some("Cmd+,"), "{}"),
+diff --git a/crates/ui-egui/src/menus.rs b/crates/ui-egui/src/menus.rs
+index f78e252..8d3a1ae 100644
+--- a/crates/ui-egui/src/menus.rs
++++ b/crates/ui-egui/src/menus.rs
+@@ -289,7 +289,7 @@ pub fn menu_tree() -> Vec<(&'static str, Vec<(&'static str, &'static str)>)> {
+                 ("Set Up Show…", "show.setup"),
+             ],
+         ),
+-        ("Help", vec![("About DeckCraft", "app.about"), ("Check for Updates…", "app.checkUpdates"), ("Command Palette", "app.palette")]),
++        ("Help", vec![("Command Palette", "app.palette")]),
+     ]
+ }
+ 
+diff --git a/crates/ui-egui/src/ribbon/title_bar.rs b/crates/ui-egui/src/ribbon/title_bar.rs
+index 6c7e825..b670154 100644
+--- a/crates/ui-egui/src/ribbon/title_bar.rs
++++ b/crates/ui-egui/src/ribbon/title_bar.rs
+@@ -55,7 +55,7 @@ pub fn title_bar(app: &mut SlideApp, ui: &mut Ui) {
+         let dirty = app.session.active().is_some_and(|d| d.is_dirty());
+         crate::qat::show(app, &mut child);
+         let title =
+-            app.session.active().map(|d| format!("{}{}", d.title(), if dirty { " — Edited" } else { "" })).unwrap_or_else(|| "DeckCraft".into());
++            app.session.active().map(|d| format!("{}{}", d.title(), if dirty { " — Edited" } else { "" })).unwrap_or_else(|| "Presentation".into());
+         ui.painter().text(rect.center(), Align2::CENTER_CENTER, title, theme::font(13.0), t.text);
+         // Right side.
+         let mut right = ui.new_child(
+diff --git a/crates/ui-egui/src/show/presenter.rs b/crates/ui-egui/src/show/presenter.rs
+index 4b0c252..4898074 100644
+--- a/crates/ui-egui/src/show/presenter.rs
++++ b/crates/ui-egui/src/show/presenter.rs
+@@ -108,7 +108,7 @@ pub(super) fn presenter_window(ctx: &egui::Context, show: &mut Show, doc: &Prese
+     };
+     ctx.show_viewport_immediate(
+         egui::ViewportId::from_hash_of("deckcraft_presenter"),
+-        egui::ViewportBuilder::default().with_title("Presenter View — DeckCraft").with_inner_size([1100.0, 700.0]),
++        egui::ViewportBuilder::default().with_title("Presenter View").with_inner_size([1100.0, 700.0]),
+         |ui, _| {
+             if !keyboard(ui.ctx(), show, doc, now, true) {
+                 *keep = false;
