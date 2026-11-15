@@ -2493,6 +2493,48 @@ html[data-theme="dark"] mark.hl{background:color-mix(in srgb,var(--c) 45%,transp
   .dkbk{display:none}.dkhead .btn,.dkhead .icon-btn{flex:none}.dkhead{gap:4px}
   .dkfab{display:inline-flex;align-items:center;gap:6px;position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:40;border:0;border-radius:999px;background:var(--ink);color:var(--onink);padding:13px 18px;font-weight:600;font-size:14px;box-shadow:0 6px 18px rgba(16,24,40,.28)}
 }
+
+/* Pingado */
+.pgbi{display:inline-flex;width:24px;height:24px}.pgbtn{gap:6px}
+.pgm{overflow:visible;display:block}
+.pgm .pgbody{transform-origin:100px 176px;animation:pgbob 3.4s ease-in-out infinite}
+.pgm .pgsh{transform-origin:100px 188px;animation:pgsh 3.4s ease-in-out infinite}
+.pgm .pgeye{transform-box:fill-box;transform-origin:center;animation:pgblink 5.5s infinite}
+.pg-think .pgbody{animation:pgbob 1.1s ease-in-out infinite}.pg-think .pgeyes{transform:translate(5px,-6px)}
+.pg-think .pgdots circle{animation:pgdot 1.2s infinite}.pg-think .pgdots circle:nth-child(2){animation-delay:.2s}.pg-think .pgdots circle:nth-child(3){animation-delay:.4s}
+@keyframes pgbob{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-6px) scale(1.015,.99)}}
+@keyframes pgsh{0%,100%{transform:scaleX(1);opacity:.13}50%{transform:scaleX(.9);opacity:.09}}
+@keyframes pgblink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes pgdot{0%,100%{opacity:.25}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.pgm *{animation:none!important}}
+.pgp{position:fixed;top:0;right:0;bottom:0;width:min(420px,100vw);z-index:95;display:flex;flex-direction:column;background:var(--card);border-left:1px solid var(--line);box-shadow:-10px 0 34px rgba(16,24,40,.14);animation:pgin .22s ease-out}
+.pgp[hidden]{display:none}@keyframes pgin{from{transform:translateX(24px);opacity:0}}
+.pgh{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line2);background:linear-gradient(180deg,#EAF5FF,transparent)}
+html[data-theme="dark"] .pgh{background:linear-gradient(180deg,#14283A,transparent)}
+.pgav{display:inline-flex;width:40px;height:40px;flex:none}.pgav.sm{width:26px;height:26px;margin-top:2px}
+.pgt b{display:block;font-size:15px}.pgt small{color:var(--mut);font-size:12px}
+.pgmsgs{flex:1;overflow:auto;padding:14px 12px;display:flex;flex-direction:column;gap:10px}
+.pgmsg{display:flex;gap:8px;max-width:94%;font-size:14px;line-height:1.5}
+.pgmsg.me{align-self:flex-end;flex-direction:column;align-items:flex-end;background:var(--ink);color:var(--onink);padding:8px 12px;border-radius:16px 16px 4px 16px}
+.pgmsg.me p{margin:0;white-space:pre-wrap}.pgmsg.me img{max-width:180px;border-radius:10px;margin-bottom:6px}
+.pgmsg.bot>div{background:var(--soft);padding:8px 12px;border-radius:16px 16px 16px 4px;min-width:0;overflow-wrap:anywhere}
+.pgmsg.bot p{margin:0 0 6px}.pgmsg.bot p:last-child{margin:0}.pgmsg.bot ul{margin:4px 0 4px 18px;padding:0}.pgmsg.bot.err>div{background:#FDECEC;color:#7A1F1F}
+.pgdots3{display:flex;gap:4px;padding:12px 14px!important}.pgdots3 i{width:7px;height:7px;border-radius:50%;background:var(--mut);animation:pgdot 1.1s infinite}.pgdots3 i:nth-child(2){animation-delay:.18s}.pgdots3 i:nth-child(3){animation-delay:.36s}
+.pgempty{margin:auto;text-align:center;padding:20px 14px;display:flex;flex-direction:column;align-items:center;gap:8px}.pgempty h3{margin:4px 0 0}.pgempty p{margin:0;color:var(--mut);font-size:13.5px}
+.pgsug{display:flex;flex-direction:column;gap:6px;width:100%;margin-top:8px}.pgchip{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:9px 12px;text-align:left;font-size:13px;color:var(--tx)}.pgchip:hover{background:var(--soft)}
+.pgplan{border:1px solid var(--line);border-radius:14px;padding:10px;background:var(--card);box-shadow:0 2px 8px rgba(16,24,40,.06)}
+.pgplan.open{border-color:#46B6FF;box-shadow:0 0 0 3px rgba(70,182,255,.18)}
+.pgplh{display:flex;align-items:center;gap:7px;font-size:13.5px}.pgplr{font-size:12.5px;color:var(--mut);margin:4px 0}
+.pgpli{display:flex;flex-direction:column;gap:2px;margin:8px 0}
+.pgit{display:flex;gap:8px;align-items:flex-start;padding:6px 6px;border-radius:9px;font-size:13px;cursor:pointer}.pgit:hover{background:var(--soft)}.pgit small{display:block;color:var(--mut);font-size:12px;margin-top:1px}.pgit.danger b{color:#B91C1C}.pgit.done{opacity:.7}
+.pgit input{margin-top:3px;flex:none}
+.pgpla{display:flex;gap:6px;flex-wrap:wrap}
+.pgatt{display:flex;gap:6px;padding:0 12px}.pgth{position:relative}.pgth img{width:54px;height:54px;object-fit:cover;border-radius:10px}.pgth button{position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;border:0;background:var(--ink);color:var(--onink);font-size:12px;line-height:1}
+.pgform{display:flex;align-items:flex-end;gap:6px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line2)}
+.pgform textarea{flex:1;resize:none;border:1px solid var(--line);border-radius:14px;padding:9px 12px;font:inherit;font-size:14px;max-height:140px;background:var(--card);color:var(--tx)}
+.pgsend{background:var(--ink);color:var(--onink);border-radius:50%}.pgsend:hover{background:var(--ink);color:var(--onink)}
+@media (max-width:760px){.pgp{width:100vw;border-left:0}.pgbtn .lbl{display:none}.pgbtn{padding:0 9px}}
+.pgset .pgsh{display:flex;align-items:center;gap:12px}.pgperm{display:grid;grid-template-columns:1fr 70px 110px;gap:6px 8px;align-items:center;font-size:13.5px;margin-top:6px}.pgperm b{font-size:12px;color:var(--mut);text-align:center}.pgperm input{justify-self:center}
 </style>
 </head>
 <body>
@@ -2510,6 +2552,7 @@ html[data-theme="dark"] mark.hl{background:color-mix(in srgb,var(--c) 45%,transp
   <button class="gsearch" data-a="gs-open" aria-label="Pesquisar em todo o site"><span data-ic="search" data-s="16"></span><span class="gst">Faça uma pesquisa</span><kbd>Ctrl K</kbd></button>
   <div class="actions">
     <button class="pillb" data-a="tab" data-v="habitos" title="Trilha do dia"><span data-ic="sprout" data-s="15"></span><span class="lbl">Trilha do dia</span></button>
+    <button class="pillb pgbtn" id="btnPg" data-a="pg-open" title="Pingado | Assistente (Ctrl J)" aria-label="Pingado, assistente"><span class="pgbi" id="pgBtnIco"></span><span class="lbl">Pingado</span></button>
     <button class="icon-btn" id="btnBell" data-a="nc-open" title="Avisos e pendências" aria-label="Avisos e pendências"><span data-ic="bell"></span><span class="badge" id="ncbadge" hidden></span></button>
     <button class="icon-btn" id="btnMore" data-a="more-menu" title="Mais opções" aria-label="Mais opções"><span data-ic="more"></span></button>
     <button class="btn primary" data-a="new-act"><span data-ic="plus" data-s="16"></span><span class="lbl">Nova atividade</span></button>
@@ -4740,7 +4783,8 @@ function renderAjustes(){
     '<div class="addrow"><input type="text" id="nkNew" placeholder="Novo tipo de nota" autocomplete="off"><button class="btn primary sm" data-a="nk-add">Adicionar</button></div></div>';
   SEC.notif=notifHTML();
   SEC.app=appHTML();
-  const tabs=[['horas','Horas'],['cats','Categorias'],['objs','Objetos'],['titulo','Título e Listas'],['nk','Tipos de nota'],['notif','Notificações'],['app','App e Widgets'],['dados','Dados']];
+  SEC.pingado=pgSettingsHTML();
+  const tabs=[['horas','Horas'],['cats','Categorias'],['objs','Objetos'],['titulo','Título e Listas'],['nk','Tipos de nota'],['notif','Notificações'],['app','App e Widgets'],['pingado','Pingado'],['dados','Dados']];
   return '<div class="toolbar"><div class="seg">'+tabs.map(t=>'<button class="'+(UI.ajTab===t[0]?'on':'')+'" data-a="aj-tab" data-v="'+t[0]+'">'+t[1]+'</button>').join('')+'</div></div>'+(UI.ajTab==='horas'?hoursHTML():(SEC[UI.ajTab]||SEC.cats));
 }
 
@@ -11500,6 +11544,361 @@ Object.assign(ACT,{
   'imp-copy-fmt'(){impCopy(iaFormatPrompt(),'Formato copiado. Cole na IA junto com o seu pedido.');},
   'imp-all'(el){if(!IMP)return;const on=!!el.dataset.on;IMP.items.forEach(i=>{if(!i.bad)i.off=!on;});$('#impPrev').innerHTML=impPreviewHTML();const n=IMP.items.filter(i=>!i.bad&&!i.off).length;$('#impGo').textContent=n?'Criar '+n+(n===1?' item':' itens'):'Criar selecionados';}
 });
+
+/* ==========================================================================
+   PINGADO: assistente com Gemini (a chave fica no Worker; aqui só o token)
+   Lê os dados por ferramentas e só ESCREVE depois da sua aprovação.
+   ========================================================================== */
+const PG_DOMS=[['agenda','Agenda e eventos'],['tarefas','Tarefas e datas'],['disc','Disciplinas e focos'],['notas','Notas'],['docs','Documentos'],['cul','Culinária e despensa'],['mat','Materiais'],['fin','Finanças'],['hab','Hábitos e objetivos'],['quest','Questões (MedFisher)']];
+const PG_KEY='pg_chat_v1',PG_TOK='pg_token';
+const pgCfg=()=>{const c=Object.assign({on:false,model:'',read:{},write:{}},S.prefs.pg||{});return c;};
+const pgCan=(dom,kind)=>pgCfg()[kind][dom]!==false;
+const pgApi=()=>String(S.prefs.pgApi||S.prefs.titleApi||'').trim().replace(/\/+$/,'');
+const pgTok=()=>LS.get(PG_TOK)||'';
+const pgReady=()=>!!(pgCfg().on&&pgApi()&&pgTok()&&pgCfg().model);
+const PG={open:false,busy:false,ui:[],contents:[],abort:null,models:null,plans:{},att:[]};
+
+/* ----- mascote: nuvem azul com boina (ilustração 2D vetorial) ----- */
+function pgDefs(){
+  if(document.getElementById('pgDefs'))return;
+  const d=document.createElement('div');d.id='pgDefs';d.style.cssText='position:absolute;width:0;height:0;overflow:hidden';
+  d.innerHTML='<svg width="0" height="0" aria-hidden="true"><defs><radialGradient id="pgG" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#6CC8FF"/><stop offset=".55" stop-color="#2EA2F2"/><stop offset="1" stop-color="#1678D6"/></radialGradient><linearGradient id="pgB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3A3A42"/><stop offset="1" stop-color="#17171B"/></linearGradient></defs></svg>';
+  document.body.appendChild(d);
+}
+function pgMascot(state,size,cls){
+  const lobes=[0,60,120,180,240,300].map(a=>{const r=a*Math.PI/180;return [100+52*Math.cos(r),116+46*Math.sin(r)];});
+  const shapes='<circle cx="100" cy="116" r="58"/>'+lobes.map(p=>'<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="30"/>').join('');
+  const closed=state==='sleep';
+  const eyes=closed?'<path d="M76 122q8 7 16 0M108 122q8 7 16 0" fill="none" stroke="#14141A" stroke-width="4.5" stroke-linecap="round"/>':
+    '<g class="pgeyes"><ellipse class="pgeye" cx="84" cy="121" rx="7.4" ry="10" fill="#14141A"/><ellipse class="pgeye" cx="118" cy="121" rx="7.4" ry="10" fill="#14141A"/><circle cx="86.5" cy="116.5" r="2.4" fill="#fff" opacity=".9"/><circle cx="120.5" cy="116.5" r="2.4" fill="#fff" opacity=".9"/></g>';
+  return '<svg class="pgm pg-'+(state||'idle')+(cls?' '+cls:'')+'" width="'+size+'" height="'+size+'" viewBox="0 0 200 200" role="img" aria-label="Pingado">'+
+    '<ellipse class="pgsh" cx="100" cy="188" rx="54" ry="8" fill="#000" opacity=".13"/>'+
+    '<g class="pgbody"><g fill="#1368C2" stroke="#1368C2" stroke-width="6" stroke-linejoin="round">'+shapes+'</g><g fill="url(#pgG)">'+shapes+'</g>'+
+    '<ellipse cx="72" cy="86" rx="26" ry="12" fill="#fff" opacity=".2" transform="rotate(-24 72 86)"/>'+
+    eyes+
+    '<g class="pgberet" transform="rotate(-9 100 74)"><rect x="92" y="38" width="9" height="16" rx="4.5" fill="#17171B"/><ellipse cx="100" cy="72" rx="52" ry="23" fill="url(#pgB)"/><ellipse cx="100" cy="88" rx="42" ry="8" fill="#101014"/><path d="M62 66q14-14 36-15" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".16"/></g></g>'+
+    (state==='think'?'<g class="pgdots" fill="#1678D6"><circle cx="150" cy="66" r="4"/><circle cx="163" cy="56" r="5"/><circle cx="178" cy="44" r="6"/></g>':'')+'</svg>';
+}
+
+/* ----- ferramentas ----- */
+const PG_STR={type:'STRING'},PG_NUM={type:'NUMBER'};
+const pgP=(o,req)=>({type:'OBJECT',properties:o,required:req||[]});
+function pgTools(){
+  const D=[],add=(dom,name,desc,params)=>{if(pgCan(dom,'read'))D.push({name:name,description:desc,parameters:params||pgP({})});};
+  add('agenda','ver_agenda','Lista os eventos da agenda entre duas datas (AAAA-MM-DD, no máximo 31 dias).',pgP({de:PG_STR,ate:PG_STR},['de','ate']));
+  add('agenda','horarios_livres','Mostra os intervalos livres de um dia (entre 06:00 e 23:00) e as tarefas com prazo nele.',pgP({dia:PG_STR,duracao_min:PG_NUM},['dia']));
+  add('tarefas','listar_tarefas','Lista tarefas. situacao: pendentes, concluidas ou todas.',pgP({situacao:PG_STR,busca:PG_STR}));
+  add('tarefas','listar_datas','Lista as datas e prazos importantes (provas, entregas).');
+  add('disc','listar_disciplinas','Lista disciplinas/assuntos usados nos eventos, os Focos (áreas e módulos) e as categorias.');
+  add('notas','buscar_notas','Procura notas pelo título ou conteúdo.',pgP({texto:PG_STR},['texto']));
+  add('notas','ler_nota','Lê o texto de uma nota pelo id.',pgP({id:PG_STR},['id']));
+  add('docs','listar_documentos','Lista documentos e PDFs.',pgP({busca:PG_STR}));
+  add('cul','listar_receitas','Lista receitas com ingredientes.',pgP({busca:PG_STR}));
+  add('cul','ver_despensa','Mostra o estoque da despensa e o preço/embalagem dos ingredientes.');
+  add('mat','listar_materiais','Lista materiais, mochilas e kits cadastrados.');
+  add('fin','ver_financas','Lista contas, entradas e saídas previstas entre duas datas (padrão: próximos 30 dias).',pgP({de:PG_STR,ate:PG_STR}));
+  add('hab','ver_habitos_objetivos','Resume hábitos (micro-ações) e objetivos de vida.');
+  add('quest','questoes_erradas','Lista questões do MedFisher que o usuário errou (a mais recente resposta de cada uma).',pgP({area:PG_STR,limite:PG_NUM}));
+  D.push({name:'dados_gerais',description:'Data e hora atuais, categorias e contagens gerais do site.',parameters:pgP({})});
+  const tipos=[['agenda','reagendar_evento'],['agenda','editar_evento'],['agenda','excluir_evento'],['tarefas','editar_tarefa'],['tarefas','concluir_tarefa'],['tarefas','adiar_tarefa'],['tarefas','editar_data'],['notas','criar_nota'],['notas','acrescentar_nota'],['cul','registrar_consumo'],['cul','ajustar_despensa'],['cul','registrar_preco']].filter(x=>pgCan(x[0],'write')).map(x=>x[1]);
+  const criar=['agenda','tarefas','cul','fin','hab'].some(d=>pgCan(d,'write'));if(criar)tipos.unshift('criar');
+  if(tipos.length)D.push({name:'propor_mudancas',description:'ÚNICA forma de alterar dados. Nada é gravado: o usuário vê cada item e aprova antes. Use "criar" com criar_json (formato combinado) para novos eventos, tarefas, datas, finanças, refeições/receitas, mercado, hábitos e objetivos.',
+    parameters:pgP({resumo:PG_STR,itens:{type:'ARRAY',items:pgP({tipo:{type:'STRING',enum:tipos},id:PG_STR,alvo_data:PG_STR,nova_data:PG_STR,novo_inicio:PG_STR,novo_fim:PG_STR,titulo:PG_STR,descricao:PG_STR,observacoes:PG_STR,local:PG_STR,prazo:PG_STR,hora:PG_STR,concluida:{type:'BOOLEAN'},ingrediente:PG_STR,quantidade:PG_NUM,unidade:PG_STR,valor:PG_NUM,texto:PG_STR,criar_json:PG_STR,motivo:PG_STR},['tipo'])}},['itens'])});
+  return D;
+}
+const pgCap=(o,n)=>{const s=JSON.stringify(o),mx=n||22000;return s.length>mx?{resultado_cortado:true,texto:s.slice(0,mx)}:o;};
+const pgNorm=s=>norm(String(s||''));
+const pgClip=(s,n)=>{s=String(s||'').replace(/\s+/g,' ').trim();return s.length>n?s.slice(0,n)+'…':s;};
+function pgRead(name,a){
+  const today=todayISO();
+  if(name==='dados_gerais'){const n=new Date();return {hoje:today,dia_da_semana:WDL[n.getDay()],hora:pad(n.getHours())+':'+pad(n.getMinutes()),fuso:Intl.DateTimeFormat().resolvedOptions().timeZone,categorias:catNamesForPrompt(),contagens:{eventos:S.acts.length,tarefas:S.tasks.length,notas:S.notes.length,documentos:S.docs.length,receitas:S.recipes.length,baralhos:S.decks.length}};}
+  if(name==='ver_agenda'){
+    let de=a.de||today,ate=a.ate||de;if(parseISO(ate)-parseISO(de)>31*864e5)ate=addISO(de,31);
+    return {eventos:occurrences(de,ate).sort(cmpOcc).slice(0,150).map(o=>{const a2=o.act,pt=actParts(a2);return {id:a2.id,data:o.date,inicio:o.start,fim:o.end,titulo:aT(a2),tipo:pt.tipo||a2.kind,disciplina:pt.disc||'',local:a2.place||'',professor:a2.noTeacher?'':(a2.teacher||''),feito:o.done,perdido:o.miss,objetivos:pgClip(a2.doWhat,160),observacoes:pgClip(a2.obs,120)};})};
+  }
+  if(name==='horarios_livres'){
+    const d=a.dia||today,dur=Math.max(5,Number(a.duracao_min)||30),occ=occurrences(d,d).sort(cmpOcc),busy=occ.map(o=>[tmin(o.start),tmin(o.end)]).sort((x,y)=>x[0]-y[0]);
+    const free=[];let cur=6*60;busy.forEach(b=>{if(b[0]-cur>=dur)free.push(mt(cur)+'-'+mt(b[0]));cur=Math.max(cur,b[1]);});if(23*60-cur>=dur)free.push(mt(cur)+'-'+mt(23*60));
+    return {dia:d,livres:free,ocupados:occ.map(o=>o.start+'-'+o.end+' '+aT(o.act)),tarefas_com_prazo:S.tasks.filter(t=>!t.done&&tDue(t)===d).map(t=>({id:t.id,titulo:t.title,hora:tDueTime(t)||''}))};
+  }
+  if(name==='listar_tarefas'){
+    const sit=pgNorm(a.situacao||'pendentes'),q=pgNorm(a.busca);
+    return {tarefas:S.tasks.filter(t=>(sit==='todas'||(sit.indexOf('conclu')===0?t.done:!t.done))&&(!q||pgNorm(t.title+' '+t.notes).includes(q))).slice(0,120).map(t=>({id:t.id,titulo:t.title,prazo:tDue(t)||'',hora:tDueTime(t)||'',feita:!!t.done,descricao:pgClip(t.notes,200),observacoes:pgClip(t.obs,120),categoria:catPath(t.catId).map(c=>c.name).join(' > ')}))};
+  }
+  if(name==='listar_datas')return {datas:S.dates.map(d=>({id:d.id,titulo:d.title,data:d.date||'',hora:d.time||'',tipo:d.cat,observacoes:pgClip(d.notes,120)}))};
+  if(name==='listar_disciplinas'){
+    const disc={};S.acts.forEach(x=>{const p=actParts(x);if(p.disc)disc[p.disc]=(disc[p.disc]||0)+1;});
+    return {disciplinas:Object.keys(disc).map(k=>({nome:k,eventos:disc[k]})),focos:(S.focos||[]).slice(0,300).map(f=>({id:f.id,area:(areaById(f.area)||{}).name||'',modulo:f.mod,nome:f.name})),categorias:catNamesForPrompt()};
+  }
+  if(name==='buscar_notas'){const q=pgNorm(a.texto);return {notas:S.notes.filter(n=>!q||pgNorm(n.title+' '+noteText(n)).includes(q)).slice(0,30).map(n=>({id:n.id,titulo:n.title||'Sem título',tipo:n.type,trecho:pgClip(noteText(n),200)}))};}
+  if(name==='ler_nota'){const n=noteById(a.id);return n?{id:n.id,titulo:n.title,tipo:n.type,texto:pgClip(noteText(n),9000)}:{erro:'Nota não encontrada'};}
+  if(name==='listar_documentos'){const q=pgNorm(a.busca);return {documentos:S.docs.filter(d=>!q||pgNorm(d.title+' '+d.notes).includes(q)).slice(0,80).map(d=>({id:d.id,titulo:d.title,categoria:catPath(d.catId).map(c=>c.name).join(' > '),status:d.status||'',link:d.link||'',observacoes:pgClip(d.notes,160)})),pdfs:S.pdfs.slice(0,60).map(p=>({id:p.id,titulo:p.title||p.name}))};}
+  if(name==='listar_receitas'){const q=pgNorm(a.busca);return {receitas:S.recipes.filter(r=>!q||pgNorm(r.title).includes(q)).slice(0,60).map(r=>({id:r.id,titulo:r.title,momento:r.momento,porcoes:r.servings,ingredientes:(r.ings||[]).map(i=>ingName(i.ingId)+(i.qty?' '+i.qty+((ingById(i.ingId)||{}).unit||''):'')),passos:(r.steps||[]).slice(0,8).map(x=>pgClip(x,100))}))};}
+  if(name==='ver_despensa')return {despensa:S.pantry.map(p=>{const i=ingById(p.ingId)||{};return {ingrediente:i.name||'?',quantidade:p.gosto?'a gosto':p.qty,unidade:i.unit||'',local:p.loc||''};}),ingredientes:S.ingr.map(i=>({nome:i.name,unidade:i.unit,preco_embalagem:i.price,embalagem:i.pack}))};
+  if(name==='listar_materiais')return {materiais:S.items.map(i=>({id:i.id,nome:i.name,grupo:i.group||'',recipiente:!!i.container,dentro:(i.inside||[]).map(itemById).filter(Boolean).map(x=>x.name)}))};
+  if(name==='ver_financas'){const de=a.de||today,ate=a.ate||addISO(de,30);let ev=[];try{ev=finEvents(de,ate);}catch(e){}return {contas:(S.fin.accounts||[]).map(c=>c.name),movimentos:ev.slice(0,120).map(e=>({data:e.date,tipo:e.kind==='in'?'entrada':'saida',nome:e.name,valor:e.amount,pago:!!e.paid}))};}
+  if(name==='ver_habitos_objetivos')return {texto:pgClip(iaHabitos()+'\n'+iaObjetivos(),9000)};
+  if(name==='questoes_erradas'){
+    if(MFD.st!=='ok')return {erro:'O banco do MedFisher ainda não foi carregado neste aparelho. Peça ao usuário para abrir a aba Questões uma vez.'};
+    const ar=pgNorm(a.area),lim=Math.min(40,Math.max(1,Number(a.limite)||15)),out=[];
+    Object.keys(MFD.est.r).forEach(id=>{const r=MFD.est.r[id];if(!r||r[1]!==0)return;const q=MFD.byId[id];if(!q)return;const m=mfQ(q);if(ar&&!pgNorm(m.area+' '+m.subarea+' '+m.foco).includes(ar))return;out.push({id:id,prova:m.provaNome||m.provaId,ano:m.ano,numero:m.numero,area:m.area,subarea:m.subarea,foco:m.foco,enunciado:pgClip(m.enunciado,420),marcada:r[0],gabarito:m.gabarito,comentario:pgClip(m.comentario,300)});});
+    return {total_erradas:out.length,questoes:out.slice(0,lim)};
+  }
+  return {erro:'Ferramenta desconhecida: '+name};
+}
+
+/* ----- propostas de mudança (nada é gravado antes da aprovação) ----- */
+function pgToBase(q,un,iu){const u=pgNorm(un);q=Number(q)||0;if(iu==='g'&&u==='kg')return q*1000;if(iu==='mL'&&/^l(itros?)?$/.test(u))return q*1000;return q;}
+function pgIngFor(nome,un,create){let i=ingByName(nome);if(!i&&create){const uu=UNITS.find(x=>norm(x[0])===norm(un||'')),u=uu?uu[0]:(/^kg$|^g$/i.test(un||'')?'g':/^l$|^ml$/i.test(un||'')?'mL':'g');i={id:uid(),name:nome,unit:u,price:0,pack:u==='un'?1:1000,minPk:0};S.ingr.push(i);}return i;}
+const pgDM=d=>d?fmtDM(d):'?';
+function pgBuild(it){
+  const bad=m=>[{label:it.tipo,detail:'',bad:m}],t=String(it.tipo||'');
+  const A=()=>actById(it.id),T=()=>S.tasks.find(x=>x.id===it.id);
+  if(t==='criar'){
+    const r=impParseIA(it.criar_json||'');if(r.err||!r.items.length)return bad(r.err||'Nada para criar');
+    const KD={ev:'agenda',task:'tarefas',date:'tarefas',bill:'fin',income:'fin',debt:'fin',meal:'cul',shop:'cul',goal:'hab',habit:'hab'};
+    return r.items.map(x=>({label:IMP_LBL[x.kind]+': '+(x.label||x.hint||'—'),detail:x.sub||'',bad:x.bad||(pgCan(KD[x.kind]||'agenda','write')?'':'sem permissão para propor isso'),cols:['acts','tasks','dates','meals','recipes','ingr','pantry','fin','habits','goals'],apply:()=>{impApply([x]);}}));
+  }
+  if(t==='reagendar_evento'){
+    const a=A();if(!a)return bad('Evento não encontrado');
+    const od=it.alvo_data||'',occ=od?occurrences(od,od).find(o=>o.act.id===a.id):null,slot=occ?occ.slot:a.slots[0];if(!slot)return bad('Evento sem horário');
+    const nd=it.nova_data||od||slot.date,ns=it.novo_inicio||slot.start,dur=Math.max(5,tmin(slot.end)-tmin(slot.start)),ne=it.novo_fim||mt(Math.min(24*60-1,tmin(ns)+dur));
+    const antes=pgDM(occ?occ.date:slot.date)+' '+slot.start+'–'+slot.end,depois=pgDM(nd)+' '+ns+'–'+ne;
+    if(slot.mode==='date')return [{label:'Reagendar: '+aT(a),detail:antes+' → '+depois+(it.motivo?' ('+it.motivo+')':''),cols:['acts'],apply:()=>{slot.date=nd;slot.start=ns;slot.end=ne;}}];
+    return [{label:'Reagendar só esta ocorrência: '+aT(a),detail:antes+' → '+depois+' (cria um evento avulso e marca esta como não feita)',cols:['acts'],apply:()=>{const c=JSON.parse(JSON.stringify(a));c.id=uid();c.done={};c.miss={};c.slots=[{id:uid(),mode:'date',date:nd,start:ns,end:ne}];S.acts.push(c);if(occ){a.miss=a.miss||{};a.miss[occ.key]=true;}}}];
+  }
+  if(t==='editar_evento'){
+    const a=A();if(!a)return bad('Evento não encontrado');const ch=[];
+    if(it.titulo)ch.push('título: '+it.titulo);if(it.local!==undefined&&it.local!=='')ch.push('local: '+it.local);if(it.observacoes)ch.push('observações: '+pgClip(it.observacoes,80));
+    if(!ch.length)return bad('Nada a alterar');
+    return [{label:'Editar evento: '+aT(a),detail:ch.join(' | '),cols:['acts'],apply:()=>{if(it.titulo){a.theme=it.titulo;a.themeNA=false;}if(it.local)a.place=it.local;if(it.observacoes)a.obs=it.observacoes;}}];
+  }
+  if(t==='excluir_evento'){const a=A();if(!a)return bad('Evento não encontrado');return [{label:'Excluir evento: '+aT(a),detail:(a.slots.length>1?a.slots.length+' horários':'')+(it.motivo?' '+it.motivo:''),danger:true,off:true,cols:['acts'],apply:()=>{S.acts=S.acts.filter(x=>x!==a);}}];}
+  if(t==='editar_tarefa'||t==='adiar_tarefa'||t==='concluir_tarefa'){
+    const x=T();if(!x)return bad('Tarefa não encontrada');
+    if(t==='concluir_tarefa'){const v=it.concluida!==false;return [{label:(v?'Concluir':'Reabrir')+' tarefa: '+x.title,detail:'',cols:['tasks'],apply:()=>{x.done=v;}}];}
+    const nd=t==='adiar_tarefa'?it.nova_data:it.prazo,ch=[];
+    if(it.titulo)ch.push('título: '+it.titulo);if(it.descricao)ch.push('descrição: '+pgClip(it.descricao,80));if(nd)ch.push('prazo: '+pgDM(tDue(x))+' → '+pgDM(nd));if(it.hora)ch.push('hora: '+it.hora);
+    if(!ch.length)return bad('Nada a alterar');
+    return [{label:(t==='adiar_tarefa'?'Adiar':'Editar')+' tarefa: '+x.title,detail:ch.join(' | '),cols:['tasks'],apply:()=>{if(it.titulo)x.title=it.titulo;if(it.descricao)x.notes=it.descricao;if(nd)x.deadline=nd;if(it.hora)x.deadlineTime=it.hora;}}];
+  }
+  if(t==='editar_data'){
+    const d=S.dates.find(x=>x.id===it.id);if(!d)return bad('Data não encontrada');const nd=it.nova_data||it.prazo;
+    return [{label:'Editar data: '+d.title,detail:[it.titulo?'título: '+it.titulo:'',nd?pgDM(d.date)+' → '+pgDM(nd):'',it.hora?'hora: '+it.hora:''].filter(Boolean).join(' | '),cols:['dates'],apply:()=>{if(it.titulo)d.title=it.titulo;if(nd)d.date=nd;if(it.hora)d.time=it.hora;}}];
+  }
+  const html=tx=>String(tx||'').split(/\n{2,}/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('');
+  if(t==='criar_nota'){if(!it.titulo&&!it.texto)return bad('Nota vazia');return [{label:'Criar nota: '+(it.titulo||'Sem título'),detail:pgClip(it.texto,120),cols:['notes'],apply:()=>{const now=Date.now();S.notes.push(normNote({id:uid(),type:'nota',title:it.titulo||'',html:html(it.texto),folderId:'',catId:'',cd:null,deckIds:[],focoIds:[],created:now,updated:now}));}}];}
+  if(t==='acrescentar_nota'){const n=noteById(it.id);if(!n)return bad('Nota não encontrada');return [{label:'Acrescentar à nota: '+(n.title||'Sem título'),detail:pgClip(it.texto,140),cols:['notes'],apply:()=>{n.html=(n.html||'')+html(it.texto);n.updated=Date.now();}}];}
+  if(t==='registrar_consumo'){
+    const i=ingByName(it.ingrediente);if(!i)return bad('Ingrediente "'+it.ingrediente+'" não cadastrado');const p=pantryOf(i.id);if(!p)return bad(i.name+' não está na despensa');
+    const q=pgToBase(it.quantidade,it.unidade,i.unit),novo=Math.max(0,r2((Number(p.qty)||0)-q));
+    return [{label:'Baixar da despensa: '+i.name,detail:fmtN(p.qty)+' → '+fmtN(novo)+' '+i.unit+' (−'+fmtN(q)+')',cols:['pantry'],apply:()=>{p.qty=novo;}}];
+  }
+  if(t==='ajustar_despensa'){
+    if(!it.ingrediente)return bad('Falta o ingrediente');const ex=ingByName(it.ingrediente),u=ex?ex.unit:'g',q=pgToBase(it.quantidade,it.unidade,u);
+    return [{label:'Ajustar despensa: '+it.ingrediente,detail:'quantidade → '+fmtN(q)+' '+u,cols:['pantry','ingr'],apply:()=>{const i=pgIngFor(it.ingrediente,it.unidade,true);let p=pantryOf(i.id);if(!p){p={ingId:i.id,qty:0,gosto:false,loc:''};S.pantry.push(p);}p.qty=q;p.gosto=false;}}];
+  }
+  if(t==='registrar_preco'){
+    if(!it.ingrediente||!(Number(it.valor)>0))return bad('Falta o ingrediente ou o valor');
+    return [{label:'Preço: '+it.ingrediente,detail:money(it.valor)+(it.quantidade?' por '+fmtN(it.quantidade)+' '+(it.unidade||''):''),cols:['ingr'],apply:()=>{const i=pgIngFor(it.ingrediente,it.unidade,true);i.price=r2(it.valor);if(it.quantidade>0)i.pack=pgToBase(it.quantidade,it.unidade,i.unit);}}];
+  }
+  return bad('Tipo de mudança desconhecido: '+t);
+}
+const PG_WRITE_DOM={criar:'agenda',reagendar_evento:'agenda',editar_evento:'agenda',excluir_evento:'agenda',editar_tarefa:'tarefas',concluir_tarefa:'tarefas',adiar_tarefa:'tarefas',editar_data:'tarefas',criar_nota:'notas',acrescentar_nota:'notas',registrar_consumo:'cul',ajustar_despensa:'cul',registrar_preco:'cul'};
+function pgPropose(a){
+  const props=[],rej=[];
+  (a.itens||[]).forEach(it=>{
+    const dom=PG_WRITE_DOM[it.tipo];
+    if(dom&&it.tipo!=='criar'&&!pgCan(dom,'write')){rej.push(it.tipo+': sem permissão');return;}
+    pgBuild(it).forEach(p=>{if(p.bad)rej.push(p.label+': '+p.bad);else props.push(p);});
+  });
+  if(props.length){const id=uid();PG.plans[id]={id:id,items:props,state:'open',resumo:a.resumo||''};pgUi({k:'plan',id:id});}
+  return {itens_aguardando_aprovacao:props.length,rejeitados:rej,aviso:props.length?'Nada foi gravado. O usuário vai revisar e aprovar no cartão.':'Nenhuma mudança válida.'};
+}
+function pgRunTool(name,a){
+  try{
+    if(name==='propor_mudancas')return pgPropose(a);
+    return pgCap(pgRead(name,a||{}));
+  }catch(e){return {erro:'Falha: '+(e&&e.message||e)};}
+}
+
+/* ----- conversa com o Gemini (laço de function calling) ----- */
+function pgSystem(){
+  const n=new Date();
+  return 'Você é o Pingado, o assistente do "Site do Luís": uma nuvem azul simpática de boina que ajuda a organizar a rotina de estudos de medicina (agenda, tarefas, disciplinas, notas, documentos, culinária e despensa, materiais, finanças, hábitos e as questões do MedFisher). Fale em português do Brasil, de forma curta, clara e gentil.\n'+
+  'Hoje é '+WDL[n.getDay()]+', '+todayISO()+', agora '+pad(n.getHours())+':'+pad(n.getMinutes())+' ('+Intl.DateTimeFormat().resolvedOptions().timeZone+').\n'+
+  'REGRAS: 1) Consulte os dados com as ferramentas de leitura antes de afirmar algo; nunca invente ids, horários, estoques ou preços. 2) Você NÃO altera nada diretamente: para qualquer mudança use somente a ferramenta propor_mudancas; nada é gravado até o usuário aprovar. 3) Depois de propor, explique em 1 a 3 linhas e diga que está aguardando a aprovação. 4) Se faltar informação essencial, pergunte antes de propor. 5) Evite conflitos de horário (use horarios_livres) e respeite o que já está marcado. 6) Para ler fotos de cronogramas, extraia os eventos e proponha-os com tipo "criar". 7) Mudanças destrutivas (excluir) só se o usuário pedir claramente.\n'+
+  'FORMATO DO campo criar_json (apenas o bloco JSON, sem texto em volta): '+iaFormatPrompt().replace(/^FORMATO DA RESPOSTA[^.]*\./,'');
+}
+function pgTrim(){
+  while(PG.contents.length>40)PG.contents.shift();
+  while(PG.contents.length&&!(PG.contents[0].role==='user'&&PG.contents[0].parts.some(p=>p.text)))PG.contents.shift();
+}
+function pgPersist(){try{localStorage.setItem(PG_KEY,JSON.stringify({ui:PG.ui.slice(-60).map(m=>m.k==='plan'?Object.assign({},m):m),contents:PG.contents.map(c=>({role:c.role,parts:c.parts.filter(p=>!p.inlineData)})),plans:PG.plans}));}catch(e){}}
+function pgLoad(){try{const j=JSON.parse(localStorage.getItem(PG_KEY)||'null');if(j){PG.ui=j.ui||[];PG.contents=j.contents||[];PG.plans=j.plans||{};Object.values(PG.plans).forEach(p=>{if(p.state==='open')p.state='expired';p.items.forEach(i=>{i.apply=null;});});}}catch(e){}}
+async function pgCall(){
+  const ctl=new AbortController();PG.abort=ctl;
+  const body={systemInstruction:{parts:[{text:pgSystem()}]},contents:PG.contents,generationConfig:{temperature:.5}},tools=pgTools();
+  if(tools.length){body.tools=[{functionDeclarations:tools}];body.toolConfig={functionCallingConfig:{mode:'AUTO'}};}
+  const r=await fetch(pgApi()+'/pingado/generate?model='+encodeURIComponent(pgCfg().model),{method:'POST',headers:{'Content-Type':'application/json','X-Pingado-Token':pgTok()},body:JSON.stringify(body),signal:ctl.signal});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error((j.error&&(j.error.message||j.error))||('Erro '+r.status));
+  return j;
+}
+async function pgSend(text,imgs){
+  if(PG.busy)return;
+  text=String(text||'').trim();if(!text&&!(imgs||[]).length)return;
+  if(!pgReady()){pgUi({k:'bot',t:'Ainda falta configurar o Pingado em Ajustes > Pingado.'});return;}
+  const parts=[];if(text)parts.push({text:text});(imgs||[]).forEach(m=>parts.push({inlineData:{mimeType:m.mime,data:m.data}}));
+  PG.contents.push({role:'user',parts:parts});pgUi({k:'me',t:text,imgs:(imgs||[]).map(m=>m.src)});
+  PG.busy=true;pgState('think');
+  try{
+    for(let i=0;i<8;i++){
+      pgTrim();const j=await pgCall(),cand=j.candidates&&j.candidates[0];
+      if(!cand||!cand.content||!(cand.content.parts||[]).length){const why=(j.promptFeedback&&j.promptFeedback.blockReason)||(cand&&cand.finishReason)||'';pgUi({k:'bot',t:'Não consegui responder agora'+(why?' ('+why+')':'')+'. Tente reformular.'});break;}
+      const ps=cand.content.parts;PG.contents.push({role:'model',parts:ps});
+      const tx=ps.filter(p=>p.text&&!p.thought).map(p=>p.text).join('').trim();if(tx)pgUi({k:'bot',t:tx});
+      const calls=ps.filter(p=>p.functionCall);if(!calls.length)break;
+      PG.contents.push({role:'user',parts:calls.map(c=>({functionResponse:{name:c.functionCall.name,response:{result:pgRunTool(c.functionCall.name,c.functionCall.args||{})}}}))});
+    }
+  }catch(e){if(e&&e.name!=='AbortError')pgUi({k:'bot',err:true,t:'Erro: '+(e.message||e)});}
+  PG.busy=false;PG.abort=null;pgState('idle');
+  // fotos antigas não voltam ao Gemini
+  PG.contents.forEach(c=>{c.parts=c.parts.map(p=>p.inlineData?{text:'[foto enviada]'}:p);});
+  pgPersist();pgRender();
+}
+
+/* ----- aplicar, recusar e desfazer ----- */
+function pgApply(id){
+  const pl=PG.plans[id];if(!pl||pl.state!=='open')return;
+  const chosen=pl.items.filter(i=>!i.off&&i.apply);if(!chosen.length){toast('Nada selecionado.');return;}
+  const cols={};chosen.forEach(i=>(i.cols||[]).forEach(c=>{cols[c]=1;}));
+  const snap={};Object.keys(cols).forEach(c=>{snap[c]=JSON.stringify(S[c]);});
+  let ok=0,fail=0;chosen.forEach(i=>{try{i.apply();i.done=true;ok++;}catch(e){i.err=String(e&&e.message||e);fail++;}});
+  pl.state='applied';pl.snap=snap;pl.ok=ok;pl.fail=fail;
+  foodSave();PG.contents.push({role:'user',parts:[{text:'[Sistema] O usuário aprovou e aplicou '+ok+' de '+pl.items.length+' mudanças propostas'+(fail?' ('+fail+' falharam)':'')+'. Recusadas: '+pl.items.filter(i=>i.off).map(i=>i.label).join('; ')+'.'}]});
+  pgPersist();pgRender();try{rerender();}catch(e){}toast('Pingado aplicou '+ok+(ok===1?' mudança.':' mudanças.'));
+}
+function pgUndo(id){
+  const pl=PG.plans[id];if(!pl||pl.state!=='applied'||!pl.snap)return;
+  Object.keys(pl.snap).forEach(c=>{S[c]=JSON.parse(pl.snap[c]);});
+  pl.state='undone';delete pl.snap;foodSave();
+  PG.contents.push({role:'user',parts:[{text:'[Sistema] O usuário desfez as mudanças aplicadas.'}]});
+  pgPersist();pgRender();try{rerender();}catch(e){}toast('Mudanças desfeitas.');
+}
+
+/* ----- interface ----- */
+const pgMd=t=>{
+  let h=esc(t).replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>').replace(/`([^`\n]+)`/g,'<code>$1</code>');
+  const L=h.split('\n'),out=[];let ul=false;
+  L.forEach(l=>{const m=l.match(/^\s*[-*•]\s+(.*)/);if(m){if(!ul){out.push('<ul>');ul=true;}out.push('<li>'+m[1]+'</li>');}else{if(ul){out.push('</ul>');ul=false;}out.push(l.trim()?'<p>'+l+'</p>':'');}});
+  if(ul)out.push('</ul>');return out.join('');
+};
+function pgUi(m){PG.ui.push(m);if(PG.open)pgRender();}
+function pgState(s){const p=$('#pgPanel');if(!p)return;const av=$('.pgav',p);if(av)av.innerHTML=pgMascot(s,40);const t=$('#pgState');if(t)t.textContent=s==='think'?'pensando…':'Assistente';}
+function pgPlanHTML(m){
+  const pl=PG.plans[m.id];if(!pl)return '';
+  const open=pl.state==='open';
+  const head={open:'Quero fazer estas mudanças. Você aprova?',applied:'Aplicado: '+(pl.ok||0)+' mudança(s)'+(pl.fail?' ('+pl.fail+' falharam)':''),undone:'Mudanças desfeitas',refused:'Recusado',expired:'Proposta antiga (não dá mais para aplicar)'}[pl.state];
+  return '<div class="pgplan '+pl.state+'"><div class="pgplh">'+ic(open?'sparkle':pl.state==='applied'?'checkCircle':'xCircle',15)+'<b>'+head+'</b></div>'+
+    (pl.resumo&&open?'<div class="pgplr">'+esc(pl.resumo)+'</div>':'')+
+    '<div class="pgpli">'+pl.items.map((i,k)=>'<label class="pgit'+(i.danger?' danger':'')+(i.done?' done':'')+'"><input type="checkbox" data-pgi="'+pl.id+':'+k+'" '+(i.off?'':'checked')+(open?'':' disabled')+'><span><b>'+esc(i.label)+'</b>'+(i.detail?'<small>'+esc(i.detail)+'</small>':'')+(i.err?'<small class="neg">'+esc(i.err)+'</small>':'')+'</span></label>').join('')+'</div>'+
+    (open?'<div class="pgpla"><button class="btn sm primary" data-a="pg-apply" data-id="'+pl.id+'">Aplicar selecionados</button><button class="btn sm" data-a="pg-refuse" data-id="'+pl.id+'">Recusar</button></div>':'')+
+    (pl.state==='applied'&&pl.snap?'<div class="pgpla"><button class="btn sm" data-a="pg-undo" data-id="'+pl.id+'">'+ic('undo',13)+' Desfazer</button></div>':'')+'</div>';
+}
+function pgRender(){
+  const box=$('#pgMsgs');if(!box)return;
+  if(!pgReady()){
+    box.innerHTML='<div class="pgempty">'+pgMascot('idle',120)+'<h3>Oi, eu sou o Pingado!</h3><p>Para eu conversar com você, falta configurar a conexão (Worker + modelo do Gemini).</p><button class="btn primary" data-a="pg-setup">'+ic('settings',15)+' Abrir Ajustes do Pingado</button></div>';
+    $('#pgForm').hidden=true;return;
+  }
+  $('#pgForm').hidden=false;
+  if(!PG.ui.length){
+    box.innerHTML='<div class="pgempty">'+pgMascot('idle',120)+'<h3>Como posso ajudar?</h3><p>Eu leio seus dados e só altero algo depois da sua aprovação.</p><div class="pgsug">'+
+      ['Quais tarefas e em qual horário posso inserir hoje?','Verifique os ingredientes e bole uma receita para sexta','Hoje não consegui fazer nada do proposto, reagende meus compromissos','Quais questões do MedFisher eu mais errei?'].map(s=>'<button type="button" class="pgchip" data-a="pg-sug">'+esc(s)+'</button>').join('')+'</div></div>';
+  }else{
+    box.innerHTML=PG.ui.map(m=>m.k==='me'?'<div class="pgmsg me">'+(m.imgs||[]).map(s=>'<img src="'+s+'" alt="">').join('')+(m.t?'<p>'+esc(m.t)+'</p>':'')+'</div>':
+      m.k==='plan'?pgPlanHTML(m):'<div class="pgmsg bot'+(m.err?' err':'')+'"><span class="pgav sm">'+pgMascot('idle',26)+'</span><div>'+pgMd(m.t)+'</div></div>').join('')+
+      (PG.busy?'<div class="pgmsg bot"><span class="pgav sm">'+pgMascot('think',26)+'</span><div class="pgdots3"><i></i><i></i><i></i></div></div>':'');
+  }
+  box.scrollTop=box.scrollHeight;
+  const att=$('#pgAtt');if(att)att.innerHTML=PG.att.map((m,i)=>'<span class="pgth"><img src="'+m.src+'" alt=""><button type="button" data-a="pg-att-del" data-i="'+i+'" aria-label="Remover">×</button></span>').join('');
+}
+function pgBuildPanel(){
+  if($('#pgPanel'))return;pgDefs();
+  const p=document.createElement('aside');p.id='pgPanel';p.className='pgp';p.hidden=true;p.setAttribute('aria-label','Pingado, assistente');
+  p.innerHTML='<header class="pgh"><span class="pgav">'+pgMascot('idle',40)+'</span><div class="pgt"><b>Pingado</b><small id="pgState">Assistente</small></div><span class="sp"></span><button class="icon-btn sm" data-a="pg-new" title="Nova conversa" aria-label="Nova conversa">'+ic('filePlus',16)+'</button><button class="icon-btn sm" data-a="pg-close" title="Fechar" aria-label="Fechar">'+ic('x',17)+'</button></header>'+
+    '<div id="pgMsgs" class="pgmsgs"></div><div id="pgAtt" class="pgatt"></div>'+
+    '<form id="pgForm" class="pgform"><button type="button" class="icon-btn" data-a="pg-photo" title="Enviar foto (cronograma, rótulo, lista…)" aria-label="Enviar foto">'+ic('image',19)+'</button><textarea id="pgIn" rows="1" placeholder="Fale com o Pingado…" aria-label="Mensagem"></textarea><button type="submit" class="icon-btn pgsend" id="pgSendBtn" title="Enviar" aria-label="Enviar">'+ic('chevR',20)+'</button></form>'+
+    '<input type="file" id="pgFile" accept="image/*" multiple hidden>';
+  document.body.appendChild(p);
+  const f=$('#pgForm',p),ta=$('#pgIn',p);
+  f.addEventListener('submit',e=>{e.preventDefault();pgSubmit();});
+  ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();pgSubmit();}});
+  ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=Math.min(140,ta.scrollHeight)+'px';});
+  $('#pgFile',p).addEventListener('change',async e=>{
+    const fl=[...e.target.files];e.target.value='';
+    for(const file of fl.slice(0,4-PG.att.length)){try{const r=await compressImage(file,{max:1600});const m=String(r.src).match(/^data:([^;]+);base64,(.*)$/);if(m)PG.att.push({mime:m[1],data:m[2],src:r.src});}catch(err){toast('Não consegui usar essa imagem.');}}
+    pgRender();
+  });
+  p.addEventListener('change',e=>{const t=e.target;if(t.dataset&&t.dataset.pgi){const a=t.dataset.pgi.split(':'),pl=PG.plans[a[0]];if(pl&&pl.items[+a[1]]){pl.items[+a[1]].off=!t.checked;}}});
+}
+function pgSubmit(){
+  const ta=$('#pgIn');if(!ta)return;if(PG.busy){if(PG.abort)PG.abort.abort();return;}
+  const t=ta.value,imgs=PG.att.slice();ta.value='';ta.style.height='auto';PG.att=[];pgSend(t,imgs).then(()=>{});pgRender();
+}
+function pgOpen(on){
+  pgBuildPanel();PG.open=on===undefined?!PG.open:!!on;const p=$('#pgPanel');p.hidden=!PG.open;document.body.classList.toggle('pgopen',PG.open);
+  if(PG.open){if(!PG.loaded){pgLoad();PG.loaded=true;}pgRender();setTimeout(()=>{const t=$('#pgIn');if(t&&pgReady())t.focus();},60);}
+}
+/* ----- Ajustes ----- */
+function pgSettingsHTML(){
+  const c=pgCfg(),models=PG.models||(c.model?[{id:c.model,name:''}]:[]);
+  return '<div class="card sec pgset"><div class="pgsh">'+pgMascot('idle',64)+'<div><h3 style="margin:0">Pingado | Assistente com Gemini</h3><div class="muted small">Lê seus dados e só muda algo com a sua aprovação, quando você o chama.</div></div></div>'+
+    '<label class="sw" style="margin:12px 0"><input type="checkbox" data-pg="on" '+(c.on?'checked':'')+'> <b>Pingado ligado</b></label>'+
+    '<label class="f">Endereço do Worker<input data-pg="api" value="'+esc(S.prefs.pgApi||S.prefs.titleApi||'')+'" placeholder="https://…workers.dev" autocomplete="off"></label>'+
+    '<label class="f">Senha do Pingado (PINGADO_TOKEN) <small>fica só neste aparelho</small><input data-pg="tok" type="password" value="'+esc(pgTok())+'" placeholder="a mesma cadastrada no Worker" autocomplete="off"></label>'+
+    '<div class="frow" style="align-items:flex-end"><label class="f" style="flex:1;min-width:220px">Modelo<select data-pg="model">'+(models.length?'':'<option value="">Teste a conexão para listar</option>')+models.map(m=>'<option value="'+esc(m.id)+'" '+(m.id===c.model?'selected':'')+'>'+esc(m.id+(m.name?' | '+m.name:''))+'</option>').join('')+'</select></label><button type="button" class="btn" data-a="pg-test">'+ic('zap',14)+' Testar conexão</button></div>'+
+    '<label class="f">Ou digite o id do modelo<input data-pg="modelIn" value="" placeholder="ex.: gemini-2.5-flash" autocomplete="off"></label><div id="pgTest" class="muted small"></div>'+
+    '<div class="sechead" style="margin-top:14px">O que o Pingado pode fazer</div><div class="pgperm"><span></span><b>Ler</b><b>Propor mudanças</b>'+
+    PG_DOMS.map(d=>'<span>'+esc(d[1])+'</span><input type="checkbox" data-pgp="read:'+d[0]+'" '+(c.read[d[0]]!==false?'checked':'')+' aria-label="Ler '+esc(d[1])+'"><input type="checkbox" data-pgp="write:'+d[0]+'" '+(c.write[d[0]]!==false?'checked':'')+' aria-label="Propor mudanças em '+esc(d[1])+'">').join('')+'</div>'+
+    '<p class="muted small" style="margin:10px 0 0">Mudanças nunca são gravadas sem o seu OK no cartão de aprovação (com Desfazer). Ao perguntar, só os dados que o Pingado pedir por ferramenta são enviados ao Google.</p></div>';
+}
+document.addEventListener('change',e=>{
+  const t=e.target;if(!t||!t.dataset)return;
+  if(t.dataset.pgp){const a=t.dataset.pgp.split(':'),c=pgCfg();c[a[0]]=Object.assign({},c[a[0]],{[a[1]]:t.checked});S.prefs.pg=c;save();return;}
+  const k=t.dataset.pg;if(!k)return;
+  if(k==='tok'){try{localStorage.setItem(PG_TOK,t.value.trim());}catch(err){}return;}
+  if(k==='api'){S.prefs.pgApi=t.value.trim();save();return;}
+  const c=pgCfg();
+  if(k==='on')c.on=t.checked;else if(k==='model')c.model=t.value;else if(k==='modelIn'){if(t.value.trim()){c.model=t.value.trim();PG.models=(PG.models||[]).filter(m=>m.id!==c.model).concat([{id:c.model,name:''}]);}}
+  S.prefs.pg=c;save();if(k==='modelIn')renderMain();
+});
+Object.assign(ACT,{
+  'pg-open'(){pgOpen();},'pg-close'(){pgOpen(false);},
+  'pg-new'(){if(PG.busy&&PG.abort)PG.abort.abort();PG.ui=[];PG.contents=[];PG.plans={};PG.att=[];pgPersist();pgRender();},
+  'pg-photo'(){const f=$('#pgFile');if(f)f.click();},
+  'pg-att-del'(el){PG.att.splice(Number(el.dataset.i),1);pgRender();},
+  'pg-sug'(el){const ta=$('#pgIn');if(ta){ta.value=el.textContent;pgSubmit();}},
+  'pg-setup'(){pgOpen(false);UI.ajTab='pingado';ACT.tab({dataset:{v:'ajustes'}});},
+  'pg-apply'(el){pgApply(el.dataset.id);},
+  'pg-refuse'(el){const pl=PG.plans[el.dataset.id];if(!pl||pl.state!=='open')return;pl.state='refused';PG.contents.push({role:'user',parts:[{text:'[Sistema] O usuário recusou as mudanças propostas.'}]});pgPersist();pgRender();},
+  'pg-undo'(el){pgUndo(el.dataset.id);},
+  async 'pg-test'(){
+    const out=$('#pgTest');if(out)out.textContent='Testando…';
+    try{
+      const r=await fetch(pgApi()+'/pingado/models',{headers:{'X-Pingado-Token':pgTok()}}),j=await r.json().catch(()=>({}));
+      if(!r.ok)throw new Error(j.error||('Erro '+r.status));
+      PG.models=j.models||[];const c=pgCfg();if(!c.model&&PG.models.length){c.model=(PG.models.find(m=>/flash/.test(m.id))||PG.models[0]).id;S.prefs.pg=c;save();}
+      renderMain();const o2=$('#pgTest');if(o2)o2.textContent='Conectado: '+PG.models.length+' modelos disponíveis.';
+    }catch(e){if(out)out.textContent='Não consegui conectar: '+(e.message||e);}
+  }
+});
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()==='j'&&$('#pgPanel')!==undefined&&!/INPUT|TEXTAREA|SELECT/.test((e.target&&e.target.tagName)||'')){e.preventDefault();pgOpen();}});
+document.addEventListener('DOMContentLoaded',()=>pgDefs());
+if(document.readyState!=='loading')pgDefs();
+(()=>{const b=document.getElementById('pgBtnIco');if(b)b.innerHTML=pgMascot('idle',24);})();
+
 
 /* ==========================================================================
    38. PAINEL DIÁRIO: só o que pede ação agora
