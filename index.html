@@ -2536,7 +2536,8 @@ html[data-theme="dark"] .pgh{background:linear-gradient(180deg,#2B2119,transpare
 .pgform textarea{flex:1;resize:none;border:1px solid var(--line);border-radius:14px;padding:9px 12px;font:inherit;font-size:14px;max-height:140px;background:var(--card);color:var(--tx)}
 .pgsend{background:var(--ink);color:var(--onink);border-radius:50%}.pgsend:hover{background:var(--ink);color:var(--onink)}
 @media (max-width:760px){.pgp{width:100vw;border-left:0}.actions .pgbtn{display:inline-flex;padding:6px 8px}.pgbtn .lbl{display:none}}
-.pgset .pgsh{display:flex;align-items:center;gap:12px}.pgperm{display:grid;grid-template-columns:1fr 70px 110px;gap:6px 8px;align-items:center;font-size:13.5px;margin-top:6px}.pgperm b{font-size:12px;color:var(--mut);text-align:center}.pgperm input{justify-self:center}
+.pgset .pgsh{display:flex;align-items:center;gap:12px}.pgmem{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;flex-wrap:wrap}.pgmem input{flex:1 1 140px}.pgmem textarea{flex:3 1 260px}
+.pgperm{display:grid;grid-template-columns:1fr 70px 110px;gap:6px 8px;align-items:center;font-size:13.5px;margin-top:6px}.pgperm b{font-size:12px;color:var(--mut);text-align:center}.pgperm input{justify-self:center}
 </style>
 </head>
 <body>
@@ -11553,6 +11554,7 @@ Object.assign(ACT,{
    ========================================================================== */
 const PG_DOMS=[['agenda','Agenda e eventos'],['tarefas','Tarefas e datas'],['disc','Disciplinas e focos'],['notas','Notas'],['docs','Documentos'],['cul','Culinária e despensa'],['mat','Materiais'],['fin','Finanças'],['hab','Hábitos e objetivos'],['quest','Questões (MedFisher)']];
 const PG_KEY='pg_chat_v1',PG_TOK='pg_token';
+const pgMem=()=>Array.isArray(S.prefs.pgMem)?S.prefs.pgMem:(S.prefs.pgMem=[]);
 const pgCfg=()=>{const c=Object.assign({on:false,model:'',read:{},write:{}},S.prefs.pg||{});return c;};
 const pgCan=(dom,kind)=>pgCfg()[kind][dom]!==false;
 const pgApi=()=>String(S.prefs.pgApi||S.prefs.titleApi||'').trim().replace(/\/+$/,'');
@@ -11594,7 +11596,7 @@ function pgTools(){
   add('quest','questoes_erradas','Lista questões do MedFisher que o usuário errou (a mais recente resposta de cada uma).',pgP({area:PG_STR,limite:PG_NUM}));
   D.push({name:'dados_gerais',description:'Data e hora atuais, categorias e contagens gerais do site.',parameters:pgP({})});
   const tipos=[['agenda','reagendar_evento'],['agenda','editar_evento'],['agenda','excluir_evento'],['tarefas','editar_tarefa'],['tarefas','concluir_tarefa'],['tarefas','adiar_tarefa'],['tarefas','editar_data'],['notas','criar_nota'],['notas','acrescentar_nota'],['cul','registrar_consumo'],['cul','ajustar_despensa'],['cul','registrar_preco']].filter(x=>pgCan(x[0],'write')).map(x=>x[1]);
-  const criar=['agenda','tarefas','cul','fin','hab'].some(d=>pgCan(d,'write'));if(criar)tipos.unshift('criar');
+  const criar=['agenda','tarefas','cul','fin','hab'].some(d=>pgCan(d,'write'));if(criar)tipos.unshift('criar');tipos.push('lembrar','esquecer');
   if(tipos.length)D.push({name:'propor_mudancas',description:'ÚNICA forma de alterar dados. Nada é gravado: o usuário vê cada item e aprova antes. Use "criar" com criar_json (formato combinado) para novos eventos, tarefas, datas, finanças, refeições/receitas, mercado, hábitos e objetivos.',
     parameters:pgP({resumo:PG_STR,itens:{type:'ARRAY',items:pgP({tipo:{type:'STRING',enum:tipos},id:PG_STR,alvo_data:PG_STR,nova_data:PG_STR,novo_inicio:PG_STR,novo_fim:PG_STR,titulo:PG_STR,descricao:PG_STR,observacoes:PG_STR,local:PG_STR,prazo:PG_STR,hora:PG_STR,concluida:{type:'BOOLEAN'},ingrediente:PG_STR,quantidade:PG_NUM,unidade:PG_STR,valor:PG_NUM,texto:PG_STR,criar_json:PG_STR,motivo:PG_STR},['tipo'])}},['itens'])});
   return D;
@@ -11695,6 +11697,11 @@ function pgBuild(it){
     if(!it.ingrediente||!(Number(it.valor)>0))return bad('Falta o ingrediente ou o valor');
     return [{label:'Preço: '+it.ingrediente,detail:money(it.valor)+(it.quantidade?' por '+fmtN(it.quantidade)+' '+(it.unidade||''):''),cols:['ingr'],apply:()=>{const i=pgIngFor(it.ingrediente,it.unidade,true);i.price=r2(it.valor);if(it.quantidade>0)i.pack=pgToBase(it.quantidade,it.unidade,i.unit);}}];
   }
+  if(t==='lembrar'){
+    const tx=String(it.texto||it.descricao||'').trim();if(!tx)return bad('Falta o texto da memória');
+    return [{label:'Lembrar'+(it.titulo?' ('+it.titulo+')':''),detail:pgClip(tx,220),cols:['prefs'],apply:()=>{const L=pgMem();if(L.length>=40)throw new Error('Limite de 40 memórias');L.push({id:uid(),topic:String(it.titulo||'Geral').slice(0,60),text:tx.slice(0,700)});}}];
+  }
+  if(t==='esquecer'){const m=pgMem().find(x=>x.id===it.id);if(!m)return bad('Memória não encontrada');return [{label:'Esquecer: '+m.topic,detail:pgClip(m.text,160),danger:true,off:true,cols:['prefs'],apply:()=>{S.prefs.pgMem=pgMem().filter(x=>x!==m);}}];}
   return bad('Tipo de mudança desconhecido: '+t);
 }
 const PG_WRITE_DOM={criar:'agenda',reagendar_evento:'agenda',editar_evento:'agenda',excluir_evento:'agenda',editar_tarefa:'tarefas',concluir_tarefa:'tarefas',adiar_tarefa:'tarefas',editar_data:'tarefas',criar_nota:'notas',acrescentar_nota:'notas',registrar_consumo:'cul',ajustar_despensa:'cul',registrar_preco:'cul'};
@@ -11721,6 +11728,8 @@ function pgSystem(){
   return 'Você é o Pingado, o assistente do "Site do Luís": uma nuvem azul simpática de boina que ajuda a organizar a rotina de estudos de medicina (agenda, tarefas, disciplinas, notas, documentos, culinária e despensa, materiais, finanças, hábitos e as questões do MedFisher). Fale em português do Brasil, de forma curta, clara e gentil.\n'+
   'Hoje é '+WDL[n.getDay()]+', '+todayISO()+', agora '+pad(n.getHours())+':'+pad(n.getMinutes())+' ('+Intl.DateTimeFormat().resolvedOptions().timeZone+').\n'+
   'REGRAS: 1) Consulte os dados com as ferramentas de leitura antes de afirmar algo; nunca invente ids, horários, estoques ou preços. 2) Você NÃO altera nada diretamente: para qualquer mudança use somente a ferramenta propor_mudancas; nada é gravado até o usuário aprovar. 3) Depois de propor, explique em 1 a 3 linhas e diga que está aguardando a aprovação. 4) Se faltar informação essencial, pergunte antes de propor. 5) Evite conflitos de horário (use horarios_livres) e respeite o que já está marcado. 6) Para ler fotos de cronogramas, extraia os eventos e proponha-os com tipo "criar". 7) Mudanças destrutivas (excluir) só se o usuário pedir claramente.\n'+
+  (pgMem().length?'MEMÓRIAS DO USUÁRIO (siga sempre: estilo de formatação, metodologias, preferências; use-as ao criar ou editar eventos, tarefas, notas e receitas):\n'+pgMem().map(m=>'- ['+m.id+'] '+m.topic+': '+m.text).join('\n')+'\n':'')+
+  '8) Quando o usuário pedir para você lembrar de algo ("sempre faça assim", "lembre que…"), proponha o tipo "lembrar" (titulo = tema curto, texto = a regra completa); para apagar uma memória use "esquecer" com o id.\n'+
   'FORMATO DO campo criar_json (apenas o bloco JSON, sem texto em volta): '+iaFormatPrompt().replace(/^FORMATO DA RESPOSTA[^.]*\./,'');
 }
 function pgTrim(){
@@ -11856,10 +11865,14 @@ function pgSettingsHTML(){
     '<label class="f">Ou digite o id do modelo<input data-pg="modelIn" value="" placeholder="ex.: gemini-3.8-flash" autocomplete="off"></label><div id="pgTest" class="muted small"></div>'+
     '<div class="sechead" style="margin-top:14px">O que o Pingado pode fazer</div><div class="pgperm"><span></span><b>Ler</b><b>Propor mudanças</b>'+
     PG_DOMS.map(d=>'<span>'+esc(d[1])+'</span><input type="checkbox" data-pgp="read:'+d[0]+'" '+(c.read[d[0]]!==false?'checked':'')+' aria-label="Ler '+esc(d[1])+'"><input type="checkbox" data-pgp="write:'+d[0]+'" '+(c.write[d[0]]!==false?'checked':'')+' aria-label="Propor mudanças em '+esc(d[1])+'">').join('')+'</div>'+
+    '<div class="sechead" style="margin-top:16px">Memória do Pingado</div><div class="muted small" style="margin-bottom:8px">Regras que ele segue sempre: estilo de formatação de cada tipo de item, metodologia de eventos, preferências. Também dá para pedir no chat: "lembre que…" (ele propõe e você aprova).</div>'+
+    pgMem().map(m=>'<div class="pgmem"><input data-pgm="topic:'+m.id+'" value="'+esc(m.topic)+'" placeholder="Tema (ex.: Tutoria, Receitas)" maxlength="60"><textarea data-pgm="text:'+m.id+'" rows="3" maxlength="700" placeholder="A regra, como se explicasse a uma pessoa">'+esc(m.text)+'</textarea><button type="button" class="icon-btn sm" data-a="pg-mem-del" data-id="'+m.id+'" title="Apagar" aria-label="Apagar">'+ic('trash',15)+'</button></div>').join('')+
+    '<button type="button" class="btn sm" data-a="pg-mem-add">'+ic('plus',14)+' Nova memória</button>'+
     '<p class="muted small" style="margin:10px 0 0">Mudanças nunca são gravadas sem o seu OK no cartão de aprovação (com Desfazer). Ao perguntar, só os dados que o Pingado pedir por ferramenta são enviados ao Google.</p></div>';
 }
 document.addEventListener('change',e=>{
   const t=e.target;if(!t||!t.dataset)return;
+  if(t.dataset.pgm){const a=t.dataset.pgm.split(':'),m=pgMem().find(x=>x.id===a[1]);if(m){m[a[0]]=t.value;save();}return;}
   if(t.dataset.pgp){const a=t.dataset.pgp.split(':'),c=pgCfg();c[a[0]]=Object.assign({},c[a[0]],{[a[1]]:t.checked});S.prefs.pg=c;save();return;}
   const k=t.dataset.pg;if(!k)return;
   if(k==='tok'){try{localStorage.setItem(PG_TOK,t.value.trim());}catch(err){}if(S.prefs.pgSync){S.prefs.pgTok=t.value.trim();save();}return;}
@@ -11870,6 +11883,8 @@ document.addEventListener('change',e=>{
   S.prefs.pg=c;save();if(k==='modelIn')renderMain();
 });
 Object.assign(ACT,{
+  'pg-mem-add'(){const L=pgMem();if(L.length>=40){toast('Limite de 40 memórias.');return;}L.push({id:uid(),topic:'',text:''});save();renderMain();},
+  'pg-mem-del'(el){S.prefs.pgMem=pgMem().filter(m=>m.id!==el.dataset.id);save();renderMain();},
   'pg-open'(){pgOpen();},'pg-close'(){pgOpen(false);},
   'pg-new'(){if(PG.busy&&PG.abort)PG.abort.abort();PG.ui=[];PG.contents=[];PG.plans={};PG.att=[];pgPersist();pgRender();},
   'pg-photo'(){const f=$('#pgFile');if(f)f.click();},
