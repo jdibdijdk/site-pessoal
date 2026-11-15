@@ -11754,7 +11754,7 @@ async function pgSend(text,imgs){
       const calls=ps.filter(p=>p.functionCall);if(!calls.length)break;
       PG.contents.push({role:'user',parts:calls.map(c=>({functionResponse:{name:c.functionCall.name,response:{result:pgRunTool(c.functionCall.name,c.functionCall.args||{})}}}))});
     }
-  }catch(e){if(e&&e.name!=='AbortError')pgUi({k:'bot',err:true,t:'Erro: '+(e.message||e)});}
+  }catch(e){if(e&&e.name!=='AbortError'){const m=String(e.message||e);pgUi({k:'bot',err:true,t:/function calling/i.test(m)?'Este modelo não aceita ferramentas (function calling), que o Pingado precisa para ler e alterar seus dados. Em Ajustes > Pingado, toque em "Testar conexão" e escolha um modelo Gemini de texto, como gemini-2.5-flash.':'Erro: '+m});}}
   PG.busy=false;PG.abort=null;pgState('idle');
   // fotos antigas não voltam ao Gemini
   PG.contents.forEach(c=>{c.parts=c.parts.map(p=>p.inlineData?{text:'[foto enviada]'}:p);});
@@ -11884,7 +11884,7 @@ Object.assign(ACT,{
     try{
       const r=await fetch(pgApi()+'/pingado/models',{headers:{'X-Pingado-Token':pgTok()}}),j=await r.json().catch(()=>({}));
       if(!r.ok)throw new Error(j.error||('Erro '+r.status));
-      PG.models=j.models||[];const c=pgCfg();if(!c.model&&PG.models.length){c.model=(PG.models.find(m=>/flash/.test(m.id))||PG.models[0]).id;S.prefs.pg=c;save();}
+      PG.models=(j.models||[]).filter(m=>/^gemini/i.test(m.id)&&!/embed|imagen|tts|aqa|veo|image|live|audio|learnlm|robotics|computer-use/i.test(m.id));const c=pgCfg();if(!c.model&&PG.models.length){c.model=(PG.models.find(m=>/flash/.test(m.id))||PG.models[0]).id;S.prefs.pg=c;save();}
       renderMain();const o2=$('#pgTest');if(o2)o2.textContent='Conectado: '+PG.models.length+' modelos disponíveis.';
     }catch(e){if(out)out.textContent='Não consegui conectar: '+(e.message||e);}
   }
