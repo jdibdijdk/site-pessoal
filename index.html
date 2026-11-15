@@ -2494,23 +2494,25 @@ html[data-theme="dark"] mark.hl{background:color-mix(in srgb,var(--c) 45%,transp
   .dkfab{display:inline-flex;align-items:center;gap:6px;position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:40;border:0;border-radius:999px;background:var(--ink);color:var(--onink);padding:13px 18px;font-weight:600;font-size:14px;box-shadow:0 6px 18px rgba(16,24,40,.28)}
 }
 
-/* Pingado */
-.pgbi{display:inline-flex;width:24px;height:24px}.pgbtn{gap:6px}
-.pgm{overflow:visible;display:block}
-.pgm .pgbody{transform-origin:100px 176px;animation:pgbob 3.4s ease-in-out infinite}
-.pgm .pgsh{transform-origin:100px 188px;animation:pgsh 3.4s ease-in-out infinite}
-.pgm .pgeye{transform-box:fill-box;transform-origin:center;animation:pgblink 5.5s infinite}
-.pg-think .pgbody{animation:pgbob 1.1s ease-in-out infinite}.pg-think .pgeyes{transform:translate(5px,-6px)}
+.pgbi{display:inline-flex;width:24px;height:24px}.pgbtn{gap:7px}.pgbtn .lbl{color:#0B0B0F;font-weight:600}html[data-theme="dark"] .pgbtn .lbl{color:#F5F5F7}
+.pgm{overflow:visible;display:block;--pgb:#946C4A;--pge:#FFFFFF}
+html[data-theme="dark"] .pgm{--pgb:#C9996C;--pge:#1B120B}
+.pgm .pgbd{fill:var(--pgb)}.pgm .pgeye{fill:var(--pge)}.pgm .pgln path{fill:none;stroke:var(--pge);stroke-width:5;stroke-linecap:round}.pgm .pgdots circle{fill:var(--pgb)}
+.pgm .pgbody{transform-origin:100px 176px}.pgm .pgsh{transform-origin:100px 187px}
+.pgm .pgeye{transform-box:fill-box;transform-origin:center;animation:pgblink 6s infinite}
+.pgp .pgm .pgbody,.pgset .pgm .pgbody,body.pgopen #pgBtnIco .pgm .pgbody{animation:pgbreath 3.6s ease-in-out infinite}
+.pgp .pgm .pgsh,.pgset .pgm .pgsh,body.pgopen #pgBtnIco .pgm .pgsh{animation:pgshb 3.6s ease-in-out infinite}
+.pgp .pg-think .pgbody{animation:pgbreath 1.2s ease-in-out infinite}.pg-think .pgeyes{transform:translate(4px,-6px)}
 .pg-think .pgdots circle{animation:pgdot 1.2s infinite}.pg-think .pgdots circle:nth-child(2){animation-delay:.2s}.pg-think .pgdots circle:nth-child(3){animation-delay:.4s}
-@keyframes pgbob{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-6px) scale(1.015,.99)}}
-@keyframes pgsh{0%,100%{transform:scaleX(1);opacity:.13}50%{transform:scaleX(.9);opacity:.09}}
-@keyframes pgblink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes pgbreath{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-7px) scale(1.025,.975)}}
+@keyframes pgshb{0%,100%{transform:scaleX(1);opacity:.14}50%{transform:scaleX(.88);opacity:.08}}
+@keyframes pgblink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.12)}}
 @keyframes pgdot{0%,100%{opacity:.25}50%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.pgm *{animation:none!important}}
 .pgp{position:fixed;top:0;right:0;bottom:0;width:min(420px,100vw);z-index:95;display:flex;flex-direction:column;background:var(--card);border-left:1px solid var(--line);box-shadow:-10px 0 34px rgba(16,24,40,.14);animation:pgin .22s ease-out}
 .pgp[hidden]{display:none}@keyframes pgin{from{transform:translateX(24px);opacity:0}}
-.pgh{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line2);background:linear-gradient(180deg,#EAF5FF,transparent)}
-html[data-theme="dark"] .pgh{background:linear-gradient(180deg,#14283A,transparent)}
+.pgh{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line2);background:linear-gradient(180deg,#F5ECE3,transparent)}
+html[data-theme="dark"] .pgh{background:linear-gradient(180deg,#2B2119,transparent)}
 .pgav{display:inline-flex;width:40px;height:40px;flex:none}.pgav.sm{width:26px;height:26px;margin-top:2px}
 .pgt b{display:block;font-size:15px}.pgt small{color:var(--mut);font-size:12px}
 .pgmsgs{flex:1;overflow:auto;padding:14px 12px;display:flex;flex-direction:column;gap:10px}
@@ -2523,7 +2525,7 @@ html[data-theme="dark"] .pgh{background:linear-gradient(180deg,#14283A,transpare
 .pgempty{margin:auto;text-align:center;padding:20px 14px;display:flex;flex-direction:column;align-items:center;gap:8px}.pgempty h3{margin:4px 0 0}.pgempty p{margin:0;color:var(--mut);font-size:13.5px}
 .pgsug{display:flex;flex-direction:column;gap:6px;width:100%;margin-top:8px}.pgchip{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:9px 12px;text-align:left;font-size:13px;color:var(--tx)}.pgchip:hover{background:var(--soft)}
 .pgplan{border:1px solid var(--line);border-radius:14px;padding:10px;background:var(--card);box-shadow:0 2px 8px rgba(16,24,40,.06)}
-.pgplan.open{border-color:#46B6FF;box-shadow:0 0 0 3px rgba(70,182,255,.18)}
+.pgplan.open{border-color:#946C4A;box-shadow:0 0 0 3px rgba(148,108,74,.2)}
 .pgplh{display:flex;align-items:center;gap:7px;font-size:13.5px}.pgplr{font-size:12.5px;color:var(--mut);margin:4px 0}
 .pgpli{display:flex;flex-direction:column;gap:2px;margin:8px 0}
 .pgit{display:flex;gap:8px;align-items:flex-start;padding:6px 6px;border-radius:9px;font-size:13px;cursor:pointer}.pgit:hover{background:var(--soft)}.pgit small{display:block;color:var(--mut);font-size:12px;margin-top:1px}.pgit.danger b{color:#B91C1C}.pgit.done{opacity:.7}
@@ -2533,7 +2535,7 @@ html[data-theme="dark"] .pgh{background:linear-gradient(180deg,#14283A,transpare
 .pgform{display:flex;align-items:flex-end;gap:6px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line2)}
 .pgform textarea{flex:1;resize:none;border:1px solid var(--line);border-radius:14px;padding:9px 12px;font:inherit;font-size:14px;max-height:140px;background:var(--card);color:var(--tx)}
 .pgsend{background:var(--ink);color:var(--onink);border-radius:50%}.pgsend:hover{background:var(--ink);color:var(--onink)}
-@media (max-width:760px){.pgp{width:100vw;border-left:0}.pgbtn .lbl{display:none}.pgbtn{padding:0 9px}}
+@media (max-width:760px){.pgp{width:100vw;border-left:0}.actions .pgbtn{display:inline-flex;padding:6px 8px}.pgbtn .lbl{display:none}}
 .pgset .pgsh{display:flex;align-items:center;gap:12px}.pgperm{display:grid;grid-template-columns:1fr 70px 110px;gap:6px 8px;align-items:center;font-size:13.5px;margin-top:6px}.pgperm b{font-size:12px;color:var(--mut);text-align:center}.pgperm input{justify-self:center}
 </style>
 </head>
@@ -11559,25 +11561,16 @@ const pgReady=()=>!!(pgCfg().on&&pgApi()&&pgTok()&&pgCfg().model);
 const PG={open:false,busy:false,ui:[],contents:[],abort:null,models:null,plans:{},att:[]};
 
 /* ----- mascote: nuvem azul com boina (ilustração 2D vetorial) ----- */
-function pgDefs(){
-  if(document.getElementById('pgDefs'))return;
-  const d=document.createElement('div');d.id='pgDefs';d.style.cssText='position:absolute;width:0;height:0;overflow:hidden';
-  d.innerHTML='<svg width="0" height="0" aria-hidden="true"><defs><radialGradient id="pgG" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#6CC8FF"/><stop offset=".55" stop-color="#2EA2F2"/><stop offset="1" stop-color="#1678D6"/></radialGradient><linearGradient id="pgB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3A3A42"/><stop offset="1" stop-color="#17171B"/></linearGradient></defs></svg>';
-  document.body.appendChild(d);
-}
+function pgDefs(){} // o desenho usa só variáveis CSS (cores por tema), sem definições globais
+const PG_BODY='M100 34C130 33 160 38 166 66C171 90 170 140 165 158C160 174 132 176 100 176C68 176 38 172 33 156C28 138 29 88 34 66C40 38 70 35 100 34Z';
 function pgMascot(state,size,cls){
-  const lobes=[0,60,120,180,240,300].map(a=>{const r=a*Math.PI/180;return [100+52*Math.cos(r),116+46*Math.sin(r)];});
-  const shapes='<circle cx="100" cy="116" r="58"/>'+lobes.map(p=>'<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="30"/>').join('');
-  const closed=state==='sleep';
-  const eyes=closed?'<path d="M76 122q8 7 16 0M108 122q8 7 16 0" fill="none" stroke="#14141A" stroke-width="4.5" stroke-linecap="round"/>':
-    '<g class="pgeyes"><ellipse class="pgeye" cx="84" cy="121" rx="7.4" ry="10" fill="#14141A"/><ellipse class="pgeye" cx="118" cy="121" rx="7.4" ry="10" fill="#14141A"/><circle cx="86.5" cy="116.5" r="2.4" fill="#fff" opacity=".9"/><circle cx="120.5" cy="116.5" r="2.4" fill="#fff" opacity=".9"/></g>';
+  const sleep=state==='sleep';
+  const eyes=sleep?'<g class="pgeyes pgln"><path d="M96 92q7 6 14 0M137 85q7 6 14 0"/></g>':
+    '<g class="pgeyes"><g transform="rotate(-18 103.5 89.5)"><rect class="pgeye" x="94" y="73" width="19" height="33" rx="9.5"/></g><g transform="rotate(-22 144.5 82.5)"><rect class="pgeye" x="135" y="66" width="19" height="33" rx="9.5"/></g></g>';
   return '<svg class="pgm pg-'+(state||'idle')+(cls?' '+cls:'')+'" width="'+size+'" height="'+size+'" viewBox="0 0 200 200" role="img" aria-label="Pingado">'+
-    '<ellipse class="pgsh" cx="100" cy="188" rx="54" ry="8" fill="#000" opacity=".13"/>'+
-    '<g class="pgbody"><g fill="#1368C2" stroke="#1368C2" stroke-width="6" stroke-linejoin="round">'+shapes+'</g><g fill="url(#pgG)">'+shapes+'</g>'+
-    '<ellipse cx="72" cy="86" rx="26" ry="12" fill="#fff" opacity=".2" transform="rotate(-24 72 86)"/>'+
-    eyes+
-    '<g class="pgberet" transform="rotate(-9 100 74)"><rect x="92" y="38" width="9" height="16" rx="4.5" fill="#17171B"/><ellipse cx="100" cy="72" rx="52" ry="23" fill="url(#pgB)"/><ellipse cx="100" cy="88" rx="42" ry="8" fill="#101014"/><path d="M62 66q14-14 36-15" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".16"/></g></g>'+
-    (state==='think'?'<g class="pgdots" fill="#1678D6"><circle cx="150" cy="66" r="4"/><circle cx="163" cy="56" r="5"/><circle cx="178" cy="44" r="6"/></g>':'')+'</svg>';
+    '<ellipse class="pgsh" cx="100" cy="187" rx="52" ry="7" fill="#000" opacity=".14"/>'+
+    '<g class="pgbody"><path class="pgbd" d="'+PG_BODY+'"/><path d="M52 62C60 48 80 44 96 44" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" opacity=".13"/>'+eyes+
+    (state==='think'?'<g class="pgdots"><circle cx="176" cy="40" r="4"/><circle cx="188" cy="28" r="3.200"/><circle cx="196" cy="18" r="2.400"/></g>':'')+'</g></svg>';
 }
 
 /* ----- ferramentas ----- */
