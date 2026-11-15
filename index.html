@@ -2538,6 +2538,11 @@ html[data-theme="dark"] .pgh{background:linear-gradient(180deg,#2B2119,transpare
 @media (max-width:760px){.pgp{width:100vw;border-left:0}.actions .pgbtn{display:inline-flex;padding:6px 8px}.pgbtn .lbl{display:none}}
 .pgset .pgsh{display:flex;align-items:center;gap:12px}.pgmem{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;flex-wrap:wrap}.pgmem input{flex:1 1 140px}.pgmem textarea{flex:3 1 260px}
 .pgperm{display:grid;grid-template-columns:1fr 70px 110px;gap:6px 8px;align-items:center;font-size:13.5px;margin-top:6px}.pgperm b{font-size:12px;color:var(--mut);text-align:center}.pgperm input{justify-self:center}
+
+.pgb{gap:6px}.pgbi16{display:inline-flex;width:16px;height:16px}.pgb .pgbi16 .pgm{width:16px;height:16px}
+.pgfillrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0 10px;padding:8px 10px;border:1px dashed var(--line);border-radius:12px;background:var(--soft)}
+.pgrow{display:flex;gap:6px;flex-wrap:wrap;margin:-6px 0 14px}
+.pgfilled{box-shadow:0 0 0 2px #C9996C!important;transition:box-shadow .4s}
 </style>
 </head>
 <body>
@@ -2955,7 +2960,7 @@ function normalize(o){
     decks:arr('decks').map(d=>Object.assign({name:'',folderId:'',catId:'',goalId:'',actId:'',noteId:'',parentId:'',focoIds:[],icon:'',color:'',ret:0,newPd:0,revPd:0,created:0,updated:0},d)),
     cards:arr('cards').map(c=>Object.assign({deckId:'',type:'basic',front:'',back:'',frontImg:'',backImg:'',text:'',extra:'',okind:'image',image:'',rects:[],table:[],occ:[],hdr:true,s:{},rl:[],created:0,updated:0},c)),
     ingr:arr('ingr').map(i=>Object.assign({name:'',unit:'g',price:0,pack:1000,minPk:0},i)),
-    pantry:arr('pantry').map(p=>Object.assign({ingId:'',qty:0,gosto:false,loc:''},p)),
+    pantry:arr('pantry').map(p=>Object.assign({ingId:'',qty:0,gosto:false,loc:'',exp:''},p)),
     recipes:arr('recipes').map(r=>Object.assign({title:'',photo:'',momento:'',area:'',servings:2,ings:[],steps:'',created:0,updated:0},r)),
     meals:arr('meals').map(m=>Object.assign({date:'',slot:'almoco',kind:'recipe',recipeId:'',servings:1,st:'',actId:'',amount:0,done:false,used:[],created:0},m)),
     folders:arr('folders'),dfolders:arr('dfolders'),
@@ -4136,7 +4141,7 @@ function renderRevisoes(){
   const wkEnd=addISO(T,6),sum=a=>a.reduce((x,r)=>x+Math.max(0,r.min-(r.spent||0)),0),wk=all.filter(r=>!r.done&&r.date<=wkEnd);
   let h='<h2 class="vt" style="margin:0 0 4px">Revisões</h2>'+(c.on?'':'<p class="muted small" style="margin:0 0 12px">As revisões estão desligadas.</p>')+
     '<div class="rvsum"><div><b>'+dueNow.length+'</b><span>pendentes agora</span></div><div><b>'+sum(dueNow)+' min</b><span>previstos hoje</span></div><div><b>'+sum(wk)+' min</b><span>nos próximos 7 dias</span></div></div>'+
-    '<div class="toolbar"><button class="btn sm" data-a="anki-start">'+ic('cards',14)+' Revisão ativa</button><div class="seg">'+[['hoje','Hoje e atrasadas ('+dueNow.length+')'],['prox','Próximas ('+next.length+')'],['feitas','Concluídas ('+dn.length+')'],['cfg','Ajustes']].map(v=>'<button class="'+(tab===v[0]?'on':'')+'" data-a="rv-tab" data-v="'+v[0]+'">'+v[1]+'</button>').join('')+'</div></div>';
+    '<div class="toolbar"><button class="btn sm" data-a="anki-start">'+ic('cards',14)+' Revisão ativa</button>'+pgBtn('revisoes','Organizar com o Pingado')+'<div class="seg">'+[['hoje','Hoje e atrasadas ('+dueNow.length+')'],['prox','Próximas ('+next.length+')'],['feitas','Concluídas ('+dn.length+')'],['cfg','Ajustes']].map(v=>'<button class="'+(tab===v[0]?'on':'')+'" data-a="rv-tab" data-v="'+v[0]+'">'+v[1]+'</button>').join('')+'</div></div>';
   if(tab==='cfg')return h+rvSettingsHTML();
   h+='<div class="nfbar tfbar"><label class="nfsel"><span>Categoria</span><select id="rvcatSel"><option value="">Todas</option>'+catTreeOpts(UI.rvCat)+'</select></label>'+
     '<div class="frow">'+RV_FILTERS.map(f=>'<button class="chip '+((UI.rvF||'')===f[0]?'on':'')+'" data-a="rv-f" data-v="'+f[0]+'">'+f[1]+'</button>').join('')+'</div></div>';
@@ -5263,6 +5268,7 @@ function openActForm(opts){
     '<div class="locbox"><label class="f">'+ic('pin',13)+' Local<input name="place" list="placedl" value="'+esc(p.place)+'" placeholder="Buscar ou digitar o local" autocomplete="off"></label><datalist id="placedl">'+placeList().map(n=>'<option value="'+esc(n)+'">').join('')+'</datalist><div class="profq" id="placechips"></div></div>'+
     '<label class="f">Observações<textarea name="obs" rows="2" placeholder="Anotações livres sobre este evento">'+esc(p.obs||'')+'</textarea></label>'+
     '<details class="adv"'+(advOpen?' open':'')+'><summary>Opções avançadas</summary>'+
+    '<div class="pgfillrow"><button type="button" class="btn sm pgb" data-a="pg-fill-event" title="O Pingado completa objetivos, metodologia, o que levar e observações com base no nome do evento e em eventos passados"><span class="pgbi16">'+pgMascot('idle',16)+'</span> Delegar ao Pingado</button><span id="pgFillMsg" class="muted small">Completa os campos vazios com base no nome e em eventos passados.</span></div>'+
     '<div class="locbox"><div class="f"><span>'+ic('user',13)+' Professor(es)</span><input type="hidden" name="teacher" value="'+esc(p.teacher)+'"><input type="hidden" name="noteacher" value="'+(p.noTeacher?'1':'0')+'"><div class="profq" id="profchips"></div><div class="frow" style="margin-top:6px"><input id="newProfInline" placeholder="+ novo professor(a)" autocomplete="off" style="flex:1;min-width:0"><button type="button" class="btn sm" data-a="prof-new-inline">Adicionar</button></div></div></div>'+
     '<label class="chip cb" style="align-self:flex-start;margin:4px 0"><input type="checkbox" name="rev" '+(p.rev?'checked':'')+'><span>'+ic('repeat',13)+' Gera revisão <small>(D1, D7, D30…)</small></span></label>'+
     '<div class="optchips" id="optchips"'+(OPTS.every(o=>has[o.k])?' hidden':'')+'><span class="lbl">Adicionar</span>'+OPTS.map(o=>'<button type="button" class="chip" data-a="opt-show" data-k="'+o.k+'" '+(has[o.k]?'hidden':'')+'>'+ic(o.icon,13)+o.label+'</button>').join('')+'</div>'+
@@ -5948,7 +5954,7 @@ function noteViewHTML(n){
   const edit=UI.nview.edit,isQ=n.type==='questao',isC=n.type==='caso',isF=n.type==='fluxo',isB=n.type==='bula';
   let h='<div class="nhead"><button class="btn sm ghost" data-a="n-back">'+ic('chevL',14)+' Notas</button><span class="sp"></span>'+(isC?'<button class="btn sm soapbtn '+(n.soapOn?'on':'')+'" data-a="soap-toggle" aria-pressed="'+(n.soapOn?'true':'false')+'" title="Mostra os campos S, O, A e P do caso">'+ic('layers',14)+' Modo SOAP</button>':'')+
     '<button class="btn sm ghost serifbtn '+(((S.prefs.noteFont||(S.prefs.noteSerif?'serif':'poppins'))!=='poppins')?'on':'')+'" data-a="n-serif" aria-pressed="'+(((S.prefs.noteFont||(S.prefs.noteSerif?'serif':'poppins'))!=='poppins')?'true':'false')+'" title="Alternar a fonte do texto das notas: Poppins, Serifada (Crimson Pro) ou Montserrat">'+ic('type',14)+' '+({poppins:'Poppins',serif:'Serifada',montserrat:'Montserrat'}[S.prefs.noteFont||(S.prefs.noteSerif?'serif':'poppins')])+'</button>'+
-    '<button class="icon-btn" data-a="n-pdf" title="Exportar esta nota em PDF" aria-label="Exportar em PDF">'+ic('download',18)+'</button>'+
+    (isF||isQ?'':pgBtn('nota_cards','Flashcards',' data-id="'+n.id+'"'))+'<button class="icon-btn" data-a="n-pdf" title="Exportar esta nota em PDF" aria-label="Exportar em PDF">'+ic('download',18)+'</button>'+
     (edit?'<button class="btn sm primary" data-a="n-edit">'+ic('check',14)+' Concluir edição</button>':'<button class="icon-btn" data-a="n-edit" title="Editar" aria-label="Editar">'+ic('edit',19)+'</button>')+
     '<button class="icon-btn" data-a="n-del" title="Excluir" aria-label="Excluir">'+ic('trash',18)+'</button></div>';
   if(edit){
@@ -8264,7 +8270,7 @@ function finSpends(){
 }
 function renderFin(){
   const tabs=[['resumo','Resumo'],['saidas','Saídas'],['cartoes','Cartões'],['pagar','Contas e dívidas'],['receber','Entradas'],['contas','Contas']];
-  let h='<div class="toolbar"><div class="seg">'+tabs.map(t=>'<button class="'+(UI.fTab===t[0]?'on':'')+'" data-a="set" data-k="fTab" data-v="'+t[0]+'">'+t[1]+'</button>').join('')+'</div></div>';
+  let h='<div class="toolbar"><div class="seg">'+tabs.map(t=>'<button class="'+(UI.fTab===t[0]?'on':'')+'" data-a="set" data-k="fTab" data-v="'+t[0]+'">'+t[1]+'</button>').join('')+'</div><span class="sp"></span>'+pgBtn('fin_plano','Planejar com o Pingado')+'</div>';
   h+=({resumo:finSummary,saidas:finSpends,cartoes:finCards,pagar:finPay,receber:finIn,contas:finAccounts}[UI.fTab]||finSummary)();
   return h+'<p class="muted small" style="margin-top:14px">Marque o círculo ao pagar ou receber: o saldo da conta é atualizado. Gastos e entradas lançados em atividades e tarefas aparecem aqui sozinhos, com o sinal certo.</p>';
 }
@@ -8785,7 +8791,7 @@ function deckRowHTML(d,lv,tree){
 function studyHomeHTML(){
   const now=Date.now(),all=dueCardCount(),roots=deckRoots().sort((a,b)=>(a.name||'').localeCompare(b.name||'','pt-BR')),dense=S.prefs.dkDense!==false;
   let h='<div class="toolbar"><div><b style="font-size:17px">Estudar</b></div><span class="sp"></span>'+
-    '<button class="btn" data-a="deck-new">'+ic('plus',14)+' Novo baralho</button>'+
+    '<button class="btn" data-a="deck-new">'+ic('plus',14)+' Novo baralho</button>'+pgBtn('flashcards','Sugestões do Pingado').replace('btn sm pgb','btn pgb')+
     '<button class="btn primary" data-a="st-start" '+(all?'':'disabled')+'>'+ic('play',14)+' Estudar tudo'+(all?' ('+all+')':'')+'</button></div>';
   if(!roots.length)return nSubBar()+h+'<div class="empty">Você ainda não tem baralhos.<br><button class="btn primary" data-a="deck-new">'+ic('plus',15)+' Criar baralho</button></div>';
   h+='<div class="dkbar"><span class="muted small"><b class="cn">novos</b> | <b class="cl">aprendendo</b> | <b class="cr">revisar</b></span><span class="sp"></span>'+
@@ -10105,7 +10111,8 @@ function renderCul(){
   const nShort=shopItems(UI.cwk||curFoodWeek()).length;
   const seg=[['estoque','Ingredientes em Estoque','bag'],['mercado','Lista de Mercado','cart'],['receitas','Receitas','book'],['plano','Planejamento Semanal','calendar']];
   const bar='<div class="seg" style="margin-bottom:16px">'+seg.map(x=>'<button class="'+(UI.csub===x[0]?'on':'')+'" data-a="cu-sub" data-v="'+x[0]+'">'+ic(x[2],15)+x[1]+((x[0]==='plano'||x[0]==='mercado')&&nShort?' <span class="count" title="Itens que faltam nesta semana">'+nShort+'</span>':'')+'</button>').join('')+'</div>';
-  return bar+(UI.csub==='estoque'?estoqueHTML():UI.csub==='mercado'?mercadoHTML():UI.csub==='receitas'?receitasHTML():planoHTML());
+  const pgr='<div class="pgrow">'+pgBtn('cul_vence','O que vence')+pgBtn('cul_mercado','Lista inteligente')+pgBtn('cul_semana','Planejar a semana')+'</div>';
+  return bar+pgr+(UI.csub==='estoque'?estoqueHTML():UI.csub==='mercado'?mercadoHTML():UI.csub==='receitas'?receitasHTML():planoHTML());
 }
 
 /* ----- 1. ingredientes em estoque ----- */
@@ -10138,6 +10145,7 @@ function estoqueHTML(){
   const groups={};rows.forEach(x=>{const c=ingCatOf(x.i);(groups[c]=groups[c]||[]).push(x);});
   const row=x=>'<div class="crow"><span class="lki">'+ic((ING_CATS.find(c=>c[0]===ingCatOf(x.i))||[])[1]||'igOutros',16)+'</span><div class="cprev"><b>'+esc(x.i.name)+'</b>'+(loc?'':'<span class="muted small">'+esc(pantryLoc(x.p))+'</span>')+'</div>'+
     '<span class="qtychip '+(x.p.gosto?'g':'')+'">'+fmtQty(Number(x.p.qty)||0,x.i.unit,x.p.gosto)+'</span>'+
+    (x.p.exp?(()=>{const d=Math.round((parseISO(x.p.exp)-parseISO(todayISO()))/864e5);return '<span class="mst '+(d<0?'s-buy':d<=3?'s-buy':'')+'" title="Validade '+esc(x.p.exp)+'">'+(d<0?'Vencido':d===0?'Vence hoje':d<=7?'Vence em '+d+' d':fmtDM(x.p.exp))+'</span>';})():'')+
     (!x.p.gosto&&ingMin(x.i)>0&&(Number(x.p.qty)||0)<ingMin(x.i)-0.0001?'<span class="mst s-buy" title="Abaixo do mínimo de '+fmtQty(ingMin(x.i),x.i.unit)+': está na lista de mercado">Baixo</span>':'')+
     '<span class="tact"><button class="icon-btn sm" data-a="pa-use" data-id="'+x.p.id+'" aria-label="Registrar consumo" title="Registrar consumo">'+ic('minus',15)+'</button><button class="icon-btn sm" data-a="pa-edit" data-id="'+x.p.id+'" aria-label="Alterar" title="Alterar">'+ic('edit',15)+'</button><button class="icon-btn sm" data-a="pa-del" data-id="'+x.p.id+'" aria-label="Remover" title="Remover">'+ic('trash',15)+'</button></span></div>';
   return h+ING_CATS.filter(c=>groups[c[0]]).map(c=>'<section class="igroup"><h4>'+ic(c[1],16)+esc(c[0])+' <span class="count">'+groups[c[0]].length+'</span></h4><div class="card">'+groups[c[0]].map(row).join('')+'</div></section>').join('');
@@ -10280,6 +10288,7 @@ function openPantry(id){
     '<label class="f">Ingrediente<input name="name" list="ingNames" required value="'+esc(ing?ing.name:'')+'" autocomplete="off"></label>'+
     '<div class="f"><span>Quantidade</span><div class="frow" style="flex-wrap:nowrap"><input name="qty" inputmode="decimal" value="'+(p&&!p.gosto?esc(String(p.qty).replace('.',',')):'')+'" style="flex:1"><span class="qtyunit" id="pUnit">g / mL / un</span></div>'+
     '<label class="chip cb"><input type="checkbox" name="gosto" '+(p&&p.gosto?'checked':'')+'><span>À gosto (não controlar a quantidade)</span></label></div>'+
+    '<label class="f">Validade <small>opcional</small><input type="date" name="exp" value="'+esc((p&&p.exp)||'')+'"></label>'+
     '<div class="fgrid"><label class="f">Local<select name="loc">'+ING_LOCS.map(l=>'<option '+(l[0]===pantryLoc(p)?'selected':'')+'>'+l[0]+'</option>').join('')+'</select></label>'+
     '<label class="f">Categoria<select name="icat">'+ING_CATS.map(c=>'<option '+(c[0]===ingCatOf(ing)?'selected':'')+'>'+c[0]+'</option>').join('')+'</select></label></div>'+newIngFields()+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
@@ -10303,10 +10312,10 @@ function openPantry(id){
       const other=pantryOf(i.id);
       if(other&&other!==p){ // virou um ingrediente que já estava no estoque: junta
         if(gosto)other.gosto=true;else if(!other.gosto)other.qty=r2((Number(other.qty)||0)+qty);S.pantry=S.pantry.filter(x=>x!==p);
-      }else{p.ingId=i.id;p.gosto=gosto;p.qty=gosto?0:qty;p.loc=E.loc.value;}
+      }else{p.ingId=i.id;p.gosto=gosto;p.qty=gosto?0:qty;p.loc=E.loc.value;p.exp=E.exp.value||'';}
     }else{
-      if(pantryOf(i.id)){addPantry(i.id,qty,gosto);toast('Somado ao que você já tinha de '+i.name+'.');}
-      else S.pantry.push({id:uid(),ingId:i.id,qty:gosto?0:qty,gosto:gosto,loc:E.loc.value});
+      if(pantryOf(i.id)){addPantry(i.id,qty,gosto);if(E.exp.value)pantryOf(i.id).exp=E.exp.value;toast('Somado ao que você já tinha de '+i.name+'.');}
+      else S.pantry.push({id:uid(),ingId:i.id,qty:gosto?0:qty,gosto:gosto,loc:E.loc.value,exp:E.exp.value||''});
     }
     foodSave();closeModal();rerender();
   });
@@ -11552,7 +11561,7 @@ Object.assign(ACT,{
    PINGADO: assistente com Gemini (a chave fica no Worker; aqui só o token)
    Lê os dados por ferramentas e só ESCREVE depois da sua aprovação.
    ========================================================================== */
-const PG_DOMS=[['agenda','Agenda e eventos'],['tarefas','Tarefas e datas'],['disc','Disciplinas e focos'],['notas','Notas'],['docs','Documentos'],['cul','Culinária e despensa'],['mat','Materiais'],['fin','Finanças'],['hab','Hábitos e objetivos'],['quest','Questões (MedFisher)']];
+const PG_DOMS=[['agenda','Agenda e eventos'],['tarefas','Tarefas e datas'],['disc','Disciplinas e focos'],['notas','Notas'],['docs','Documentos'],['cul','Culinária e despensa'],['mat','Materiais'],['fin','Finanças'],['hab','Hábitos e objetivos'],['quest','Questões (MedFisher)'],['cards','Flashcards e revisões']];
 const PG_KEY='pg_chat_v1',PG_TOK='pg_token';
 const pgMem=()=>Array.isArray(S.prefs.pgMem)?S.prefs.pgMem:(S.prefs.pgMem=[]);
 const pgCfg=()=>{const c=Object.assign({on:false,model:'',read:{},write:{}},S.prefs.pg||{});return c;};
@@ -11594,11 +11603,17 @@ function pgTools(){
   add('fin','ver_financas','Lista contas, entradas e saídas previstas entre duas datas (padrão: próximos 30 dias).',pgP({de:PG_STR,ate:PG_STR}));
   add('hab','ver_habitos_objetivos','Resume hábitos (micro-ações) e objetivos de vida.');
   add('quest','questoes_erradas','Lista questões do MedFisher que o usuário errou (a mais recente resposta de cada uma).',pgP({area:PG_STR,limite:PG_NUM}));
+  add('agenda','eventos_parecidos','Eventos passados parecidos com um título (mesmo tema/tipo), com os campos extras que o usuário costuma preencher (objetivos, metodologia, o que levar, observações). Use para copiar o estilo.',pgP({titulo:PG_STR},['titulo']));
+  add('cards','ver_revisoes','Revisões pendentes e atrasadas (chave, tema, data prevista, minutos).');
+  add('cards','ver_flashcards','Baralhos e subbaralhos com contagem de novos, aprendendo e a revisar, sanguessugas e retenção.');
+  add('cards','exemplos_de_cards','Amostra de flashcards existentes para imitar o estilo (tipo, tamanho, formatação). Opcional: baralho (id ou nome).',pgP({baralho:PG_STR}));
+  add('cul','ver_cardapio','Refeições planejadas (data, momento, receita, porções) a partir de uma data (padrão: hoje, 14 dias).',pgP({de:PG_STR}));
+  add('fin','ver_orcamento','Resumo financeiro: entradas e saídas dos próximos 30 dias, contas a vencer, gasto por categoria e custo estimado do mercado da semana.');
   D.push({name:'dados_gerais',description:'Data e hora atuais, categorias e contagens gerais do site.',parameters:pgP({})});
-  const tipos=[['agenda','reagendar_evento'],['agenda','editar_evento'],['agenda','excluir_evento'],['tarefas','editar_tarefa'],['tarefas','concluir_tarefa'],['tarefas','adiar_tarefa'],['tarefas','editar_data'],['notas','criar_nota'],['notas','acrescentar_nota'],['cul','registrar_consumo'],['cul','ajustar_despensa'],['cul','registrar_preco']].filter(x=>pgCan(x[0],'write')).map(x=>x[1]);
+  const tipos=[['cards','criar_cards'],['cards','criar_baralho'],['cards','mover_card'],['cards','reagendar_revisao'],['agenda','reagendar_evento'],['agenda','editar_evento'],['agenda','excluir_evento'],['tarefas','editar_tarefa'],['tarefas','concluir_tarefa'],['tarefas','adiar_tarefa'],['tarefas','editar_data'],['notas','criar_nota'],['notas','acrescentar_nota'],['cul','registrar_consumo'],['cul','ajustar_despensa'],['cul','registrar_preco']].filter(x=>pgCan(x[0],'write')).map(x=>x[1]);
   const criar=['agenda','tarefas','cul','fin','hab'].some(d=>pgCan(d,'write'));if(criar)tipos.unshift('criar');tipos.push('lembrar','esquecer');
   if(tipos.length)D.push({name:'propor_mudancas',description:'ÚNICA forma de alterar dados. Nada é gravado: o usuário vê cada item e aprova antes. Use "criar" com criar_json (formato combinado) para novos eventos, tarefas, datas, finanças, refeições/receitas, mercado, hábitos e objetivos.',
-    parameters:pgP({resumo:PG_STR,itens:{type:'ARRAY',items:pgP({tipo:{type:'STRING',enum:tipos},id:PG_STR,alvo_data:PG_STR,nova_data:PG_STR,novo_inicio:PG_STR,novo_fim:PG_STR,titulo:PG_STR,descricao:PG_STR,observacoes:PG_STR,local:PG_STR,prazo:PG_STR,hora:PG_STR,concluida:{type:'BOOLEAN'},ingrediente:PG_STR,quantidade:PG_NUM,unidade:PG_STR,valor:PG_NUM,texto:PG_STR,criar_json:PG_STR,motivo:PG_STR},['tipo'])}},['itens'])});
+    parameters:pgP({resumo:PG_STR,itens:{type:'ARRAY',items:pgP({tipo:{type:'STRING',enum:tipos},id:PG_STR,alvo_data:PG_STR,nova_data:PG_STR,novo_inicio:PG_STR,novo_fim:PG_STR,titulo:PG_STR,descricao:PG_STR,observacoes:PG_STR,local:PG_STR,prazo:PG_STR,hora:PG_STR,concluida:{type:'BOOLEAN'},ingrediente:PG_STR,quantidade:PG_NUM,unidade:PG_STR,validade:PG_STR,valor:PG_NUM,texto:PG_STR,criar_json:PG_STR,motivo:PG_STR,baralho:PG_STR,baralho_pai:PG_STR,chave:PG_STR,cards:{type:'ARRAY',items:pgP({tipo:PG_STR,frente:PG_STR,verso:PG_STR,texto:PG_STR,extra:PG_STR},['tipo'])}},['tipo'])}},['itens'])});
   return D;
 }
 const pgCap=(o,n)=>{const s=JSON.stringify(o),mx=n||22000;return s.length>mx?{resultado_cortado:true,texto:s.slice(0,mx)}:o;};
@@ -11629,7 +11644,27 @@ function pgRead(name,a){
   if(name==='ler_nota'){const n=noteById(a.id);return n?{id:n.id,titulo:n.title,tipo:n.type,texto:pgClip(noteText(n),9000)}:{erro:'Nota não encontrada'};}
   if(name==='listar_documentos'){const q=pgNorm(a.busca);return {documentos:S.docs.filter(d=>!q||pgNorm(d.title+' '+d.notes).includes(q)).slice(0,80).map(d=>({id:d.id,titulo:d.title,categoria:catPath(d.catId).map(c=>c.name).join(' > '),status:d.status||'',link:d.link||'',observacoes:pgClip(d.notes,160)})),pdfs:S.pdfs.slice(0,60).map(p=>({id:p.id,titulo:p.title||p.name}))};}
   if(name==='listar_receitas'){const q=pgNorm(a.busca);return {receitas:S.recipes.filter(r=>!q||pgNorm(r.title).includes(q)).slice(0,60).map(r=>({id:r.id,titulo:r.title,momento:r.momento,porcoes:r.servings,ingredientes:(r.ings||[]).map(i=>ingName(i.ingId)+(i.qty?' '+i.qty+((ingById(i.ingId)||{}).unit||''):'')),passos:(r.steps||[]).slice(0,8).map(x=>pgClip(x,100))}))};}
-  if(name==='ver_despensa')return {despensa:S.pantry.map(p=>{const i=ingById(p.ingId)||{};return {ingrediente:i.name||'?',quantidade:p.gosto?'a gosto':p.qty,unidade:i.unit||'',local:p.loc||''};}),ingredientes:S.ingr.map(i=>({nome:i.name,unidade:i.unit,preco_embalagem:i.price,embalagem:i.pack}))};
+  if(name==='eventos_parecidos'){
+    const q=pgNorm(a.titulo),tk=q.split(' ').filter(w=>w.length>3);
+    const sc=x=>{const t=pgNorm(aT(x)+' '+(actParts(x).theme||'')+' '+(actParts(x).disc||''));return (t.includes(q)?3:0)+tk.filter(w=>t.includes(w)).length;};
+    const last=x=>x.slots.map(s=>s.date||s.from||'').sort().pop()||'';
+    return {eventos:S.acts.map(x=>({x:x,s:sc(x)})).filter(r=>r.s>0&&(r.x.doWhat||r.x.where||r.x.bring||r.x.obs)).sort((m,n)=>n.s-m.s||last(n.x).localeCompare(last(m.x))).slice(0,8).map(r=>{const x=r.x,pt=actParts(x);return {titulo:aT(x),tipo:pt.tipo||x.kind,disciplina:pt.disc||'',local:x.place||'',professor:x.noTeacher?'':(x.teacher||''),objetivos:pgClip(x.doWhat,500),metodologia:pgClip(x.where,500),levar:pgClip(x.bring,300),observacoes:pgClip(x.obs,300)};})};
+  }
+  if(name==='ver_revisoes'){const T=todayISO();return {revisoes:reviewList(addISO(T,-45),addISO(T,30)).filter(r=>!r.done).slice(0,120).map(r=>({chave:r.key,tema:r.theme,tipo:r.kind==='rp'?'organizar':'revisar',data:r.date,original:r.orig,atrasada:r.date<T,minutos:r.min,intervalo_dias:r.n}))};}
+  if(name==='ver_flashcards'){const now=Date.now();return {baralhos:S.decks.map(d=>{const st=deckStats(d.id,now,true);return {id:d.id,nome:deckPath(d).join(' > '),itens:st.total,novos:st.newAll,aprendendo:st.learn,revisar:st.revAll,retencao_desejada:Math.round(deckOpt(d,'ret')*100)+'%',sanguessugas:S.cards.filter(c=>c.deckId===d.id&&c.leech).length};}),a_revisar_hoje:dueCardCount()};}
+  if(name==='exemplos_de_cards'){
+    const q=pgNorm(a.baralho),d=q?S.decks.find(x=>x.id===a.baralho||pgNorm(x.name)===q):null;
+    const pool=S.cards.filter(c=>!d||c.deckId===d.id).slice(-60),pick=pool.filter((c,i)=>pool.length<=14||i%Math.ceil(pool.length/14)===0).slice(0,14);
+    return {cards:pick.map(c=>({baralho:(deckById(c.deckId)||{}).name||'',tipo:c.type,frente:pgClip(richText(c.front||c.text),240),verso:pgClip(richText(c.back),300),extra:pgClip(richText(c.extra),160)}))};
+  }
+  if(name==='ver_cardapio'){const de=a.de||today;return {refeicoes:S.meals.filter(m=>m.date>=de&&m.date<=addISO(de,14)).sort((x,y)=>x.date<y.date?-1:1).map(m=>({data:m.date,momento:m.slot,receita:m.kind==='fora'?'(fora de casa)':((S.recipes.find(r=>r.id===m.recipeId)||{}).title||'?'),porcoes:m.servings,feita:!!m.done}))};}
+  if(name==='ver_orcamento'){
+    let ev=[];try{ev=finEvents(today,addISO(today,30));}catch(e){}
+    const by={};ev.forEach(e=>{const c=String(e.sub||'Outro').split(' | ')[0]||'Outro';by[c]=(by[c]||0)+(e.kind==='in'?e.amount:-e.amount);});
+    let mk=[],tot=0;try{mk=shopItems(UI.cwk||curFoodWeek());mk.forEach(i=>{tot+=i.est||0;});}catch(e){}
+    return {entradas_30d:r2(ev.filter(e=>e.kind==='in').reduce((t,e)=>t+e.amount,0)),saidas_30d:r2(ev.filter(e=>e.kind!=='in').reduce((t,e)=>t+e.amount,0)),a_vencer:ev.filter(e=>e.kind!=='in'&&!e.paid).slice(0,25).map(e=>({data:e.date,nome:e.name,valor:e.amount})),saldo_por_categoria:by,mercado_semana:{itens:mk.length,custo_estimado:r2(tot)}};
+  }
+  if(name==='ver_despensa')return {despensa:S.pantry.map(p=>{const i=ingById(p.ingId)||{};const dd=p.exp?Math.round((parseISO(p.exp)-parseISO(today))/864e5):null;return {ingrediente:i.name||'?',quantidade:p.gosto?'a gosto':p.qty,unidade:i.unit||'',local:p.loc||'',validade:p.exp||'',dias_para_vencer:dd};}),ingredientes:S.ingr.map(i=>({nome:i.name,unidade:i.unit,preco_embalagem:i.price,embalagem:i.pack}))};
   if(name==='listar_materiais')return {materiais:S.items.map(i=>({id:i.id,nome:i.name,grupo:i.group||'',recipiente:!!i.container,dentro:(i.inside||[]).map(itemById).filter(Boolean).map(x=>x.name)}))};
   if(name==='ver_financas'){const de=a.de||today,ate=a.ate||addISO(de,30);let ev=[];try{ev=finEvents(de,ate);}catch(e){}return {contas:(S.fin.accounts||[]).map(c=>c.name),movimentos:ev.slice(0,120).map(e=>({data:e.date,tipo:e.kind==='in'?'entrada':'saida',nome:e.name,valor:e.amount,pago:!!e.paid}))};}
   if(name==='ver_habitos_objetivos')return {texto:pgClip(iaHabitos()+'\n'+iaObjetivos(),9000)};
@@ -11646,6 +11681,11 @@ function pgRead(name,a){
 function pgToBase(q,un,iu){const u=pgNorm(un);q=Number(q)||0;if(iu==='g'&&u==='kg')return q*1000;if(iu==='mL'&&/^l(itros?)?$/.test(u))return q*1000;return q;}
 function pgIngFor(nome,un,create){let i=ingByName(nome);if(!i&&create){const uu=UNITS.find(x=>norm(x[0])===norm(un||'')),u=uu?uu[0]:(/^kg$|^g$/i.test(un||'')?'g':/^l$|^ml$/i.test(un||'')?'mL':'g');i={id:uid(),name:nome,unit:u,price:0,pack:u==='un'?1:1000,minPk:0};S.ingr.push(i);}return i;}
 const pgDM=d=>d?fmtDM(d):'?';
+function pgDeckFor(nome,pai,create){
+  const q=pgNorm(nome);let d=S.decks.find(x=>x.id===nome||pgNorm(x.name)===q);
+  if(!d&&create){const par=pai?S.decks.find(x=>x.id===pai||pgNorm(x.name)===pgNorm(pai)):null,now=Date.now();d={id:uid(),name:String(nome).slice(0,80),folderId:par?par.folderId||'':'',catId:par?par.catId||'':'',goalId:'',actId:'',noteId:'',parentId:par?par.id:'',focoIds:[],icon:'',color:'',ret:0,newPd:0,revPd:0,created:now,updated:now};S.decks.push(d);}
+  return d||null;
+}
 function pgBuild(it){
   const bad=m=>[{label:it.tipo,detail:'',bad:m}],t=String(it.tipo||'');
   const A=()=>actById(it.id),T=()=>S.tasks.find(x=>x.id===it.id);
@@ -11690,8 +11730,8 @@ function pgBuild(it){
     return [{label:'Baixar da despensa: '+i.name,detail:fmtN(p.qty)+' → '+fmtN(novo)+' '+i.unit+' (−'+fmtN(q)+')',cols:['pantry'],apply:()=>{p.qty=novo;}}];
   }
   if(t==='ajustar_despensa'){
-    if(!it.ingrediente)return bad('Falta o ingrediente');const ex=ingByName(it.ingrediente),u=ex?ex.unit:'g',q=pgToBase(it.quantidade,it.unidade,u);
-    return [{label:'Ajustar despensa: '+it.ingrediente,detail:'quantidade → '+fmtN(q)+' '+u,cols:['pantry','ingr'],apply:()=>{const i=pgIngFor(it.ingrediente,it.unidade,true);let p=pantryOf(i.id);if(!p){p={ingId:i.id,qty:0,gosto:false,loc:''};S.pantry.push(p);}p.qty=q;p.gosto=false;}}];
+    if(!it.ingrediente)return bad('Falta o ingrediente');const ex=ingByName(it.ingrediente),u=ex?ex.unit:'g',q=pgToBase(it.quantidade,it.unidade,u),hasQ=it.quantidade!==undefined&&it.quantidade!==null;
+    return [{label:'Ajustar despensa: '+it.ingrediente,detail:[hasQ?'quantidade → '+fmtN(q)+' '+u:'',it.validade?'validade → '+pgDM(it.validade):''].filter(Boolean).join(' | '),cols:['pantry','ingr'],apply:()=>{const i=pgIngFor(it.ingrediente,it.unidade,true);let p=pantryOf(i.id);if(!p){p={id:uid(),ingId:i.id,qty:0,gosto:false,loc:''};S.pantry.push(p);}if(hasQ){p.qty=q;p.gosto=false;}if(it.validade)p.exp=it.validade;}}];
   }
   if(t==='registrar_preco'){
     if(!it.ingrediente||!(Number(it.valor)>0))return bad('Falta o ingrediente ou o valor');
@@ -11702,9 +11742,35 @@ function pgBuild(it){
     return [{label:'Lembrar'+(it.titulo?' ('+it.titulo+')':''),detail:pgClip(tx,220),cols:['prefs'],apply:()=>{const L=pgMem();if(L.length>=40)throw new Error('Limite de 40 memórias');L.push({id:uid(),topic:String(it.titulo||'Geral').slice(0,60),text:tx.slice(0,700)});}}];
   }
   if(t==='esquecer'){const m=pgMem().find(x=>x.id===it.id);if(!m)return bad('Memória não encontrada');return [{label:'Esquecer: '+m.topic,detail:pgClip(m.text,160),danger:true,off:true,cols:['prefs'],apply:()=>{S.prefs.pgMem=pgMem().filter(x=>x!==m);}}];}
+  if(t==='reagendar_revisao'){
+    if(!it.chave||!it.nova_data)return bad('Falta a chave da revisão ou a nova data');
+    return [{label:'Reagendar revisão para '+pgDM(it.nova_data),detail:String(it.titulo||it.chave).slice(0,100)+(it.motivo?' ('+it.motivo+')':''),cols:['rv'],apply:()=>{S.rv=S.rv||{};S.rv[it.chave]=Object.assign(S.rv[it.chave]||{},{to:it.nova_data});}}];
+  }
+  if(t==='criar_baralho'){
+    if(!it.titulo&&!it.baralho)return bad('Falta o nome');const nm=it.titulo||it.baralho;
+    if(S.decks.some(d=>pgNorm(d.name)===pgNorm(nm)))return bad('Já existe um baralho "'+nm+'"');
+    return [{label:'Criar baralho: '+nm,detail:it.baralho_pai?'dentro de '+it.baralho_pai:'',cols:['decks'],apply:()=>{pgDeckFor(nm,it.baralho_pai,true);}}];
+  }
+  if(t==='mover_card'){
+    const c=S.cards.find(x=>x.id===it.id);if(!c)return bad('Card não encontrado');const d=pgDeckFor(it.baralho,'',false);if(!d)return bad('Baralho não encontrado');
+    return [{label:'Mover card para "'+d.name+'"',detail:pgClip(richText(c.front||c.text),100),cols:['cards'],apply:()=>{c.deckId=d.id;c.updated=Date.now();}}];
+  }
+  if(t==='criar_cards'){
+    const list=Array.isArray(it.cards)?it.cards:[];if(!list.length)return bad('Nenhum card');const nm=it.baralho||it.titulo||'';if(!nm)return bad('Falta o baralho');
+    const ex=pgDeckFor(nm,'',false),have=new Set(S.cards.filter(c=>!ex||c.deckId===ex.id).map(c=>pgNorm(richText(c.front||c.text))));
+    let dk=ex;const getDeck=()=>dk||(dk=pgDeckFor(nm,it.baralho_pai,true));
+    const out=[];
+    list.forEach(c=>{
+      const tp=pgNorm(c.tipo),type=/cloze|lacuna|oclus/.test(tp)?'cloze':/invert|rev/.test(tp)?'rev':'basic',fr=String(c.frente||'').trim(),vs=String(c.verso||'').trim(),tx=String(c.texto||'').trim();
+      if(type==='cloze'?!/\{\{[^}]+\}\}/.test(tx):!(fr&&vs))return;
+      if(have.has(pgNorm(type==='cloze'?tx.replace(/\{\{(?:c\d+::)?([^{}:]+?)(?:::[^{}]+?)?\}\}/g,'$1'):fr)))return;
+      out.push({label:'Card'+(type==='rev'?' invertido':type==='cloze'?' (lacuna)':'')+' em "'+nm+(ex?'':' (novo)')+'"',detail:pgClip(type==='cloze'?tx:fr+' → '+vs,200),cols:['cards','decks'],apply:()=>{const d=getDeck(),now=Date.now();S.cards.push({id:uid(),deckId:d.id,type:type,front:type==='cloze'?'':fr,back:type==='cloze'?'':vs,frontImg:'',backImg:'',text:type==='cloze'?tx:'',extra:String(c.extra||'').trim(),okind:'image',image:'',rects:[],table:[],occ:[],hdr:true,s:{},rl:[],created:now,updated:now});}});
+    });
+    return out.length?out:bad('Todos os cards já existem ou estavam incompletos');
+  }
   return bad('Tipo de mudança desconhecido: '+t);
 }
-const PG_WRITE_DOM={criar:'agenda',reagendar_evento:'agenda',editar_evento:'agenda',excluir_evento:'agenda',editar_tarefa:'tarefas',concluir_tarefa:'tarefas',adiar_tarefa:'tarefas',editar_data:'tarefas',criar_nota:'notas',acrescentar_nota:'notas',registrar_consumo:'cul',ajustar_despensa:'cul',registrar_preco:'cul'};
+const PG_WRITE_DOM={criar_cards:'cards',criar_baralho:'cards',mover_card:'cards',reagendar_revisao:'cards',criar:'agenda',reagendar_evento:'agenda',editar_evento:'agenda',excluir_evento:'agenda',editar_tarefa:'tarefas',concluir_tarefa:'tarefas',adiar_tarefa:'tarefas',editar_data:'tarefas',criar_nota:'notas',acrescentar_nota:'notas',registrar_consumo:'cul',ajustar_despensa:'cul',registrar_preco:'cul'};
 function pgPropose(a){
   const props=[],rej=[];
   (a.itens||[]).forEach(it=>{
@@ -11738,21 +11804,21 @@ function pgTrim(){
 }
 function pgPersist(){try{localStorage.setItem(PG_KEY,JSON.stringify({ui:PG.ui.slice(-60).map(m=>m.k==='plan'?Object.assign({},m):m),contents:PG.contents.map(c=>({role:c.role,parts:c.parts.filter(p=>!p.inlineData)})),plans:PG.plans}));}catch(e){}}
 function pgLoad(){try{const j=JSON.parse(localStorage.getItem(PG_KEY)||'null');if(j){PG.ui=j.ui||[];PG.contents=j.contents||[];PG.plans=j.plans||{};Object.values(PG.plans).forEach(p=>{if(p.state==='open')p.state='expired';p.items.forEach(i=>{i.apply=null;});});}}catch(e){}}
-async function pgCall(){
-  const ctl=new AbortController();PG.abort=ctl;
-  const body={systemInstruction:{parts:[{text:pgSystem()}]},contents:PG.contents,generationConfig:{temperature:.5}},tools=pgTools();
+async function pgCall(o){
+  o=o||{};const ctl=new AbortController();PG.abort=ctl;
+  const body={systemInstruction:{parts:[{text:o.system||pgSystem()}]},contents:o.contents||PG.contents,generationConfig:{temperature:.5}},tools=o.tools||pgTools();
   if(tools.length){body.tools=[{functionDeclarations:tools}];body.toolConfig={functionCallingConfig:{mode:'AUTO'}};}
   const r=await fetch(pgApi()+'/pingado/generate?model='+encodeURIComponent(pgCfg().model),{method:'POST',headers:{'Content-Type':'application/json','X-Pingado-Token':pgTok()},body:JSON.stringify(body),signal:ctl.signal});
   const j=await r.json().catch(()=>({}));
   if(!r.ok)throw new Error((j.error&&(j.error.message||j.error))||('Erro '+r.status));
   return j;
 }
-async function pgSend(text,imgs){
+async function pgSend(text,imgs,label){
   if(PG.busy)return;
   text=String(text||'').trim();if(!text&&!(imgs||[]).length)return;
   if(!pgReady()){pgUi({k:'bot',t:'Ainda falta configurar o Pingado em Ajustes > Pingado.'});return;}
   const parts=[];if(text)parts.push({text:text});(imgs||[]).forEach(m=>parts.push({inlineData:{mimeType:m.mime,data:m.data}}));
-  PG.contents.push({role:'user',parts:parts});pgUi({k:'me',t:text,imgs:(imgs||[]).map(m=>m.src)});
+  PG.contents.push({role:'user',parts:parts});pgUi({k:'me',t:label||text,imgs:(imgs||[]).map(m=>m.src)});
   PG.busy=true;pgState('think');
   try{
     for(let i=0;i<8;i++){
@@ -11789,6 +11855,56 @@ function pgUndo(id){
   pgPersist();pgRender();try{rerender();}catch(e){}toast('Mudanças desfeitas.');
 }
 
+/* ----- botões "Delegar ao Pingado" ----- */
+const PG_TASKS={
+  revisoes:{label:'Organizar minhas revisões',prompt:()=>'Organize minhas revisões. Use ver_revisoes, questoes_erradas, ver_flashcards e horarios_livres dos próximos 7 dias. Priorize as atrasadas e os assuntos com mais erros. Em propor_mudancas, diga onde encaixar cada revisão: use reagendar_revisao (chave + nova_data) para as existentes e criar (eventos "Revisão: tema") nos horários livres, sem conflitos e sem sobrecarregar um dia. Explique o raciocínio em poucas linhas.'},
+  questoes:{label:'Analisar meus erros no MedFisher',prompt:()=>'Analise as questões que eu errei (questoes_erradas, quantas puder). Agrupe por área e foco, aponte padrões e o que estudar primeiro. Proponha (propor_mudancas) revisões ou eventos de estudo em horários livres e flashcards (criar_cards, no meu estilo: veja exemplos_de_cards e minhas memórias) dos conceitos errados, no baralho mais adequado de ver_flashcards.'},
+  flashcards:{label:'Sugestões para meus flashcards',prompt:()=>'Olhe meus flashcards (ver_flashcards) e revisões. Diga quais baralhos estão atrasados ou negligenciados, quais têm sanguessugas, e onde vale inserir novos cards (considere também as questões erradas e as notas recentes). Se fizer sentido, proponha criar_cards no meu estilo (exemplos_de_cards) e reagendar_revisao para encaixar o estudo dos atrasados nos horários livres.'},
+  nota_cards:{label:'Criar flashcards desta nota',prompt:c=>{const n=noteById(c.id);return 'Leia a nota id="'+c.id+'"'+(n&&n.title?' ("'+n.title+'")':'')+' com ler_nota e crie flashcards dela no MEU estilo: veja exemplos_de_cards e minhas memórias, e ver_flashcards para escolher o baralho certo (ou proponha um novo baralho). Use criar_cards com cards bem atômicos (cloze, básico ou invertido conforme o meu padrão). Não repita cards que já existem.';}},
+  cul_semana:{label:'Planejar a semana de alimentação',prompt:()=>'Planeje meu cardápio da próxima semana. Use ver_despensa (validade e quantidades), listar_receitas, ver_cardapio, ver_orcamento e minhas memórias. Use primeiro o que vence antes, indique quantidades por refeição e proponha as refeições com criar (refeicoes) e o que falta comprar (mercado), com custo estimado e respeitando o orçamento.'},
+  cul_vence:{label:'O que está para vencer e como usar',prompt:()=>'Veja a despensa (ver_despensa): liste o que vence nos próximos dias, as quantidades, e como usar cada item (receitas do meu livro ou ideias rápidas). Se houver itens sem validade, sugira valores com ajustar_despensa só quando eu informar; proponha refeições (criar) para consumir antes de vencer.'},
+  cul_mercado:{label:'Lista de mercado inteligente',prompt:()=>'Monte minha lista de mercado inteligente: compare cardápio (ver_cardapio), receitas e despensa (ver_despensa), considere validades e mínimos, e proponha criar (mercado) só com o que falta, com quantidades e valor estimado, e o custo total vs. orçamento (ver_orcamento).'},
+  fin_plano:{label:'Planejamento financeiro',prompt:()=>'Faça meu planejamento financeiro: ver_orcamento (contas a vencer, entradas, saídas, categorias), cardápio/mercado da semana e minhas memórias. Diga o que vence primeiro, quanto posso gastar por semana (inclusive no mercado), riscos de saldo e sugestões. Se for útil, proponha criar (financas) lembretes/contas ou metas.'}
+};
+function pgDelegate(id,ctx){
+  const t=PG_TASKS[id];if(!t)return;
+  if(!pgReady()){ACT['pg-setup']();toast('Configure o Pingado primeiro.');return;}
+  if(PG.busy){pgOpen(true);toast('O Pingado ainda está respondendo.');return;}
+  pgOpen(true);pgSend(t.prompt(ctx||{}),[],t.label);
+}
+const pgBtn=(task,label,extra)=>'<button type="button" class="btn sm pgb" data-a="pg-task" data-t="'+task+'"'+(extra||'')+' title="'+esc(PG_TASKS[task].label)+'"><span class="pgbi16">'+pgMascot('idle',16)+'</span> '+label+'</button>';
+/* preenche os campos extras do formulário de evento (rascunho: você revisa e salva) */
+async function pgFillEvent(){
+  const f=$('#fAct');if(!f)return;
+  if(!pgReady()){ACT['pg-setup']();toast('Configure o Pingado primeiro.');return;}
+  const E=f.elements,msg=$('#pgFillMsg'),btn=$('[data-a=pg-fill-event]',f);if(btn&&btn.disabled)return;
+  const cat=$('[data-catpick="cat"]',f),catTxt=cat&&cat.dataset.value?catPath(cat.dataset.value).map(c=>c.name).join(' > '):'';
+  const title=[E.tipoAtv&&E.tipoAtv.value,E.theme&&!E.theme.disabled?E.theme.value:''].filter(Boolean).join(' - ')||'';
+  if(!title){toast('Escreva o tema ou o tipo do evento antes.');return;}
+  const cur={objetivos:E.doWhat.value.trim(),metodologia:E.where.value.trim(),levar:E.bring.value.trim(),observacoes:E.obs.value.trim(),local:E.place.value.trim()};
+  const prompt='Complete os campos extras do evento "'+title+'"'+(catTxt?' (categoria: '+catTxt+')':'')+'. Campos já preenchidos (NÃO sobrescreva): '+JSON.stringify(cur)+'. Use eventos_parecidos para ver como eu preencho eventos iguais ou parecidos e siga as minhas memórias. Depois chame preencher_campos apenas com os campos vazios que você conseguir preencher com boa base; se não houver base, deixe em branco. Não invente local nem datas.';
+  const fp=pgP({objetivos:PG_STR,metodologia:PG_STR,levar:PG_STR,observacoes:PG_STR,local:PG_STR});
+  const tools=pgTools().filter(t=>t.name==='eventos_parecidos'||t.name==='dados_gerais').concat([{name:'preencher_campos',description:'Preenche campos extras do evento no formulário (rascunho que o usuário revisa).',parameters:fp}]);
+  const contents=[{role:'user',parts:[{text:prompt}]}];let got=null;
+  if(btn)btn.disabled=true;if(msg)msg.textContent='O Pingado está lendo seus eventos…';
+  try{
+    for(let i=0;i<5&&!got;i++){
+      const j=await pgCall({contents:contents,tools:tools,system:pgSystem()});
+      const ps=(j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts)||[];if(!ps.length)break;
+      contents.push({role:'model',parts:ps});const calls=ps.filter(p=>p.functionCall);if(!calls.length)break;
+      const resp=[];calls.forEach(c=>{if(c.functionCall.name==='preencher_campos'){got=c.functionCall.args||{};resp.push({functionResponse:{name:'preencher_campos',response:{result:{ok:true}}}});}else resp.push({functionResponse:{name:c.functionCall.name,response:{result:pgRunTool(c.functionCall.name,c.functionCall.args||{})}}});});
+      contents.push({role:'user',parts:resp});
+    }
+  }catch(e){if(msg)msg.textContent='Erro: '+(e.message||e);if(btn)btn.disabled=false;return;}
+  if(btn)btn.disabled=false;
+  if(!got){if(msg)msg.textContent='Não encontrei base suficiente para completar.';return;}
+  const map=[['objetivos','doWhat','obj'],['metodologia','where','met'],['levar','bring',''],['observacoes','obs',''],['local','place','']],undo=[];let n=0;
+  map.forEach(m=>{const v=String(got[m[0]]||'').trim(),el=E[m[1]];if(!v||!el||el.value.trim())return;undo.push([el,el.value]);el.value=v;n++;el.classList.add('pgfilled');setTimeout(()=>el.classList.remove('pgfilled'),6000);
+    if(m[2]){const o=$('[data-opt="'+m[2]+'"]',f);if(o)o.hidden=false;}el.dispatchEvent(new Event('input',{bubbles:true}));});
+  const det=$('details.adv',f);if(det&&n)det.open=true;
+  PG.fillUndo=undo;
+  if(msg)msg.innerHTML=n?'O Pingado preencheu '+n+(n===1?' campo':' campos')+'. Revise e salve. <button type="button" class="btn sm ghost" data-a="pg-fill-undo">Desfazer</button>':'Os campos que ele consegue preencher já estavam preenchidos.';
+}
 /* ----- interface ----- */
 const pgMd=t=>{
   let h=esc(t).replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>').replace(/`([^`\n]+)`/g,'<code>$1</code>');
@@ -11885,6 +12001,9 @@ document.addEventListener('change',e=>{
 Object.assign(ACT,{
   'pg-mem-add'(){const L=pgMem();if(L.length>=40){toast('Limite de 40 memórias.');return;}L.push({id:uid(),topic:'',text:''});save();renderMain();},
   'pg-mem-del'(el){S.prefs.pgMem=pgMem().filter(m=>m.id!==el.dataset.id);save();renderMain();},
+  'pg-task'(el){pgDelegate(el.dataset.t,{id:el.dataset.id});},
+  'pg-fill-event'(){pgFillEvent();},
+  'pg-fill-undo'(){(PG.fillUndo||[]).forEach(u=>{u[0].value=u[1];u[0].dispatchEvent(new Event('input',{bubbles:true}));});PG.fillUndo=[];const m=$('#pgFillMsg');if(m)m.textContent='Desfeito.';},
   'pg-open'(){pgOpen();},'pg-close'(){pgOpen(false);},
   'pg-new'(){if(PG.busy&&PG.abort)PG.abort.abort();PG.ui=[];PG.contents=[];PG.plans={};PG.att=[];pgPersist();pgRender();},
   'pg-photo'(){const f=$('#pgFile');if(f)f.click();},
@@ -12632,7 +12751,7 @@ const mfAreaStyle=nm=>{const a=(S.areas||[]).find(x=>norm(nm).indexOf(norm(x.nam
 const mfAreaPill=nm=>{const a=mfAreaStyle(nm);return '<span class="fpill" style="--fc:'+esc(a.color)+'">'+ic(a.icon,13)+'<span>'+esc(nm)+'</span></span>';};
 const mfStatus=id=>{const r=MFD.est.r[id];return r?(r[1]===1?'certa':r[1]===0?'errada':'anulada'):'nova';};
 function renderQuestoes(){
-  const nNotas=S.notes.filter(x=>x.mfId).length,head='<div class="qhead"><h2 class="vt">Questões</h2><img class="mflogo" src="'+MF_LOGO+'" alt=""><span class="muted small">MedFisher | '+(mfNome()?esc(mfNome())+' (usuário '+mfUser()+')':'usuário '+mfUser())+(nNotas?' | '+nNotas+(nNotas===1?' enviada para Notas':' enviadas para Notas'):'')+'</span><span class="sp"></span>'+
+  const nNotas=S.notes.filter(x=>x.mfId).length,head='<div class="qhead"><h2 class="vt">Questões</h2>'+pgBtn('questoes','Analisar meus erros')+'<img class="mflogo" src="'+MF_LOGO+'" alt=""><span class="muted small">MedFisher | '+(mfNome()?esc(mfNome())+' (usuário '+mfUser()+')':'usuário '+mfUser())+(nNotas?' | '+nNotas+(nNotas===1?' enviada para Notas':' enviadas para Notas'):'')+'</span><span class="sp"></span>'+
     '<button class="btn sm ghost" data-a="mf-user">'+ic('user',14)+' '+mfUser()+'</button><button class="btn sm ghost" data-a="mf-reload">'+ic('repeat',14)+' Recarregar</button></div>';
   if(MFD.st==='idle'||MFD.user!==mfUser()&&MFD.st!=='loading'){setTimeout(()=>mfLoad(),0);}
   if(MFD.st==='loading'||MFD.st==='idle')return head+'<div class="empty">Carregando o banco de questões…</div>';
