@@ -2553,6 +2553,9 @@ html[data-theme="dark"] .pgh{background:linear-gradient(180deg,#2B2119,transpare
 .pgcul .pgbi16{width:22px;height:22px}.pgcul .pgbi16 .pgm{width:22px;height:22px}
 .pgrow{display:flex;gap:6px;flex-wrap:wrap;margin:-6px 0 14px}
 .pgfilled{box-shadow:0 0 0 2px #C9996C!important;transition:box-shadow .4s}
+
+.slmat{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 14px}.slmb{display:flex;align-items:center;gap:10px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:14px;text-align:left}
+.slmb i{width:22px;height:22px;border-radius:5px;background:var(--c);flex:none}.slmb:hover{background:var(--soft);border-color:var(--c)}
 </style>
 </head>
 <body>
@@ -11616,6 +11619,7 @@ function pgTools(){
   add('hab','ver_habitos_objetivos','Resume hábitos (micro-ações) e objetivos de vida.');
   add('quest','questoes_erradas','Lista questões do MedFisher que o usuário errou (a mais recente resposta de cada uma).',pgP({area:PG_STR,limite:PG_NUM}));
   add('agenda','eventos_parecidos','Eventos passados parecidos com um título (mesmo tema/tipo), com os campos extras que o usuário costuma preencher (objetivos, metodologia, o que levar, observações). Use para copiar o estilo.',pgP({titulo:PG_STR},['titulo']));
+  add('docs','ler_apresentacao','Lista as apresentações ou, com id, devolve o texto de cada slide da apresentação.',pgP({id:PG_STR}));
   add('cards','ver_revisoes','Revisões pendentes e atrasadas (chave, tema, data prevista, minutos).');
   add('cards','ver_flashcards','Baralhos e subbaralhos com contagem de novos, aprendendo e a revisar, sanguessugas e retenção.');
   add('cards','exemplos_de_cards','Amostra de flashcards existentes para imitar o estilo (tipo, tamanho, formatação). Opcional: baralho (id ou nome).',pgP({baralho:PG_STR}));
@@ -11661,6 +11665,11 @@ function pgRead(name,a){
     const sc=x=>{const t=pgNorm(aT(x)+' '+(actParts(x).theme||'')+' '+(actParts(x).disc||''));return (t.includes(q)?3:0)+tk.filter(w=>t.includes(w)).length;};
     const last=x=>x.slots.map(s=>s.date||s.from||'').sort().pop()||'';
     return {eventos:S.acts.map(x=>({x:x,s:sc(x)})).filter(r=>r.s>0&&(r.x.doWhat||r.x.where||r.x.bring||r.x.obs)).sort((m,n)=>n.s-m.s||last(n.x).localeCompare(last(m.x))).slice(0,8).map(r=>{const x=r.x,pt=actParts(x);return {titulo:aT(x),tipo:pt.tipo||x.kind,disciplina:pt.disc||'',local:x.place||'',professor:x.noTeacher?'':(x.teacher||''),objetivos:pgClip(x.doWhat,500),metodologia:pgClip(x.where,500),levar:pgClip(x.bring,300),observacoes:pgClip(x.obs,300)};})};
+  }
+  if(name==='ler_apresentacao'){
+    const x=a.id?S.slides.find(y=>y.id===a.id):null;
+    if(!x)return {apresentacoes:S.slides.map(y=>({id:y.id,titulo:y.title,slides:y.n}))};
+    return (async()=>{let buf=null;try{buf=await SLF.get(x.fileId);}catch(e){}if(!buf)return {erro:'O arquivo não está neste aparelho.'};return {titulo:x.title,slides:await pptxText(buf)};})();
   }
   if(name==='ver_revisoes'){const T=todayISO();return {revisoes:reviewList(addISO(T,-45),addISO(T,30)).filter(r=>!r.done).slice(0,120).map(r=>({chave:r.key,tema:r.theme,tipo:r.kind==='rp'?'organizar':'revisar',data:r.date,original:r.orig,atrasada:r.date<T,minutos:r.min,intervalo_dias:r.n}))};}
   if(name==='ver_flashcards'){const now=Date.now();return {baralhos:S.decks.map(d=>{const st=deckStats(d.id,now,true);return {id:d.id,nome:deckPath(d).join(' > '),itens:st.total,novos:st.newAll,aprendendo:st.learn,revisar:st.revAll,retencao_desejada:Math.round(deckOpt(d,'ret')*100)+'%',sanguessugas:S.cards.filter(c=>c.deckId===d.id&&c.leech).length};}),a_revisar_hoje:dueCardCount()};}
@@ -11796,7 +11805,8 @@ function pgPropose(a){
 function pgRunTool(name,a){
   try{
     if(name==='propor_mudancas')return pgPropose(a);
-    return pgCap(pgRead(name,a||{}));
+    const r=pgRead(name,a||{});
+    return r&&typeof r.then==='function'?r.then(v=>pgCap(v)).catch(e=>({erro:String(e&&e.message||e)})):pgCap(r);
   }catch(e){return {erro:'Falha: '+(e&&e.message||e)};}
 }
 
@@ -11840,7 +11850,7 @@ async function pgSend(text,imgs,label){
       const ps=cand.content.parts;PG.contents.push({role:'model',parts:ps});
       const tx=ps.filter(p=>p.text&&!p.thought).map(p=>p.text).join('').trim();if(tx)pgUi({k:'bot',t:tx});
       const calls=ps.filter(p=>p.functionCall);if(!calls.length)break;
-      PG.contents.push({role:'user',parts:calls.map(c=>({functionResponse:{name:c.functionCall.name,response:{result:pgRunTool(c.functionCall.name,c.functionCall.args||{})}}}))});
+      PG.contents.push({role:'user',parts:await Promise.all(calls.map(async c=>({functionResponse:{name:c.functionCall.name,response:{result:await pgRunTool(c.functionCall.name,c.functionCall.args||{})}}})))});
     }
   }catch(e){if(e&&e.name!=='AbortError'){const m=String(e.message||e);pgUi({k:'bot',err:true,t:/not enabled for this model|function calling|multiturn/i.test(m)?'O modelo "'+pgCfg().model+'" não serve para o Pingado: ele precisa de conversa em vários turnos e de ferramentas (function calling). Em Ajustes > Pingado, toque em "Testar conexão" e escolha um modelo Gemini de texto, como o flash mais novo da lista.':'Erro: '+m});}}
   PG.busy=false;PG.abort=null;pgState('idle');
@@ -11873,6 +11883,7 @@ const PG_TASKS={
   revisoes:{label:'Organizar minhas revisões',prompt:()=>'Organize minhas revisões. Use ver_revisoes, questoes_erradas, ver_flashcards e horarios_livres dos próximos 7 dias. Priorize as atrasadas e os assuntos com mais erros. Em propor_mudancas, diga onde encaixar cada revisão: use reagendar_revisao (chave + nova_data) para as existentes e criar (eventos "Revisão: tema") nos horários livres, sem conflitos e sem sobrecarregar um dia. Explique o raciocínio em poucas linhas.'},
   questoes:{label:'Analisar meus erros no MedFisher',prompt:()=>'Analise as questões que eu errei (questoes_erradas, quantas puder). Agrupe por área e foco, aponte padrões e o que estudar primeiro. Proponha (propor_mudancas) revisões ou eventos de estudo em horários livres e flashcards (criar_cards, no meu estilo: veja exemplos_de_cards e minhas memórias) dos conceitos errados, no baralho mais adequado de ver_flashcards.'},
   flashcards:{label:'Sugestões para meus flashcards',prompt:()=>'Olhe meus flashcards (ver_flashcards) e revisões. Diga quais baralhos estão atrasados ou negligenciados, quais têm sanguessugas, e onde vale inserir novos cards (considere também as questões erradas e as notas recentes). Se fizer sentido, proponha criar_cards no meu estilo (exemplos_de_cards) e reagendar_revisao para encaixar o estudo dos atrasados nos horários livres.'},
+  slides:{label:'Ajuda com esta apresentação',prompt:c=>'Estou editando a apresentação id="'+c.id+'". Leia-a com ler_apresentacao e me ajude: aponte o que melhorar no conteúdo e na estrutura e escreva, slide a slide, os textos prontos para eu colar. Siga o sistema de design "Resumo Médico": português do Brasil direto e telegráfico, abreviações da área sem explicar, negrito só em termos-chave e condutas, setas (→, ↓) para causa e conduta, conteúdo fora da fonte marcado como "(acrescentado)", no máximo 6 linhas por slide, sem emoji. Pergunte o que faltar antes de escrever.'},
   nota_cards:{label:'Criar flashcards desta nota',prompt:c=>{const n=noteById(c.id);return 'Leia a nota id="'+c.id+'"'+(n&&n.title?' ("'+n.title+'")':'')+' com ler_nota e crie flashcards dela no MEU estilo: veja exemplos_de_cards e minhas memórias, e ver_flashcards para escolher o baralho certo (ou proponha um novo baralho). Use criar_cards com cards bem atômicos (cloze, básico ou invertido conforme o meu padrão). Não repita cards que já existem.';}},
   cul_semana:{label:'Planejar a semana de alimentação',prompt:()=>'Planeje meu cardápio da próxima semana. Use ver_despensa (validade e quantidades), listar_receitas, ver_cardapio, ver_orcamento e minhas memórias. Use primeiro o que vence antes, indique quantidades por refeição e proponha as refeições com criar (refeicoes) e o que falta comprar (mercado), com custo estimado e respeitando o orçamento.'},
   cul_vence:{label:'O que está para vencer e como usar',prompt:()=>'Veja a despensa (ver_despensa): liste o que vence nos próximos dias, as quantidades, e como usar cada item (receitas do meu livro ou ideias rápidas). Se houver itens sem validade, sugira valores com ajustar_despensa só quando eu informar; proponha refeições (criar) para consumir antes de vencer.'},
@@ -11905,7 +11916,7 @@ async function pgFillEvent(){
       const j=await pgCall({contents:contents,tools:tools,system:pgSystem()});
       const ps=(j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts)||[];if(!ps.length)break;
       contents.push({role:'model',parts:ps});const calls=ps.filter(p=>p.functionCall);if(!calls.length)break;
-      const resp=[];calls.forEach(c=>{if(c.functionCall.name==='preencher_campos'){got=c.functionCall.args||{};resp.push({functionResponse:{name:'preencher_campos',response:{result:{ok:true}}}});}else resp.push({functionResponse:{name:c.functionCall.name,response:{result:pgRunTool(c.functionCall.name,c.functionCall.args||{})}}});});
+      const resp=[];for(const c of calls){if(c.functionCall.name==='preencher_campos'){got=c.functionCall.args||{};resp.push({functionResponse:{name:'preencher_campos',response:{result:{ok:true}}}});}else resp.push({functionResponse:{name:c.functionCall.name,response:{result:await pgRunTool(c.functionCall.name,c.functionCall.args||{})}}});}
       contents.push({role:'user',parts:resp});
     }
   }catch(e){if(msg)msg.textContent='Erro: '+(e.message||e);if(btn)btn.disabled=false;return;}
@@ -13341,6 +13352,19 @@ function pptxSlideCount(buf){
   const u=new Uint8Array(buf);let t='';for(let i=0;i<u.length;i+=0x8000)t+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));
   const m=t.match(/ppt\/slides\/slide\d+\.xml/g);return m?new Set(m).size:0;
 }
+async function pptxText(buf){
+  const u=new Uint8Array(buf),dv=new DataView(buf);let e=-1;for(let i=u.length-22;i>=Math.max(0,u.length-70000);i--){if(dv.getUint32(i,true)===0x06054b50){e=i;break;}}
+  if(e<0)return [];const n=dv.getUint16(e+10,true);let p=dv.getUint32(e+16,true);const out=[],td=new TextDecoder();
+  for(let k=0;k<n;k++){
+    if(dv.getUint32(p,true)!==0x02014b50)break;const meth=dv.getUint16(p+10,true),cs=dv.getUint32(p+20,true),nl=dv.getUint16(p+28,true),xl=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),lo=dv.getUint32(p+42,true),name=td.decode(u.subarray(p+46,p+46+nl));
+    p+=46+nl+xl+cl;const m=name.match(/^ppt\/slides\/slide(\d+)\.xml$/);if(!m)continue;
+    const ln=dv.getUint16(lo+26,true),lx=dv.getUint16(lo+28,true),data=u.subarray(lo+30+ln+lx,lo+30+ln+lx+cs);
+    let xml='';try{if(meth===0)xml=td.decode(data);else{const ds=new DecompressionStream('deflate-raw'),w=ds.writable.getWriter();w.write(data);w.close();xml=await new Response(ds.readable).text();}}catch(er){}
+    const paras=(xml.match(/<a:p[ >][\s\S]*?<\/a:p>/g)||[]).map(pp=>(pp.match(/<a:t>([^<]*)<\/a:t>/g)||[]).map(t=>t.replace(/<\/?a:t>/g,'')).join('')).filter(Boolean);
+    out.push({n:Number(m[1]),linhas:paras.map(t=>t.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'"))});
+  }
+  return out.sort((a,b)=>a.n-b.n);
+}
 const DECKCRAFT_URL='deckcraft/index.html';
 const PPTX_MIME='application/vnd.openxmlformats-officedocument.presentationml.presentation';
 let SL=null; // apresentação aberta no DeckCraft: {x,frame,ready,dirty}
@@ -13356,17 +13380,28 @@ async function slImportFile(file,into){
     x.mid='';delete pdfWatch[x.id];save();pdfPush(x,buf,PPTX_MIME);UI.tab='notas';UI.nview={type:'slides',id:x.id};renderTabs();renderMain();window.scrollTo(0,0);
   }catch(e){toast(e.message||'Não consegui ler esse arquivo.');}
 }
+const SL_MATERIAS=[['cardiologia','Cardiologia','#B3261E'],['pneumologia','Pneumologia','#1F5FAF'],['neurologia','Neurologia','#0F766E'],['endocrinologia','Endocrinologia','#B45309']];
 function slNew(){
-  const x={id:uid(),title:'Nova apresentação',folderId:(UI.nf&&UI.nf!=='__none')?UI.nf:'',catId:'',fileId:'',fileName:'Nova apresentação.pptx',n:1,ratio:16/9,annots:{},created:Date.now(),updated:Date.now()};
+  openModal('<div class="fh"><h2>Nova apresentação</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div><p class="muted small" style="margin:0 0 10px">Começa do modelo <b>Resumo Médico</b> (capa, tópicos, tabela, fluxograma e caixas) já pronto: é só trocar os textos. Escolha a matéria, que define a cor de destaque.</p>'+
+    '<div class="slmat">'+SL_MATERIAS.map(m=>'<button type="button" class="slmb" data-a="sl-tpl" data-t="'+m[0]+'" style="--c:'+m[2]+'"><i></i><b>'+m[1]+'</b></button>').join('')+'</div>'+
+    '<div class="ff"><button type="button" class="btn" data-a="sl-tpl" data-t="">Em branco</button><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button></div>');
+}
+async function slCreate(tid){
+  closeModal();
+  const m=SL_MATERIAS.find(z=>z[0]===tid),x={id:uid(),title:m?'Resumo Médico | '+m[1]:'Nova apresentação',folderId:(UI.nf&&UI.nf!=='__none')?UI.nf:'',catId:'',fileId:'',fileName:(m?'Resumo Médico - '+m[1]:'Nova apresentação')+'.pptx',n:1,ratio:16/9,annots:{},created:Date.now(),updated:Date.now()};
+  if(m){
+    try{const r=await fetch('slides-templates/resumo-'+tid+'.pptx',{cache:'no-cache'});if(!r.ok)throw new Error(r.status);const buf=await r.arrayBuffer(),id=await SLF.hash(buf);await SLF.put(id,buf);x.fileId=id;x.n=pptxSlideCount(buf)||5;}
+    catch(e){toast('Não consegui carregar o modelo; abrindo uma apresentação em branco.');}
+  }
   S.slides.push(x);save();UI.tab='notas';UI.nview={type:'slides',id:x.id};renderTabs();renderMain();window.scrollTo(0,0);
 }
 let SL_INTO=null;
 $('#pptxFile').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';const into=SL_INTO?slideById(SL_INTO):null;SL_INTO=null;slImportFile(f,into);});
 function slViewHTML(x){
   return '<div class="nhead"><button class="btn sm ghost" data-a="sl-back">'+ic('chevL',14)+' Notas</button><span class="sp"></span><span id="pdfSync" class="pdfsync"></span>'+
-    '<button class="btn sm" data-a="sl-download" title="Baixar o arquivo .pptx">'+ic('download',14)+' .pptx</button>'+
+    pgBtn('slides','Ajuda do Pingado',' data-id="'+x.id+'"')+'<button class="btn sm" data-a="sl-download" title="Baixar o arquivo .pptx">'+ic('download',14)+' .pptx</button>'+
     '<button class="icon-btn" data-a="sl-rename" title="Renomear, pasta e categoria" aria-label="Editar informações">'+ic('edit',18)+'</button><button class="icon-btn" data-a="sl-del" title="Excluir" aria-label="Excluir">'+ic('trash',18)+'</button></div>'+
-    '<h2 class="vt" style="margin:0 0 6px">'+esc(x.title||'Apresentação')+'</h2><div class="muted small" id="slStatus" style="margin-bottom:8px">Carregando o DeckCraft…</div><div class="hostbox" id="slHost"></div>';
+    '<h2 class="vt" style="margin:0 0 6px">'+esc(x.title||'Apresentação')+'</h2><div class="muted small" id="slStatus" style="margin-bottom:8px">Carregando o editor…</div><div class="hostbox" id="slHost"></div>';
 }
 function slLeave(){if(SL&&SL.frame)SL.frame.remove();SL=null;}
 async function slMount(x){
@@ -13385,8 +13420,8 @@ async function slMount(x){
   pdfSyncPaint(x);
   slLeave();
   SL={x:x,buf:buf,ready:false,dirty:false,frame:null};
-  SL.frame=hostFrame(box,DECKCRAFT_URL+'?host=parent','DeckCraft');
-  setTimeout(()=>{if(SL&&SL.x===x&&!SL.ready){const s=$('#slStatus');if(s)s.innerHTML='O DeckCraft não respondeu (precisa de WebGPU ou WebGL2).'+(buf?' <button class="btn sm" data-a="sl-download">Baixar o .pptx</button>':'');}},25000);
+  SL.frame=hostFrame(box,DECKCRAFT_URL+'?host=parent','Editor de apresentações');
+  setTimeout(()=>{if(SL&&SL.x===x&&!SL.ready){const s=$('#slStatus');if(s)s.innerHTML='O editor não respondeu (precisa de WebGPU ou WebGL2).'+(buf?' <button class="btn sm" data-a="sl-download">Baixar o .pptx</button>':'');}},25000);
 }
 async function slHostMessage(d){
   const x=SL.x;
@@ -13394,20 +13429,21 @@ async function slHostMessage(d){
     SL.ready=true;
     if(SL.buf){const copy=SL.buf.slice(0);SL.frame.contentWindow.postMessage({type:'deckcraft:open',name:(x.fileName||x.title+'.pptx').replace(/[\\/:*?"<>|]/g,'_'),bytes:copy},location.origin,[copy]);}
     else SL.frame.contentWindow.postMessage({type:'deckcraft:new'},location.origin);
-    hostStatus('Edite e apresente aqui. Salve (Ctrl+S) para guardar as alterações.');
+    hostStatus('Edite e apresente aqui. As alterações são salvas automaticamente.');
   }else if(d.type==='deckcraft:dirty'){
-    SL.dirty=!!d.dirty;hostStatus(SL.dirty?'Alterações não salvas. Salve (Ctrl+S) antes de sair.':'Tudo salvo.');
+    SL.dirty=!!d.dirty;hostStatus(SL.dirty?'Salvando automaticamente…':'Tudo salvo.');
   }else if(d.type==='deckcraft:save'&&d.bytes){
     const buf=d.bytes,id=await SLF.hash(buf),old=x.fileId;
     await SLF.put(id,buf);
     if(old&&old!==id&&!S.slides.some(y=>y!==x&&y.fileId===old))SLF.del(old);
     x.fileId=id;SL.buf=buf;x.n=pptxSlideCount(buf)||x.n;x.updated=Date.now();x.thumb='';x.mid='';delete pdfWatch[x.id];save();pdfPush(x,buf,PPTX_MIME);
-    SL.dirty=false;toast('Apresentação salva.');hostStatus(RF.ok()?'Salva. Enviando para os outros aparelhos…':'Salva neste aparelho (sincronização desligada).');
+    SL.dirty=false;hostStatus(RF.ok()?'Salva. Enviando para os outros aparelhos…':'Salva neste aparelho (sincronização desligada).');
   }
 }
 Object.assign(ACT,{
   'sl-import'(){SL_INTO=null;$('#pptxFile').click();},
   'sl-new'(){slNew();},
+  'sl-tpl'(el){slCreate(el.dataset.t);},
   'ntm-sub'(el){const sb=el.closest('.ntmsub');if(sb)sb.classList.toggle('open');},
   'imp-pdf'(){ntmClose();openModal('<div class="fh"><h2>Importar PDF</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div><p class="muted small" style="margin:0 0 10px">Como você quer abrir o PDF?</p><div class="chooser"><button type="button" class="btn big" data-a="imp-pdf-ink">'+ic('pen',18)+'<span><b>Caderno</b><small>Escreva à mão sobre as páginas</small></span></button><button type="button" class="btn big" data-a="imp-pdf-view">'+ic('file',18)+'<span><b>Leitor de PDF</b><small>Ler, grifar e anotar no leitor</small></span></button></div>');},
   'imp-ppt'(){ntmClose();openModal('<div class="fh"><h2>PowerPoint</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div><p class="muted small" style="margin:0 0 10px">O que você quer fazer?</p><div class="chooser"><button type="button" class="btn big" data-a="imp-ppt-new">'+ic('plus',18)+'<span><b>Nova apresentação</b><small>Começa de um modelo pronto</small></span></button><button type="button" class="btn big" data-a="imp-ppt-file">'+ic('upload',18)+'<span><b>Importar apresentação</b><small>Abre um arquivo .pptx do aparelho</small></span></button></div>');},
@@ -13418,7 +13454,7 @@ Object.assign(ACT,{
   'sl-retry'(){const x=slideById(UI.nview&&UI.nview.id);if(x)slMount(x);},
   'sl-back'(){
     const go=()=>{slLeave();UI.nview=null;renderMain();};
-    if(SL&&SL.dirty)askConfirm('Sair sem salvar?','Há alterações que ainda não foram salvas (Ctrl+S dentro do DeckCraft).',go,'Sair');else go();
+    if(SL&&SL.dirty)askConfirm('Sair sem salvar?','Há alterações que ainda estão sendo salvas.',go,'Sair');else go();
   },
   'sl-download'(){const x=slideById(UI.nview&&UI.nview.id);if(!x||!x.fileId)return;SLF.get(x.fileId).then(b=>{if(b)downloadBuf(b,x.fileName||x.title+'.pptx','application/vnd.openxmlformats-officedocument.presentationml.presentation');else toast('O arquivo não está neste aparelho.');});},
   'sl-file'(){const v=UI.nview;SL_INTO=v&&v.type==='slides'?v.id:null;$('#pptxFile').click();},

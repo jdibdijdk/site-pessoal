@@ -60,6 +60,7 @@ jobs:
             cp "$GITHUB_WORKSPACE"/apps-patches/fonts/Poppins-*.ttf "$RUNNER_TEMP/$app/assets/fonts/"
           done
           git -C "$RUNNER_TEMP/deckcraft" apply "$GITHUB_WORKSPACE/apps-patches/deckcraft-font.patch"
+          git -C "$RUNNER_TEMP/deckcraft" apply "$GITHUB_WORKSPACE/apps-patches/deckcraft-host-ui.patch"
           git -C "$RUNNER_TEMP/pdfcraft" apply "$GITHUB_WORKSPACE/apps-patches/pdfcraft-font.patch"
           git -C "$RUNNER_TEMP/pdfcraft" apply "$GITHUB_WORKSPACE/apps-patches/pdfcraft-host-ui.patch"
 
