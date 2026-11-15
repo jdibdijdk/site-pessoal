@@ -11754,7 +11754,7 @@ async function pgSend(text,imgs){
       const calls=ps.filter(p=>p.functionCall);if(!calls.length)break;
       PG.contents.push({role:'user',parts:calls.map(c=>({functionResponse:{name:c.functionCall.name,response:{result:pgRunTool(c.functionCall.name,c.functionCall.args||{})}}}))});
     }
-  }catch(e){if(e&&e.name!=='AbortError'){const m=String(e.message||e);pgUi({k:'bot',err:true,t:/function calling/i.test(m)?'Este modelo não aceita ferramentas (function calling), que o Pingado precisa para ler e alterar seus dados. Em Ajustes > Pingado, toque em "Testar conexão" e escolha um modelo Gemini de texto, como gemini-2.5-flash.':'Erro: '+m});}}
+  }catch(e){if(e&&e.name!=='AbortError'){const m=String(e.message||e);pgUi({k:'bot',err:true,t:/not enabled for this model|function calling|multiturn/i.test(m)?'O modelo "'+pgCfg().model+'" não serve para o Pingado: ele precisa de conversa em vários turnos e de ferramentas (function calling). Em Ajustes > Pingado, toque em "Testar conexão" e escolha um modelo Gemini de texto, como gemini-2.5-flash.':'Erro: '+m});}}
   PG.busy=false;PG.abort=null;pgState('idle');
   // fotos antigas não voltam ao Gemini
   PG.contents.forEach(c=>{c.parts=c.parts.map(p=>p.inlineData?{text:'[foto enviada]'}:p);});
