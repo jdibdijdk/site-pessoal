@@ -11754,7 +11754,7 @@ async function pgSend(text,imgs){
       const calls=ps.filter(p=>p.functionCall);if(!calls.length)break;
       PG.contents.push({role:'user',parts:calls.map(c=>({functionResponse:{name:c.functionCall.name,response:{result:pgRunTool(c.functionCall.name,c.functionCall.args||{})}}}))});
     }
-  }catch(e){if(e&&e.name!=='AbortError'){const m=String(e.message||e);pgUi({k:'bot',err:true,t:/not enabled for this model|function calling|multiturn/i.test(m)?'O modelo "'+pgCfg().model+'" não serve para o Pingado: ele precisa de conversa em vários turnos e de ferramentas (function calling). Em Ajustes > Pingado, toque em "Testar conexão" e escolha um modelo Gemini de texto, como gemini-2.5-flash.':'Erro: '+m});}}
+  }catch(e){if(e&&e.name!=='AbortError'){const m=String(e.message||e);pgUi({k:'bot',err:true,t:/not enabled for this model|function calling|multiturn/i.test(m)?'O modelo "'+pgCfg().model+'" não serve para o Pingado: ele precisa de conversa em vários turnos e de ferramentas (function calling). Em Ajustes > Pingado, toque em "Testar conexão" e escolha um modelo Gemini de texto, como o flash mais novo da lista.':'Erro: '+m});}}
   PG.busy=false;PG.abort=null;pgState('idle');
   // fotos antigas não voltam ao Gemini
   PG.contents.forEach(c=>{c.parts=c.parts.map(p=>p.inlineData?{text:'[foto enviada]'}:p);});
@@ -11853,7 +11853,7 @@ function pgSettingsHTML(){
     '<label class="f">Senha do Pingado (PINGADO_TOKEN) <small>'+(S.prefs.pgSync?'sincronizada entre seus aparelhos':'fica só neste aparelho')+'</small><input data-pg="tok" type="password" value="'+esc(pgTok())+'" placeholder="a mesma cadastrada no Worker" autocomplete="off"></label>'+
     '<label class="sw" style="margin:0 0 10px"><input type="checkbox" data-pg="sync" '+(S.prefs.pgSync?'checked':'')+'> <b>Sincronizar a senha entre meus aparelhos</b></label><div class="muted small" style="margin:-4px 0 10px">Assim você digita uma vez só. Em troca, a senha vai junto com os dados do site na nuvem: quem conseguir ler esses dados poderia usar sua cota do Gemini. Desligado, cada aparelho guarda a sua.</div>'+
     '<div class="frow" style="align-items:flex-end"><label class="f" style="flex:1;min-width:220px">Modelo<select data-pg="model">'+(models.length?'':'<option value="">Teste a conexão para listar</option>')+models.map(m=>'<option value="'+esc(m.id)+'" '+(m.id===c.model?'selected':'')+'>'+esc(m.id+(m.name?' | '+m.name:''))+'</option>').join('')+'</select></label><button type="button" class="btn" data-a="pg-test">'+ic('zap',14)+' Testar conexão</button></div>'+
-    '<label class="f">Ou digite o id do modelo<input data-pg="modelIn" value="" placeholder="ex.: gemini-2.5-flash" autocomplete="off"></label><div id="pgTest" class="muted small"></div>'+
+    '<label class="f">Ou digite o id do modelo<input data-pg="modelIn" value="" placeholder="ex.: gemini-3.8-flash" autocomplete="off"></label><div id="pgTest" class="muted small"></div>'+
     '<div class="sechead" style="margin-top:14px">O que o Pingado pode fazer</div><div class="pgperm"><span></span><b>Ler</b><b>Propor mudanças</b>'+
     PG_DOMS.map(d=>'<span>'+esc(d[1])+'</span><input type="checkbox" data-pgp="read:'+d[0]+'" '+(c.read[d[0]]!==false?'checked':'')+' aria-label="Ler '+esc(d[1])+'"><input type="checkbox" data-pgp="write:'+d[0]+'" '+(c.write[d[0]]!==false?'checked':'')+' aria-label="Propor mudanças em '+esc(d[1])+'">').join('')+'</div>'+
     '<p class="muted small" style="margin:10px 0 0">Mudanças nunca são gravadas sem o seu OK no cartão de aprovação (com Desfazer). Ao perguntar, só os dados que o Pingado pedir por ferramenta são enviados ao Google.</p></div>';
@@ -11884,7 +11884,9 @@ Object.assign(ACT,{
     try{
       const r=await fetch(pgApi()+'/pingado/models',{headers:{'X-Pingado-Token':pgTok()}}),j=await r.json().catch(()=>({}));
       if(!r.ok)throw new Error(j.error||('Erro '+r.status));
-      PG.models=(j.models||[]).filter(m=>/^gemini/i.test(m.id)&&!/embed|imagen|tts|aqa|veo|image|live|audio|learnlm|robotics|computer-use/i.test(m.id));const c=pgCfg();if(!c.model&&PG.models.length){c.model=(PG.models.find(m=>/flash/.test(m.id))||PG.models[0]).id;S.prefs.pg=c;save();}
+      PG.models=(j.models||[]).filter(m=>/^gemini/i.test(m.id)&&!/embed|imagen|tts|aqa|veo|image|live|audio|learnlm|robotics|computer-use/i.test(m.id));const ver=id=>{const m=id.match(/(\d+(?:\.\d+)?)/);return m?parseFloat(m[1]):0;};PG.models.sort((x,y)=>ver(y.id)-ver(x.id)||x.id.localeCompare(y.id));
+      const c=pgCfg(),best=PG.models.find(m=>/flash/.test(m.id)&&!/lite/.test(m.id))||PG.models.find(m=>/flash/.test(m.id))||PG.models[0];
+      if(best&&(!c.model||!PG.models.some(m=>m.id===c.model))){c.model=best.id;S.prefs.pg=c;save();}
       renderMain();const o2=$('#pgTest');if(o2)o2.textContent='Conectado: '+PG.models.length+' modelos disponíveis.';
     }catch(e){if(out)out.textContent='Não consegui conectar: '+(e.message||e);}
   }
