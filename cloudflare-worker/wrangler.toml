@@ -4,3 +4,9 @@ compatibility_date = "2024-11-01"
 
 [triggers]
 crons = ["*/5 * * * *"]
+
+# Pingado (assistente Gemini). Segredos (nunca no código):
+#   npx wrangler secret put GEMINI_API_KEY     # chave do Google AI Studio
+#   npx wrangler secret put PINGADO_TOKEN      # senha qualquer; a mesma vai em Ajustes > Pingado
+#   npx wrangler secret put ALLOWED_ORIGINS    # ex.: https://SEU-USUARIO.github.io (endereço do site)
+#   npx wrangler deploy

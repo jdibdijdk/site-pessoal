@@ -57,6 +57,44 @@ export async function run(env = {}, now = Date.now()) {
   return log;
 }
 
+
+// ----- Pingado: ponte segura para o Gemini -----
+// Segredos: GEMINI_API_KEY (chave do Google AI Studio), PINGADO_TOKEN (senha que o site envia), ALLOWED_ORIGINS (endereços do site, separados por vírgula)
+const PG_MODEL = /^[A-Za-z0-9][A-Za-z0-9._-]{2,80}$/;
+const PG_MAX = 8 * 1024 * 1024;
+async function pingado(request, env, u) {
+  const origins = String(env.ALLOWED_ORIGINS || '').split(',').map((x) => x.trim().replace(/\/$/, '')).filter(Boolean);
+  const origin = request.headers.get('Origin') || '';
+  const okOrigin = !origins.length || origins.includes(origin);
+  const cors = { 'Access-Control-Allow-Origin': okOrigin && origin ? origin : (origins[0] || 'null'), 'Access-Control-Allow-Headers': 'Content-Type, X-Pingado-Token', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Vary': 'Origin', 'Content-Type': 'application/json' };
+  const out = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: cors });
+  if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
+  if (!env.GEMINI_API_KEY || !env.PINGADO_TOKEN) return out({ error: 'O Worker ainda não tem os segredos GEMINI_API_KEY e PINGADO_TOKEN.' }, 503);
+  if (!okOrigin) return out({ error: 'Origem não permitida.' }, 403);
+  if (request.headers.get('X-Pingado-Token') !== env.PINGADO_TOKEN) return out({ error: 'Token do Pingado inválido.' }, 401);
+  const base = 'https://generativelanguage.googleapis.com/v1beta/';
+  const headers = { 'x-goog-api-key': env.GEMINI_API_KEY, 'Content-Type': 'application/json' };
+  try {
+    if (u.pathname === '/pingado/models' && request.method === 'GET') {
+      const r = await fetch(base + 'models?pageSize=200', { headers });
+      const j = await r.json();
+      if (!r.ok) return out({ error: (j.error && j.error.message) || 'Erro do Google (' + r.status + ')' }, r.status);
+      const models = (j.models || []).filter((m) => (m.supportedGenerationMethods || []).includes('generateContent')).map((m) => ({ id: String(m.name).replace(/^models\//, ''), name: m.displayName || '', desc: (m.description || '').slice(0, 140) }));
+      return out({ models });
+    }
+    if (u.pathname === '/pingado/generate' && request.method === 'POST') {
+      const model = u.searchParams.get('model') || '';
+      if (!PG_MODEL.test(model)) return out({ error: 'Modelo inválido.' }, 400);
+      const body = await request.text();
+      if (body.length > PG_MAX) return out({ error: 'Pedido grande demais.' }, 413);
+      const r = await fetch(base + 'models/' + encodeURIComponent(model) + ':generateContent', { method: 'POST', headers, body });
+      const t = await r.text();
+      return new Response(t, { status: r.status, headers: cors });
+    }
+    return out({ error: 'Rota desconhecida.' }, 404);
+  } catch (e) { return out({ error: 'Falha ao falar com o Google: ' + (e && e.message || e) }, 502); }
+}
+
 export default {
   async scheduled(event, env, ctx) { ctx.waitUntil(run(env).then((l) => console.log(l.join('\n') || 'Nada a enviar.'))); },
   async fetch(request, env) {
@@ -73,5 +111,7 @@ export default {
         return new Response(JSON.stringify({ title }), { headers: cors });
       } catch (e) { return new Response(JSON.stringify({ title: '' }), { headers: cors }); }
     }
+    // Pingado (assistente Gemini): a chave fica só aqui, nos segredos do Worker
+    if (u.pathname.startsWith('/pingado/')) return pingado(request, env, u);
     return new Response(env.VAPID_PRIVATE ? 'Rotina de Estudos · avisos ativos (verifica a cada 5 minutos).' : 'Falta configurar o segredo VAPID_PRIVATE.', { headers: { 'content-type': 'text/plain; charset=utf-8' } }); },
 };
