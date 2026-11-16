@@ -1286,7 +1286,7 @@ html[data-theme="dark"] .stg.s1{background:#1E3329}html[data-theme="dark"] .stg.
 .hc.on{background:var(--okd)}
 .hc.miss{background:var(--line3)}
 .hc.off{background:transparent;border:1px dashed var(--line2)}
-.hc.now{background:var(--soft);border:1px solid var(--okd)}
+.hc.now{background:var(--soft);border:1px solid var(--okd);position:static;left:auto;right:auto;z-index:auto;pointer-events:auto}
 .hc.td{outline:2px solid var(--acc);outline-offset:1px}
 .hbup{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--accs);color:var(--ink);font-size:13.5px}
 .hbintro{display:grid;gap:14px;padding:6px 2px}
@@ -2556,6 +2556,10 @@ html[data-theme="dark"] .pgh{background:linear-gradient(180deg,#2B2119,transpare
 
 .slmat{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 14px}.slmb{display:flex;align-items:center;gap:10px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:14px;text-align:left}
 .slmb i{width:22px;height:22px;border-radius:5px;background:var(--c);flex:none}.slmb:hover{background:var(--soft);border-color:var(--c)}
+
+.pgsugg{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-4px 0 8px;padding:8px 10px;border:1px dashed #C9996C;border-radius:12px;background:var(--soft);font-size:13px}
+.pgsugg .pgst{flex:1 1 220px;min-width:0;overflow-wrap:anywhere;color:var(--tx)}.pgsugg .pgst b{color:#946C4A}.pgsugg .pgsi{display:inline-flex;width:16px;height:16px}
+.icopick .icogrid{max-height:160px;overflow:auto}
 </style>
 </head>
 <body>
@@ -3786,11 +3790,16 @@ function occDetail(o,opt){
   h+=secHTML('Tarefas',tr.length?tr.map(x=>'<p>'+x+'</p>').join(''):'');
   return h;
 }
+// Foco tem prioridade sobre a Categoria: cor, ícone e etiqueta saem do Foco quando existe
+const evFoco=a=>focoIdsOf(a).map(focoById).filter(Boolean)[0]||null;
+const evColor=a=>{const f=evFoco(a);return f?focoStyle(f).color:catColor(a.catId);};
+const evIcon=a=>{const f=evFoco(a);return f?focoStyle(f).icon:catIcon(a.catId);};
+const evTags=a=>{const f=evFoco(a);return (f?focoPill(f,true):'')+(a.catId?tagHTML(a.catId):'');};
 function tcard(o){
-  const a=o.act,col=catColor(a.catId),weekly=o.slot.mode==='weekly';
+  const a=o.act,col=evColor(a),weekly=o.slot.mode==='weekly';
   return '<article class="tcard '+(o.done?'done':o.miss?'miss':'')+'" style="--c:'+col+';--ct:'+ink(col)+'">'+
     '<div class="tt"><b>'+o.start+'</b><span>'+o.end+'</span></div>'+
-    '<div class="tb"><div class="tr">'+tagHTML(a.catId)+'<span class="kd">'+esc(blockById(a.blockType).label)+'</span>'+(weekly?'<span class="rp" title="Repete toda semana">'+ic('repeat',13)+'</span>':'')+'</div>'+
+    '<div class="tb"><div class="tr">'+evTags(a)+'<span class="kd">'+esc(blockById(a.blockType).label)+'</span>'+(weekly?'<span class="rp" title="Repete toda semana">'+ic('repeat',13)+'</span>':'')+'</div>'+
     '<h3>'+esc(aT(a))+'</h3>'+occDetail(o)+'</div>'+
     '<div class="ts"><button class="chk big '+(o.done?'on':'')+'" data-a="toggle-occ" data-aid="'+a.id+'" data-key="'+esc(o.key)+'" aria-label="Marcar como concluída" title="Concluir">'+ic('check',18)+'</button>'+(o.done?'':'<button class="icon-btn missb '+(o.miss?'on':'')+'" data-a="miss-occ" data-aid="'+a.id+'" data-key="'+esc(o.key)+'" title="'+(o.miss?'Desfazer o Não fiz':'Não fiz')+'" aria-label="Não fiz">'+ic('x',17)+'</button>')+
     '<button class="icon-btn" data-a="edit-act" data-aid="'+a.id+'" title="Editar" aria-label="Editar">'+ic('edit',17)+'</button>'+
@@ -3827,14 +3836,14 @@ const hoursStr=list=>{const m=list.reduce((s,o)=>s+tmin(o.end)-tmin(o.start),0);
 const GRID_DESK=window.innerWidth>760,GPX=GRID_DESK?64:96; // computador: grade mais compacta
 const GRID_LO=360,GRID_HI=1380;
 function gridEvHTML(ev,lo,hi,span,print,pxh){
-  const o=ev.o,a=o.act,col=catColor(a.catId),w=100/ev.n,dur=ev.e-ev.s,s0=Math.max(ev.s,lo),e0=Math.min(ev.e,hi),hpx=(e0-s0)*pxh/60,qk=!print&&quickOf(a);
+  const o=ev.o,a=o.act,col=evColor(a),w=100/ev.n,dur=ev.e-ev.s,s0=Math.max(ev.s,lo),e0=Math.min(ev.e,hi),hpx=(e0-s0)*pxh/60,qk=!print&&quickOf(a);
   const pos='top:'+((s0-lo)/span*100)+'%;height:'+((e0-s0)/span*100)+'%;left:calc('+(ev.lane*w)+'% + '+(GRID_DESK&&!print?3:1)+'px);width:calc('+w+'% - '+(GRID_DESK&&!print?7:3)+'px);--c:'+col+';--ct:'+inkG(col)+';--cb:'+shade(col,.55);
   const act=print?'':' data-a="open-occ" data-aid="'+a.id+'" data-key="'+esc(o.key)+'" role="button" tabindex="0"';
   const pt=actParts(a),where=[a.place,a.teacher].filter(Boolean).join(' | ');
   const tip=[aT(a),o.start+'–'+o.end,where].filter(Boolean).join(' | ');
   if(qk||dur<=15){ // atalhos rápidos e eventos de até 15 min: só o ícone
     const sz=qk?16:Math.max(9,Math.min(14,Math.round(hpx)));
-    return '<div class="ev ico '+(qk?'qk ':'')+(dur<=15?'tiny ':'')+(o.done?'done':o.miss?'miss':'')+'" style="'+pos+'"'+act+' title="'+esc(tip)+'" aria-label="'+esc(tip)+'">'+ic(qk?qk.icon:catIcon(a.catId),sz)+'</div>';
+    return '<div class="ev ico '+(qk?'qk ':'')+(dur<=15?'tiny ':'')+(o.done?'done':o.miss?'miss':'')+'" style="'+pos+'"'+act+' title="'+esc(tip)+'" aria-label="'+esc(tip)+'">'+icoHTML(qk?qk.icon:evIcon(a),sz)+'</div>';
   }
   if(!print)return gridEvCard(ev,o,a,pt,pos,act,tip,hpx);
   // Cartão: horário, título em negrito (tipo | tema), caminho da categoria, local/professor, o que fazer, refeição e marcadores.
@@ -3848,7 +3857,8 @@ function gridEvHTML(ev,lo,hi,span,print,pxh){
   if(left>=1){inc.time=1;left--;}
   const want=Math.min(Math.ceil(title.length/cpl),L>=9?5:4);
   if(want>1&&left>=1){const x=Math.min(want-1,left);inc.head+=x;left-=x;}
-  [['thm',!!thm],['area',!!area],['where',!!where],['food',!!food],['dw',!!dw],['bds',!!bd]].forEach(x=>{if(x[1]&&left>=1){inc[x[0]]=1;left--;}});
+  const fo=evFoco(a),fname=fo?fo.name:'';
+  [['foc',!!fname],['thm',!!thm],['area',!!area],['where',!!where],['food',!!food],['dw',!!dw],['bds',!!bd]].forEach(x=>{if(x[1]&&left>=1){inc[x[0]]=1;left--;}});
   if(inc.dw&&left>=1){inc.dw+=Math.min(left,2);left-=Math.min(left,2);}
   if(inc.area&&left>=1&&area.length>cpl){inc.area=2;left--;}
   if(inc.where&&left>=1&&where.length>cpl){inc.where=2;left--;}
@@ -3856,13 +3866,14 @@ function gridEvHTML(ev,lo,hi,span,print,pxh){
   let h='';
   if(inc.time)h+='<i>'+o.start+(nar>1?'–':' às ')+o.end+'</i>';
   h+='<b><span class="ln"'+clamp(inc.head)+'>'+esc(inc.head===1&&want>1&&nar===1?(pt.tipo||title):title)+'</span></b>';
+  if(inc.foc)h+='<em class="ln"'+clamp(1)+'>'+esc(fname)+'</em>';
   if(inc.thm)h+='<span class="th ln"'+clamp(2)+'>'+esc(thm)+'</span>';
   if(inc.area)h+='<em class="ln"'+clamp(inc.area)+'>'+esc(area)+'</em>';
   if(inc.where)h+='<em class="ln"'+clamp(inc.where)+'>'+esc(where)+'</em>';
   if(inc.food)h+='<span class="th ln"'+clamp(1)+'>'+esc(food)+'</span>';
   if(inc.dw)h+='<span class="th dw ln"'+clamp(inc.dw)+'>'+esc(dw)+'</span>';
   if(inc.bds)h+='<span class="bds">'+bd+'</span>';
-  if(!print&&nar===1&&inc.time&&hpx>=40)h+='<span class="eic">'+ic(catIcon(a.catId),14)+'</span>';
+  if(!print&&nar===1&&inc.time&&hpx>=40)h+='<span class="eic">'+icoHTML(evIcon(a),14)+'</span>';
   return '<div class="ev '+(ev.n>1?'nar'+Math.min(ev.n,3)+' ':'')+(o.done?'done':o.miss?'miss':'')+'" style="'+pos+'"'+act+' title="'+esc(tip)+'">'+h+'</div>';
 }
 // Bloco da grade na tela: uma informação por linha (horário, título, categoria, local, professor, o que levar, tarefas…),
@@ -3876,6 +3887,7 @@ function gridEvCard(ev,o,a,pt,pos,act,tip,hpx){
   const L2=[ // [classe, ícone, texto]
     ['tm','',o.start+' – '+o.end],
     ['tt','',title],
+    ['fc',evFoco(a)?focoStyle(evFoco(a)).icon:'',evFoco(a)?evFoco(a).name:''],
     ['ar','',area],
     ['pl','pin',a.place],
     ['pr','user',a.teacher],
@@ -3886,7 +3898,7 @@ function gridEvCard(ev,o,a,pt,pos,act,tip,hpx){
   let rows=L2;
   if(L<rows.length){rows=[L2[1]];if(L>=2)rows.unshift(L2[0]);rows=rows.concat(L2.slice(2,2+Math.max(0,L-rows.length)));}
   const tt2=L>=rows.length+1&&title.length>(nar===1?20:10); // sobra espaço: o título usa duas linhas
-  const h=rows.map(x=>'<span class="el el-'+x[0]+'"'+(x[0]==='tt'&&tt2?' style="-webkit-line-clamp:2;white-space:normal"':'')+'>'+(x[1]&&nar===1?ic(x[1],11):'')+esc(x[2])+'</span>').join('');
+  const h=rows.map(x=>'<span class="el el-'+x[0]+'"'+(x[0]==='tt'&&tt2?' style="-webkit-line-clamp:2;white-space:normal"':'')+'>'+(x[1]&&nar===1?icoHTML(x[1],11):'')+esc(x[2])+'</span>').join('');
   return '<div class="ev ev2 '+(nar>1?'nar'+nar+' ':'')+(o.done?'done':o.miss?'miss':'')+'" style="'+pos+'"'+act+' title="'+esc(tip)+'">'+h+'</div>';
 }
 const gpxFit=hrs=>GRID_DESK?Math.max(30,Math.min(64,(window.innerHeight-260)/Math.max(1,hrs))):GPX;
@@ -3953,11 +3965,11 @@ function listaHTML(ws,occ,dues,dts,rev){
       h+='<div class="lrow dtm" data-a="view-date" data-id="'+x.id+'" role="button" tabindex="0"><span>'+ic('calendar',16)+'</span><div class="lt">'+esc(x.cat)+'</div><div class="lm"><b>'+esc(x.title)+'</b><div class="small muted">'+cdInfo(x.date).t+(x.time?' | '+x.time:'')+'</div></div><div class="rp"></div></div>';
     });
     os.forEach(o=>{
-      const a=o.act,col=catColor(a.catId),pt=actParts(a);
+      const a=o.act,col=evColor(a),pt=actParts(a);
       h+='<div class="lrow '+(o.done?'done':o.miss?'miss':'')+'" style="--c:'+col+'" data-a="open-occ" data-aid="'+a.id+'" data-key="'+esc(o.key)+'" role="button" tabindex="0">'+
         '<button class="chk sm '+(o.done?'on':'')+'" data-a="toggle-occ" data-aid="'+a.id+'" data-key="'+esc(o.key)+'" aria-label="Concluir">'+ic('check',12)+'</button>'+
         '<div class="lt">'+o.start+' – '+o.end+'</div><div class="lm"><b>'+esc([pt.tipo,pt.theme,pt.disc,pt.eixo].filter(Boolean).join(' | '))+'</b>'+
-        '<div class="small muted">'+tagHTML(a.catId)+(a.place?'<span class="mi">'+ic('pin',12)+esc(a.place)+'</span>':'')+(a.teacher?'<span class="mi">'+ic('user',12)+esc(a.teacher)+'</span>':'')+'<span class="bds row">'+badgesHTML(a,o.date)+'</span></div>'+
+        '<div class="small muted">'+evTags(a)+(a.place?'<span class="mi">'+ic('pin',12)+esc(a.place)+'</span>':'')+(a.teacher?'<span class="mi">'+ic('user',12)+esc(a.teacher)+'</span>':'')+'<span class="bds row">'+badgesHTML(a,o.date)+'</span></div>'+
         (textLines(a.doWhat).length?'<div class="small muted clip">'+esc(textLines(a.doWhat)[0])+'</div>':'')+'</div>'+
         '<div class="rp">'+(o.slot.mode==='weekly'?ic('repeat',14):'')+(o.done?'':'<button class="icon-btn sm missb '+(o.miss?'on':'')+'" data-a="miss-occ" data-aid="'+a.id+'" data-key="'+esc(o.key)+'" title="'+(o.miss?'Desfazer o Não fiz':'Não fiz')+'" aria-label="Não fiz">'+ic('x',14)+'</button>')+'</div></div>';
     });
@@ -4418,6 +4430,39 @@ const ICON_SETS=[
  ['Natureza',[['flame','fogo'],['leaf','folha'],['tree','árvore'],['sprout','broto'],['drop','água'],['paw','animais'],['snow','neve frio'],['mountain','montanha'],['sun','sol'],['moon','lua'],['cloud','nuvem'],['road','estrada']]]
 ];
 // ícone guardado como nome do conjunto ou como emoji ("e:🫀")
+Object.assign(ICONS,{
+ mamadeira:'<path d="M10 2h4M11 2v2.5M13 2v2.5"/><path d="M9 5h6v2.5l1 1.5v10a2 2 0 01-2 2h-4a2 2 0 01-2-2V9l1-1.5z"/><path d="M9 12.500h3M9 15.500h3M9 18.500h3"/>',
+ prostata:'<path d="M5 9c0-3 3-4 7-4s7 1 7 4c0 4-3 8-7 8s-7-4-7-8z"/><path d="M12 5V2M12 17v5"/><circle cx="12" cy="11" r="1.600"/>',
+ ureter:'<path d="M8 3a4 4 0 00-4 4c0 2 1 3 3 3h1V3z"/><path d="M8 10v4c0 3 3 3 3 6"/><circle cx="13" cy="20.500" r="1.800"/><path d="M15 6c2 0 4 1 4 3"/>',
+ hemacia:'<ellipse cx="12" cy="12" rx="9" ry="6.500"/><ellipse cx="12" cy="12" rx="4" ry="2.300"/>',
+ ligamento:'<path d="M9 2v6c0 2 1 3 2 3.500M15 22v-6c0-2-1-3-2-3.500"/><path d="M9.500 10.500l5 3M11.500 8.500l3.500 7M8.500 11.500l3.500 7"/>',
+ estomago:'<path d="M8 3h3v3c0 2 2 3 4 3 3 0 5 2 5 6a5 5 0 01-9 3c-2-1-3-3-3-5V8"/><path d="M7 3v5"/>',
+ figado:'<path d="M3 11c0-3 3-5 8-5 6 0 10 2 10 5 0 4-5 7-9 7-3 0-4-2-6-3-2-1-3-2-3-4z"/><path d="M9 10c2 0 3 1 3 3"/>',
+ intestino:'<path d="M6 4h12a3 3 0 010 6H8a3 3 0 000 6h10a3 3 0 010 4H6"/>',
+ pancreas:'<path d="M3 11c3-3 6 0 9-1s5-4 8-2c2 1 1 4-2 5-3 1-6 1-8 3-3 3-6 1-7-5z"/>',
+ baco:'<path d="M6 7c0-3 5-4 9-2 4 2 4 7 1 11-2 3-6 4-8 2-3-2-4-8-2-11z"/>',
+ bexiga:'<path d="M12 3v3"/><path d="M6 14a6 6 0 0112 0c0 3-3 6-6 6s-6-3-6-6z"/><path d="M9 14h6"/>',
+ mama:'<path d="M4 14c0-5 3-9 8-9s8 4 8 9"/><path d="M4 14h16"/><circle cx="12" cy="10" r="1.500"/>',
+ nariz:'<path d="M12 3v9c0 3-5 3-5 6 0 2 2 3 5 3s5-1 5-3c0-3-5-3-5-6"/>',
+ pele:'<rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 10h18M3 15h18M8 7h.01M15 7h.01M11 12.500h.01"/>',
+ musculo:'<path d="M4 14c3 0 3-4 6-5 3-1 5-4 8-3 2 1 3 4 1 7-1 2-4 4-7 4-5 0-6 1-8-3z"/>',
+ joelho:'<path d="M9 2v7c0 2 1 3 3 3s3-1 3-3V2M9 22v-7c0-2 1-3 3-3s3 1 3 3v7"/>',
+ coluna:'<rect x="9" y="3" width="6" height="4" rx="1.500"/><rect x="9" y="9" width="6" height="4" rx="1.500"/><rect x="9" y="15" width="6" height="4" rx="1.500"/><path d="M5 5h2M17 5h2M5 11h2M17 11h2M5 17h2M17 17h2"/>',
+ cranio:'<path d="M12 3a8 8 0 00-5 14v3h10v-3a8 8 0 00-5-14z"/><circle cx="9" cy="11" r="1.500"/><circle cx="15" cy="11" r="1.500"/><path d="M10 20v-3M14 20v-3M12 14v2"/>',
+ celula:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M6 8h.01M17 16h.01"/>',
+ vacina:'<path d="M9 2h6M10 2v3h4V2"/><path d="M9 5h6v3l1 2v9a2 2 0 01-2 2h-4a2 2 0 01-2-2v-9l1-2z"/><path d="M9 13h6"/>',
+ bolsa_sangue:'<path d="M8 3h8v3a5 5 0 011 3v8a4 4 0 01-4 4h-2a4 4 0 01-4-4V9a5 5 0 011-3z"/><path d="M12 11c-1.500 2-2 3-2 4a2 2 0 004 0c0-1-.5-2-2-4z"/>',
+ cadeira_rodas:'<circle cx="9" cy="16" r="4"/><path d="M8 4v8h6l3 5h3M8 8h6"/>',
+ muleta:'<path d="M9 3h6M12 3v8l4 10M10 11h4M17 21h4"/>',
+ insulina:'<rect x="3" y="9" width="14" height="6" rx="2"/><path d="M17 11h4M17 13h4M7 9v6M11 12h2"/>',
+ glicosimetro:'<rect x="6" y="2" width="12" height="20" rx="3"/><rect x="9" y="5" width="6" height="5" rx="1"/><circle cx="12" cy="16" r="2"/>',
+ hormonio:'<circle cx="6" cy="8" r="2.500"/><circle cx="18" cy="6" r="2.500"/><circle cx="14" cy="18" r="2.500"/><path d="M8 9l4 7M8 7.500l7.500-1M17 8l-2 8"/>',
+ neuronio:'<circle cx="12" cy="12" r="3"/><path d="M12 9V4M14.500 10.500L19 7M14.500 13.500L19 17M9.500 13.500L5 17M9.500 10.500L5 7M12 15v5"/>',
+ vaso:'<path d="M3 8c4 0 5 4 9 4s5-4 9-4M3 16c4 0 5-4 9-4s5 4 9 4"/>',
+ traqueia:'<path d="M12 2v10M12 12l-5 5v4M12 12l5 5v4M10 4h4M10 7h4M10 10h4"/>'
+});
+ICON_SETS[0][1].push(['mamadeira','mamadeira pediatria'],['vacina','vacina frasco'],['bolsa_sangue','bolsa de sangue hemoterapia'],['cadeira_rodas','cadeira de rodas reabilitação'],['muleta','muleta geriatria'],['insulina','caneta insulina'],['glicosimetro','glicosímetro diabetes'],['hormonio','hormônio molécula'],['celula','célula oncologia'],['hemacia','hemácia sangue'],['puzzle','quebra-cabeça autismo psiquiatria']);
+ICON_SETS.splice(1,0,['Anatomia',[['igBrain','cérebro'],['cranio','crânio'],['neuronio','neurônio'],['eye','olho'],['ear','ouvido'],['nariz','nariz'],['tooth','dente'],['traqueia','traqueia'],['lungs','pulmão'],['heart','coração'],['vaso','vasos'],['estomago','estômago'],['figado','fígado'],['pancreas','pâncreas'],['baco','baço'],['intestino','intestino'],['igKidney','rim'],['ureter','ureter'],['bexiga','bexiga'],['prostata','próstata'],['uterus','útero'],['mama','mama'],['thyroid','tireoide'],['pele','pele'],['musculo','músculo'],['igBone','osso'],['coluna','coluna'],['joelho','articulação joelho'],['ligamento','ligamento reumatologia'],['igBaby','bebê'],['pregnant','gestante']]]);
 const icoHTML=(n,size)=>{size=size||16;return /^e:/.test(n||'')?'<span class="emo" style="font-size:'+Math.round(size*.95)+'px;width:'+size+'px;height:'+size+'px" aria-hidden="true">'+esc(String(n).slice(2))+'</span>':ic(n,size);};
 const FOLDER_PASTEL=['#F2A7A7','#F6C28B','#F3DE8A','#A9DDB0','#8FD6CC','#9CCBF2','#B6B4F2','#D8B4F0','#F2B0D2','#C9CED6'];
 function hexHS(hex){ // matiz e saturação (0–100) de uma cor
@@ -4449,6 +4494,22 @@ function iconGridHTML(st,def,q){
     items.forEach(x=>{if(seen[x[0]])return;seen[x[0]]=1;out+='<button type="button" class="ibtn lki'+((st.icon||def)===x[0]?' on':'')+'" data-i="'+x[0]+'" title="'+esc(x[1].split(' ')[0])+'" aria-label="'+esc(x[1].split(' ')[0])+'">'+ic(x[0],18)+'</button>';});
   });
   return out||'<span class="muted small">Nenhum ícone encontrado.</span>';
+}
+function iconPickHTML(cur,def){
+  const emo=/^e:/.test(cur||'')?String(cur).slice(2):'';
+  return '<div class="f icopick" data-def="'+esc(def)+'"><span>Ícone <small>opcional: sem escolher, segue o módulo</small></span><input type="hidden" name="icon" value="'+esc(cur||'')+'"><input type="search" class="icoq" placeholder="Buscar ícone (ex.: pediatria, osso)" autocomplete="off">'+
+    '<div class="icotabs">'+ICON_SETS.map(g=>'<button type="button" data-g="'+g[0]+'" class="'+(UI.icoTab===g[0]?'on':'')+'">'+g[0]+'</button>').join('')+'</div><div class="icons icogrid">'+iconGridHTML({icon:cur||''},def,'')+'</div>'+
+    '<label class="f"><small>ou um emoji</small><input class="icoemo" maxlength="8" value="'+esc(emo)+'" style="max-width:120px" autocomplete="off"></label></div>';
+}
+function iconPickBind(form){
+  const box=$('.icopick',form);if(!box)return;const hid=$('[name=icon]',box),def=box.dataset.def,q=$('.icoq',box),emo=$('.icoemo',box);
+  const grid=()=>{$('.icogrid',box).innerHTML=iconGridHTML({icon:hid.value},def,q.value);$$('.icotabs button',box).forEach(b=>b.classList.toggle('on',b.dataset.g===UI.icoTab&&!q.value));};
+  box.addEventListener('click',e=>{const i=e.target.closest('.lki'),t=e.target.closest('.icotabs button');
+    if(i){hid.value=i.dataset.i===def?'':i.dataset.i;emo.value='';grid();}
+    else if(t){UI.icoTab=t.dataset.g;q.value='';grid();}});
+  q.addEventListener('input',grid);
+  emo.addEventListener('input',()=>{const v=emo.value.trim();hid.value=v?'e:'+v:'';grid();});
+  grid();
 }
 function openFolderLook(k,id){
   const isDeck=k==='k',f=isDeck?deckById(id):folderObj(k,id);if(!f)return;
@@ -5149,7 +5210,7 @@ function renderSlotPrev(){
   let col='';for(let m=lo+60;m<hi;m+=60)col+='<div class="hl" style="top:'+((m-lo)/span*100)+'%"></div>';
   const evs=busy.map(o=>({o:o,s:tmin(o.start),e:Math.max(tmin(o.end),tmin(o.start)+5)}));
   layoutDay(evs).forEach(ev=>{
-    const a=ev.o.act,w=100/ev.n,col2=catColor(a.catId),hp=(ev.e-ev.s)*SPX/60,one=hp<30;
+    const a=ev.o.act,w=100/ev.n,col2=evColor(a),hp=(ev.e-ev.s)*SPX/60,one=hp<30;
     col+='<div class="sp-b" style="top:'+((ev.s-lo)/span*100)+'%;height:'+((ev.e-ev.s)/span*100)+'%;left:calc('+(ev.lane*w)+'% + 1px);width:calc('+w+'% - 3px);--c:'+col2+';--ct:'+ink(col2)+'" title="'+esc(aT(a)+' | '+ev.o.start+'–'+ev.o.end)+'">'+(one?'<span class="ln">'+esc(nm(ev.o))+'</span>':'<i>'+ev.o.start+'–'+ev.o.end+'</i><span class="ln">'+esc(nm(ev.o))+'</span>')+'</div>';
   });
   if(sm!=null)col+='<div class="sp-new '+(clash.length?'bad':'')+'" style="top:'+((sm-lo)/span*100)+'%;height:'+(Math.max(3,(em-sm)/span*H)/H*100)+'%"></div>';
@@ -5351,6 +5412,7 @@ function openTaskForm(opts){
   const p=Object.assign({title:'',notes:'',obs:'',deadline:'',deadlineTime:'',catId:'',docId:'',activityIds:[],goalIds:[],dateIds:[],link:'',linkIds:[],itemIds:[],where:'',plan:{},moneys:[],group:'',subs:[],min:0,focoIds:[]},t0||{},opts.prefill||{});
   openModal('<form id="fTask" class="form"><div class="fh"><h2>'+(t0?'Editar tarefa':'Nova tarefa')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<label class="f">Título<input name="title" required value="'+esc(p.title)+'" autocomplete="off"></label>'+
+    '<div class="pgfillrow"><button type="button" class="btn sm pgb" data-a="pg-fill-task" title="O Pingado completa descrição, metodologia, observações e tempo com base no título e em tarefas passadas; se você já escreveu algo, ele sugere ao lado"><span class="pgbi16">'+pgMascot('idle',16)+'</span> Delegar ao Pingado</button><span id="pgFillMsg" class="muted small">Completa as colunas vazias e sugere melhorias nas que você já escreveu.</span></div>'+
     '<label class="f">Descrição / o que falta<textarea name="notes" rows="2">'+esc(p.notes)+'</textarea></label>'+
     '<label class="f">Observações<textarea name="obs" rows="2" placeholder="Anotações livres sobre esta tarefa">'+esc(p.obs||'')+'</textarea></label>'+
     '<div class="fgrid"><label class="f">Tempo estimado (min)<input type="number" name="min" min="0" step="5" value="'+esc(p.min||'')+'"></label><label class="f">Grupo <small>ex.: TCC, Estágio</small><input name="group" list="tgroups" value="'+esc(p.group||'')+'" autocomplete="off"><datalist id="tgroups">'+[...new Set(S.tasks.map(t=>t.group).filter(Boolean))].map(g=>'<option value="'+esc(g)+'">').join('')+'</datalist></label>'+
@@ -5557,7 +5619,7 @@ function openOcc(aid,key){
   const facts=[['calendar','Dia',WDL[d.getDay()]+', '+pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()],['clock','Horário',o.start+' às '+o.end+(o.slot.mode==='weekly'?' | toda semana':'')]];
   if(a.place)facts.push(['pin','Local',a.place]);
   if(a.teacher||a.noTeacher)facts.push(['user','Professor(a)',a.teacher||'Sem professores']);
-  openModal('<div class="mh">'+tagHTML(a.catId)+'<span class="kd">'+esc(kind.label)+'</span><span class="sp"></span>'+
+  openModal('<div class="mh">'+evTags(a)+'<span class="kd">'+esc(kind.label)+'</span><span class="sp"></span>'+
     '<button class="icon-btn" data-a="edit-act" data-aid="'+aid+'" title="Editar" aria-label="Editar">'+ic('edit',19)+'</button>'+
     '<button class="icon-btn" data-a="dup-act" data-aid="'+aid+'" title="Duplicar" aria-label="Duplicar">'+ic('copy',18)+'</button>'+
     '<button class="icon-btn" data-a="del-act" data-aid="'+aid+'" title="Excluir" aria-label="Excluir">'+ic('trash',18)+'</button>'+
@@ -8268,6 +8330,67 @@ function finSpendCard(){
   return '<div class="card sec" style="margin-top:12px"><div class="dh"><h3 style="margin:0">Saídas neste mês</h3><span><button class="btn sm" data-a="spend-new">'+ic('plus',13)+' Nova saída</button> <button class="btn sm ghost" data-a="set" data-k="fTab" data-v="saidas">Ver todas</button></span></div>'+
     '<div class="mv"><b class="mout">−'+money(sumK(list,'amount'))+'</b><span>'+list.length+(list.length===1?' saída':' saídas')+'</span><span class="muted small">'+top.map(c=>esc(c)+' '+money(by[c])).join(' | ')+'</span></div></div>';
 }
+/* ----- importar extrato do Nubank (CSV da fatura/conta ou OFX) ----- */
+const nuNum=v=>{v=String(v||'').trim().replace(/R\$\s?/,'');if(/,\d{1,2}$/.test(v))v=v.replace(/\./g,'').replace(',','.');return Number(v);};
+const nuDate=v=>{v=String(v||'').trim();let m=v.match(/^(\d{2})\/(\d{2})\/(\d{4})/);if(m)return m[3]+'-'+m[2]+'-'+m[1];m=v.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return m[0];m=v.match(/^(\d{4})(\d{2})(\d{2})/);return m?m[1]+'-'+m[2]+'-'+m[3]:'';};
+function nuCSV(txt){
+  const rows=[];let cur=[],f='',q=false;const sep=(txt.split('\n')[0].match(/;/g)||[]).length>(txt.split('\n')[0].match(/,/g)||[]).length?';':',';
+  for(let i=0;i<txt.length;i++){const c=txt[i];
+    if(q){if(c==='"'&&txt[i+1]==='"'){f+='"';i++;}else if(c==='"')q=false;else f+=c;}
+    else if(c==='"')q=true;else if(c===sep){cur.push(f);f='';}else if(c==='\n'||c==='\r'){if(c==='\r'&&txt[i+1]==='\n')i++;cur.push(f);f='';if(cur.some(x=>x!==''))rows.push(cur);cur=[];}else f+=c;}
+  cur.push(f);if(cur.some(x=>x!==''))rows.push(cur);return rows;
+}
+// devolve [{ext,date,desc,amount,cat,kind:'out'|'in'}]
+function nuParse(name,txt){
+  const out=[];
+  if(/<OFX|<STMTTRN/i.test(txt)){
+    (txt.match(/<STMTTRN>[\s\S]*?(?=<\/STMTTRN>|<STMTTRN>|<\/BANKTRANLIST>)/gi)||[]).forEach(b=>{
+      const g=t=>{const m=b.match(new RegExp('<'+t+'>([^<\\r\\n]*)','i'));return m?m[1].trim():'';};
+      const amt=nuNum(g('TRNAMT')),d=nuDate(g('DTPOSTED'));if(!d||!amt)return;
+      out.push({ext:'ofx|'+(g('FITID')||d+'|'+amt+'|'+g('MEMO')),date:d,desc:g('MEMO')||g('NAME'),amount:Math.abs(amt),cat:'',kind:amt<0?'out':'in'});
+    });
+    return out;
+  }
+  const rows=nuCSV(txt.replace(/^\uFEFF/,''));if(rows.length<2)return out;
+  const h=rows[0].map(x=>norm(x));
+  const ix=n=>h.findIndex(x=>x.includes(n));
+  if(ix('title')>=0&&ix('amount')>=0){ // fatura do cartão: date,category,title,amount
+    const di=ix('date'),ci=ix('category'),ti=ix('title'),ai=ix('amount');
+    rows.slice(1).forEach(r=>{const d=nuDate(r[di]),a=nuNum(r[ai]);if(!d||!(a>0))return;out.push({ext:'cc|'+d+'|'+r[ti]+'|'+a,date:d,desc:r[ti]||'',amount:a,cat:r[ci]||'',kind:'out'});});
+    return out;
+  }
+  const di=ix('data'),vi=ix('valor'),ii=ix('identificador'),si=ix('descri');
+  if(di>=0&&vi>=0){ // conta: Data,Valor,Identificador,Descrição
+    rows.slice(1).forEach(r=>{const d=nuDate(r[di]),a=nuNum(r[vi]);if(!d||!a)return;out.push({ext:'cta|'+(r[ii]||d+'|'+a+'|'+r[si]),date:d,desc:r[si]||'',amount:Math.abs(a),cat:'',kind:a<0?'out':'in'});});
+  }
+  return out;
+}
+function finImportDialog(){
+  const F=S.fin;
+  openModal('<form id="fNu" class="form"><div class="fh"><h2>Importar extrato do Nubank</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
+    '<p class="muted small" style="margin:0">No app do Nubank, exporte a <b>fatura (CSV)</b> ou o <b>extrato da conta (CSV ou OFX)</b> e escolha o arquivo aqui. Lançamentos repetidos são ignorados, então dá para importar de novo todo mês. A conexão automática direta com o Nubank não existe para uso pessoal (o Open Finance exige uma instituição autorizada); veja o aviso no fim.</p>'+
+    '<div class="fgrid"><label class="f">É da fatura de qual cartão?<select name="card"><option value="">Não é cartão (conta)</option>'+F.cards.map(c=>'<option value="'+c.id+'">'+esc(c.name)+'</option>').join('')+'</select></label>'+
+    '<label class="f">Conta (saídas e débitos)<select name="acc">'+F.accounts.map(a=>'<option value="'+a.id+'">'+esc(a.name)+'</option>').join('')+'</select></label></div>'+
+    '<label class="f">Arquivo<input type="file" name="file" accept=".csv,.ofx,.txt,text/csv"></label><div id="nuPrev" class="muted small"></div>'+
+    '<details class="adv"><summary>Conectar automaticamente?</summary><p class="muted small" style="margin:6px 0 0">O Nubank não tem API pública para pessoas físicas e não oferece conexão por MCP. O Open Finance só entrega dados a instituições autorizadas pelo Banco Central; para uso pessoal o caminho é um agregador (por exemplo, o Meu Pluggy) que lê a sua conta e exporta os dados. Se você quiser, posso ligar o site a um agregador depois; por enquanto, a importação de arquivo cobre o mesmo resultado em poucos toques.</p></details>'+
+    '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary" id="nuGo" disabled>Importar</button></div></form>');
+  const f=$('#fNu');let items=[];
+  f.elements.file.addEventListener('change',async()=>{
+    const fl=f.elements.file.files[0];if(!fl)return;let txt='';try{txt=await fl.text();}catch(e){}
+    items=nuParse(fl.name,txt);const have=new Set(F.spends.map(x=>x.ext).filter(Boolean)),novos=items.filter(x=>x.kind==='out'&&!have.has(x.ext)),dup=items.filter(x=>x.kind==='out').length-novos.length,ent=items.filter(x=>x.kind==='in').length;
+    $('#nuPrev').textContent=items.length?novos.length+' saída(s) novas'+(dup?', '+dup+' já importadas':'')+(ent?'; '+ent+' entrada(s) ignorada(s) (use Entradas para lançar)':'')+'.':'Não reconheci o formato. Use o CSV da fatura (date,category,title,amount), o CSV da conta (Data,Valor,Identificador,Descrição) ou OFX.';
+    $('#nuGo').disabled=!novos.length;items.novos=novos;
+  });
+  f.addEventListener('submit',e=>{
+    e.preventDefault();const card=f.elements.card.value,acc=f.elements.acc.value,novos=items.novos||[];if(!novos.length)return;
+    novos.forEach(x=>{
+      const cat=(x.cat?x.cat.charAt(0).toUpperCase()+x.cat.slice(1):'Outros');
+      if(F.spendCats.indexOf(cat)<0&&SPEND_DEF.indexOf(cat)<0)F.spendCats.push(cat);
+      F.spends.push({id:uid(),ext:x.ext,date:x.date,desc:x.desc,amount:r2(x.amount),cat:cat,pay:card?'credit':'debit',card:card||'',acc:card?'':acc,n:1});
+    });
+    closeModal();save();rerender();toast(novos.length+' saída(s) importada(s).');
+  });
+}
 function finSpends(){
   const ym=UI.fMes||todayISO().slice(0,7),y=Number(ym.slice(0,4)),m=Number(ym.slice(5))-1,from=ym+'-01',to=toISO(new Date(y,m+1,0));
   const list=S.fin.spends.filter(s=>s.date>=from&&s.date<=to).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0);
@@ -8284,7 +8407,7 @@ function finSpends(){
 }
 function renderFin(){
   const tabs=[['resumo','Resumo'],['saidas','Saídas'],['cartoes','Cartões'],['pagar','Contas e dívidas'],['receber','Entradas'],['contas','Contas']];
-  let h='<div class="toolbar"><div class="seg">'+tabs.map(t=>'<button class="'+(UI.fTab===t[0]?'on':'')+'" data-a="set" data-k="fTab" data-v="'+t[0]+'">'+t[1]+'</button>').join('')+'</div><span class="sp"></span>'+pgBtn('fin_plano','Planejar com o Pingado')+'</div>';
+  let h='<div class="toolbar"><div class="seg">'+tabs.map(t=>'<button class="'+(UI.fTab===t[0]?'on':'')+'" data-a="set" data-k="fTab" data-v="'+t[0]+'">'+t[1]+'</button>').join('')+'</div><span class="sp"></span><button class="btn sm" data-a="fin-import" title="Importar fatura ou extrato do Nubank (CSV/OFX)">'+ic('upload',14)+' Importar Nubank</button>'+pgBtn('fin_plano','Planejar com o Pingado')+'</div>';
   h+=({resumo:finSummary,saidas:finSpends,cartoes:finCards,pagar:finPay,receber:finIn,contas:finAccounts}[UI.fTab]||finSummary)();
   return h+'<p class="muted small" style="margin-top:14px">Marque o círculo ao pagar ou receber: o saldo da conta é atualizado. Gastos e entradas lançados em atividades e tarefas aparecem aqui sozinhos, com o sinal certo.</p>';
 }
@@ -9770,6 +9893,7 @@ Object.assign(ACT,{
   'fin-pay'(el){finToggle(el.dataset.key);save();rerender();},
   'spend-new'(){openSpendForm();},
   'spend-edit'(el){openSpendForm(el.dataset.id);},
+  'fin-import'(){finImportDialog();},
   'spend-del'(el){const id=el.dataset.id;askConfirm('Excluir esta saída?','Se foi no crédito, ela sai da fatura; se foi no débito, o valor volta para a conta.',()=>{S.fin.spends=S.fin.spends.filter(s=>s.id!==id);closeModal();save();rerender();});},
   'fin-mes'(el){const ym=UI.fMes||todayISO().slice(0,7),d=new Date(Number(ym.slice(0,4)),Number(ym.slice(5))-1+Number(el.dataset.d),1);UI.fMes=d.getFullYear()+'-'+pad(d.getMonth()+1);renderMain();},
   /* dados */
@@ -11620,6 +11744,7 @@ function pgTools(){
   add('quest','questoes_erradas','Lista questões do MedFisher que o usuário errou (a mais recente resposta de cada uma).',pgP({area:PG_STR,limite:PG_NUM}));
   add('agenda','eventos_parecidos','Eventos passados parecidos com um título (mesmo tema/tipo), com os campos extras que o usuário costuma preencher (objetivos, metodologia, o que levar, observações). Use para copiar o estilo.',pgP({titulo:PG_STR},['titulo']));
   add('docs','ler_apresentacao','Lista as apresentações ou, com id, devolve o texto de cada slide da apresentação.',pgP({id:PG_STR}));
+  add('tarefas','tarefas_parecidas','Tarefas passadas parecidas com um título, com descrição, metodologia, observações e tempo estimado que o usuário costuma preencher. Use para copiar o estilo.',pgP({titulo:PG_STR},['titulo']));
   add('cards','ver_revisoes','Revisões pendentes e atrasadas (chave, tema, data prevista, minutos).');
   add('cards','ver_flashcards','Baralhos e subbaralhos com contagem de novos, aprendendo e a revisar, sanguessugas e retenção.');
   add('cards','exemplos_de_cards','Amostra de flashcards existentes para imitar o estilo (tipo, tamanho, formatação). Opcional: baralho (id ou nome).',pgP({baralho:PG_STR}));
@@ -11670,6 +11795,10 @@ function pgRead(name,a){
     const x=a.id?S.slides.find(y=>y.id===a.id):null;
     if(!x)return {apresentacoes:S.slides.map(y=>({id:y.id,titulo:y.title,slides:y.n}))};
     return (async()=>{let buf=null;try{buf=await SLF.get(x.fileId);}catch(e){}if(!buf)return {erro:'O arquivo não está neste aparelho.'};return {titulo:x.title,slides:await pptxText(buf)};})();
+  }
+  if(name==='tarefas_parecidas'){
+    const q=pgNorm(a.titulo),tk=q.split(' ').filter(w=>w.length>3),sc=t=>{const x=pgNorm(t.title);return (x.includes(q)?3:0)+tk.filter(w=>x.includes(w)).length;};
+    return {tarefas:S.tasks.map(t=>({t:t,s:sc(t)})).filter(r=>r.s>0&&(r.t.notes||r.t.where||r.t.obs||r.t.min)).sort((m,n)=>n.s-m.s).slice(0,8).map(r=>({titulo:r.t.title,descricao:pgClip(r.t.notes,400),metodologia:pgClip(r.t.where,400),observacoes:pgClip(r.t.obs,240),minutos:r.t.min||'',categoria:catPath(r.t.catId).map(c=>c.name).join(' > ')}))};
   }
   if(name==='ver_revisoes'){const T=todayISO();return {revisoes:reviewList(addISO(T,-45),addISO(T,30)).filter(r=>!r.done).slice(0,120).map(r=>({chave:r.key,tema:r.theme,tipo:r.kind==='rp'?'organizar':'revisar',data:r.date,original:r.orig,atrasada:r.date<T,minutos:r.min,intervalo_dias:r.n}))};}
   if(name==='ver_flashcards'){const now=Date.now();return {baralhos:S.decks.map(d=>{const st=deckStats(d.id,now,true);return {id:d.id,nome:deckPath(d).join(' > '),itens:st.total,novos:st.newAll,aprendendo:st.learn,revisar:st.revAll,retencao_desejada:Math.round(deckOpt(d,'ret')*100)+'%',sanguessugas:S.cards.filter(c=>c.deckId===d.id&&c.leech).length};}),a_revisar_hoje:dueCardCount()};}
@@ -11897,20 +12026,26 @@ function pgDelegate(id,ctx){
   pgOpen(true);pgSend(t.prompt(ctx||{}),[],t.label);
 }
 const pgBtn=(task,label,extra)=>'<button type="button" class="btn sm pgb" data-a="pg-task" data-t="'+task+'"'+(extra||'')+' title="'+esc(PG_TASKS[task].label)+'"><span class="pgbi16">'+pgMascot('idle',16)+'</span> '+label+'</button>';
-/* preenche os campos extras do formulário de evento (rascunho: você revisa e salva) */
-async function pgFillEvent(){
-  const f=$('#fAct');if(!f)return;
+/* preenche as colunas do formulário (evento ou tarefa): campos vazios são preenchidos; nos já escritos aparece uma sugestão ao lado */
+const PG_FILL={
+  event:{form:'#fAct',rotulo:'evento',tool:'eventos_parecidos',titulo:E=>[E.tipoAtv&&E.tipoAtv.value,E.theme&&!E.theme.disabled?E.theme.value:''].filter(Boolean).join(' - '),
+    campos:[['objetivos','doWhat','Objetivos da atividade','obj'],['metodologia','where','Metodologia','met'],['levar','bring','O que levar',''],['observacoes','obs','Observações',''],['local','place','Local','']]},
+  task:{form:'#fTask',rotulo:'tarefa',tool:'tarefas_parecidas',titulo:E=>E.title.value.trim(),
+    campos:[['descricao','notes','Descrição',''],['metodologia','where','Metodologia',''],['observacoes','obs','Observações',''],['minutos','min','Tempo estimado (min)','']]}
+};
+async function pgFillForm(kind){
+  const C=PG_FILL[kind],f=$(C.form);if(!f)return;
   if(!pgReady()){ACT['pg-setup']();toast('Configure o Pingado primeiro.');return;}
-  const E=f.elements,msg=$('#pgFillMsg'),btn=$('[data-a=pg-fill-event]',f);if(btn&&btn.disabled)return;
-  const cat=$('[data-catpick="cat"]',f),catTxt=cat&&cat.dataset.value?catPath(cat.dataset.value).map(c=>c.name).join(' > '):'';
-  const title=[E.tipoAtv&&E.tipoAtv.value,E.theme&&!E.theme.disabled?E.theme.value:''].filter(Boolean).join(' - ')||'';
-  if(!title){toast('Escreva o tema ou o tipo do evento antes.');return;}
-  const cur={objetivos:E.doWhat.value.trim(),metodologia:E.where.value.trim(),levar:E.bring.value.trim(),observacoes:E.obs.value.trim(),local:E.place.value.trim()};
-  const prompt='Complete os campos extras do evento "'+title+'"'+(catTxt?' (categoria: '+catTxt+')':'')+'. Campos já preenchidos (NÃO sobrescreva): '+JSON.stringify(cur)+'. Use eventos_parecidos para ver como eu preencho eventos iguais ou parecidos e siga as minhas memórias. Depois chame preencher_campos apenas com os campos vazios que você conseguir preencher com boa base; se não houver base, deixe em branco. Não invente local nem datas.';
-  const fp=pgP({objetivos:PG_STR,metodologia:PG_STR,levar:PG_STR,observacoes:PG_STR,local:PG_STR});
-  const tools=pgTools().filter(t=>t.name==='eventos_parecidos'||t.name==='dados_gerais').concat([{name:'preencher_campos',description:'Preenche campos extras do evento no formulário (rascunho que o usuário revisa).',parameters:fp}]);
+  const E=f.elements,msg=$('#pgFillMsg'),btn=$('[data-a^=pg-fill]',f);if(btn&&btn.disabled)return;
+  const cat=$('[data-catpick="cat"]',f),catTxt=cat&&cat.dataset.value?catPath(cat.dataset.value).map(c=>c.name).join(' > '):'',title=C.titulo(E);
+  if(!title){toast(kind==='task'?'Escreva o título da tarefa antes.':'Escreva o tema ou o tipo do evento antes.');return;}
+  $$('.pgsugg',f).forEach(x=>x.remove());
+  const cur={};C.campos.forEach(c=>{cur[c[0]]=String((E[c[1]]||{}).value||'').trim();});
+  const prompt='Ajude a completar o formulário de '+C.rotulo+' "'+title+'"'+(catTxt?' (categoria: '+catTxt+')':'')+'. Valores atuais: '+JSON.stringify(cur)+'. Use '+C.tool+' para ver como eu preencho '+C.rotulo+'s iguais ou parecidos e siga as minhas memórias. Chame preencher_campos: nos campos que estão VAZIOS, preencha com boa base; nos campos que JÁ têm texto, NÃO os repita: se tiver uma alternativa melhor ou complementar, coloque-a em alt_<campo> (será mostrada como sugestão ao lado). Sem base suficiente, deixe em branco. Não invente local nem datas.';
+  const props={};C.campos.forEach(c=>{props[c[0]]=c[0]==='minutos'?PG_NUM:PG_STR;props['alt_'+c[0]]=c[0]==='minutos'?PG_NUM:PG_STR;});
+  const tools=pgTools().filter(t=>t.name===C.tool||t.name==='dados_gerais').concat([{name:'preencher_campos',description:'Preenche as colunas do formulário (rascunho que o usuário revisa).',parameters:pgP(props)}]);
   const contents=[{role:'user',parts:[{text:prompt}]}];let got=null;
-  if(btn)btn.disabled=true;if(msg)msg.textContent='O Pingado está lendo seus eventos…';
+  if(btn)btn.disabled=true;if(msg)msg.textContent='O Pingado está lendo seus dados…';
   try{
     for(let i=0;i<5&&!got;i++){
       const j=await pgCall({contents:contents,tools:tools,system:pgSystem()});
@@ -11922,13 +12057,21 @@ async function pgFillEvent(){
   }catch(e){if(msg)msg.textContent='Erro: '+(e.message||e);if(btn)btn.disabled=false;return;}
   if(btn)btn.disabled=false;
   if(!got){if(msg)msg.textContent='Não encontrei base suficiente para completar.';return;}
-  const map=[['objetivos','doWhat','obj'],['metodologia','where','met'],['levar','bring',''],['observacoes','obs',''],['local','place','']],undo=[];let n=0;
-  map.forEach(m=>{const v=String(got[m[0]]||'').trim(),el=E[m[1]];if(!v||!el||el.value.trim())return;undo.push([el,el.value]);el.value=v;n++;el.classList.add('pgfilled');setTimeout(()=>el.classList.remove('pgfilled'),6000);
-    if(m[2]){const o=$('[data-opt="'+m[2]+'"]',f);if(o)o.hidden=false;}el.dispatchEvent(new Event('input',{bubbles:true}));});
-  const det=$('details.adv',f);if(det&&n)det.open=true;
+  const undo=[];let n=0,ns=0;
+  C.campos.forEach(c=>{
+    const el=E[c[1]];if(!el)return;const v=String(got[c[0]]==null?'':got[c[0]]).trim(),alt=String(got['alt_'+c[0]]==null?'':got['alt_'+c[0]]).trim(),has=String(el.value||'').trim();
+    if(!has&&v){undo.push([el,el.value]);el.value=v;n++;el.classList.add('pgfilled');setTimeout(()=>el.classList.remove('pgfilled'),6000);if(c[3]){const o=$('[data-opt="'+c[3]+'"]',f);if(o)o.hidden=false;}el.dispatchEvent(new Event('input',{bubbles:true}));}
+    else if(has&&(alt||v)&&(alt||v)!==has){
+      const sg=alt||v,lab=el.closest('label.f')||el.parentNode,d=document.createElement('div');d.className='pgsugg';d.dataset.f=c[1];d.dataset.t=sg;
+      d.innerHTML='<span class="pgsi">'+pgMascot('idle',16)+'</span><span class="pgst"><b>Sugestão do Pingado</b> | '+esc(c[2])+': '+esc(sg)+'</span><button type="button" class="btn sm" data-a="pg-sug-use">Usar</button>'+(c[1]==='min'?'':'<button type="button" class="btn sm ghost" data-a="pg-sug-add">Somar</button>')+'<button type="button" class="icon-btn sm" data-a="pg-sug-x" aria-label="Dispensar">'+ic('x',13)+'</button>';
+      lab.insertAdjacentElement('afterend',d);ns++;
+    }
+  });
+  const det=$('details.adv',f);if(det&&n&&kind==='event')det.open=true;
   PG.fillUndo=undo;
-  if(msg)msg.innerHTML=n?'O Pingado preencheu '+n+(n===1?' campo':' campos')+'. Revise e salve. <button type="button" class="btn sm ghost" data-a="pg-fill-undo">Desfazer</button>':'Os campos que ele consegue preencher já estavam preenchidos.';
+  if(msg)msg.innerHTML=(n?'O Pingado preencheu '+n+(n===1?' campo':' campos')+'. ':'')+(ns?ns+(ns===1?' sugestão apareceu':' sugestões apareceram')+' ao lado dos campos já escritos. ':'')+(!n&&!ns?'Nada a acrescentar com a base que tenho. ':'')+(n?'<button type="button" class="btn sm ghost" data-a="pg-fill-undo">Desfazer</button>':'');
 }
+const pgFillEvent=()=>pgFillForm('event');
 /* ----- interface ----- */
 const pgMd=t=>{
   let h=esc(t).replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>').replace(/`([^`\n]+)`/g,'<code>$1</code>');
@@ -12032,7 +12175,11 @@ Object.assign(ACT,{
   'pg-mem-del'(el){S.prefs.pgMem=pgMem().filter(m=>m.id!==el.dataset.id);save();renderMain();},
   'pg-task'(el){pgDelegate(el.dataset.t,{id:el.dataset.id});},
   'pg-cul'(){PG.mode='cul';if(PG.open){pgOpen(true);pgRender();}else pgOpen(true);},
-  'pg-fill-event'(){pgFillEvent();},
+  'pg-fill-event'(){pgFillForm('event');},
+  'pg-fill-task'(){pgFillForm('task');},
+  'pg-sug-use'(el){const d=el.closest('.pgsugg'),f=d&&d.closest('form'),t=f&&f.elements[d.dataset.f];if(!t)return;PG.fillUndo=(PG.fillUndo||[]).concat([[t,t.value]]);t.value=d.dataset.t;t.dispatchEvent(new Event('input',{bubbles:true}));t.classList.add('pgfilled');setTimeout(()=>t.classList.remove('pgfilled'),5000);d.remove();},
+  'pg-sug-add'(el){const d=el.closest('.pgsugg'),f=d&&d.closest('form'),t=f&&f.elements[d.dataset.f];if(!t)return;PG.fillUndo=(PG.fillUndo||[]).concat([[t,t.value]]);t.value=(t.value.trim()?t.value.trim()+'\n':'')+d.dataset.t;t.dispatchEvent(new Event('input',{bubbles:true}));d.remove();},
+  'pg-sug-x'(el){const d=el.closest('.pgsugg');if(d)d.remove();},
   'pg-fill-undo'(){(PG.fillUndo||[]).forEach(u=>{u[0].value=u[1];u[0].dispatchEvent(new Event('input',{bubbles:true}));});PG.fillUndo=[];const m=$('#pgFillMsg');if(m)m.textContent='Desfeito.';},
   'pg-open'(){PG.mode='';pgOpen();},'pg-close'(){pgOpen(false);},
   'pg-new'(){if(PG.busy&&PG.abort)PG.abort.abort();PG.ui=[];PG.contents=[];PG.plans={};PG.att=[];pgPersist();pgRender();},
@@ -14400,17 +14547,17 @@ $('#inkPdfFile').addEventListener('change',e=>{const f=e.target.files[0];e.targe
    ASSUNTOS E PROGRESSO: Focos (aulas e temas) agrupados por Grande área e Módulo; notas, arquivos, eventos
    e tarefas podem citar um ou mais Focos, e cada Foco mostra tudo o que está ligado a ele.
    ========================================================================== */
-const MOD_ICO=[[/cardiolog/i,'heart'],[/pneumolog/i,'lungs'],[/neurolog|psiquiatr/i,'igBrain'],[/nefrolog|urolog/i,'igKidney'],[/infectolog/i,'igBug'],[/endocrinolog/i,'flask'],[/oncolog|hematolog/i,'drop'],[/ortoped|trauma/i,'igBone']];
+const MOD_ICO=[[/cardiolog/i,'heart'],[/pneumolog/i,'lungs'],[/pediatr|neonat|puericult/i,'mamadeira'],[/reumat/i,'ligamento'],[/psiquiatr/i,'puzzle'],[/neurolog/i,'igBrain'],[/nefrolog/i,'igKidney'],[/urolog/i,'prostata'],[/gastro/i,'estomago'],[/hepat/i,'figado'],[/coloproct|proctolog/i,'intestino'],[/ginec|obstet/i,'uterus'],[/mastolog/i,'mama'],[/dermat/i,'pele'],[/oftalm/i,'eye'],[/otorrino/i,'ear'],[/hematolog/i,'hemacia'],[/oncolog/i,'celula'],[/endocrinolog/i,'hormonio'],[/diabet/i,'glicosimetro'],[/infectolog|parasit/i,'igBug'],[/vascular|angiolog/i,'vaso'],[/ortoped|trauma/i,'igBone'],[/fisiatr|reabilit/i,'cadeira_rodas'],[/geriatr/i,'muleta'],[/anestes/i,'mask'],[/urg[eê]nc|emerg|terapia intensiva/i,'ambulance'],[/cirurgi/i,'igScalpel'],[/radiolog|imagem/i,'igXray'],[/imuniz|vacin/i,'vacina'],[/hemoter|transfus/i,'bolsa_sangue']];
 const focoById=id=>(S.focos||[]).find(f=>f.id===id);
 const areaById=id=>(S.areas||[]).find(a=>a.id===id);
 const focoIdsOf=o=>Array.isArray(o&&o.focoIds)?o.focoIds:[];
 function focoStyle(f){
   const ar=areaById(f.area)||{name:'',icon:'tag',color:'#5B6B85'},m=MOD_ICO.find(x=>f.mod!=='Princípios'&&x[0].test(f.mod));
-  return {icon:m?m[1]:ar.icon,color:ar.color,area:ar};
+  return {icon:f.icon||(m?m[1]:ar.icon),color:ar.color,area:ar};
 }
 function focoPill(f,short){
   if(!f)return '';const st=focoStyle(f),txt=short?f.name:[st.area.name,f.mod,f.name].join(' › ');
-  return '<span class="fpill" style="--fc:'+esc(st.color)+'" title="'+esc([st.area.name,f.mod,f.name].join(' › '))+'">'+ic(st.icon,13)+'<span>'+esc(txt)+'</span></span>';
+  return '<span class="fpill" style="--fc:'+esc(st.color)+'" title="'+esc([st.area.name,f.mod,f.name].join(' › '))+'">'+icoHTML(st.icon,13)+'<span>'+esc(txt)+'</span></span>';
 }
 const focoChips=o=>focoIdsOf(o).map(focoById).filter(Boolean).map(f=>focoPill(f)).join('');
 function focoItems(){
@@ -14470,9 +14617,11 @@ function focoForm(id){
     '<label class="f">Nome<input name="name" required value="'+esc(f?f.name:'')+'" autocomplete="off"></label>'+
     '<div class="fgrid"><label class="f">Grande área<select name="area">'+areas.map(a=>'<option value="'+a.id+'" '+((f?f.area:UI.ftArea||areas[0].id)===a.id?'selected':'')+'>'+esc(a.name)+'</option>').join('')+'</select></label>'+
     '<label class="f">Módulo<input name="mod" list="ftmods" value="'+esc(f?f.mod:'')+'" autocomplete="off"><datalist id="ftmods">'+Array.from(new Set((S.focos||[]).map(x=>x.mod))).map(m=>'<option value="'+esc(m)+'">').join('')+'</datalist></label></div>'+
+    iconPickHTML(f&&f.icon,'')+
     '<div class="ff">'+(f?'<button type="button" class="btn danger" data-a="ft-del" data-id="'+f.id+'">Excluir</button>':'')+'<span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
+  iconPickBind($('#fFoco'));
   $('#fFoco').addEventListener('submit',e=>{
-    e.preventDefault();const E=e.target.elements,d={name:E.name.value.trim(),area:E.area.value,mod:E.mod.value.trim()||'Princípios'};if(!d.name)return;
+    e.preventDefault();const E=e.target.elements,d={name:E.name.value.trim(),area:E.area.value,mod:E.mod.value.trim()||'Princípios',icon:E.icon.value||''};if(!d.name)return;
     if(f)Object.assign(f,d);else S.focos.push(Object.assign({id:uid()},d));
     save();closeModal();renderMain();
   });
@@ -14501,10 +14650,11 @@ Object.assign(ACT,{
     const a=el.dataset.id?areaById(el.dataset.id):null,ics=['igScalpel','steth','igKit','uterus','igBaby','igXray','heart','lungs','igBrain','igKidney','igBug','flask','drop','igBone','eye','pill','microscope','book','target'].filter(k=>ICONS[k]);
     openModal('<form id="fArea" class="form"><div class="fh"><h2>'+(a?'Editar área':'Nova área')+'</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
       '<label class="f">Nome<input name="name" required value="'+esc(a?a.name:'')+'" autocomplete="off"></label>'+
-      '<div class="f"><span>Ícone</span><div class="nkpick">'+ics.map(k=>'<label class="chip cb"><input type="radio" name="icon" value="'+k+'" '+((a?a.icon:'tag')===k?'checked':'')+'><span>'+ic(k,18)+'</span></label>').join('')+'</div></div>'+
+      iconPickHTML(a?a.icon:'tag','tag')+
       '<label class="f">Cor<input type="color" name="color" value="'+esc(a?a.color:'#3B6FB6')+'"></label>'+
       '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
-    $('#fArea').addEventListener('submit',e=>{e.preventDefault();const E=e.target.elements,ic0=($$('input[name=icon]:checked',e.target)[0]||{}).value||'tag',d={name:E.name.value.trim(),icon:ic0,color:E.color.value};if(!d.name)return;
+    iconPickBind($('#fArea'));
+    $('#fArea').addEventListener('submit',e=>{e.preventDefault();const E=e.target.elements,ic0=E.icon.value||'tag',d={name:E.name.value.trim(),icon:ic0,color:E.color.value};if(!d.name)return;
       if(a)Object.assign(a,d);else S.areas.push(Object.assign({id:uid()},d));save();closeModal();renderMain();});
   }
 });
