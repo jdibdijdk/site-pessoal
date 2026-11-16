@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -75,10 +76,23 @@ public abstract class BaseWidget extends AppWidgetProvider {
         return PendingIntent.getActivity(c, req, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
+    @Override
+    public void onAppWidgetOptionsChanged(Context c, AppWidgetManager m, int id, Bundle op) {
+        desenhar(c, getClass(), frente());
+    }
+
     static void desenhar(Context c, Class<?> cls, String frente) {
         AppWidgetManager m = AppWidgetManager.getInstance(c);
-        int[] ids = m.getAppWidgetIds(new ComponentName(c, cls));
-        if (ids.length == 0) return;
+        for (int id : m.getAppWidgetIds(new ComponentName(c, cls))) desenharUm(c, m, id, cls, frente);
+    }
+
+    /** Um widget por vez: a quantidade de linhas acompanha o tamanho (4x3, 2x2, 2x1…). */
+    static void desenharUm(Context c, AppWidgetManager m, int wid, Class<?> cls, String frente) {
+        int[] ids = {wid};
+        Bundle op = m.getAppWidgetOptions(wid);
+        int hDp = op.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 110);
+        int cap = Math.max(1, Math.min(6, (hDp - 64) / 38));
+        boolean mini = hDp < 100;
         RemoteViews v = new RemoteViews(c.getPackageName(), R.layout.widget);
         JSONObject s = Dados.cache(c);
         String site = Dados.site(c);
@@ -95,7 +109,6 @@ public abstract class BaseWidget extends AppWidgetProvider {
             v.setViewVisibility(R.id.empty, View.VISIBLE);
             for (int id : LINHA) v.setViewVisibility(id, View.GONE);
             v.setViewVisibility(R.id.bar, View.GONE);
-            v.setTextViewText(R.id.foot, "");
             v.setOnClickPendingIntent(R.id.root, PendingIntent.getActivity(c, base + 1,
                     new Intent(c, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), PendingIntent.FLAG_IMMUTABLE));
             m.updateAppWidget(ids, v);
@@ -106,26 +119,26 @@ public abstract class BaseWidget extends AppWidgetProvider {
         Frente f = Frente.montar(frente, s);
         v.setTextViewText(R.id.title, f.nome);
         v.setTextViewText(R.id.sub, f.sub);
-        if (f.progresso >= 0) { v.setViewVisibility(R.id.bar, View.VISIBLE); v.setProgressBar(R.id.bar, 100, f.progresso, false); }
+        if (f.progresso >= 0 && !mini) { v.setViewVisibility(R.id.bar, View.VISIBLE); v.setProgressBar(R.id.bar, 100, f.progresso, false); }
         else v.setViewVisibility(R.id.bar, View.GONE);
 
         boolean vazio = f.linhas.isEmpty();
         v.setViewVisibility(R.id.empty, vazio ? View.VISIBLE : View.GONE);
         v.setTextViewText(R.id.empty, f.vazio);
         for (int i = 0; i < LINHA.length; i++) {
-            if (i >= f.linhas.size()) { v.setViewVisibility(LINHA[i], View.GONE); continue; }
+            if (i >= f.linhas.size() || i >= cap) { v.setViewVisibility(LINHA[i], View.GONE); continue; }
             Frente.Linha l = f.linhas.get(i);
             v.setViewVisibility(LINHA[i], View.VISIBLE);
             v.setTextViewText(TEXTO[i], l.texto);
             v.setTextViewText(META[i], l.meta);
             v.setViewVisibility(PONTO[i], l.titulo ? View.GONE : View.VISIBLE);
-            v.setTextViewTextSize(TEXTO[i], android.util.TypedValue.COMPLEX_UNIT_SP, l.titulo ? 11 : 14);
-            v.setTextColor(TEXTO[i], c.getColor(l.feito || l.titulo ? R.color.w_mut : R.color.w_tx));
+            v.setTextViewTextSize(TEXTO[i], android.util.TypedValue.COMPLEX_UNIT_SP, l.titulo ? 11 : (mini ? 16 : 14));
+            // sem setTextColor: a cor vem do tema (claro/escuro) e só a opacidade muda; assim o texto não some ao trocar o tema
+            v.setFloat(TEXTO[i], "setAlpha", (l.feito || l.titulo) ? 0.55f : 1f);
             if (!site.isEmpty()) v.setOnClickPendingIntent(LINHA[i], abrir(c, site + l.link, base + 10 + i));
         }
 
-        long at = s.optLong("at");
-        v.setTextViewText(R.id.foot, at > 0 ? "Atualizado " + new SimpleDateFormat("dd/MM HH:mm", new Locale("pt", "BR")).format(new Date(at)) : "");
+        v.setViewVisibility(R.id.foot, View.GONE);
         if (!site.isEmpty()) v.setOnClickPendingIntent(R.id.root, abrir(c, site + f.abrir, base + 2));
         else v.setOnClickPendingIntent(R.id.root, PendingIntent.getActivity(c, base + 1,
                 new Intent(c, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), PendingIntent.FLAG_IMMUTABLE));
