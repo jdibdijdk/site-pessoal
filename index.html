@@ -2595,6 +2595,15 @@ html[data-theme="dark"] .gh.today{background:color-mix(in srgb,var(--acc) 12%,va
 html[data-theme="dark"] .gcol{background:color-mix(in srgb,var(--card) 92%,#000)}
 html[data-theme="dark"] .gcol .hl{border-top-color:#262A35}
 html[data-theme="dark"] .dp.dt{background:#232C52;color:#B8C7FF}
+
+/* ===== Simulados, acerto por Foco ===== */
+.simq{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px;background:var(--card)}
+.simq-h{display:flex;align-items:center;gap:8px;font-weight:600;margin-bottom:8px}.simq-h span{flex:1;min-width:0}
+.simq-g{margin-top:10px;font-size:14px}.simq-g summary{cursor:pointer;color:var(--acc);font-weight:600}
+.simpick{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:6px;margin-bottom:12px}
+.fstat{padding:10px 12px;border-radius:10px;background:var(--soft);margin-bottom:10px;font-size:13.5px}
+.fsub{margin:14px 0 6px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut)}
+.ftm.acc{color:var(--acc);font-weight:600}
 </style>
 </head>
 <body>
@@ -2950,6 +2959,7 @@ function normNote(n){
     return n;
   }
   if(n.type==='fluxo'){n.fx=fxNormalize(n.fx);return n;}
+  if(n.type==='simulado'){n.qIds=Array.isArray(n.qIds)?n.qIds.filter(Boolean):[];n.html=n.html||'';return n;}
   if(n.type==='questao'){
     n.qgroup=String(n.qgroup||'');n.prova=String(n.prova||'');n.nivel=/^(R1|R\+)$/.test(n.nivel)?n.nivel:'';n.ano=String(n.ano||'');
     const q=(n.qs&&typeof n.qs==='object')?n.qs:{};n.qs={n:Number(q.n)||0,ok:Number(q.ok)||0,last:Number(q.last)||0,lastOk:!!q.lastOk};
@@ -4143,7 +4153,7 @@ function reviewList(from,to){
     });
   });
   Object.keys(S.revx||{}).forEach(id=>{ // revisões de notas e questões (modo revisão ativa)
-    const e=S.revx[id],n=noteById(id);if(!n||!e.due)return;const key='rx|'+id+'|'+e.due,st=(S.rv||{})[key]||{},rd=st.to||e.due;
+    const e=S.revx[id],n=noteById(id);if(!n||!e.due||n.type==='questao')return;const key='rx|'+id+'|'+e.due,st=(S.rv||{})[key]||{},rd=st.to||e.due;
     if(rd<from||rd>to)return;
     out.push({key:key,kind:'rv',date:rd,orig:e.due,src:e.last||e.due,n:e.iv||1,min:st.min!=null?st.min:5,spent:st.spent||0,done:!!(done[key]||st.done),moved:rd!==e.due,theme:n.title||'Nota',catId:st.cat||n.catId||'',act:{id:id,kind:n.type==='questao'?'Questão':'Nota',focoIds:n.focoIds||[],catId:n.catId||'',title:n.title||'',theme:n.title||'',tipoAtv:'',blockType:'estudo',slots:[],done:{}}});
   });
@@ -4252,7 +4262,7 @@ function rvSettingsHTML(){
 /* ----- revisão ativa (estilo Anki) para notas e questões: avalia, e a próxima revisão vai para a aba Revisões ----- */
 const ANKI_IV=[1,3,7,14,30,60,120];
 function ankiQueue(){
-  const T=todayISO(),all=S.notes.filter(n=>(n.type==='questao'||n.type==='nota'||n.type==='caso')&&(n.title||noteText(n)));
+  const T=todayISO(),all=S.notes.filter(n=>(n.type==='nota'||n.type==='caso')&&(n.title||noteText(n)));
   const due=all.filter(n=>{const e=S.revx[n.id];return !e||e.due<=T;});
   due.sort((a,b)=>{const x=S.revx[a.id],y=S.revx[b.id];return (x?x.due:'0000')<(y?y.due:'0000')?-1:1;});
   return due.slice(0,30).map(n=>n.id);
@@ -4984,7 +4994,7 @@ function renderAjustes(){
 /* ==========================================================================
    17. RENDERIZAÇÃO GERAL
    ========================================================================== */
-const TABS=[['painel','Painel','home'],['semana','Semana','calendar'],['tarefas','Tarefas','tasks'],['revisoes','Revisões','repeat'],['assuntos','Assuntos','tag'],['habitos','Hábitos','sprout'],['docs','Documentos','file'],['notas','Notas','note'],['questoes','Questões','cap'],['metas','Objetivos','target'],['datas','Datas','clock'],['links','Links','link'],['cul','Culinária','chef'],['fin','Finanças','wallet'],['ajustes','Ajustes','settings']];
+const TABS=[['painel','Painel','home'],['semana','Semana','calendar'],['tarefas','Tarefas','tasks'],['revisoes','Revisões','repeat'],['assuntos','Assuntos','tag'],['habitos','Hábitos','sprout'],['docs','Documentos','book'],['notas','Notas','note'],['questoes','Questões','cap'],['metas','Objetivos','target'],['datas','Datas','clock'],['links','Links','link'],['cul','Culinária','chef'],['fin','Finanças','wallet'],['ajustes','Ajustes','settings']];
 // Transição suave ao trocar de aba (o conteúdo entra deslizando de leve; sem movimento se o aparelho pedir)
 function tabAnim(dir){
   const m=$('#main');if(!m||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))return;
@@ -5466,9 +5476,9 @@ function openActForm(opts){
     '<div class="opt" data-opt="money" '+(has.money?'':'hidden')+'>'+moneyBlock(p.moneys)+'</div>'+
     '<div class="opt" data-opt="vinc" '+(has.vinc?'':'hidden')+'>'+
     '<div class="fgrid"><input type="hidden" name="kind" value="'+esc(p.kind)+'">'+
-    '<label class="f">Relacionada à atividade<select name="relId"><option value="">Nenhuma</option>'+S.acts.filter(x=>!a0||x.id!==a0.id).map(x=>'<option value="'+x.id+'" '+sel(x.id,p.relId)+'>'+esc(aT(x))+'</option>').join('')+'</select></label></div>'+
+    '<label class="f">Relacionada à atividade<select name="relId"><option value="">Nenhuma</option>'+S.acts.filter(x=>!a0||x.id!==a0.id).sort((x,y)=>actNear(x)-actNear(y)).map(x=>'<option value="'+x.id+'" '+sel(x.id,p.relId)+'>'+esc(aT(x))+'</option>').join('')+'</select></label></div>'+
     '<div class="fgrid"><div class="f"><span>Tarefas vinculadas</span>'+pickerHTML('tasks',S.tasks.filter(t=>!t.done||p.taskIds.indexOf(t.id)>=0).slice().sort((x,y)=>(x.done-y.done)||((tDue(x)||'9999')<(tDue(y)||'9999')?-1:1)).map(t=>({id:t.id,label:t.title,sub:t.done?'concluída':(tDue(t)?fmtDM(tDue(t)):'')})),p.taskIds,'Tarefas')+'</div>'+
-    '<div class="f"><span>Documentos</span>'+pickerHTML('docs',S.docs.map(d=>({id:d.id,label:d.title})),p.docIds,'Selecionar documentos')+'</div></div>'+
+    '<div class="f"><span>Documentos</span>'+pickerHTML('docs',docsRecent().map(d=>({id:d.id,label:d.title})),p.docIds,'Selecionar documentos')+'</div></div>'+
     '<div class="f"><span>Objetivos maiores</span>'+pickerHTML('goals',goalItems(),p.goalIds,'Em qual objetivo se encaixa')+'</div>'+
     '<div class="f"><span>Foco</span>'+focoPickHTML('focos',p.focoIds)+'</div>'+
     '<div class="f"><span>Baralhos <small>flashcards para estudar junto</small></span>'+pickerHTML('mdecks',deckItems(),p.deckIds||[],'Mencionar baralhos')+'</div>'+
@@ -5616,7 +5626,7 @@ function openDocForm(opts){
     const todo=lbls.map(l=>old.find(x=>x.label===l)||{id:uid(),label:l,done:false});
     const data={title:E.title.value.trim(),catId:$('[data-catpick="cat"]',f).dataset.value||'',link:E.link.value.trim(),notes:E.notes.value.trim(),todo:todo,goalIds:pickedValues(f,'goals'),focoIds:pickedValues(f,'focos'),linkIds:pickedValues(f,'links'),noteIds:pickedValues(f,'notes'),folderId:E.folder.value,ext:E.ext.value,status:st,source:E.source.value.trim(),srcLink:E.srcLink.value.trim()};
     let dn=d0;
-    if(d0)Object.assign(d0,data);else{dn=Object.assign({id:uid(),createdAt:Date.now()},data);S.docs.push(dn);}
+    data.updated=Date.now();if(d0)Object.assign(d0,data);else{dn=Object.assign({id:uid(),createdAt:Date.now()},data);S.docs.push(dn);}
     if(!d0&&opts.from){ // documento criado a partir de uma tarefa ou de um evento: vincula nos dois lados
       if(opts.from.k==='task'){const t=taskById(opts.from.id);if(t)t.docId=dn.id;}
       else{const a=actById(opts.from.id);if(a){a.docIds=a.docIds||[];if(a.docIds.indexOf(dn.id)<0)a.docIds.push(dn.id);}}
@@ -5889,6 +5899,8 @@ function noteTags(n){return tagsOfText((n.title||'')+' '+noteText(n)+' '+noteFie
 function allTags(){const c={};S.notes.forEach(n=>noteTags(n).forEach(t=>{c[t]=(c[t]||0)+1;}));return Object.keys(c).map(t=>({t:t,n:c[t]})).sort((a,b)=>b.n-a.n||a.t.localeCompare(b.t));}
 const tagChip=t=>'<button class="chip tagc" data-a="tag-go" data-t="'+esc(t)+'">#'+esc(t)+'</button>';
 /* ----- questões: origem, grupos e estatística do treino ----- */
+const actNear=a=>{const T=todayISO(),ds=(a.slots||[]).filter(x=>x&&x.mode==='date'&&x.date).map(x=>Math.abs(diffDays(x.date,T)));return ds.length?Math.min.apply(null,ds):999;};
+const docsRecent=()=>S.docs.slice().sort((a,b)=>((b.updated||b.created||b.createdAt||0)-(a.updated||a.created||a.createdAt||0)));
 const questions=()=>S.notes.filter(n=>n.type==='questao');
 const qGroups=()=>{const g=[];questions().forEach(q=>{if(q.qgroup&&g.indexOf(q.qgroup)<0)g.push(q.qgroup);});return g.sort((a,b)=>a.localeCompare(b,'pt-BR'));};
 const qProvas=()=>{const g=[];questions().forEach(q=>{if(q.prova&&g.indexOf(q.prova)<0)g.push(q.prova);});return g.sort((a,b)=>a.localeCompare(b,'pt-BR'));};
@@ -5898,7 +5910,7 @@ function qMetaChips(q){
   return (q.prova||q.nivel||q.ano?'<span class="tag outline" title="Prova de origem">'+esc(qOrigin(q))+'</span>':'')+(q.qgroup?'<span class="tag outline" title="Grupo de questões">'+ic('layers',11)+esc(q.qgroup)+'</span>':'')+(q.qs&&q.qs.n?'<span class="muted small">treino: '+q.qs.ok+'/'+q.qs.n+'</span>':'');
 }
 // Na lista de notas, os cards de estudo aparecem agrupados em baralhos (nunca soltos)
-const notaItemsAll=()=>S.notes.map(n=>({k:n.type==='questao'?'questao':n.type==='caso'?'caso':n.type==='fluxo'?'fluxo':n.type==='bula'?'bula':'note',o:n})).concat(S.pdfs.map(p=>({k:'pdf',o:p})),deckRoots().map(d=>({k:'deck',o:d})),(S.slides||[]).map(x=>({k:'slides',o:x})),(S.inks||[]).map(x=>({k:'ink',o:x})));
+const notaItemsAll=()=>S.notes.map(n=>({k:n.type==='simulado'?'simulado':n.type==='questao'?'questao':n.type==='caso'?'caso':n.type==='fluxo'?'fluxo':n.type==='bula'?'bula':'note',o:n})).concat(S.pdfs.map(p=>({k:'pdf',o:p})),deckRoots().map(d=>({k:'deck',o:d})),(S.slides||[]).map(x=>({k:'slides',o:x})),(S.inks||[]).map(x=>({k:'ink',o:x})));
 function notaItems(){
   let items=notaItemsAll();
   const ttl=i=>i.k==='deck'?i.o.name:i.o.title;
@@ -5950,7 +5962,7 @@ function nCardHTML(it){
       '<p>'+(deckKids(o.id).length?deckKids(o.id).length+(deckKids(o.id).length===1?' subbaralho | ':' subbaralhos | '):'')+st.total+(st.total===1?' item de estudo':' itens de estudo')+' | '+(st.due?'<b style="color:var(--acc)">'+st.due+' para revisar agora</b>':'em dia')+'</p>'+foot+'</div>';
   }
   const body=it.k==='fluxo'?'<div class="fxcard">'+fxThumb(o)+'</div><p>'+o.fx.nodes.length+(o.fx.nodes.length===1?' caixa':' caixas')+' | '+o.fx.edges.length+(o.fx.edges.length===1?' ligação':' ligações')+'</p>':it.k==='pdf'?'<p>PDF | '+((o.annots||[]).length)+' anotação(ões)'+(o.src==='drive'?' | no Drive':' | neste aparelho')+'</p>':objCardHTML(o)+(isNoteK(it.k)&&it.k!=='fluxo'?ncImgsHTML(o):'')+'<p>'+esc((it.k==='bula'?bulaSnippet(o):noteText(o)).slice(0,220)||'Nota vazia')+'</p>';
-  return '<div class="ncard" data-a="n-open" data-k="'+it.k+'" data-id="'+o.id+'" style="--c:'+col+'" role="button" tabindex="0"><h3>'+ic(it.k==='pdf'?'file':it.k==='questao'?'help':it.k==='caso'?'pulse':it.k==='bula'?'pill':it.k==='fluxo'?'grid':'note',16)+nkBadge(o,13)+esc(o.title||'Sem título')+(it.k==='bula'?'<span class="tag outline" style="margin-left:auto">'+(o.kind==='classe'?'Classe':'Medicamento')+'</span>':'')+(it.k==='questao'?'<span class="tag outline" style="margin-left:auto">Questão</span>':it.k==='caso'?'<span class="tag outline" style="margin-left:auto">Caso clínico</span>':it.k==='fluxo'?'<span class="tag outline" style="margin-left:auto">Fluxograma</span>':'')+'</h3>'+body+foot+'</div>';
+  return '<div class="ncard" data-a="n-open" data-k="'+it.k+'" data-id="'+o.id+'" style="--c:'+col+'" role="button" tabindex="0"><h3>'+ic(it.k==='pdf'?'file':it.k==='questao'?'help':it.k==='simulado'?'list':it.k==='caso'?'pulse':it.k==='bula'?'pill':it.k==='fluxo'?'grid':'note',16)+nkBadge(o,13)+esc(o.title||'Sem título')+(it.k==='bula'?'<span class="tag outline" style="margin-left:auto">'+(o.kind==='classe'?'Classe':'Medicamento')+'</span>':'')+(it.k==='questao'?'<span class="tag outline" style="margin-left:auto">Questão</span>':it.k==='caso'?'<span class="tag outline" style="margin-left:auto">Caso clínico</span>':it.k==='fluxo'?'<span class="tag outline" style="margin-left:auto">Fluxograma</span>':'')+'</h3>'+body+foot+'</div>';
 }
 function nFolderTile(f){
   const ns=S.folders.filter(x=>x.parentId===f.id).length,tot=folderCount(f.id);
@@ -5969,7 +5981,7 @@ function nFolderBar(){
 const nview=()=>S.prefs.nview==='lista'?'lista':'cartoes';
 function nRowHTML(it){
   const o=it.o,col=catColor(o.catId),fp=folderPath(o.folderId).join(' › '),kind={ink:'Caderno',deck:'Baralho',pdf:'PDF',questao:'Questão',caso:'Caso clínico',bula:'Bulário',fluxo:'Fluxograma',slides:'Apresentação'}[it.k]||'Nota';
-  const ttl=(it.k==='deck'?o.name:o.title)||(it.k==='deck'?'Baralho':'Sem título'),ico=it.k==='deck'?'cards':it.k==='ink'?'pen':it.k==='slides'?'monitor':it.k==='pdf'?'file':it.k==='questao'?'help':it.k==='caso'?'pulse':it.k==='bula'?'pill':it.k==='fluxo'?'grid':'note';
+  const ttl=(it.k==='deck'?o.name:o.title)||(it.k==='deck'?'Baralho':'Sem título'),ico=it.k==='deck'?'cards':it.k==='ink'?'pen':it.k==='slides'?'monitor':it.k==='pdf'?'file':it.k==='questao'?'help':it.k==='simulado'?'list':it.k==='caso'?'pulse':it.k==='bula'?'pill':it.k==='fluxo'?'grid':'note';
   const snip=it.k==='note'?noteText(o).replace(/\s+/g,' ').slice(0,110):'';
   const upd=o.updated?fmtDM(toISO(new Date(o.updated))):'';
   const img=isNoteK(it.k)&&it.k!=='fluxo'?noteImgs(o,1)[0]:'';
@@ -6066,7 +6078,7 @@ function renderNotas(){
     UI.nview=null;
   }
   if(UI.nsub==='estudar')return studyHTML();
-  const roots=S.cats.filter(c=>!c.parentId),tf=[['','Tudo'],['note','Notas'],['ink','Cadernos'],['questao','Questões'],['caso','Casos clínicos'],['bula','Bulário'],['fluxo','Fluxogramas'],['deck','Baralhos'],['pdf','PDFs'],['slides','Apresentações']];
+  const roots=S.cats.filter(c=>!c.parentId),tf=[['','Tudo'],['note','Notas'],['ink','Cadernos'],['questao','Questões'],['simulado','Simulados'],['caso','Casos clínicos'],['bula','Bulário'],['fluxo','Fluxogramas'],['deck','Baralhos'],['pdf','PDFs'],['slides','Apresentações']];
   return nSubBar()+'<div class="nlay'+(UI.ftoff.notes?' nofo':'')+'">'+(UI.ftoff.notes?'':'<aside class="ftree" aria-label="Pastas">'+treeHead('notes')+
     '<div class="fo '+(UI.nf===''?'on':'')+'" data-a="n-folder" data-id="" role="button" tabindex="0"><span class="fnm">'+ic('layers',16)+'Todas</span><span class="count">'+(S.notes.length+S.pdfs.length+S.decks.length+(S.slides||[]).length)+'</span></div>'+
     '<div class="fo '+(UI.nf==='__none'?'on':'')+'" data-a="n-folder" data-id="__none" role="button" tabindex="0"><span class="fnm">'+ic('note',16)+'Sem pasta</span><span class="count">'+folderCount('__none')+'</span></div>'+
@@ -6082,7 +6094,7 @@ function qGroupBarHTML(){
   if(UI.ntype!=='questao')return '';
   const gs=qGroups(),none=questions().filter(q=>!q.qgroup).length;
   const cnt=g=>questions().filter(q=>q.qgroup===g).length;
-  return '<div class="frow" style="margin-bottom:12px"><span class="fl" style="min-width:auto">Grupo</span><button class="chip '+(!UI.qgrp?'on':'')+'" data-a="q-grp" data-v="">Todos</button>'+
+  return '<div class="frow" style="margin-bottom:12px"><button class="btn sm" data-a="sim-new">'+ic('list',13)+' Juntar em simulado</button><span class="fl" style="min-width:auto">Grupo</span><button class="chip '+(!UI.qgrp?'on':'')+'" data-a="q-grp" data-v="">Todos</button>'+
     gs.map(g=>'<button class="chip '+(UI.qgrp===g?'on':'')+'" data-a="q-grp" data-v="'+esc(g)+'">'+esc(g)+' ('+cnt(g)+')</button>').join('')+
     (none&&gs.length?'<button class="chip '+(UI.qgrp==='__none'?'on':'')+'" data-a="q-grp" data-v="__none">Sem grupo ('+none+')</button>':'')+
     (UI.qgrp&&UI.qgrp!=='__none'?'<button class="btn sm ghost" data-a="q-grp-ren">'+ic('edit',13)+' Renomear grupo</button>':'')+
@@ -6137,7 +6149,38 @@ function qEditMetaHTML(n){
     '<label class="f">Ano<input id="qano" inputmode="numeric" maxlength="4" value="'+esc(n.ano)+'" autocomplete="off"></label>'+
     '<label class="f">Grupo de questões<input id="qgroup" list="qgroups" value="'+esc(n.qgroup)+'" autocomplete="off"><datalist id="qgroups">'+qGroups().map(x=>'<option value="'+esc(x)+'">').join('')+'</datalist></label></div>';
 }
+// Simulado: várias questões das Notas reunidas numa nota só (as questões originais continuam nas Notas)
+function simQs(n){return (n.qIds||[]).map(noteById).filter(q=>q&&q.type==='questao');}
+function simViewHTML(n){
+  const qs=simQs(n);
+  let h='<div class="nhead"><button class="btn sm ghost" data-a="n-back">'+ic('chevL',14)+' Notas</button><span class="sp"></span><button class="btn sm" data-a="sim-edit" data-id="'+n.id+'">'+ic('edit',14)+' Editar questões</button><button class="icon-btn" data-a="n-del" title="Excluir" aria-label="Excluir">'+ic('trash',18)+'</button></div>'+
+    '<h1 class="ntitle" style="margin:6px 0 4px">'+esc(n.title||'Simulado')+'</h1><div class="muted small" style="margin-bottom:14px">'+qs.length+(qs.length===1?' questão':' questões')+' reunidas num simulado. As questões originais continuam nas Notas.</div>';
+  if(!qs.length)return h+'<div class="empty">Nenhuma questão neste simulado.<br><button class="btn primary" data-a="sim-edit" data-id="'+n.id+'">Adicionar questões</button></div>';
+  qs.forEach((q,i)=>{
+    h+='<section class="simq"><div class="simq-h"><b>'+(i+1)+'.</b><span>'+esc(q.title||'Questão')+'</span><button class="icon-btn sm" data-a="sim-rm" data-id="'+n.id+'" data-q="'+q.id+'" title="Tirar do simulado" aria-label="Tirar do simulado">'+ic('x',13)+'</button></div>'+
+      '<div class="simq-b ned">'+(q.html||'')+'</div><details class="simq-g"><summary>Gabarito e comentário</summary>'+(q.right||'')+(q.just||'')+'</details></section>';
+  });
+  return h;
+}
+function simDlg(id){
+  const n=id?noteById(id):null,sel=new Set(n?n.qIds||[]:[]);
+  const qs=S.notes.filter(x=>x.type==='questao').sort((a,b)=>String(a.title||'').localeCompare(String(b.title||''),'pt-BR',{numeric:true}));
+  openModal('<div class="form"><div class="fh"><h2>'+(n?'Editar simulado':'Juntar questões em simulado')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
+    '<label class="f">Título do simulado<input id="simTitle" value="'+esc(n?n.title:'Simulado')+'" autocomplete="off"></label>'+
+    '<label class="f">Buscar<input id="simQ" type="search" placeholder="Buscar questão" autocomplete="off"></label>'+
+    '<div id="simPick" class="simpick">'+(qs.length?qs.map(q=>'<label class="pitem"><input type="checkbox" value="'+q.id+'" '+(sel.has(q.id)?'checked':'')+'><span>'+esc(q.title||'Questão')+'</span><small>'+esc([q.prova,q.ano,q.qgroup].filter(Boolean).join(' | '))+'</small></label>').join(''):'<div class="muted small">Nenhuma questão nas Notas ainda. Envie questões do banco MedFisher para as Notas.</div>')+'</div>'+
+    '<div class="ff"><span class="sp"></span><button class="btn" data-a="cancel">Cancelar</button><button class="btn primary" data-a="sim-save" data-id="'+(n?n.id:'')+'">'+(n?'Salvar':'Criar simulado')+'</button></div></div>');
+  const q=$('#simQ');if(q)q.addEventListener('input',e=>{const v=norm(e.target.value);$$('#simPick .pitem').forEach(l=>{l.style.display=norm(l.textContent).indexOf(v)>=0?'':'none';});});
+}
+// Foco × banco MedFisher: questões do banco com este Foco (pelo nome), erros e acertos
+const mfFocoList=f=>(MFD.idx||[]).filter(q=>norm(q.foco)===norm(f.name));
+const mfR=()=>(MFD.est&&MFD.est.r)||{};
+const mfFocoErr=f=>mfFocoList(f).filter(q=>{const r=mfR()[q.id];return r&&r[1]===0;});
+function mfStatOf(list){let ok=0,err=0,nr=0;const e=mfR();list.forEach(q=>{const r=e[q.id];if(!r)nr++;else if(r[1]===1)ok++;else if(r[1]===0)err++;});const t=ok+err;return {ok:ok,err:err,nr:nr,tot:list.length,pct:t?Math.round(ok/t*100):null};}
+// questões enviadas para as Notas que pertencem a este Foco (pelo Foco marcado ou pelo foco do MedFisher)
+function focoQNotes(f){return S.notes.filter(n=>n.type==='questao'&&(focoIdsOf(n).indexOf(f.id)>=0||(!!n.qgroup&&norm(n.qgroup)===norm(f.name))));}
 function noteViewHTML(n){
+  if(n.type==='simulado')return simViewHTML(n);
   const edit=UI.nview.edit,isQ=n.type==='questao',isC=n.type==='caso',isF=n.type==='fluxo',isB=n.type==='bula';
   let h='<div class="nhead"><button class="btn sm ghost" data-a="n-back">'+ic('chevL',14)+' Notas</button><span class="sp"></span>'+(isC?'<button class="btn sm soapbtn '+(n.soapOn?'on':'')+'" data-a="soap-toggle" aria-pressed="'+(n.soapOn?'true':'false')+'" title="Mostra os campos S, O, A e P do caso">'+ic('layers',14)+' Modo SOAP</button>':'')+
     '<button class="btn sm ghost serifbtn '+(((S.prefs.noteFont||(S.prefs.noteSerif?'serif':'poppins'))!=='poppins')?'on':'')+'" data-a="n-serif" aria-pressed="'+(((S.prefs.noteFont||(S.prefs.noteSerif?'serif':'poppins'))!=='poppins')?'true':'false')+'" title="Alternar a fonte do texto das notas: Poppins, Serifada (Crimson Pro) ou Montserrat">'+ic('type',14)+' '+({poppins:'Poppins',serif:'Serifada',montserrat:'Montserrat'}[S.prefs.noteFont||(S.prefs.noteSerif?'serif':'poppins')])+'</button>'+
@@ -7463,7 +7506,7 @@ function citeItems(){
   const out=[],cur=UI.nview&&UI.nview.id;
   S.acts.forEach(a=>out.push({k:'act',id:a.id,label:aT(a),g:'Atividades',sub:a.slots[0]&&a.slots[0].mode==='date'?fmtDM(a.slots[0].date):'semanal'}));
   S.tasks.forEach(t=>out.push({k:'task',id:t.id,label:t.title,g:'Tarefas',sub:t.done?'concluída':(tDue(t)?fmtDM(tDue(t)):'')}));
-  S.docs.forEach(d=>out.push({k:'doc',id:d.id,label:d.title,g:'Documentos',sub:FX[docExt(d)]?FX[docExt(d)].nome:''}));
+  docsRecent().forEach(d=>out.push({k:'doc',id:d.id,label:d.title,g:'Documentos',sub:FX[docExt(d)]?FX[docExt(d)].nome:''}));
   S.goals.forEach(g=>out.push({k:'goal',id:g.id,label:g.title,g:'Objetivos',sub:HNAME[g.horizon]}));
   S.dates.forEach(d=>out.push({k:'date',id:d.id,label:d.title,g:'Datas e prazos',sub:d.date?fmtDM(d.date):''}));
   S.links.forEach(l=>out.push({k:'link',id:l.id,label:l.title,g:'Links',sub:hostOf(l.url)}));
@@ -7557,7 +7600,19 @@ Object.assign(ACT,{
   'qt-next'(){qtNext();},
   'qt-stop'(){closeModal();UI.qt=null;},
   'qt-open-q'(el){closeModal();UI.qt=null;UI.tab='notas';UI.nsub='notas';UI.nview={type:'note',id:el.dataset.id,edit:false};renderTabs();renderMain();window.scrollTo(0,0);},
-  'n-open'(el){flushNote();pdfLeave();slLeave();UI.exOpen={};const k=el.dataset.k;UI.nview={type:(k==='questao'||k==='caso'||k==='fluxo'||k==='bula')?'note':k,id:el.dataset.id,edit:false};renderMain();window.scrollTo(0,0);},
+  'sim-new'(el){simDlg('');},
+  'sim-edit'(el){simDlg(el.dataset.id||'');},
+  'sim-save'(el){
+    const id=el.dataset.id,ids=$$('#simPick input:checked').map(i=>i.value),title=(($('#simTitle')||{}).value||'').trim()||'Simulado';
+    if(!ids.length){toast('Escolha ao menos uma questão.');return;}
+    let n=id?noteById(id):null;
+    if(!n){n=normNote({id:uid(),type:'simulado',title:title,html:'',qIds:ids,folderId:'',catId:'',cd:null,created:Date.now(),updated:Date.now()});S.notes.push(n);}
+    else{n.title=title;n.qIds=ids;n.updated=Date.now();}
+    save();closeModal();UI.tab='notas';UI.nsub='notas';UI.nview={type:'note',id:n.id,edit:false};renderTabs();renderMain();window.scrollTo(0,0);
+  },
+  'sim-rm'(el){const n=noteById(el.dataset.id);if(!n)return;n.qIds=(n.qIds||[]).filter(x=>x!==el.dataset.q);n.updated=Date.now();save();renderMain();},
+  'foco-mfq'(el){const f=focoById(el.dataset.f);if(!f)return;const wr=mfFocoErr(f);UI.mfq={ids:wr.map(q=>q.id),i:Number(el.dataset.i)||0,show:false};closeModal();UI.tab='questoes';renderTabs();renderMain();mfShowQ();},
+  'n-open'(el){flushNote();pdfLeave();slLeave();UI.exOpen={};const k=el.dataset.k;UI.nview={type:(k==='questao'||k==='caso'||k==='fluxo'||k==='bula'||k==='simulado')?'note':k,id:el.dataset.id,edit:false};renderMain();window.scrollTo(0,0);},
   'n-sub'(el){flushNote();pdfLeave();slLeave();studyStop();UI.nview=null;UI.nsub=el.dataset.v;renderMain();},
   'n-type'(el){UI.ntype=el.dataset.v;UI.qgrp='';renderMain();},
   'q-reveal'(el){const a=$('#qans');if(!a)return;a.hidden=!a.hidden;el.innerHTML=ic('eye',15)+(a.hidden?' Mostrar resposta':' Ocultar resposta');},
@@ -14699,7 +14754,7 @@ function focoProg(f){
   const L=focoLinked(f),tdone=L.tasks.filter(t=>t.done).length;
   let edone=0,etot=0;L.acts.forEach(a=>{const os=occurrences(addISO(todayISO(),-120),addISO(todayISO(),120)).filter(o=>o.act.id===a.id);etot+=os.length;edone+=os.filter(o=>o.done).length;});
   const tot=L.tasks.length+etot,done=tdone+edone;
-  return {L:L,tdone:tdone,ttot:L.tasks.length,edone:edone,etot:etot,pct:tot?Math.round(done/tot*100):0,any:L.tasks.length+L.acts.length+L.notes.length+L.files.length};
+  return {L:L,mf:mfStatOf(mfFocoList(f)),tdone:tdone,ttot:L.tasks.length,edone:edone,etot:etot,pct:tot?Math.round(done/tot*100):0,any:L.tasks.length+L.acts.length+L.notes.length+L.files.length};
 }
 function renderAssuntos(){
   const q=norm(UI.ftq||''),ar=UI.ftArea||'';
@@ -14711,12 +14766,12 @@ function renderAssuntos(){
   (S.areas||[]).forEach(a=>{
     const fs=list.filter(f=>f.area===a.id);if(!fs.length)return;
     const mods={};fs.forEach(f=>{(mods[f.mod]=mods[f.mod]||[]).push(f);});
-    h+='<section class="ftarea"><h3 class="fth" style="--fc:'+esc(a.color)+'"><span class="fpill big">'+ic(a.icon,18)+'<span>'+esc(a.name)+'</span></span><span class="muted small">'+fs.length+'</span></h3>';
+    h+='<section class="ftarea"><h3 class="fth" style="--fc:'+esc(a.color)+'"><span class="fpill big">'+ic(a.icon,18)+'<span>'+esc(a.name)+'</span></span><span class="muted small">'+fs.length+'</span>'+(function(){const am=mfStatOf(fs.reduce((x,f)=>x.concat(mfFocoList(f)),[]));return am.pct!=null?'<span class="muted small">acerto '+am.pct+'% no banco</span>':'';})()+'</h3>';
     Object.keys(mods).sort((x,y)=>x==='Princípios'?-1:y==='Princípios'?1:x.localeCompare(y,'pt-BR')).forEach(m=>{
       const ms=MOD_ICO.find(x=>m!=='Princípios'&&x[0].test(m));
       h+='<div class="ftmod">'+(ms?ic(ms[1],14):'')+esc(m)+'</div><div class="ftlist">'+mods[m].sort((x,y)=>x.name.localeCompare(y.name,'pt-BR')).map(f=>{
         const p=focoProg(f);
-        return '<button class="ftrow" data-a="ft-open" data-id="'+f.id+'"><span class="ftn">'+esc(f.name)+'</span>'+(p.any?'<span class="ftm">'+(p.ttot?ic('tasks',12)+p.tdone+'/'+p.ttot:'')+(p.etot?ic('calendar',12)+p.edone+'/'+p.etot:'')+(p.L.notes.length?ic('note',12)+p.L.notes.length:'')+(p.L.files.length?ic('file',12)+p.L.files.length:'')+'</span><span class="ftbar"><i style="width:'+p.pct+'%"></i></span>':'<span class="ftm"></span><span></span>')+'</button>';
+        return '<button class="ftrow" data-a="ft-open" data-id="'+f.id+'"><span class="ftn">'+esc(f.name)+'</span>'+(p.any?'<span class="ftm">'+(p.ttot?ic('tasks',12)+p.tdone+'/'+p.ttot:'')+(p.etot?ic('calendar',12)+p.edone+'/'+p.etot:'')+(p.L.notes.length?ic('note',12)+p.L.notes.length:'')+(p.L.files.length?ic('file',12)+p.L.files.length:'')+'</span>'+(p.mf.pct!=null?'<span class="ftm acc" title="Acerto no banco MedFisher">'+p.mf.pct+'% acerto</span>':'')+'<span class="ftbar"><i style="width:'+p.pct+'%"></i></span>':'<span class="ftm"></span><span></span>')+'</button>';
       }).join('')+'</div>';
     });
     h+='</section>';
@@ -14725,11 +14780,18 @@ function renderAssuntos(){
 }
 function focoModalHTML(f,tab){
   const p=focoProg(f),L=p.L,st=focoStyle(f);tab=tab||'tarefas';
-  const tabs=[['tarefas','Tarefas',L.tasks.length],['eventos','Eventos',L.acts.length],['arquivos','Arquivos',L.files.length],['notas','Notas',L.notes.length]];
+  const qn=focoQNotes(f),qe=p.mf.err;
+  const tabs=[['tarefas','Tarefas',L.tasks.length],['eventos','Eventos',L.acts.length],['arquivos','Arquivos',L.files.length],['notas','Notas',L.notes.length],['questoes','Questões',qn.length+qe]];
   let body='';
   if(tab==='tarefas')body=L.tasks.map(t=>'<div class="ftit"><button class="chk sm '+(t.done?'on':'')+'" data-a="toggle-task" data-id="'+t.id+'" aria-label="Concluir">'+ic('check',12)+'</button><span class="'+(t.done?'done':'')+'" data-a="view-task" data-id="'+t.id+'">'+esc(t.title)+'</span><small>'+(tDue(t)?fmtDM(tDue(t)):'')+'</small></div>').join('')+'<button class="btn sm ghost" data-a="ft-add" data-w="task" data-id="'+f.id+'">'+ic('plus',13)+' Tarefa deste foco</button>';
   else if(tab==='eventos')body=L.acts.map(a=>'<div class="ftit"><span data-a="view-act" data-aid="'+a.id+'">'+esc(aT(a))+'</span><small>'+esc(a.slots[0]?(a.slots[0].mode==='date'?fmtDM(a.slots[0].date):'semanal'):'')+'</small></div>').join('')+'<button class="btn sm ghost" data-a="ft-add" data-w="act" data-id="'+f.id+'">'+ic('plus',13)+' Evento deste foco</button>';
   else if(tab==='arquivos')body=L.files.map(x=>'<div class="ftit"><span data-a="n-goto" data-k="'+x.k+'" data-id="'+x.o.id+'">'+esc(x.o.title||x.o.name||'Arquivo')+'</span><small>'+({doc:'Documento',pdf:'PDF',slides:'Apresentação',ink:'Caderno',deck:'Baralho'}[x.k])+'</small></div>').join('');
+  else if(tab==='questoes'){
+    const wr=mfFocoErr(f),m=p.mf;
+    body='<div class="fstat"><b>'+(m.pct==null?'—':m.pct+'%')+'</b> de acerto no banco MedFisher | '+m.ok+' certas, '+m.err+' erradas, '+m.nr+' não respondidas de '+m.tot+(MFD.st!=='ok'?' <span class="muted">(abra a aba Questões para carregar o banco)</span>':'')+'</div>'+
+      '<h4 class="fsub">Enviadas para as Notas ('+qn.length+')</h4>'+(qn.map(n=>'<div class="ftit"><span data-a="n-goto" data-k="note" data-id="'+n.id+'">'+esc(n.title||'Questão')+'</span><small>'+esc(n.prova||'')+'</small></div>').join('')||'<div class="muted small">Nenhuma questão enviada para as Notas com este Foco.</div>')+
+      '<h4 class="fsub">Erradas no banco MedFisher ('+wr.length+')</h4>'+(wr.map((q,i)=>'<div class="ftit"><span data-a="foco-mfq" data-f="'+f.id+'" data-i="'+i+'">Q'+q.num+' | '+esc(q.inst)+' '+q.ano+'</span><small>'+esc(q.sub)+'</small></div>').join('')||'<div class="muted small">Nenhuma questão errada deste Foco.</div>');
+  }
   else body=L.notes.map(n=>'<div class="ftit"><span data-a="n-goto" data-k="note" data-id="'+n.id+'">'+esc(n.title||'Sem título')+'</span><small>'+esc({questao:'Questão',caso:'Caso clínico',bula:'Bulário',fluxo:'Fluxograma'}[n.type]||'Nota')+'</small></div>').join('')+'<button class="btn sm ghost" data-a="ft-add" data-w="note" data-id="'+f.id+'">'+ic('plus',13)+' Nota deste foco</button>';
   if(!body.replace(/<button[^>]*>.*?<\/button>/g,'').trim())body='<div class="muted small" style="padding:8px 0">Nada vinculado ainda.</div>'+body;
   return '<div class="form"><div class="fh"><div style="min-width:0">'+focoPill(f)+'<h2 style="margin-top:6px">'+esc(f.name)+'</h2></div><span class="sp"></span><button class="icon-btn" data-a="ft-edit" data-id="'+f.id+'" aria-label="Editar">'+ic('edit',18)+'</button><button class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
