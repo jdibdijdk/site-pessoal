@@ -1122,6 +1122,10 @@ span.cm{background:rgba(224,169,59,.22);border-bottom:2px dotted #E0A93B;cursor:
 .ned.editing span.cm{cursor:text}
 .cmnote{font-size:.78em;line-height:1.4;color:var(--mut);background:rgba(224,169,59,.12);border-left:3px solid #E0A93B;border-radius:6px;padding:5px 10px;margin:12px 0 4px;font-family:var(--font)}
 .cmrow b{color:var(--tx);font-weight:600}
+span.cm.cmhov{position:relative}
+.cmpop{position:absolute;left:0;bottom:calc(100% + 6px);z-index:30;width:max-content;max-width:300px;font-size:.78em;line-height:1.4;font-weight:400;font-style:normal;color:var(--mut);background:var(--card);border:1px solid var(--line);border-left:3px solid #E0A93B;border-radius:8px;box-shadow:var(--sh2);padding:6px 10px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .15s;white-space:normal;text-align:left}
+.cmpop b{color:var(--tx);font-weight:600}
+span.cm.cmhov:hover .cmpop,span.cm.cmhov:focus .cmpop{opacity:1;visibility:visible}
 .fnsec{margin-top:22px;padding-top:10px;border-top:1px solid var(--line3);font-size:.85em;color:var(--mut)}
 .fnh{font-weight:700;font-size:.85em;letter-spacing:.2px;margin-bottom:4px}
 .fnlist{margin:0;padding-left:1.4em}
@@ -6196,7 +6200,7 @@ function noteViewHTML(n){
     h+='<h2 class="vt" style="margin-top:4px">'+nkBadge(n,20)+esc(n.title||(isQ?'Questão':isC?'Caso clínico':isF?'Fluxograma':isB?'Bulário':'Sem título'))+'</h2><div class="nmetarow" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px;align-items:center">'+(isQ?'<span class="tag outline">Questão</span>':isC?'<span class="tag outline">Caso clínico</span>':isF?'<span class="tag outline">Fluxograma</span>':isB?'<span class="tag outline">'+(n.kind==='classe'?'Classe':'Medicamento')+'</span>':'')+(isQ?qMetaChips(n):'')+(n.catId?tagHTML(n.catId):'')+(typeof focoChips==='function'&&focoIdsOf(n).length?'<span class="nfocos" style="display:inline-flex;gap:6px;flex-wrap:wrap">'+focoChips(n)+'</span>':'')+cdChipHTML(n.cd)+noteTags(n).map(tagChip).join('')+(n.folderId?'<span class="meta mi" style="font-size:13px;color:var(--mut)">'+ic('folder',13)+esc(folderPath(n.folderId).join(' › '))+'</span>':'')+'<span class="muted small">Atualizada '+(n.updated?fmtDM(toISO(new Date(n.updated))):'')+'</span></div>';
   }
   const ed=(f,id,ph)=>{
-    const dec=edit?null:noteDecorate(n[f]||'',UI.prOpt);
+    const dec=edit?null:noteDecorate(n[f]||'',Object.assign({},UI.prOpt,{hov:true}));
     return '<div '+(id?'id="'+id+'" ':'')+'class="ned '+(edit?'editing':'')+(n.cols===2&&f==='html'?' doc2':'')+'" '+(edit?'contenteditable="true" spellcheck="true"':'')+' data-f="'+f+'" data-ph="'+ph+'">'+(edit?cleanHTML(n[f]||''):dec.html+dec.fn)+'</div>';
   };
   const has=f=>!!(n[f]&&noteText({html:n[f]}));
@@ -7297,6 +7301,9 @@ function noteDecorate(html,o){
     sp.setAttribute('title',(k==='ref'?'Referência: ':'Explicação: ')+tx);
   });
   if(o.cm===false){$$('span.cm',t).forEach(c=>{while(c.firstChild)c.parentNode.insertBefore(c.firstChild,c);c.remove();});}
+  else if(o.hov){ // visualização: o comentário aparece num balão só ao passar o mouse sobre o trecho
+    $$('span.cm',t).forEach(c=>{const p=document.createElement('span');p.className='cmpop';const q=document.createElement('b');q.textContent='“'+clip(c.textContent,70)+'”';p.appendChild(q);p.appendChild(document.createTextNode(' '+(c.getAttribute('data-c')||'')));c.classList.add('cmhov');c.removeAttribute('title');c.appendChild(p);});
+  }
   else{
     Array.from(t.children).forEach(blk=>{
       const cms=blk.matches('span.cm')?[blk]:$$('span.cm',blk);if(!cms.length)return;
