@@ -16391,10 +16391,10 @@ function plCfgDlg(){
   openModal('<form id="fPl" class="form"><div class="fh"><h2>Conexão com o Nubank</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<p class="muted small" style="margin:0 0 8px">O Nubank não tem API pública para pessoa física. O caminho é o <b>Open Finance</b> por um agregador autorizado, a <b>Pluggy</b>, que lê a sua conta com o seu consentimento. A leitura é só de consulta; as chaves ficam no seu Worker, nunca no site.</p>'+
     '<ol class="muted small" style="margin:0 0 10px 18px"><li>Crie uma conta na Pluggy e conecte o Nubank pelo Open Finance. Copie o <b>ID do item</b> dessa conexão.</li><li>No Worker, guarde os segredos <code>PLUGGY_CLIENT_ID</code> e <code>PLUGGY_CLIENT_SECRET</code> (do painel da Pluggy) e faça o deploy da versão atual.</li><li>Em Ajustes > Pingado, confira o endereço do Worker e a senha (a mesma é usada aqui).</li></ol>'+
-    '<label class="f">ID do item na Pluggy<input name="item" value="'+esc(S.prefs.plItem||'')+'" placeholder="00000000-0000-0000-0000-000000000000" autocomplete="off"></label>'+
+    '<label class="f">ID do item na Pluggy<input name="plitem" value="'+esc(S.prefs.plItem||'')+'" placeholder="00000000-0000-0000-0000-000000000000" autocomplete="off"></label>'+
     '<label class="chip cb" style="align-self:flex-start;margin:4px 0"><input type="checkbox" name="auto" '+(S.prefs.plAuto!==false?'checked':'')+'><span>Sincronizar sozinho ao abrir Finanças (no máximo a cada 20 min)</span></label>'+
     '<div class="ff">'+(S.prefs.plItem?'<button type="button" class="btn danger" data-a="pl-off">Desconectar</button>':'')+'<span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar e sincronizar</button></div></form>');
-  $('#fPl').addEventListener('submit',e=>{e.preventDefault();const E=e.target.elements;S.prefs.plItem=E.item.value.trim();S.prefs.plAuto=E.auto.checked;save();closeModal();renderMain();plSync(true);});
+  $('#fPl').addEventListener('submit',e=>{e.preventDefault();const E=e.target.elements;S.prefs.plItem=E.plitem.value.trim();S.prefs.plAuto=E.auto.checked;save();closeModal();renderMain();plSync(true);});
 }
 Object.assign(ACT,{
   'pl-cfg'(){plCfgDlg();},
