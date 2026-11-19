@@ -95,10 +95,133 @@ async function pingado(request, env, u) {
   } catch (e) { return out({ error: 'Falha ao falar com o Google: ' + (e && e.message || e) }, 502); }
 }
 
+// ----- Calendário .ics (somente leitura): GET /calendar.ics?token=… -----
+// O token é criado no site (Ajustes > App e Widgets) e fica em prefs.icsToken, no mesmo documento do Firestore.
+// Eventos (S.acts, com repetição semanal a cada N semanas, a cada N dias e exceções por dia) e datas (S.dates) viram um
+// arquivo iCalendar (RFC 5545) que o Google Agenda, o Outlook e o Apple Agenda assinam por URL.
+const ICS_TZ = 'America/Sao_Paulo';
+const icsEsc = (t) => String(t == null ? '' : t).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+function icsFold(line) { // linhas de no máximo 75 octetos; as continuações começam com um espaço
+  const e = new TextEncoder();
+  if (e.encode(line).length <= 75) return line;
+  const out = []; let cur = '', bytes = 0;
+  for (const ch of line) {
+    const b = e.encode(ch).length;
+    if (bytes + b > 75) { out.push(cur); cur = ' ' + ch; bytes = 1 + b; } else { cur += ch; bytes += b; }
+  }
+  out.push(cur); return out.join('\r\n');
+}
+const icsDay = (iso, n) => { const d = new Date(iso + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const icsDow = (iso) => new Date(iso + 'T00:00:00Z').getUTCDay();
+const icsMonday = (iso) => icsDay(iso, -((icsDow(iso) + 6) % 7));
+const icsDiff = (a, b) => Math.round((Date.parse(a + 'T00:00:00Z') - Date.parse(b + 'T00:00:00Z')) / 864e5);
+const icsYmd = (iso) => iso.replace(/-/g, '');
+const icsHm = (t) => String(t).replace(':', '') + '00';
+const icsAddMin = (t, m) => { const x = Math.min(1439, Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5)) + m); return String(Math.floor(x / 60)).padStart(2, '0') + ':' + String(x % 60).padStart(2, '0'); };
+const ICS_BYDAY = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+
+export function buildIcs(S, nowMs = Date.now()) {
+  const L = [];
+  const push = (l) => L.push(icsFold(l));
+  const stamp = new Date(nowMs).toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+  ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Site do Luis//Rotina//PT-BR', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:Rotina', 'X-WR-TIMEZONE:' + ICS_TZ,
+    'BEGIN:VTIMEZONE', 'TZID:' + ICS_TZ, 'BEGIN:STANDARD', 'DTSTART:19700101T000000', 'TZOFFSETFROM:-0300', 'TZOFFSETTO:-0300', 'TZNAME:-03', 'END:STANDARD', 'END:VTIMEZONE'].forEach(push);
+  const local = (name, iso, t) => name + ';TZID=' + ICS_TZ + ':' + icsYmd(iso) + 'T' + icsHm(t);
+  const vevent = (o) => {
+    push('BEGIN:VEVENT'); push('UID:' + o.uid); push('DTSTAMP:' + stamp);
+    if (o.recId) push(local('RECURRENCE-ID', o.recId.d, o.recId.t));
+    if (o.allDay) { push('DTSTART;VALUE=DATE:' + icsYmd(o.d)); push('DTEND;VALUE=DATE:' + icsYmd(icsDay(o.d, 1))); }
+    else { push(local('DTSTART', o.d, o.start)); push(local('DTEND', o.d, o.end)); }
+    if (o.rrule) push('RRULE:' + o.rrule);
+    (o.ex || []).forEach((x) => push(local('EXDATE', x.d, x.t)));
+    push('SUMMARY:' + icsEsc(o.summary));
+    if (o.place) push('LOCATION:' + icsEsc(o.place));
+    if (o.desc) push('DESCRIPTION:' + icsEsc(o.desc));
+    push('END:VEVENT');
+  };
+  const until = (iso) => 'UNTIL=' + icsYmd(icsDay(iso, 1)) + 'T025959Z'; // fim do dia local (-03:00) em UTC
+  for (const a of S.acts || []) {
+    const title = a.title || a.theme || a.tipoAtv || 'Atividade';
+    const descOf = (teacher) => [a.tipoAtv && 'Tipo: ' + a.tipoAtv, teacher && 'Professor(es): ' + teacher, a.doWhat && 'Objetivos: ' + a.doWhat, a.obs && 'Observações: ' + a.obs, a.link && 'Link: ' + a.link].filter(Boolean).join('\n');
+    const ov = a.overrides || {};
+    for (const s of a.slots || []) {
+      if (!s || !s.start) continue;
+      const end = s.end && s.end > s.start ? s.end : icsAddMin(s.start, 60), uid = (a.id || 'a') + '-' + (s.id || 's') + '@rotina';
+      if (s.mode === 'date') {
+        if (!s.date) continue;
+        vevent({ uid, d: s.date, start: s.start, end, summary: title, place: a.place, desc: descOf(a.teacher) });
+        continue;
+      }
+      const every = Math.max(1, Number(s.every) || 1);
+      let first, rule, valid;
+      if (s.mode === 'days') {
+        if (!s.date) continue;
+        first = s.date; rule = 'FREQ=DAILY;INTERVAL=' + every;
+        valid = (d) => d >= first && icsDiff(d, first) % every === 0;
+      } else {
+        const from = s.from || new Date(a.createdAt || nowMs).toISOString().slice(0, 10);
+        first = from; for (let i = 0; i < 7 && icsDow(first) !== s.weekday; i++) first = icsDay(first, 1);
+        rule = 'FREQ=WEEKLY;INTERVAL=' + every + ';BYDAY=' + ICS_BYDAY[s.weekday];
+        valid = (d) => d >= first && icsDow(d) === s.weekday && Math.round(icsDiff(icsMonday(d), icsMonday(first)) / 7) % every === 0;
+      }
+      if (s.until) { if (s.until < first) continue; rule += ';' + until(s.until); }
+      const dates = Object.keys(ov).filter((d) => valid(d) && (!s.until || d <= s.until)).sort();
+      const ex = dates.filter((d) => ov[d] && ov[d].cancelled).map((d) => ({ d, t: s.start }));
+      vevent({ uid, d: first, start: s.start, end, summary: title, place: a.place, desc: descOf(a.teacher), rrule: rule, ex });
+      for (const d of dates) { // exceções: uma ocorrência alterada vira um evento filho com RECURRENCE-ID
+        const o = ov[d]; if (!o || o.cancelled) continue;
+        const st = o.start || s.start, en = o.end && o.end > st ? o.end : (o.start ? icsAddMin(st, 60) : end);
+        vevent({ uid, recId: { d, t: s.start }, d, start: st, end: en, summary: o.title || title, place: o.place != null ? o.place : a.place, desc: descOf(o.teacher != null ? o.teacher : a.teacher) });
+      }
+    }
+  }
+  for (const x of S.dates || []) {
+    if (!x || !x.date) continue;
+    const summary = (x.cat ? x.cat + ': ' : '') + (x.title || 'Data'), uid = (x.id || x.date) + '@rotina';
+    if (x.time && /^\d{2}:\d{2}$/.test(x.time)) vevent({ uid, d: x.date, start: x.time, end: icsAddMin(x.time, 60), summary, desc: x.notes });
+    else vevent({ uid, d: x.date, allDay: true, summary, desc: x.notes });
+  }
+  L.push('END:VCALENDAR');
+  return L.join('\r\n') + '\r\n';
+}
+
+const icsSafeEq = (a, b) => { a = String(a); b = String(b); let r = a.length ^ b.length; for (let i = 0; i < Math.max(a.length, b.length); i++) r |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0); return r === 0; };
+// lê as partes do estado no Firestore (REST): meta -> p_<chave>_<n>
+function icsReader(cfg) {
+  const base = 'https://firestore.googleapis.com/v1/projects/' + cfg.FB_PROJECT + '/databases/(default)/documents/rotina/' + cfg.FB_KEY + '_';
+  const get = async (name) => { const r = await fetch(base + name + '?key=' + cfg.FB_API_KEY); if (r.status === 404) return null; if (!r.ok) throw new Error('Firestore ' + r.status); return r.json(); };
+  let meta;
+  return async (key) => {
+    if (!meta) meta = await get('meta');
+    const p = meta && meta.fields && meta.fields.parts && meta.fields.parts.mapValue && meta.fields.parts.mapValue.fields && meta.fields.parts.mapValue.fields[key];
+    if (!p) return null;
+    const n = Number(p.mapValue.fields.n.integerValue || 0);
+    const docs = await Promise.all(Array.from({ length: n }, (_, i) => get('p_' + key + '_' + i)));
+    if (docs.some((d) => !d)) throw new Error('dados incompletos (' + key + ')');
+    return JSON.parse(docs.map((d) => d.fields.t.stringValue).join(''));
+  };
+}
+async function calendar(request, env, u) {
+  const cfg = Object.assign({}, DEF, Object.fromEntries(Object.entries(env || {}).filter(([, v]) => typeof v === 'string' && v)));
+  const txt = (body, status) => new Response(body, { status, headers: { 'content-type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' } });
+  if (request.method !== 'GET' && request.method !== 'HEAD') return txt('Método não permitido.', 405);
+  const token = u.searchParams.get('token') || '';
+  if (token.length < 16) return txt('Token ausente ou inválido.', 403);
+  try {
+    const part = icsReader(cfg);
+    const misc = await part('misc'), want = (misc && misc.prefs && misc.prefs.icsToken) || '';
+    if (!want || !icsSafeEq(token, want)) return txt('Token inválido.', 403); // só lê os eventos depois de conferir o token
+    const body = buildIcs({ acts: (await part('acts')) || [], dates: (await part('dates')) || [] });
+    return new Response(request.method === 'HEAD' ? null : body, { headers: { 'content-type': 'text/calendar; charset=utf-8', 'Content-Disposition': 'inline; filename="rotina.ics"', 'Cache-Control': 'private, max-age=300' } });
+  } catch (e) { return txt('Não foi possível ler os dados: ' + e.message, 503); }
+}
+
 export default {
   async scheduled(event, env, ctx) { ctx.waitUntil(run(env).then((l) => console.log(l.join('\n') || 'Nada a enviar.'))); },
   async fetch(request, env) {
     const u = new URL(request.url), cors = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
+    // calendário .ics somente leitura: /calendar.ics?token=… (o token é criado no site)
+    if (u.pathname === '/calendar.ics') return calendar(request, env, u);
     // título de uma página pública (usado ao colar links em Documentos): ?u=<endereço>
     if (u.searchParams.get('u')) {
       try {
