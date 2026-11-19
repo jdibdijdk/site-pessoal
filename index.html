@@ -2608,6 +2608,17 @@ html[data-theme="dark"] .dp.dt{background:#232C52;color:#B8C7FF}
 .fstat{padding:10px 12px;border-radius:10px;background:var(--soft);margin-bottom:10px;font-size:13.5px}
 .fsub{margin:14px 0 6px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut)}
 .ftm.acc{color:var(--acc);font-weight:600}
+
+/* ===== Execução: capacidade, comparativo do foco, dependências ===== */
+.capbar{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin:0 0 12px}
+.capbar-top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;font-size:13px}
+.capbar-track{height:6px;border-radius:99px;background:var(--soft);margin-top:6px;overflow:hidden}
+.capbar-track i{display:block;height:100%;background:var(--acc);border-radius:99px}
+.capbar.over{border-color:#C62F2F}.capbar.over .capbar-track i{background:#C62F2F}
+.capbar-warn{color:#C62F2F;font-weight:600;font-size:12.5px}
+.pmcmp{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--mut);margin:-2px 0 8px}.pmcmp b{color:var(--tx)}
+.pmbar{flex:1;min-width:80px;height:5px;border-radius:99px;background:var(--soft);overflow:hidden}.pmbar i{display:block;height:100%;background:var(--acc)}
+.mi.dep{color:#8F6422}
 </style>
 </head>
 <body>
@@ -3014,9 +3025,9 @@ function normalize(o){
     items:(Array.isArray(o.items)?o.items:seedItems()).map(i=>{const x=Object.assign({apps:[],inside:[]},i);if(!Array.isArray(x.inside))x.inside=[];if(x.container===undefined)x.container=/^bolsa/i.test(x.name)||norm(x.group||'')==='bolsas';if(ver<5&&x.group==='Eletrônicos'&&(x.name==='Mouse Logitech'||x.name==='Extensão'))x.group='Acessórios';return x;}),
     links:arr('links'),
     linkCats:(Array.isArray(o.linkCats)&&o.linkCats.length)?o.linkCats:LINKCATS.slice(),
-    packed:o.packed||{},revx:(o.revx&&typeof o.revx==='object'&&!Array.isArray(o.revx))?o.revx:{},bagRules:(Array.isArray(o.bagRules)?o.bagRules:[]).filter(r=>r&&r.value&&Array.isArray(r.itemIds)),health:arr('health'),hprefs:Object.assign({weeklyMin:150,sleepH:7,heightCm:''},o.hprefs||{}),fin:normFin(o.fin),
-    acts:arr('acts').map(a=>{const x=Object.assign({deckIds:[],title:'',kind:'Atividade',tipoAtv:'',blockType:'estudo',catId:'',teacher:'',noTeacher:false,obs:'',place:'',link:'',doWhat:'',where:'',plan:{},bring:'',slots:[],done:{},miss:{},goalIds:[],docIds:[],relId:'',itemIds:[],linkIds:[],stow:{},extras:[],moneys:[],noArea:false,themeNA:false},a);if(x.theme==null)x.theme=x.title;return x;}),
-    tasks:arr('tasks').map(t=>Object.assign({deckIds:[],title:'',notes:'',obs:'',deadline:'',catId:'',docId:'',link:'',done:false,activityIds:[],goalIds:[],linkIds:[],itemIds:[],where:'',plan:{},deadlineTime:'',dateIds:[],moneys:[],group:'',subs:[]},t)),
+    packed:o.packed||{},taskHist:Array.isArray(o.taskHist)?o.taskHist.slice(-500):[],revx:(o.revx&&typeof o.revx==='object'&&!Array.isArray(o.revx))?o.revx:{},bagRules:(Array.isArray(o.bagRules)?o.bagRules:[]).filter(r=>r&&r.value&&Array.isArray(r.itemIds)),health:arr('health'),hprefs:Object.assign({weeklyMin:150,sleepH:7,heightCm:''},o.hprefs||{}),fin:normFin(o.fin),
+    acts:arr('acts').map(a=>{const x=Object.assign({actualMin:0,deckIds:[],title:'',kind:'Atividade',tipoAtv:'',blockType:'estudo',catId:'',teacher:'',noTeacher:false,obs:'',place:'',link:'',doWhat:'',where:'',plan:{},bring:'',slots:[],done:{},miss:{},goalIds:[],docIds:[],relId:'',itemIds:[],linkIds:[],stow:{},extras:[],moneys:[],noArea:false,themeNA:false},a);if(x.theme==null)x.theme=x.title;return x;}),
+    tasks:arr('tasks').map(t=>Object.assign({actualMin:0,repeat:null,blockedBy:'',deckIds:[],title:'',notes:'',obs:'',deadline:'',catId:'',docId:'',link:'',done:false,activityIds:[],goalIds:[],linkIds:[],itemIds:[],where:'',plan:{},deadlineTime:'',dateIds:[],moneys:[],group:'',subs:[]},t)),
     docs:arr('docs').map(d=>Object.assign({title:'',catId:'',link:'',notes:'',todo:[],goalIds:[],linkIds:[],noteIds:[],folderId:'',ext:'',status:'',source:'',srcLink:'',starnote:false,driveId:'',driveMod:0},d)),
     goals:arr('goals').map(g=>Object.assign({title:'',horizon:'curto',parentId:'',done:false,linkIds:[]},g,{deadline:'',firm:false})),
     dates:arr('dates').map(d=>{const x=Object.assign({title:'',date:'',time:'',cat:'Prazo',notes:'',catId:'',deckIds:[],qtd:0,qlabel:''},d);x.deckIds=Array.isArray(x.deckIds)?x.deckIds:[];x.qtd=Math.max(0,Number(x.qtd)||0);return x;}),
@@ -4348,7 +4359,7 @@ function taskRow(t){
   const doc=t.docId&&docById(t.docId),acts=S.acts.filter(a=>t.activityIds.includes(a.id)),gs=S.goals.filter(g=>t.goalIds.includes(g.id)),dts=(t.dateIds||[]).map(dateById).filter(Boolean);
   return '<div class="trow '+(t.done?'done':'')+(ATTMAP[t.id]&&!t.done?' hot':'')+'"><button class="chk '+(t.done?'on':'')+'" data-a="toggle-task" data-id="'+t.id+'" aria-label="Concluir tarefa">'+ic('check',16)+'</button>'+
     '<div class="trb"><div class="lc-top"><span class="trail">Estudar › Tarefa'+(t.group?' › '+esc(t.group):'')+'</span><span class="lc-badge">'+(ATTMAP[t.id]&&!t.done?'<span class="due late">'+ic('bell',12)+'Prioritário</span>':dueChip(t))+'</span></div>'+((function(){const pa=catPath(t.catId);return pa.length>1?'<div class="lc-sub">'+esc(pa[pa.length-2].name)+'</div>':'';})())+'<div class="tt1"><span class="ttl" data-a="view-task" data-id="'+t.id+'">'+esc(t.title)+'</span></div>'+
-    '<div class="tmeta">'+tagHTML(t.catId)+focoChips(t)+(doc?'<span class="mi">'+ic('file',13)+esc(doc.title)+'</span>':'')+acts.map(a=>'<span class="mi">'+ic('calendar',13)+esc(aT(a))+'</span>').join('')+
+    '<div class="tmeta">'+tagHTML(t.catId)+(t.repeat?'<span class="mi">'+ic('repeat',13)+esc(repTxt(t.repeat))+'</span>':'')+(isBlockedTask(t)?'<span class="mi dep">'+ic('link',13)+'Depende de: '+esc(taskById(t.blockedBy).title)+'</span>':'')+focoChips(t)+(doc?'<span class="mi">'+ic('file',13)+esc(doc.title)+'</span>':'')+acts.map(a=>'<span class="mi">'+ic('calendar',13)+esc(aT(a))+'</span>').join('')+
       dts.map(d=>'<span class="mi">'+ic('clock',13)+esc(d.title)+'</span>').join('')+
       gs.map(g=>'<span class="mi">'+ic('target',13)+esc(g.title)+'</span>').join('')+((t.itemIds||[]).length?'<span class="mi">'+ic('bag',13)+t.itemIds.length+' objeto(s)</span>':'')+((t.moneys||[]).length?'<span class="mi">'+ic('dollar',13)+t.moneys.length+'</span>':'')+(t.link?linkHTML(t.link):'')+savedLinksHTML(t.linkIds)+(t.group?'<span class="mi">'+ic('layers',13)+esc(t.group)+'</span>':'')+tSubsChip(t)+'</div>'+tSubsBox(t)+
     (t.notes?'<div class="tnote">'+esc(t.notes)+'</div>':'')+(t.obs?'<div class="tnote">'+ic('note',12)+' '+esc(t.obs)+'</div>':'')+(t.where?'<div class="tnote">'+ic('pin',12)+' '+esc(t.where)+'</div>':'')+planLines(t)+(t.min?'<div class="lc-time">'+ic('clock',13)+' '+hm(t.min)+' estimado</div>':'')+(t.done?'':'<div class="lc-foot"><button class="btn sm" data-a="toggle-task" data-id="'+t.id+'">'+ic('check',13)+' Concluir</button><button class="btn sm ghost" data-a="att-plus1" data-id="'+t.id+'">Adiar</button><button class="btn sm primary" data-a="task-focus" data-id="'+t.id+'">'+ic('play',13)+' Foco</button></div>')+'</div>'+
@@ -4366,10 +4377,10 @@ function taskGroupKey(t,mode){
 }
 function renderTarefas(){
   const cs=UI.tcat?catDesc(UI.tcat):null,tcat=t=>!cs||cs.indexOf(t.catId)>=0;
-  const list=S.tasks.filter(passTask).filter(tcat),pend=list.filter(t=>!t.done),done=list.filter(t=>t.done),today=todayISO(),mode=tGrp();
+  const list=S.tasks.filter(passTask).filter(tcat),pend=list.filter(t=>!t.done&&!isBlockedTask(t)),blk=list.filter(t=>!t.done&&isBlockedTask(t)),done=list.filter(t=>t.done),today=todayISO(),mode=tGrp();
   const cmp=(a,b)=>(tDue(a)||'9999')<(tDue(b)||'9999')?-1:(tDue(a)||'9999')>(tDue(b)||'9999')?1:0;
   const allT=S.tasks.filter(passTask);
-  let h='<div class="toolbar"><div class="seg">'+[['todo','A fazer ('+pend.length+')'],['done','Concluídas ('+done.length+')'],['all','Todas']].map(v=>'<button class="'+(UI.taskTab===v[0]?'on':'')+'" data-a="set" data-k="taskTab" data-v="'+v[0]+'">'+v[1]+'</button>').join('')+'</div>'+
+  let h=capBarHTML(today)+'<div class="toolbar"><div class="seg">'+[['todo','A fazer ('+pend.length+')'],['done','Concluídas ('+done.length+')'],['all','Todas']].map(v=>'<button class="'+(UI.taskTab===v[0]?'on':'')+'" data-a="set" data-k="taskTab" data-v="'+v[0]+'">'+v[1]+'</button>').join('')+'</div>'+
     '<span class="sp"></span>'+(done.length?'<button class="btn sm ghost" data-a="tasks-clear-done">'+ic('trash',14)+' Excluir concluídas ('+done.length+')</button>':'')+'<button class="btn primary" data-a="new-task">'+ic('plus',15)+' Nova tarefa</button></div>'+
     '<div class="nfbar tfbar"><label class="nfsel"><span>Categoria</span><select id="tcatSel"><option value="">Todas</option>'+catTreeOpts(UI.tcat,id=>{const c=catDesc(id);return allT.filter(t=>!t.done&&c.indexOf(t.catId)>=0).length;})+'</select></label>'+
     '<label class="nfsel"><span>Agrupar por</span><select id="tgrpSel">'+T_GRPS.map(x=>'<option value="'+x[0]+'" '+(mode===x[0]?'selected':'')+'>'+x[1]+'</option>').join('')+'</select></label></div>';
@@ -4383,6 +4394,7 @@ function renderTarefas(){
       const secs=[['late','Atrasadas'],['today','Hoje'],['week','Próximos 7 dias'],['later','Depois'],['none','Sem prazo']];
       secs.forEach(s=>{if(g[s[0]].length){any=true;h+=fold('prazo|'+s[0],s[1],g[s[0]],s[0]==='late'?'late':'');}});
     }else if(pend.length){any=true;h+=byGroup(pend.slice().sort(cmp));}
+    if(blk.length){const op=!!UI.blkOpen;h+='<div class="sechead tgh" data-a="blk-fold" role="button" tabindex="0" aria-expanded="'+op+'">'+ic(op?'chevD':'chevR',14)+'Bloqueadas por dependência <span class="count">'+blk.length+'</span></div>'+(op?blk.sort(cmp).map(taskRow).join(''):'');}
     if(!any)h+='<div class="empty">Nenhuma tarefa pendente.<br><button class="btn primary" data-a="new-task">'+ic('plus',15)+' Criar tarefa</button></div>';
     const docs=S.docs.filter(d=>passDoc(d)&&docPending(d)>0&&(!cs||cs.indexOf(d.catId)>=0));
     if(docs.length){
@@ -5534,7 +5546,7 @@ function openActForm(opts){
 function openTaskForm(opts){
   opts=opts||{};
   const t0=opts.id?taskById(opts.id):null;
-  const p=Object.assign({title:'',notes:'',obs:'',deadline:'',deadlineTime:'',catId:'',docId:'',activityIds:[],goalIds:[],dateIds:[],link:'',linkIds:[],itemIds:[],where:'',plan:{},moneys:[],group:'',subs:[],min:0,focoIds:[]},t0||{},opts.prefill||{});
+  const p=Object.assign({title:'',notes:'',obs:'',deadline:'',deadlineTime:'',catId:'',docId:'',activityIds:[],goalIds:[],dateIds:[],link:'',linkIds:[],itemIds:[],where:'',plan:{},moneys:[],group:'',subs:[],min:0,focoIds:[],repeat:null,blockedBy:''},t0||{},opts.prefill||{});
   openModal('<form id="fTask" class="form"><div class="fh"><h2>'+(t0?'Editar tarefa':'Nova tarefa')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<label class="f">Título<input name="title" required value="'+esc(p.title)+'" autocomplete="off"></label>'+
     '<div class="pgfillrow"><button type="button" class="btn sm pgb" data-a="pg-fill-task" title="O Pingado completa descrição, metodologia, observações e tempo com base no título e em tarefas passadas; se você já escreveu algo, ele sugere ao lado"><span class="pgbi16">'+pgMascot('idle',16)+'</span> Delegar ao Pingado</button><span id="pgFillMsg" class="muted small">Completa as colunas vazias e sugere melhorias nas que você já escreveu.</span></div>'+
@@ -5545,6 +5557,10 @@ function openTaskForm(opts){
     '<label class="f">Metodologia<textarea name="where" rows="2">'+esc(p.where)+'</textarea></label>'+
     '<div class="f"><span>O que levar / usar</span>'+itemsPickHTML(p.itemIds)+'</div><div id="planbox"></div>'+
     '<div class="fgrid"><div class="f"><span>Prazo próprio</span><div class="frow" style="flex-wrap:nowrap"><input type="date" name="deadline" value="'+esc(p.deadline)+'" style="flex:1"><input type="time" name="deadlineTime" value="'+esc(p.deadlineTime||'')+'" style="width:110px"></div><div class="quick"><button type="button" class="chip" data-a="quick-due" data-v="0">Hoje</button><button type="button" class="chip" data-a="quick-due" data-v="1">Amanhã</button><button type="button" class="chip" data-a="quick-due" data-v="7">+7 dias</button><button type="button" class="chip" data-a="quick-due" data-v="">Sem prazo</button></div></div>'+
+    '<div class="fgrid"><div class="f"><span>Repetir</span><select name="repMode"><option value="">Não repete</option><option value="wk" '+sel('wk',p.repeat&&p.repeat.mode)+'>Semanal (dias da semana)</option><option value="mo" '+sel('mo',p.repeat&&p.repeat.mode)+'>Mensal (dia do mês)</option><option value="af" '+sel('af',p.repeat&&p.repeat.mode)+'>X dias após concluir</option></select></div>'+
+    '<label class="f">Dia do mês ou nº de dias <small>mensal: 1–31 · após concluir: dias</small><input type="number" name="repN" min="1" max="365" value="'+esc(p.repeat&&p.repeat.mode==='mo'?p.repeat.dom:p.repeat&&p.repeat.mode==='af'?p.repeat.days:'')+'"></label></div>'+
+    '<div class="f"><span>Dias da semana <small>para o modo semanal</small></span><div class="frow">'+REP_WD.map((x,i)=>'<label class="chip cb"><input type="checkbox" name="repWd" value="'+i+'" '+(p.repeat&&p.repeat.mode==='wk'&&(p.repeat.wd||[]).indexOf(i)>=0?'checked':'')+'><span>'+x+'</span></label>').join('')+'</div></div>'+
+    '<div class="f"><span>Depende de (tarefa pré-requisito)</span><select name="blockedBy"><option value="">Nenhuma</option>'+S.tasks.filter(x=>(!x.done||x.id===p.blockedBy)&&(!t0||x.id!==t0.id)).map(x=>'<option value="'+x.id+'" '+sel(x.id,p.blockedBy)+'>'+esc(x.title)+'</option>').join('')+'</select></div>'+
     '<div class="f"><span>Datas e prazos ligados</span>'+pickerHTML('dates',dateItems(),p.dateIds,'Ligar a datas / prazos')+'<span class="hint" style="font-size:12px;color:var(--mut2)">Crie datas na aba Datas.</span></div></div>'+
     '<div class="fgrid"><label class="f">Documento relacionado<select name="docId"><option value="">Nenhum</option>'+S.docs.map(d=>'<option value="'+d.id+'" '+sel(d.id,p.docId)+'>'+esc(d.title)+'</option>').join('')+'</select></label>'+
     '<div class="f"><span>Objetivos maiores</span>'+pickerHTML('goals',goalItems(),p.goalIds,'Em qual objetivo se encaixa')+'</div></div>'+
@@ -5562,6 +5578,10 @@ function openTaskForm(opts){
     const data={title:E.title.value.trim(),notes:E.notes.value.trim(),obs:E.obs.value.trim(),where:E.where.value.trim(),plan:readPlan(f),itemIds:$$('input[name=it]:checked',f).map(i=>i.value),deadline:E.deadline.value,deadlineTime:E.deadlineTime.value,docId:E.docId.value,catId:$('[data-catpick="cat"]',f).dataset.value||'',
       activityIds:pickedValues(f,'acts'),goalIds:pickedValues(f,'goals'),dateIds:pickedValues(f,'dates'),link:E.link.value.trim(),linkIds:pickedValues(f,'links'),deckIds:pickedValues(f,'mdecks'),moneys:readMoneys(f),group:E.group.value.trim(),min:Math.max(0,Math.round(Number(E.min.value)||0)),focoIds:pickedValues(f,'focos')};
     const old=(t0&&t0.subs)||[],used={};data.subs=E.subs.value.split('\n').map(x=>x.trim()).filter(Boolean).map(x=>{const m=old.find(o=>o.t===x&&!used[o.id]);if(m){used[m.id]=1;return m;}return {id:uid(),t:x,done:false,doneAt:0};});
+    const rm=E.repMode.value,rn=Math.max(1,Math.min(365,Math.round(Number(E.repN.value)||0)));
+    data.repeat=rm==='wk'?(()=>{const wd=$$('input[name=repWd]:checked',f).map(i=>Number(i.value));return wd.length?{mode:'wk',wd:wd}:null;})():rm==='mo'?{mode:'mo',dom:Math.min(31,rn||1)}:rm==='af'?{mode:'af',days:rn||1}:null;
+    data.blockedBy=E.blockedBy.value||'';
+    for(let c=data.blockedBy,k=0;c&&k<200;k++){if(t0&&c===t0.id){toast('Dependência circular: escolha outra tarefa.');return;}const pr=taskById(c);c=pr&&pr.blockedBy;}
     if(t0)Object.assign(t0,data);else S.tasks.push(Object.assign({id:uid(),done:false,createdAt:Date.now()},data));
     save();finishForm();toast('Tarefa salva.');
   });
@@ -8304,7 +8324,7 @@ function hoursHTML(){
   let h='<div class="toolbar"><div class="seg">'+opts.map(o=>'<button class="'+(UI.hr.range===o[0]?'on':'')+'" data-a="hr-range" data-v="'+o[0]+'">'+o[1]+'</button>').join('')+'</div>'+
     (UI.hr.range==='custom'?'<div class="opts"><input type="date" data-hr="from" value="'+D.rg[0]+'"><span class="muted small">até</span><input type="date" data-hr="to" value="'+D.rg[1]+'"></div>':'<span class="muted small">'+fmtDMY(D.rg[0])+' a '+fmtDMY(D.rg[1])+'</span>')+'</div>';
   const pct=D.total?Math.round(D.done/D.total*100):0;
-  h+='<div class="hcards"><div class="hcard"><span class="hl">Planejadas</span><b>'+hm(D.total)+'</b><span class="muted small">'+D.occ.length+(D.occ.length===1?' Atividade':' Atividades')+'</span></div>'+
+  h+=realCapHTML(D)+'<div class="hcards"><div class="hcard"><span class="hl">Planejadas</span><b>'+hm(D.total)+'</b><span class="muted small">'+D.occ.length+(D.occ.length===1?' Atividade':' Atividades')+'</span></div>'+
     '<div class="hcard"><span class="hl">Concluídas</span><b>'+hm(D.done)+'</b><span class="muted small">'+pct+'% do planejado</span></div>'+
     '<div class="hcard"><span class="hl">Pendentes</span><b>'+hm(D.total-D.done)+'</b><span class="muted small">Ainda não marcadas</span></div></div>';
   [['Por área maior',D.byArea],['Por categoria',D.bySub],['Por tipo de atividade',D.byTipo],['Por tipo de bloco',D.byBloco]].forEach(s=>{h+='<div class="card sec"><h3>'+s[0]+'</h3>'+hbars(s[1],mx(s[1]))+'</div>';});
@@ -9879,7 +9899,14 @@ Object.assign(ACT,{
   'tsub-add'(el){const t=taskById(el.dataset.id),i=$('#tsn_'+el.dataset.id),v=i&&i.value.trim();if(!t)return;if(!v){if(i)i.focus();return;}t.subs.push({id:uid(),t:v,done:false,doneAt:0});save();renderMain();const n=$('#tsn_'+t.id);if(n)n.focus();},
   'tg-fold'(el){UI.tgFold[el.dataset.k]=!UI.tgFold[el.dataset.k];renderMain();},
   'toggle-task'(el){
-    const t=taskById(el.dataset.id);if(!t)return;t.done=!t.done;t.doneAt=t.done?Date.now():0;if(t.done&&t.status)delete t.status;save();
+    const t=taskById(el.dataset.id);if(!t)return;
+    if(!t.done&&isBlockedTask(t)){toast('Conclua antes: '+taskById(t.blockedBy).title);return;}
+    if(!t.done&&t.repeat){ // tarefa recorrente: registra no histórico e reabre com o próximo prazo
+      const nx=repNext(t.repeat,todayISO());S.taskHist=S.taskHist||[];
+      S.taskHist.push({id:uid(),tid:t.id,title:t.title,doneAt:Date.now(),due:tDue(t)||'',catId:t.catId||'',min:Number(t.min)||0,actualMin:t.actualMin||0});
+      if(S.taskHist.length>500)S.taskHist=S.taskHist.slice(-500);
+      if(nx)t.deadline=nx;t.done=false;t.doneAt=0;save();toast(nx?'Concluída. Próxima em '+fmtDM(nx)+'.':'Concluída. Sem próxima data.');rerender();return;}
+    t.done=!t.done;t.doneAt=t.done?Date.now():0;if(t.done&&t.status)delete t.status;save();
     if(!$('#modal').hidden&&!UI.openOcc&&!UI.openTask)closeModal();
     rerender();
   },
@@ -12403,12 +12430,75 @@ if(document.readyState!=='loading')pgDefs();
 /* ==========================================================================
    PAINEL: POMODORO (com tarefa e subtarefas) E ÁRVORE DE PROGRESSO
    ========================================================================== */
-const PM_PHASES=[['focus','Foco'],['short','Pausa Curta'],['long','Pausa Longa']];
+const PM_PHASES=[['focus','Foco'],['short','Pausa Curta'],['long','Pausa Longa'],['flow','Flowtime']];
+const FLOW_BREAK_PCT=20; // sugestão de pausa no Flowtime: 20% do tempo focado
+const pmElapsed=c=>Math.floor((c.flowAcc||0)+(c.running&&c.startAt?(Date.now()-c.startAt)/1000:0));
+const pmLinked=c=>!!(c.rvKey||c.actId||c.taskId);
+// soma o tempo real focado no item vinculado (atividade ou tarefa); revisões já somam em spent
+function pmLink(c,mnt){
+  if(!mnt)return;
+  if(c.actId){const a=actById(c.actId);if(a)a.actualMin=(a.actualMin||0)+mnt;}
+  else if(c.taskId){const t=taskById(c.taskId);if(t)t.actualMin=(t.actualMin||0)+mnt;}
+}
+// comparativo estimado x real do item vinculado ao foco
+function pmCompHTML(p){
+  const c=p.cur,T=todayISO();let est=0,real=0,nm='';
+  if(c.actId){const a=actById(c.actId);if(a){nm=aT(a);real=a.actualMin||0;const o=occurrences(T,T).find(x=>x.act.id===a.id);const s2=o||a.slots[0]||{};est=s2.start&&s2.end?Math.max(0,tmin(s2.end)-tmin(s2.start)):0;}}
+  else if(c.taskId){const t=taskById(c.taskId);if(t){nm=t.title;est=Number(t.min)||0;real=t.actualMin||0;}}
+  else if(c.rvKey){const r=reviewList(addISO(T,-45),addISO(T,60)).find(x=>x.key===c.rvKey);if(r){nm=r.theme;est=r.min;real=r.spent||0;}}
+  if(!nm)return '';
+  const pc=est?Math.round(real/est*100):0;
+  return '<div class="pmcmp"><span>Estimado <b>'+hm(est)+'</b></span><span>Real <b>'+hm(real)+'</b></span>'+(est?'<span class="pmbar"><i style="width:'+Math.min(100,pc)+'%"></i></span><span class="muted small">'+pc+'%'+(real>est?' (acima do estimado)':'')+'</span>':'')+'</div>';
+}
+// seletor "Em foco": atividades de hoje, revisões de hoje, tarefas pendentes ou foco livre
+function pmSelectHTML(p){
+  const c=p.cur,T=todayISO(),seen={},acts=[];
+  occurrences(T,T).filter(o=>!o.done).forEach(o=>{if(!seen[o.act.id]){seen[o.act.id]=1;acts.push(o);}});
+  const rv=reviewList(addISO(T,-6),T).filter(r=>!r.done&&r.kind==='rv');
+  const tasks=S.tasks.filter(t=>!t.done||t.id===c.taskId);
+  const cur=c.rvKey?'rv:'+c.rvKey:c.actId?'act:'+c.actId:c.taskId?'task:'+c.taskId:'';
+  const opt=(v,l)=>'<option value="'+esc(v)+'" '+(v===cur?'selected':'')+'>'+esc(l)+'</option>';
+  return '<label class="f"><span>Em foco</span><select data-pm="task"><option value="">Foco livre</option>'+
+    (acts.length?'<optgroup label="Atividades de hoje">'+acts.map(o=>opt('act:'+o.act.id,aT(o.act)+' ('+o.start+'–'+o.end+')')).join('')+'</optgroup>':'')+
+    (rv.length?'<optgroup label="Revisões de hoje">'+rv.map(r=>opt('rv:'+r.key,'D+'+r.n+' | '+r.theme+' ('+Math.max(0,r.min-(r.spent||0))+' min)')).join('')+'</optgroup>':'')+
+    '<optgroup label="Tarefas">'+tasks.map(t=>opt('task:'+t.id,t.title)).join('')+'</optgroup></select></label>'+(pmLinked(c)?pmCompHTML(p):'');
+}
+// Real (Pomodoro e Flowtime) e horas úteis por dia, no relatório de Ajustes > Horas
+function realMinRange(D){return (pmGet().log||[]).filter(e=>e.d>=D.rg[0]&&e.d<=D.rg[1]).reduce((s2,e)=>s2+(Number(e.min)||0),0);}
+function realCapHTML(D){
+  const real=realMinRange(D),pc=D.total?Math.round(real/D.total*100):0;
+  return '<div class="hcards"><div class="hcard"><span class="hl">Real (Pomodoro e Flowtime)</span><b>'+hm(real)+'</b><span class="muted small">'+pc+'% do planejado</span></div>'+
+    '<div class="hcard"><span class="hl">Horas úteis por dia</span><div class="opts"><input type="number" min="1" max="24" data-cap="h" value="'+(Number(S.prefs.capH)||8)+'" style="width:80px"></div><span class="muted small">usado no orçamento de capacidade</span></div></div>';
+}
+// orçamento de capacidade do dia: eventos + estimativas das tarefas com prazo no dia + revisões previstas
+const capMin=()=>Math.max(60,Math.round((Number(S.prefs.capH)||8)*60));
+function capLoad(d){
+  let ev=0;occurrences(d,d).forEach(o=>{ev+=Math.max(0,tmin(o.end)-tmin(o.start));});
+  const tk=S.tasks.filter(t=>!t.done&&tDue(t)===d).reduce((x,t)=>x+(Number(t.min)||0),0);
+  const rv=reviewList(d,d).filter(r=>!r.done).reduce((x,r)=>x+Math.max(0,r.min-(r.spent||0)),0);
+  return {ev:ev,tk:tk,rv:rv,total:ev+tk+rv};
+}
+function capBarHTML(d){
+  const L=capLoad(d),cap=capMin(),over=L.total>cap,pct=Math.min(100,Math.round(L.total/cap*100));
+  return '<div class="capbar '+(over?'over':'')+'" title="Eventos '+hm(L.ev)+' | tarefas '+hm(L.tk)+' | revisões '+hm(L.rv)+'"><div class="capbar-top"><span class="muted small">Carga de '+(d===todayISO()?'hoje':fmtDM(d))+'</span><b>'+hm(L.total)+' / '+hm(cap)+' disponíveis</b>'+(over?'<span class="capbar-warn">Sobrecarga de '+hm(L.total-cap)+'</span>':'')+'</div><div class="capbar-track"><i style="width:'+pct+'%"></i></div></div>';
+}
+// tarefas recorrentes e dependências
+const REP_WD=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const dISO=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const repTxt=r=>!r?'':r.mode==='wk'?'Semanal: '+(r.wd||[]).map(i=>REP_WD[i]).join(', '):r.mode==='mo'?'Todo dia '+r.dom:'A cada '+r.days+(r.days===1?' dia':' dias')+' após concluir';
+function repNext(r,from){ // próxima data depois de "from" (AAAA-MM-DD)
+  if(r.mode==='af')return addISO(from,r.days);
+  if(r.mode==='wk'){const wd=r.wd||[];if(!wd.length)return '';for(let i=1;i<=7;i++){const d=addISO(from,i);if(wd.indexOf(parseISO(d).getDay())>=0)return d;}return '';}
+  const dt=parseISO(from);
+  for(let k=0;k<=12;k++){const y=dt.getFullYear(),m=dt.getMonth()+k,last=new Date(y,m+1,0).getDate(),iso=dISO(new Date(y,m,Math.min(r.dom,last)));if(iso>from)return iso;}
+  return '';
+}
+const isBlockedTask=t=>{const pr=t.blockedBy&&taskById(t.blockedBy);return !!(pr&&!pr.done&&pr.id!==t.id);};
 function pmGet(){
   const p=S.prefs.pomo=S.prefs.pomo||{};
   p.cfg=Object.assign({focus:25,short:5,long:15,every:4},p.cfg||{});
   p.subs=p.subs||{};p.log=p.log||[];
-  p.cur=Object.assign({taskId:'',rvKey:'',title:'',phase:'focus',running:false,endsAt:0,left:0,n:0},p.cur||{});
+  p.cur=Object.assign({taskId:'',rvKey:'',actId:'',title:'',phase:'focus',running:false,endsAt:0,left:0,n:0,flowAcc:0,startAt:0},p.cur||{});
   if(!p.cur.left&&!p.cur.running)p.cur.left=pmDur(p,p.cur.phase);
   return p;
 }
@@ -12429,7 +12519,7 @@ function pmComplete(){
   if(ph==='focus'){
     const t=c.taskId&&taskById(c.taskId);
     const mnt=Math.round(pmDur(p,'focus')/60);
-    p.log.push({d:todayISO(),at:Date.now(),min:mnt,title:t?t.title:(c.rvKey?'Revisão':(c.title||'')),taskId:c.taskId||''});
+    p.log.push({d:todayISO(),at:Date.now(),min:mnt,title:t?t.title:(c.rvKey?'Revisão':(c.title||'')),taskId:c.taskId||'',actId:c.actId||'',kind:'pomo'});pmLink(c,mnt);
     if(c.rvKey){const r=rvSt(c.rvKey);r.spent=(r.spent||0)+mnt;const it=reviewList(addISO(todayISO(),-45),addISO(todayISO(),1)).find(x=>x.key===c.rvKey);if(it&&r.spent>=it.min){rvMark(c.rvKey,3);c.rvKey='';toast('Revisão concluída pelo tempo de foco.');}}
     if(p.log.length>500)p.log=p.log.slice(-500);
   }
@@ -12438,7 +12528,7 @@ function pmComplete(){
   if(UI.tab==='painel')renderMain();
 }
 function pmTick(){
-  const p=S.prefs.pomo;if(!p||!p.cur||!p.cur.running)return;
+  const p=S.prefs.pomo;if(!p||!p.cur||!p.cur.running)return;if(p.cur.phase==='flow'){const fe=$('#pmTime');if(fe)fe.textContent=pmFmt(pmElapsed(p.cur));return;}
   const l=pmLeft(p);
   if(l<=0){pmComplete();return;}
   const el=$('#pmTime');if(el){el.textContent=pmFmt(l);const r=$('#pmRing');if(r){const tot=pmDur(p,p.cur.phase),c=2*Math.PI*54;r.style.strokeDashoffset=(c*(1-(tot-l)/tot)).toFixed(1);}}
@@ -12446,7 +12536,7 @@ function pmTick(){
 setInterval(pmTick,1000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')pmTick();});
 function pmHTML(){
-  const p=pmGet(),c=p.cur,left=pmLeft(p),tot=pmDur(p,c.phase),circ=2*Math.PI*54;
+  const p=pmGet(),c=p.cur,flow=c.phase==='flow',left=flow?pmElapsed(c):pmLeft(p),tot=flow?3600:pmDur(p,c.phase),circ=2*Math.PI*54;
   const tasks=S.tasks.filter(t=>!t.done||t.id===c.taskId);
   const rvToday=reviewList(addISO(todayISO(),-6),todayISO()).filter(r=>!r.done&&r.kind==='rv');
   const subs=pmSubs(p),dn=subs.filter(s=>s.done).length;
@@ -12455,15 +12545,24 @@ function pmHTML(){
   return '<section class="card pmc" data-ph="'+c.phase+'"><div class="phead"><h3>'+ic('clock',17)+' Pomodoro</h3><span class="muted small">'+today.length+(today.length===1?' Ciclo':' Ciclos')+' Hoje | '+mins+' Min</span></div>'+
     '<div class="seg pmseg">'+PM_PHASES.map(x=>'<button type="button" class="'+(c.phase===x[0]?'on':'')+'" data-a="pm-phase" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>'+
     '<div class="pmdial"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" class="bg"/><circle id="pmRing" cx="60" cy="60" r="54" class="fg" transform="rotate(-90 60 60)" style="stroke-dasharray:'+circ.toFixed(1)+';stroke-dashoffset:'+(circ*(1-(tot-left)/tot)).toFixed(1)+'"/></svg><div class="pmt"><b id="pmTime">'+pmFmt(left)+'</b><span>'+PM_PHASES.find(x=>x[0]===c.phase)[1]+'</span></div></div>'+
-    '<div class="addrow pmbtns"><button class="btn primary" data-a="pm-toggle">'+(c.running?'Pausar':(left<tot?'Continuar':'Iniciar'))+'</button><button class="btn" data-a="pm-reset">Reiniciar</button><button class="btn" data-a="pm-skip">Pular</button></div>'+
-    '<label class="f"><span>Em foco</span><select data-pm="task"><option value="">Foco livre</option>'+(rvToday.length?'<optgroup label="Revisões de hoje">'+rvToday.map(r=>'<option value="rv:'+esc(r.key)+'" '+(r.key===c.rvKey?'selected':'')+'>D+'+r.n+' | '+esc(r.theme)+' ('+Math.max(0,r.min-(r.spent||0))+' min)</option>').join('')+'</optgroup>':'')+'<optgroup label="Tarefas">'+tasks.map(t=>'<option value="'+t.id+'" '+(t.id===c.taskId?'selected':'')+'>'+esc(t.title)+'</option>').join('')+'</optgroup></select></label>'+
-    (c.taskId?'':'<label class="f"><input type="text" data-pm="title" value="'+esc(c.title)+'" placeholder="Foco livre" aria-label="Foco" autocomplete="off"></label>')+
+    '<div class="addrow pmbtns"><button class="btn primary" data-a="pm-toggle">'+(c.running?'Pausar':(flow?(pmElapsed(c)>0?'Continuar':'Iniciar'):(left<tot?'Continuar':'Iniciar')))+'</button><button class="btn" data-a="pm-reset">Reiniciar</button>'+(c.phase==='flow'?'<button class="btn" data-a="pm-flow-end">Encerrar e sugerir pausa</button>':'<button class="btn" data-a="pm-skip">Pular</button>')+'</div>'+
+    pmSelectHTML(p)+
+    (pmLinked(c)?'':'<label class="f"><input type="text" data-pm="title" value="'+esc(c.title)+'" placeholder="Foco livre" aria-label="Foco" autocomplete="off"></label>')+
     '<div class="pmsubs"><div class="sechead" style="margin:6px 0">Subtarefas <span class="count">'+dn+'/'+subs.length+'</span></div>'+
     subs.map(s=>'<div class="pmsub '+(s.done?'done':'')+'"><button class="chk sm '+(s.done?'on':'')+'" data-a="pm-sub" data-id="'+s.id+'" aria-label="Concluir subtarefa">'+ic('check',12)+'</button><span>'+esc(s.t)+'</span><button class="icon-btn sm" data-a="pm-subdel" data-id="'+s.id+'" aria-label="Remover subtarefa">'+ic('x',13)+'</button></div>').join('')+
     '<div class="addrow"><input type="text" id="pmSubNew" placeholder="Nova subtarefa" autocomplete="off"><button class="btn sm primary" data-a="pm-addsub">'+ic('plus',14)+' Adicionar</button></div>'+
     (cur&&subs.length&&dn===subs.length&&!cur.done?'<button class="btn sm" data-a="pm-finish-task">'+ic('check',14)+' Concluir a tarefa "'+esc(cur.title)+'"</button>':'')+'</div>'+
     '<details class="pmcfg"><summary>Ajustar Tempos</summary><div class="pmcfgg">'+[['focus','Foco (min)'],['short','Pausa Curta (min)'],['long','Pausa Longa (min)'],['every','Pausa Longa a Cada (ciclos)']].map(x=>'<label class="f"><span>'+x[1]+'</span><input type="number" min="1" max="180" data-pmc="'+x[0]+'" value="'+p.cfg[x[0]]+'"></label>').join('')+'</div></details></section>';
 }
+Object.assign(ACT,{
+  'pm-flow-end'(){const p=pmGet(),c=p.cur;if(c.phase!=='flow')return;const mnt=Math.round(pmElapsed(c)/60);
+    if(mnt>=1){const t=c.taskId&&taskById(c.taskId);p.log.push({d:todayISO(),at:Date.now(),min:mnt,title:t?t.title:(c.rvKey?'Revisão':(c.title||'')),taskId:c.taskId||'',actId:c.actId||'',kind:'flow'});pmLink(c,mnt);if(c.rvKey){const r=rvSt(c.rvKey);r.spent=(r.spent||0)+mnt;}}
+    if(p.log.length>500)p.log=p.log.slice(-500);
+    const sug=Math.max(1,Math.round(mnt*FLOW_BREAK_PCT/100));
+    c.running=false;c.flowAcc=0;c.startAt=0;c.endsAt=0;c.phase='short';c.left=sug*60;
+    save();toast('Sessão encerrada: '+mnt+' min focados. Pausa sugerida: '+sug+' min.');renderMain();},
+  'blk-fold'(){UI.blkOpen=!UI.blkOpen;renderMain();},
+});
 Object.assign(ACT,{
   'wk-tools'(){
     const row=(a,icon,t)=>'<button class="mm-row" data-a="more-do" data-x="'+a+'">'+ic(icon,18)+t+'</button>';
@@ -12530,17 +12629,18 @@ Object.assign(ACT,{
   'sb-toggle'(){S.prefs.sbCollapsed=!S.prefs.sbCollapsed;save();renderTabs();},
   'sb-open'(){document.body.classList.toggle('sb-open');},
   'attn-toggle'(){S.prefs.attnHide=!S.prefs.attnHide;save();renderMain();},
-  'pm-toggle'(){const p=pmGet(),c=p.cur;if(c.running){c.left=pmLeft(p);c.running=false;c.endsAt=0;}else{if(c.left<=0)c.left=pmDur(p,c.phase);c.running=true;c.endsAt=Date.now()+c.left*1000;}save();renderMain();},
-  'pm-reset'(){const p=pmGet(),c=p.cur;c.running=false;c.endsAt=0;c.left=pmDur(p,c.phase);save();renderMain();},
+  'pm-toggle'(){const p=pmGet(),c=p.cur;if(c.phase==='flow'){if(c.running){c.flowAcc=pmElapsed(c);c.running=false;c.startAt=0;}else{c.running=true;c.startAt=Date.now();}save();renderMain();return;}if(c.running){c.left=pmLeft(p);c.running=false;c.endsAt=0;}else{if(c.left<=0)c.left=pmDur(p,c.phase);c.running=true;c.endsAt=Date.now()+c.left*1000;}save();renderMain();},
+  'pm-reset'(){const p=pmGet(),c=p.cur;if(c.phase==='flow'){c.running=false;c.flowAcc=0;c.startAt=0;save();renderMain();return;}c.running=false;c.endsAt=0;c.left=pmDur(p,c.phase);save();renderMain();},
   'pm-skip'(){const p=pmGet(),c=p.cur;c.phase=c.phase==='focus'?'short':'focus';c.running=false;c.endsAt=0;c.left=pmDur(p,c.phase);save();renderMain();},
-  'pm-phase'(el){const p=pmGet(),c=p.cur;c.phase=el.dataset.v;c.running=false;c.endsAt=0;c.left=pmDur(p,c.phase);save();renderMain();},
+  'pm-phase'(el){const p=pmGet(),c=p.cur;c.phase=el.dataset.v;if(c.phase==='flow'){c.flowAcc=0;c.startAt=0;}c.running=false;c.endsAt=0;c.left=pmDur(p,c.phase);save();renderMain();},
   'pm-addsub'(){const p=pmGet(),i=$('#pmSubNew'),v=i&&i.value.trim();if(!v){if(i)i.focus();return;}pmSubs(p).push({id:uid(),t:v,done:false});save();renderMain();const n=$('#pmSubNew');if(n)n.focus();},
   'pm-sub'(el){const p=pmGet(),s=pmSubs(p).find(x=>x.id===el.dataset.id);if(!s)return;s.done=!s.done;s.doneAt=s.done?Date.now():0;save();renderMain();},
   'pm-subdel'(el){const p=pmGet(),a=pmSubs(p),i=a.findIndex(x=>x.id===el.dataset.id);if(i>=0)a.splice(i,1);save();renderMain();},
   'pm-finish-task'(){const p=pmGet(),t=taskById(p.cur.taskId);if(!t)return;t.done=true;t.doneAt=Date.now();p.cur.taskId='';save();toast('Tarefa concluída.');renderMain();}
 });
 document.addEventListener('change',e=>{const t=e.target;if(!t||!t.dataset)return;
-  if(t.dataset.pm==='task'){const p=pmGet();if(t.value.indexOf('rv:')===0){p.cur.rvKey=t.value.slice(3);p.cur.taskId='';}else{p.cur.rvKey='';p.cur.taskId=t.value;}save();renderMain();}
+  if(t.dataset.pm==='task'){const p=pmGet(),c=p.cur,v=t.value;c.rvKey='';c.actId='';c.taskId='';if(v.indexOf('rv:')===0)c.rvKey=v.slice(3);else if(v.indexOf('act:')===0)c.actId=v.slice(4);else if(v.indexOf('task:')===0)c.taskId=v.slice(5);save();renderMain();}
+  else if(t.dataset.cap==='h'){S.prefs.capH=Math.max(1,Math.min(24,Number(t.value)||8));save();renderMain();}
   else if(t.dataset.pm==='title'){pmGet().cur.title=t.value.trim();save();}
   else if(t.dataset.pmc){const p=pmGet(),v=Math.max(1,Math.min(180,Number(t.value)||1));p.cfg[t.dataset.pmc]=v;if(!p.cur.running&&t.dataset.pmc===p.cur.phase)p.cur.left=pmDur(p,p.cur.phase);save();renderMain();}
 });
@@ -12555,7 +12655,7 @@ function rvWidgetHTML(){
 
 function renderPainel(){
   const t=todayISO(),end=addISO(t,6),H=[];
-  const tasks=S.tasks.filter(x=>!x.done&&tDue(x)&&tDue(x)<=t).sort((a,b)=>(tDue(a)+(tDueTime(a)||'99'))<(tDue(b)+(tDueTime(b)||'99'))?-1:1);
+  const tasks=S.tasks.filter(x=>!x.done&&tDue(x)&&tDue(x)<=t&&!isBlockedTask(x)).sort((a,b)=>(tDue(a)+(tDueTime(a)||'99'))<(tDue(b)+(tDueTime(b)||'99'))?-1:1);
   const meals=S.meals.filter(m=>m.date===t&&!(m.st==='eaten'||m.done)).sort(cmpMeal);
   const low=lowStock();
   const bills=finEvents(addISO(t,-30),end).filter(e=>e.kind==='out'&&!e.paid);
@@ -12573,7 +12673,7 @@ function renderPainel(){
   if(low.length)H.push(sec('bag','Estoque crítico',low.length,low.map(x=>{const p=pantryOf(x.ing.id);return '<div class="crow"><span class="lki">'+ic('bag',16)+'</span><div class="cprev"><b>'+esc(x.ing.name)+'</b><span class="muted small">restam '+fmtQty(x.qty,x.ing.unit)+' | mínimo '+fmtQty(x.min,x.ing.unit)+'</span></div>'+(p?'<button class="icon-btn sm" data-a="pa-use" data-id="'+p.id+'" aria-label="Registrar consumo" title="Registrar consumo">'+ic('minus',15)+'</button>':'')+'</div>';}).join('')+'<div style="margin-top:8px"><button class="btn sm primary" data-a="goto-mercado">'+ic('cart',14)+' Abrir lista de mercado</button></div>'));
   if(bills.length)H.push(sec('wallet','Contas que vencem nesta semana',bills.length,bills.map(e=>finRow(e)).join('')));
   const d=parseISO(t);
-  return '<div class="painel"><h2 class="vt" style="margin:0 0 4px">Hoje, '+WDL[d.getDay()]+' '+fmtDM(t)+'</h2>'+NC.cardHTML()+
+  return '<div class="painel"><h2 class="vt" style="margin:0 0 4px">Hoje, '+WDL[d.getDay()]+' '+fmtDM(t)+'</h2>'+capBarHTML(t)+NC.cardHTML()+
     '<div class="pmgrid">'+pmHTML()+rvWidgetHTML()+'</div>'+
     (H.length?H.join(''):'<div class="empty">Nada exige ação agora.<br><button class="btn" data-a="tab" data-v="semana">'+ic('calendar',15)+' Ver a semana</button></div>')+'</div>';
 }
