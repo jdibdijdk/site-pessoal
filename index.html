@@ -2718,6 +2718,15 @@ button.lzico.lk:hover{transform:scale(1.06);box-shadow:0 0 0 3px color-mix(in sr
 .prn .nhide,#printSheet .nhide{color:inherit!important;background:none!important;border-bottom:1px dotted #888}
 .nbk{padding:6px 0;border-bottom:1px solid var(--line2)}.nbk:last-child{border-bottom:0}.nbk-t{margin-left:8px}
 .nbk-s{font-size:13px;color:var(--mut);margin-top:2px;padding-left:2px}
+
+/* ===== Questões: causa e simulado ===== */
+.mfcause{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0}
+.mfextime{display:inline-flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums;padding:3px 10px;border:1px solid var(--line);border-radius:999px;margin-left:6px}
+.mfextime.q b.slow{color:#C62F2F}
+.mfexgrid{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 10px}
+.mfexn{min-width:30px;height:28px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--tx);font-size:12px;cursor:pointer}
+.mfexn.ok{background:var(--accs);border-color:var(--acc);color:var(--acc)}.mfexn.cur{outline:2px solid var(--acc)}
+.mfbol{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:8px}.mfbol th,.mfbol td{text-align:left;padding:5px 8px;border-bottom:1px solid var(--line2)}.mfbol th{color:var(--mut);font-weight:600;font-size:12px}
 </style>
 </head>
 <body>
@@ -3131,7 +3140,7 @@ function normalize(o){
     items:(Array.isArray(o.items)?o.items:seedItems()).map(i=>{const x=Object.assign({apps:[],inside:[]},i);if(!Array.isArray(x.inside))x.inside=[];if(x.container===undefined)x.container=/^bolsa/i.test(x.name)||norm(x.group||'')==='bolsas';if(ver<5&&x.group==='Eletrônicos'&&(x.name==='Mouse Logitech'||x.name==='Extensão'))x.group='Acessórios';return x;}),
     links:arr('links'),
     linkCats:(Array.isArray(o.linkCats)&&o.linkCats.length)?o.linkCats:LINKCATS.slice(),
-    packed:o.packed||{},kits:Array.isArray(o.kits)?o.kits.filter(k=>k&&k.id):[],wishes:arr('wishes').map(x=>Object.assign({title:'',url:'',price:0,qty:1,store:'',priority:2,catId:'',note:'',status:'quero',paid:0,created:Date.now(),updated:Date.now(),boughtAt:0},x)),lazer:arr('lazer').map(x=>Object.assign({type:'outro',title:'',scope:'pessoal',status:'todo',catId:'',link:'',total:0,progress:0,unit:'',plannedMin:0,stars:0,review:'',noteId:'',note:'',created:Date.now(),updated:Date.now(),doneAt:0},x)),templates:Array.isArray(o.templates)?o.templates.filter(t=>t&&t.id):[],taskHist:Array.isArray(o.taskHist)?o.taskHist.slice(-500):[],revx:(o.revx&&typeof o.revx==='object'&&!Array.isArray(o.revx))?o.revx:{},bagRules:(Array.isArray(o.bagRules)?o.bagRules:[]).filter(r=>r&&r.value&&Array.isArray(r.itemIds)),health:arr('health'),hprefs:Object.assign({weeklyMin:150,sleepH:7,heightCm:''},o.hprefs||{}),fin:normFin(o.fin),
+    packed:o.packed||{},kits:Array.isArray(o.kits)?o.kits.filter(k=>k&&k.id):[],mfCause:(o.mfCause&&typeof o.mfCause==='object'&&!Array.isArray(o.mfCause))?o.mfCause:{},mfSims:Array.isArray(o.mfSims)?o.mfSims.slice(-100):[],wishes:arr('wishes').map(x=>Object.assign({title:'',url:'',price:0,qty:1,store:'',priority:2,catId:'',note:'',status:'quero',paid:0,created:Date.now(),updated:Date.now(),boughtAt:0},x)),lazer:arr('lazer').map(x=>Object.assign({type:'outro',title:'',scope:'pessoal',status:'todo',catId:'',link:'',total:0,progress:0,unit:'',plannedMin:0,stars:0,review:'',noteId:'',note:'',created:Date.now(),updated:Date.now(),doneAt:0},x)),templates:Array.isArray(o.templates)?o.templates.filter(t=>t&&t.id):[],taskHist:Array.isArray(o.taskHist)?o.taskHist.slice(-500):[],revx:(o.revx&&typeof o.revx==='object'&&!Array.isArray(o.revx))?o.revx:{},bagRules:(Array.isArray(o.bagRules)?o.bagRules:[]).filter(r=>r&&r.value&&Array.isArray(r.itemIds)),health:arr('health'),hprefs:Object.assign({weeklyMin:150,sleepH:7,heightCm:''},o.hprefs||{}),fin:normFin(o.fin),
     acts:arr('acts').map(a=>{const x=Object.assign({actualMin:0,kitIds:[],overrides:{},deckIds:[],title:'',kind:'Atividade',tipoAtv:'',blockType:'estudo',catId:'',teacher:'',noTeacher:false,obs:'',place:'',link:'',doWhat:'',where:'',plan:{},bring:'',slots:[],done:{},miss:{},goalIds:[],docIds:[],relId:'',itemIds:[],linkIds:[],stow:{},extras:[],moneys:[],noArea:false,themeNA:false},a);if(x.theme==null)x.theme=x.title;return x;}),
     tasks:arr('tasks').map(t=>Object.assign({actualMin:0,repeat:null,blockedBy:'',deckIds:[],title:'',notes:'',obs:'',deadline:'',catId:'',docId:'',link:'',done:false,activityIds:[],goalIds:[],linkIds:[],itemIds:[],where:'',plan:{},deadlineTime:'',dateIds:[],moneys:[],group:'',subs:[]},t)),
     docs:arr('docs').map(d=>Object.assign({title:'',catId:'',link:'',notes:'',todo:[],goalIds:[],linkIds:[],noteIds:[],folderId:'',ext:'',status:'',source:'',srcLink:'',starnote:false,driveId:'',driveMod:0},d)),
@@ -13633,10 +13642,10 @@ function mfPut(tb,bloco,chave,row){
   if(row===null){T.delete(chave);}else{const js=JSON.stringify(row);T.set(chave,{bloco:bloco,v:row});MFD.size[bloco]=(MFD.size[bloco]||0)+js.length;}
   return k.setDoc(k.doc(MFD.db,'sheets',bloco),{rows:{[chave]:row===null?k.deleteField():JSON.stringify(row)}},{merge:true}).catch(e=>{toast('Não consegui gravar no banco: '+((e&&e.message)||e));});
 }
-function mfAnswer(id,alt,tempo){
+function mfAnswer(id,alt,tempo,ctx){
   const q=MFD.byId[id];if(!q)return null;
   const c=q.anul?'':(alt===String(q.v[10])?1:0),tb='Respostas',ch=mfChave();
-  mfPut(tb,mfBloco(tb),ch,[MFD.user,id,alt,c,Math.max(0,Math.min(86400,Math.round(tempo||0))),'livre','',new Date().toISOString()]);
+  mfPut(tb,mfBloco(tb),ch,[MFD.user,id,alt,c,Math.max(0,Math.min(86400,Math.round(tempo||0))),(ctx||'livre'),'',new Date().toISOString()]);
   const a=MFD.est.r[id];MFD.est.r[id]=[alt,c===''?2:c,(a?a[2]:0)+1];return c;
 }
 function mfFav(id){
@@ -13663,6 +13672,7 @@ function mfFiltered(){
     if(f.areas.length&&f.areas.indexOf(q.area)<0)return false;
     if(f.provas.length&&f.provas.indexOf(q.prova)<0)return false;
     if(f.ano&&String(q.ano)!==f.ano)return false;
+    if(f.cause){const cz=(S.mfCause||{})[q.id],rr=e.r[q.id];if(!cz||cz.c!==f.cause||!rr||rr[1]!==0)return false;}
     if(f.sub&&q.sub!==f.sub)return false;
     if(f.foco&&q.foco!==f.foco)return false;
     if(f.nao||f.err||f.cer||f.fav||f.rev){
@@ -13697,16 +13707,17 @@ function renderQuestoes(){
   const cb=(k,l)=>'<label class="chip cb"><input type="checkbox" data-mf="'+k+'" '+(f[k]?'checked':'')+'><span>'+l+'</span></label>';
   const shown=list.slice(0,UI.mfn||50);
   return head+'<div class="qsub"><b>'+list.length+'</b> questões encontradas</div>'+
-    '<div class="toolbar" style="margin-bottom:4px"><span class="sp"></span><button class="btn sm" data-a="mf-imprimir">'+ic('printer',14)+' Imprimir</button><button class="btn sm" data-a="mf-trilha">'+ic('list',14)+' Salvar como trilha</button><button class="btn primary sm" data-a="mf-treinar">'+ic('play',14)+' Treinar com estes filtros</button></div>'+
+    '<div class="toolbar" style="margin-bottom:4px"><span class="sp"></span><button class="btn sm" data-a="mf-imprimir">'+ic('printer',14)+' Imprimir</button><button class="btn sm" data-a="mf-trilha">'+ic('list',14)+' Salvar como trilha</button><button class="btn primary sm" data-a="mf-treinar">'+ic('play',14)+' Treinar com estes filtros</button><button class="btn sm" data-a="mf-simulado">'+ic('clock',14)+' Simulado cronometrado</button>'+(f.cause?'<button class="btn sm" data-a="mf-cards">'+ic('cards',14)+' Gerar flashcards dos erros</button>':'')+'</div>'+
     '<div class="mfareas">'+areas.map(a=>'<button class="mfarea '+(f.areas.indexOf(a)>=0?'on':'')+'" data-a="mf-area" data-v="'+esc(a)+'">'+mfAreaPill(a)+'</button>').join('')+'</div>'+
-    '<div class="nfbar">'+mfProvaHTML()+sel('mfAno','Ano',anos.map(a=>[a,a]),f.ano)+sel('mfSub','Subárea',subs.map(a=>[a,a]),f.sub)+sel('mfFoco','Foco',focos.map(a=>[a,a]),f.foco)+'</div>'+
+    '<div class="nfbar">'+mfProvaHTML()+sel('mfAno','Ano',anos.map(a=>[a,a]),f.ano)+sel('mfSub','Subárea',subs.map(a=>[a,a]),f.sub)+sel('mfFoco','Foco',focos.map(a=>[a,a]),f.foco)+sel('mfCause','Causa do erro',MF_CAUSAS,f.cause||'')+'</div>'+
     '<div class="frow" style="margin:6px 0 10px">'+cb('nao','Não respondidas')+cb('err','Erradas')+cb('cer','Certas')+cb('fav','Favoritas')+cb('rev','Revisar depois')+cb('anul','Incluir anuladas')+'<button class="btn sm ghost" data-a="mf-limpar">Limpar filtros</button></div>'+
     (shown.length?'<div class="llist mfl">'+shown.map(q=>{const st=mfStatus(q.id);return '<button class="mfrow" data-a="mf-open" data-id="'+esc(q.id)+'"><span class="mfst '+st+'">'+ic(st==='certa'?'check':st==='errada'?'x':'minus',13)+'</span><span class="mft"><b>'+esc(q.inst)+' '+q.ano+'</b> | Questão '+q.num+'</span>'+mfAreaPill(q.area)+'<span class="muted small mfsub">'+esc([q.sub,q.foco].filter(Boolean).join(' › '))+'</span>'+(MFD.est.f[q.id]?'<span class="mfmk">'+ic('star',13)+'</span>':'')+(MFD.est.v[q.id]?'<span class="mfmk">'+ic('bell',13)+'</span>':'')+'</button>';}).join('')+'</div>'+(list.length>shown.length?'<div style="text-align:center;margin:10px"><button class="btn" data-a="mf-mais">Mostrar mais ('+(list.length-shown.length)+')</button></div>':''):'<div class="empty">Nenhuma questão com estes filtros.</div>')+
     '<p class="muted small" style="margin-top:12px">Simulados, trilhas salvas, flashcards e importação continuam no MedFisher.</p>';
 }
 function mfTxtB(t){return String(t||'').split(/\n+/).map(l=>l.trim()).filter(Boolean).map(l=>'<p>'+esc(l)+'</p>').join('');}
 function mfQHTML(){
-  const m=UI.mfq;if(!m)return '';const id=m.ids[m.i],q=MFD.byId[id];if(!q)return '<div class="form"><div class="fh"><h2>Questão</h2><button class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div><div class="empty">Questão não encontrada.</div></div>';
+  const m=UI.mfq;if(!m)return '';
+  if(m.exam)return mfExamHTML(m);const id=m.ids[m.i],q=MFD.byId[id];if(!q)return '<div class="form"><div class="fh"><h2>Questão</h2><button class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div><div class="empty">Questão não encontrada.</div></div>';
   const Q=mfQ(q),r=MFD.est.r[id],rev=!!r||m.show,marcada=r?r[0]:'',nota=mfNotaOf(id);
   const disc=!Q.alternativas.length,H=mfDividirComentario({com:Q.comentario,alts:Q.alternativas});Q.alternativas=H.alts;Q.comentario=H.com;
   const imgs=pos=>Q.imagens.filter(x=>pos?x.posicao===pos:x.posicao!=='comentario'&&String(x.posicao).indexOf('alternativa_')!==0).map(x=>x.fileId?'<figure class="mfimg"><img data-fid="'+esc(x.fileId)+'" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="'+esc(x.legenda||'Imagem da questão')+'">'+(x.legenda?'<figcaption>'+esc(x.legenda)+'</figcaption>':'')+'</figure>':'').join('');
@@ -13715,7 +13726,7 @@ function mfQHTML(){
     (q.anul?'<div class="warn">Questão anulada.</div>':'')+'<div class="mfhlrow" id="mfHlBar">'+mfHlBarHTML(m)+'</div><div class="mfenun"><div id="mfEnun" class="mfenunt">'+mfHlHTML(String(q.v[8]),mfHlGet(id))+'</div>'+imgs()+'</div>'+
     (disc?mfDiscHTML(q,Q,r,m,imgs):    '<div class="mfalts">'+Q.alternativas.map(a=>{let cl='';if(rev){if(a.letra===Q.gabarito&&!q.anul)cl=' ok';else if(a.letra===marcada)cl=' bad';}else if(a.letra===marcada)cl=' sel';
       return '<button class="mfalt'+cl+'" data-a="mf-alt" data-l="'+esc(a.letra)+'" '+(r?'disabled':'')+'><b>'+esc(a.letra)+'</b><span>'+esc(a.texto)+'</span></button>'+(rev&&a.comentario?'<div class="mfcom">'+esc(a.comentario)+'</div>':'');}).join('')+'</div>'+
-    (rev?'<div class="mfres">'+(q.anul?'Anulada.':'Gabarito: <b>'+esc(Q.gabarito)+'</b>'+(r&&r[1]===1?' | você acertou':r&&r[1]===0?' | você marcou '+esc(marcada):''))+'</div>'+(Q.comentario?'<div class="mfcomg"><b>Comentário</b>'+mfTxtB(Q.comentario)+imgs('comentario')+'</div>':''):'<div class="ff"><span class="sp"></span><button class="btn" data-a="mf-reveal">Ver gabarito sem responder</button></div>'))+
+    (rev?'<div class="mfres">'+(q.anul?'Anulada.':'Gabarito: <b>'+esc(Q.gabarito)+'</b>'+(r&&r[1]===1?' | você acertou':r&&r[1]===0?' | você marcou '+esc(marcada):''))+'</div>'+mfCauseHTML(id,r)+(Q.comentario?'<div class="mfcomg"><b>Comentário</b>'+mfTxtB(Q.comentario)+imgs('comentario')+'</div>':''):'<div class="ff"><span class="sp"></span><button class="btn" data-a="mf-reveal">Ver gabarito sem responder</button></div>'))+
     '<div class="mfnota"><textarea id="mfNota" rows="2" placeholder="Anotação" aria-label="Anotação">'+esc(nota?nota[2]:'')+'</textarea><label class="chip cb"><input type="checkbox" id="mfRev" '+(MFD.est.v[id]?'checked':'')+'><span>Revisar depois</span></label><button class="btn sm" data-a="mf-nota">Salvar anotação</button></div>'+
     '<div class="ff"><button class="btn sm ghost" data-a="mf-report">Relatar problema</button><button class="btn sm" data-a="mf-send">'+ic('download',14)+' Enviar para Notas</button><span class="sp"></span>'+(m.ids.length>1?'<button class="btn sm" data-a="mf-nav" data-d="-1" '+(m.i?'':'disabled')+'>'+ic('chevL',14)+'</button><button class="btn sm primary" data-a="mf-nav" data-d="1">'+(m.i<m.ids.length-1?'Próxima':'Concluir')+'</button>':'')+'</div></div>';
 }
@@ -13966,7 +13977,7 @@ Object.assign(ACT,{
 document.addEventListener('change',e=>{
   const t=e.target;if(!t||UI.tab!=='questoes')return;const f=MFF();
   if(t.dataset&&t.dataset.pv){const k=f.provas.indexOf(t.dataset.pv);if(t.checked&&k<0)f.provas.push(t.dataset.pv);else if(!t.checked&&k>=0)f.provas.splice(k,1);mfKeepPop();}else if(t.id==='mfAno'){f.ano=t.value;UI.mfn=50;renderMain();}
-  else if(t.id==='mfSub'){f.sub=t.value;f.foco='';UI.mfn=50;renderMain();}else if(t.id==='mfFoco'){f.foco=t.value;UI.mfn=50;renderMain();}
+  else if(t.id==='mfSub'){f.sub=t.value;f.foco='';UI.mfn=50;renderMain();}else if(t.id==='mfFoco'){f.foco=t.value;UI.mfn=50;renderMain();}else if(t.id==='mfCause'){f.cause=t.value;UI.mfn=50;renderMain();}
   else if(t.dataset&&t.dataset.mf){f[t.dataset.mf]=t.checked;UI.mfn=50;renderMain();}
 });
 Object.assign(ACT,{
@@ -15937,6 +15948,94 @@ Object.assign(ACT,{
   },
   'fsrs-apply'(){const r=UI.fsrsOpt;if(!r)return;S.prefs.fsrsW=r.W.slice();fsrsSyncW();save();renderMain();toast('Pesos calibrados aplicados.');},
   'fsrs-reset'(){delete S.prefs.fsrsW;fsrsSyncW();save();renderMain();toast('Pesos padrão restaurados.');}
+});
+
+
+/* ----- Questões: causa-raiz do erro e simulado cronometrado (prova fechada com boletim) ----- */
+const MF_CAUSAS=[['lac','Lacuna teórica'],['atn','Falta de atenção / pegadinha'],['dup','Dúvida entre duas'],['esq','Esquecimento']];
+function mfCauseHTML(id,r){
+  if(!r||r[1]!==0)return '';const cur=(S.mfCause||{})[id];
+  return '<div class="mfcause"><span class="muted small">Por que errei?</span>'+MF_CAUSAS.map(c=>'<button type="button" class="chip '+(cur&&cur.c===c[0]?'on':'')+'" data-a="mf-cause" data-id="'+esc(id)+'" data-c="'+c[0]+'">'+c[1]+'</button>').join('')+'</div>';
+}
+const mfClk=sec=>{sec=Math.max(0,Math.round(sec));const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60);return (h?h+':'+pad(m):m)+':'+pad(sec%60);};
+let MF_EX_T=0;
+function mfExLap(m){const id=m.ids[m.i],now=Date.now();m.times[id]=(m.times[id]||0)+(now-m.tq)/1000;m.tq=now;}
+function mfExamStart(n){
+  const pool=mfFiltered().filter(q=>!q.anul&&mfQ(q).alternativas.length);
+  if(!pool.length){toast('Nenhuma questão objetiva com estes filtros.');return;}
+  const ids=pool.map(q=>[Math.random(),q.id]).sort((a,b)=>a[0]-b[0]).slice(0,n).map(x=>x[1]);
+  UI.mfq={ids:ids,i:0,show:false,exam:true,ans:{},times:{},t0:Date.now(),tq:Date.now()};mfShowQ();
+  clearInterval(MF_EX_T);MF_EX_T=setInterval(()=>{
+    const m=UI.mfq;if(!m||!m.exam){clearInterval(MF_EX_T);return;}
+    const id=m.ids[m.i],tq=(m.times[id]||0)+(Date.now()-m.tq)/1000,a=$('#mfExTot'),b=$('#mfExQ');
+    if(a)a.textContent=mfClk((Date.now()-m.t0)/1000);if(b){b.textContent=mfClk(tq);b.classList.toggle('slow',tq>180);}
+  },1000);
+}
+function mfExamHTML(m){
+  const id=m.ids[m.i],q=MFD.byId[id];if(!q)return '';
+  const Q=mfQ(q),cur=m.ans[id]||'',n=m.ids.length,done=m.ids.filter(x=>m.ans[x]).length;
+  const imgs=Q.imagens.filter(x=>x.posicao!=='comentario'&&String(x.posicao).indexOf('alternativa_')!==0).map(x=>x.fileId?'<figure class="mfimg"><img data-fid="'+esc(x.fileId)+'" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Imagem da questão"></figure>':'').join('');
+  return '<div class="form mfq mfex"><div class="fh"><div><b>Simulado</b> <span class="muted small">Questão '+(m.i+1)+' de '+n+' | '+done+' respondida'+(done===1?'':'s')+'</span></div><span class="sp"></span><span class="mfextime" title="Tempo total">'+ic('clock',14)+' <b id="mfExTot">'+mfClk((Date.now()-m.t0)/1000)+'</b></span><span class="mfextime q" title="Tempo nesta questão (acima de 3 min fica em alerta)"><b id="mfExQ">'+mfClk(m.times[id]||0)+'</b></span></div>'+
+    '<div class="mfexgrid">'+m.ids.map((x,i)=>'<button type="button" class="mfexn '+(i===m.i?'cur':'')+(m.ans[x]?' ok':'')+'" data-a="mf-ex-go" data-i="'+i+'">'+(i+1)+'</button>').join('')+'</div>'+
+    '<div class="mfenun"><div class="mfenunt" style="white-space:pre-wrap">'+esc(String(q.v[8]))+'</div>'+imgs+'</div>'+
+    '<div class="mfalts">'+Q.alternativas.map(a=>'<button class="mfalt'+(a.letra===cur?' sel':'')+'" data-a="mf-ex-alt" data-l="'+esc(a.letra)+'"><b>'+esc(a.letra)+'</b><span>'+esc(a.texto)+'</span></button>').join('')+'</div>'+
+    '<div class="ff"><button class="btn sm ghost" data-a="mf-ex-cancel">Cancelar simulado</button><span class="sp"></span><button class="btn sm" data-a="mf-ex-nav" data-d="-1" '+(m.i?'':'disabled')+'>'+ic('chevL',14)+' Anterior</button><button class="btn sm" data-a="mf-ex-nav" data-d="1" '+(m.i<n-1?'':'disabled')+'>Próxima '+ic('chevR',14)+'</button><button class="btn primary" data-a="mf-ex-end">Entregar prova</button></div></div>';
+}
+function mfExamFinish(){
+  const m=UI.mfq;if(!m||!m.exam)return;mfExLap(m);clearInterval(MF_EX_T);
+  const area={},foco={},wrong=[],slow=[];let ok=0,ans=0,tot=0;
+  m.ids.forEach((id,i)=>{
+    const q=MFD.byId[id],Q=mfQ(q),alt=m.ans[id]||'',t=m.times[id]||0,c=alt?(alt===Q.gabarito?1:0):null;tot+=t;
+    if(alt){mfAnswer(id,alt,t,'simulado');ans++;if(c===1)ok++;else wrong.push(id);}
+    if(t>180)slow.push(i+1);
+    const add=(o,k)=>{const e=o[k]||(o[k]={n:0,ok:0,bl:0,t:0});e.n++;e.t+=t;if(c===1)e.ok++;if(c===null)e.bl++;};
+    add(area,q.area||'Sem área');add(foco,q.foco||'Sem foco');
+  });
+  const n=m.ids.length,sim={t:Date.now(),n:n,ok:ok,ans:ans,time:Math.round(tot),area:area,foco:foco};
+  S.mfSims=(S.mfSims||[]).concat([sim]).slice(-100);save();
+  const rows=(o,asc)=>Object.keys(o).map(k=>({k:k,e:o[k],p:o[k].n?o[k].ok/o[k].n:0})).sort((a,b)=>asc?a.p-b.p:b.e.n-a.e.n).map(r=>'<tr><td>'+esc(r.k)+'</td><td>'+r.e.n+'</td><td>'+r.e.ok+'</td><td><b>'+Math.round(r.p*100)+'%</b></td><td>'+mfClk(r.e.t/Math.max(1,r.e.n))+'</td></tr>').join('');
+  const tb=(h,b)=>'<table class="mfbol"><thead><tr><th>'+h+'</th><th>Questões</th><th>Acertos</th><th>%</th><th>Tempo médio</th></tr></thead><tbody>'+b+'</tbody></table>';
+  UI.mfq={ids:wrong,i:0,show:false};
+  openModal('<div class="form"><div class="fh"><h2>Boletim do simulado</h2><button class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
+    '<div class="rvsum"><div><b>'+ok+' / '+n+'</b><span>acertos ('+Math.round(ok/n*100)+'% do total'+(ans&&ans<n?', '+Math.round(ok/ans*100)+'% das respondidas':'')+')</span></div><div><b>'+mfClk(tot)+'</b><span>tempo total | média '+mfClk(tot/n)+'</span></div><div><b>'+slow.length+'</b><span>acima de 3 min'+(slow.length?': Q'+slow.join(', Q'):'')+'</span></div></div>'+
+    (n-ans?'<p class="muted small">'+(n-ans)+(n-ans===1?' questão em branco.':' questões em branco.')+'</p>':'')+
+    '<h4 class="fsub">Por grande área</h4>'+tb('Grande área',rows(area,false))+'<h4 class="fsub">Por foco (menor acerto primeiro)</h4>'+tb('Foco',rows(foco,true))+
+    '<div class="ff">'+(wrong.length?'<button class="btn primary" data-a="mf-ex-review">Rever '+wrong.length+(wrong.length===1?' erro':' erros')+' com comentários</button>':'')+'<span class="sp"></span><button class="btn" data-a="close">Fechar</button></div></div>');
+}
+Object.assign(ACT,{
+  'mf-cause'(el){
+    S.mfCause=S.mfCause||{};const id=el.dataset.id,c=el.dataset.c;
+    if(S.mfCause[id]&&S.mfCause[id].c===c)delete S.mfCause[id];else S.mfCause[id]={c:c,t:Date.now()};
+    save();$$('.mfcause .chip').forEach(b=>b.classList.toggle('on',!!(S.mfCause[id]&&S.mfCause[id].c===b.dataset.c)));
+  },
+  'mf-cards'(){
+    const list=mfFiltered().filter(q=>{const r=MFD.est.r[q.id];return r&&r[1]===0;}).slice(0,80);
+    if(!list.length){toast('Nenhum erro neste filtro.');return;}
+    let d=S.decks.find(x=>x.name==='Erros de questões');
+    if(!d){d={id:uid(),name:'Erros de questões',parentId:'',folderId:'',catId:'',goalId:'',actId:'',noteId:'',focoIds:[],created:Date.now(),updated:Date.now(),ret:0,newPd:0,revPd:0};S.decks.push(d);}
+    let n=0;const now=Date.now();
+    list.forEach(q=>{
+      if(S.cards.some(c=>c.mfId===q.id))return;
+      const Q=mfQ(q),ok=Q.alternativas.find(a=>a.letra===Q.gabarito),f=(S.focos||[]).find(x=>norm(x.name)===norm(q.foco));
+      if(f&&(d.focoIds||[]).indexOf(f.id)<0){d.focoIds=(d.focoIds||[]).concat([f.id]);}
+      S.cards.push({id:uid(),deckId:d.id,type:'basic',front:clip(Q.enunciado,420),back:'Gabarito: '+Q.gabarito+(ok?') '+ok.texto:'')+(Q.comentario?'\n\n'+clip(Q.comentario,500):''),frontImg:'',backImg:'',text:'',extra:[q.inst+' '+q.ano,'Questão '+q.num,q.foco].filter(Boolean).join(' | '),s:{},rl:[],created:now,updated:now,mfId:q.id});n++;
+    });
+    save();toast(n?n+(n===1?' flashcard criado':' flashcards criados')+' em “Erros de questões”.':'Esses erros já viraram flashcards.');
+  },
+  'mf-simulado'(){
+    openModal('<form id="fMfEx" class="form"><div class="fh"><h2>Simulado cronometrado</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
+      '<p class="muted small" style="margin:0 0 10px">Prova fechada com as questões dos filtros atuais: sem gabarito nem comentários até a entrega, com tempo por questão (alerta acima de 3 min) e boletim por grande área e foco.</p>'+
+      '<label class="f">Quantas questões<input type="number" name="n" min="1" max="200" value="20" required></label>'+
+      '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Começar</button></div></form>');
+    $('#fMfEx').addEventListener('submit',e=>{e.preventDefault();const n=Math.max(1,Math.min(200,Math.round(Number(e.target.elements.n.value))||20));mfExamStart(n);});
+  },
+  'mf-ex-alt'(el){const m=UI.mfq;if(!m||!m.exam)return;const id=m.ids[m.i];m.ans[id]=m.ans[id]===el.dataset.l?'':el.dataset.l;if(!m.ans[id])delete m.ans[id];
+    $$('.mfex .mfalt').forEach(b=>b.classList.toggle('sel',b.dataset.l===m.ans[id]));const g=$$('.mfexn')[m.i];if(g)g.classList.toggle('ok',!!m.ans[id]);},
+  'mf-ex-nav'(el){const m=UI.mfq;if(!m||!m.exam)return;mfExLap(m);m.i=Math.max(0,Math.min(m.ids.length-1,m.i+Number(el.dataset.d)));mfShowQ();},
+  'mf-ex-go'(el){const m=UI.mfq;if(!m||!m.exam)return;mfExLap(m);m.i=Number(el.dataset.i)||0;mfShowQ();},
+  'mf-ex-end'(){const m=UI.mfq;if(!m||!m.exam)return;const bl=m.ids.filter(x=>!m.ans[x]).length;if(bl){askConfirm('Entregar a prova?',bl+(bl===1?' questão está em branco.':' questões estão em branco.'),mfExamFinish,'Entregar');}else mfExamFinish();},
+  'mf-ex-cancel'(){askConfirm('Cancelar o simulado?','As respostas desta prova não serão salvas.',()=>{clearInterval(MF_EX_T);UI.mfq=null;closeModal();renderMain();},'Cancelar simulado');},
+  'mf-ex-review'(){mfShowQ();}
 });
 
 /* ==========================================================================
