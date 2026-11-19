@@ -2650,6 +2650,34 @@ html[data-theme="dark"] .dp.dt{background:#232C52;color:#B8C7FF}
 .gs-caprow{display:flex;justify-content:space-between;gap:12px;padding:4px 0;border-bottom:1px solid var(--line2);font-size:14px}
 .gs-caprow span{color:var(--mut)}
 html[data-theme="dark"] .trvwarn{background:rgba(224,160,48,.16)}
+
+/* ===== Lazer ===== */
+.lztypes{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+.lzchip{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--tx);font-size:13.5px;cursor:pointer}
+.lzchip .ic{color:var(--c,var(--acc))}.lzchip small{opacity:.6;font-size:11.5px}
+.lzchip.on{background:color-mix(in srgb,var(--c,var(--acc)) 16%,var(--card));border-color:var(--c,var(--acc));font-weight:600}
+.lzchip.on:not([style]){background:var(--accs);border-color:var(--acc)}
+.lzd,.lzdot i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:0}
+.lzdot{display:inline-flex;align-items:center;font-size:11.5px;color:var(--mut);border:1px solid var(--line);border-radius:999px;padding:1px 9px 1px 8px;margin-left:8px;white-space:nowrap}
+.lzdot i{background:var(--d);margin-right:5px}
+.lzlist{display:flex;flex-direction:column;gap:10px}
+.lzcard{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:start;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--c);border-radius:14px;padding:14px 16px}
+.lzcard.done{background:color-mix(in srgb,var(--c) 5%,var(--card))}
+.lzico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 16%,var(--card));color:var(--c)}
+.lzt{display:flex;align-items:center;flex-wrap:wrap;gap:4px}.lzt b{font-size:15.5px}
+.lzm{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;color:var(--mut);font-size:13px;margin-top:2px}
+.lzp{display:flex;align-items:center;gap:10px;margin-top:8px}.lzbar{flex:1;max-width:320px;height:7px;border-radius:99px;background:var(--soft);overflow:hidden}.lzbar i{display:block;height:100%;background:var(--c);border-radius:99px}
+.lzrate{display:flex;align-items:center;gap:2px;margin-top:6px}.lzrate.big{gap:6px}.lzrate.big .lzs{font-size:30px}
+.lzs{border:0;background:none;padding:0 1px;font-size:19px;line-height:1;color:var(--line3);cursor:pointer}.lzs.on{color:#E9A100}
+span.lzs{cursor:default;font-size:15px}
+.lzrev{margin:8px 0 0;padding:8px 12px;border-left:3px solid var(--c);background:var(--soft);border-radius:0 8px 8px 0;font-size:13.5px;color:var(--tx);white-space:pre-wrap}
+.lzobs{margin-top:4px}
+.lza{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;max-width:360px}
+.lzt-opt input:checked+span{color:var(--c);font-weight:600}
+.lzt-opt:has(input:checked){border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,var(--card))}
+@media(max-width:760px){.lzcard{grid-template-columns:auto minmax(0,1fr)}.lza{grid-column:1/-1;justify-content:flex-start;max-width:none}}
+html[data-theme="dark"] .lzico{background:color-mix(in srgb,var(--c) 24%,#1A1D25)}
+html[data-theme="dark"] .lzs{color:#3A3F4C}html[data-theme="dark"] .lzs.on{color:#F5B93A}
 </style>
 </head>
 <body>
@@ -2775,6 +2803,11 @@ const ICONS={
  filter:'<path d="M22 3H2l8 9.5V19l4 2v-8.5L22 3z"/>',
  settings:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+ film:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/>',
+ tv:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M8 21h8M12 18v3M9 3l3 3 3-3"/>',
+ music:'<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+ mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3M9 21h6"/>',
+ gamepad:'<rect x="3" y="7" width="18" height="11" rx="4"/><path d="M8 10v5M5.5 12.5h5M15.5 11.5h.01M18 13.5h.01"/>',
  file:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/>',
  bell:'<path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/>',
  chevL:'<path d="M15 18l-6-6 6-6"/>',
@@ -3056,7 +3089,7 @@ function normalize(o){
     items:(Array.isArray(o.items)?o.items:seedItems()).map(i=>{const x=Object.assign({apps:[],inside:[]},i);if(!Array.isArray(x.inside))x.inside=[];if(x.container===undefined)x.container=/^bolsa/i.test(x.name)||norm(x.group||'')==='bolsas';if(ver<5&&x.group==='Eletrônicos'&&(x.name==='Mouse Logitech'||x.name==='Extensão'))x.group='Acessórios';return x;}),
     links:arr('links'),
     linkCats:(Array.isArray(o.linkCats)&&o.linkCats.length)?o.linkCats:LINKCATS.slice(),
-    packed:o.packed||{},kits:Array.isArray(o.kits)?o.kits.filter(k=>k&&k.id):[],templates:Array.isArray(o.templates)?o.templates.filter(t=>t&&t.id):[],taskHist:Array.isArray(o.taskHist)?o.taskHist.slice(-500):[],revx:(o.revx&&typeof o.revx==='object'&&!Array.isArray(o.revx))?o.revx:{},bagRules:(Array.isArray(o.bagRules)?o.bagRules:[]).filter(r=>r&&r.value&&Array.isArray(r.itemIds)),health:arr('health'),hprefs:Object.assign({weeklyMin:150,sleepH:7,heightCm:''},o.hprefs||{}),fin:normFin(o.fin),
+    packed:o.packed||{},kits:Array.isArray(o.kits)?o.kits.filter(k=>k&&k.id):[],lazer:arr('lazer').map(x=>Object.assign({type:'outro',title:'',scope:'pessoal',status:'todo',catId:'',link:'',total:0,progress:0,unit:'',plannedMin:0,stars:0,review:'',noteId:'',note:'',created:Date.now(),updated:Date.now(),doneAt:0},x)),templates:Array.isArray(o.templates)?o.templates.filter(t=>t&&t.id):[],taskHist:Array.isArray(o.taskHist)?o.taskHist.slice(-500):[],revx:(o.revx&&typeof o.revx==='object'&&!Array.isArray(o.revx))?o.revx:{},bagRules:(Array.isArray(o.bagRules)?o.bagRules:[]).filter(r=>r&&r.value&&Array.isArray(r.itemIds)),health:arr('health'),hprefs:Object.assign({weeklyMin:150,sleepH:7,heightCm:''},o.hprefs||{}),fin:normFin(o.fin),
     acts:arr('acts').map(a=>{const x=Object.assign({actualMin:0,kitIds:[],overrides:{},deckIds:[],title:'',kind:'Atividade',tipoAtv:'',blockType:'estudo',catId:'',teacher:'',noTeacher:false,obs:'',place:'',link:'',doWhat:'',where:'',plan:{},bring:'',slots:[],done:{},miss:{},goalIds:[],docIds:[],relId:'',itemIds:[],linkIds:[],stow:{},extras:[],moneys:[],noArea:false,themeNA:false},a);if(x.theme==null)x.theme=x.title;return x;}),
     tasks:arr('tasks').map(t=>Object.assign({actualMin:0,repeat:null,blockedBy:'',deckIds:[],title:'',notes:'',obs:'',deadline:'',catId:'',docId:'',link:'',done:false,activityIds:[],goalIds:[],linkIds:[],itemIds:[],where:'',plan:{},deadlineTime:'',dateIds:[],moneys:[],group:'',subs:[]},t)),
     docs:arr('docs').map(d=>Object.assign({title:'',catId:'',link:'',notes:'',todo:[],goalIds:[],linkIds:[],noteIds:[],folderId:'',ext:'',status:'',source:'',srcLink:'',starnote:false,driveId:'',driveMod:0},d)),
@@ -3182,7 +3215,7 @@ function save(){try{Watch.touch();}catch(e){}HBMEMO={};DAYMEMO={};S.savedAt=Math
 
 const UNSENT_KEY='rotina_unsent';
 // Listas que nunca devem encolher de repente sem você saber (a nuvem e o site checam as duas).
-const PROT=[['inks','Cadernos'],['acts','Eventos'],['tasks','Tarefas'],['docs','Documentos'],['goals','Objetivos'],['notes','Notas'],['pdfs','PDFs'],['decks','Baralhos'],['cards','Questões e cards'],['recipes','Receitas'],['pantry','Estoque'],['meals','Refeições'],['health','Saúde'],['links','Links'],['dates','Datas'],['habits','Hábitos'],['slides','Apresentações'],['docTpls','Modelos de documento'],['spends','Saídas']];
+const PROT=[['inks','Cadernos'],['acts','Eventos'],['tasks','Tarefas'],['docs','Documentos'],['lazer','Lazer'],['goals','Objetivos'],['notes','Notas'],['pdfs','PDFs'],['decks','Baralhos'],['cards','Questões e cards'],['recipes','Receitas'],['pantry','Estoque'],['meals','Refeições'],['health','Saúde'],['links','Links'],['dates','Datas'],['habits','Hábitos'],['slides','Apresentações'],['docTpls','Modelos de documento'],['spends','Saídas']];
 const getL=(st,k)=>k==='spends'?(st&&st.fin&&st.fin.spends)||[]:(st&&st[k])||[];
 function lossInfo(L,R){ // listas em que um lado tem menos da metade do outro (com pelo menos 3 no maior)
   const out=[];
@@ -5270,7 +5303,7 @@ function renderAjustes(){
     (S.nkinds||[]).map(k=>'<div class="nkrow"><span class="nkb">'+ic(k.icon,18)+'</span><b>'+esc(k.name)+'</b><span class="sp"></span><button class="icon-btn sm" data-a="nk-icon" data-id="'+k.id+'" title="Trocar ícone">'+ic('image',14)+'</button><button class="icon-btn sm" data-a="nk-ren" data-id="'+k.id+'" title="Renomear">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="nk-del" data-id="'+k.id+'" title="Excluir">'+ic('trash',14)+'</button></div>').join('')+
     '<div class="addrow"><input type="text" id="nkNew" placeholder="Novo tipo de nota" autocomplete="off"><button class="btn primary sm" data-a="nk-add">Adicionar</button></div></div>';
   SEC.notif=notifHTML();
-  SEC.app=appHTML();
+  SEC.app=appHTML()+icsCardHTML();
   SEC.pingado=pgSettingsHTML();
   const tabs=[['horas','Horas'],['cats','Categorias'],['objs','Objetos'],['titulo','Título e Listas'],['nk','Tipos de nota'],['notif','Notificações'],['app','App e Widgets'],['pingado','Pingado'],['dados','Dados']];
   return '<div class="toolbar"><div class="seg">'+tabs.map(t=>'<button class="'+(UI.ajTab===t[0]?'on':'')+'" data-a="aj-tab" data-v="'+t[0]+'">'+t[1]+'</button>').join('')+'</div></div>'+(UI.ajTab==='horas'?hoursHTML():(SEC[UI.ajTab]||SEC.cats));
@@ -5279,7 +5312,7 @@ function renderAjustes(){
 /* ==========================================================================
    17. RENDERIZAÇÃO GERAL
    ========================================================================== */
-const TABS=[['painel','Painel','home'],['semana','Semana','calendar'],['tarefas','Tarefas','tasks'],['revisoes','Revisões','repeat'],['assuntos','Assuntos','tag'],['habitos','Hábitos','sprout'],['docs','Documentos','book'],['notas','Notas','note'],['questoes','Questões','cap'],['metas','Objetivos','target'],['datas','Datas','clock'],['links','Links','link'],['cul','Culinária','chef'],['fin','Finanças','wallet'],['ajustes','Ajustes','settings']];
+const TABS=[['painel','Painel','home'],['semana','Semana','calendar'],['tarefas','Tarefas','tasks'],['revisoes','Revisões','repeat'],['assuntos','Assuntos','tag'],['habitos','Hábitos','sprout'],['docs','Documentos','book'],['notas','Notas','note'],['questoes','Questões','cap'],['metas','Objetivos','target'],['datas','Datas','clock'],['links','Links','link'],['cul','Culinária','chef'],['fin','Finanças','wallet'],['lazer','Lazer','film'],['ajustes','Ajustes','settings']];
 // Transição suave ao trocar de aba (o conteúdo entra deslizando de leve; sem movimento se o aparelho pedir)
 function tabAnim(dir){
   const m=$('#main');if(!m||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))return;
@@ -5312,7 +5345,7 @@ applyAppMode();
     ACT.tab({dataset:{v:TABS[j][0]}});
   },{passive:true});
 })();
-const SB_GROUPS=[['Execução',['painel','semana','tarefas']],['Estudo',['revisoes','assuntos','notas','questoes','docs']],['Estratégia',['metas','habitos','datas']],['Gestão',['fin','cul']],['Sistema',['links','ajustes']]];
+const SB_GROUPS=[['Execução',['painel','semana','tarefas']],['Estudo',['revisoes','assuntos','notas','questoes','docs']],['Estratégia',['metas','habitos','datas']],['Gestão',['fin','cul','lazer']],['Sistema',['links','ajustes']]];
 function renderTabs(){
   const bar=$('#sbnav');if(!bar)return;
   const due=S.prefs.hideDueBadge?0:dueCardCount();
@@ -5421,7 +5454,7 @@ function renderMain(){
   if(hostAlive())return;
   applyLook();
   const mn=$('#main');if(mn)mn.classList.toggle('wide',UI.tab==='semana'&&UI.view==='grade');
-  const map={painel:renderPainel,semana:renderSemana,tarefas:renderTarefas,revisoes:renderRevisoes,assuntos:renderAssuntos,habitos:renderHabitos,docs:renderDocs,notas:renderNotas,questoes:renderQuestoes,metas:renderMetas,datas:renderDatas,links:renderLinks,cul:renderCul,fin:renderFin,ajustes:renderAjustes};
+  const map={painel:renderPainel,semana:renderSemana,tarefas:renderTarefas,revisoes:renderRevisoes,assuntos:renderAssuntos,habitos:renderHabitos,docs:renderDocs,notas:renderNotas,questoes:renderQuestoes,metas:renderMetas,datas:renderDatas,links:renderLinks,cul:renderCul,fin:renderFin,lazer:renderLazer,ajustes:renderAjustes};
   computeAttention();
   $('#main').innerHTML=map[UI.tab]();
   try{NC.badge();}catch(e){}
@@ -7694,6 +7727,7 @@ function gsBuild(){
   (S.focos||[]).forEach(f=>P('foco',f.id,'Focos','tag',f.name,f.mod+' '+((areaById(f.area)||{}).name||'')));
   S.acts.forEach(a=>P('act',a.id,'Atividades','calendar',aT(a),[a.teacher,a.obs,a.place,a.doWhat,a.where,a.bring,a.link,a.kind,gsFlat(a.extras,SK).join(' ')].join(' '),a.slots&&a.slots[0]&&a.slots[0].mode==='date'?fmtDM(a.slots[0].date):'semanal'));
   S.tasks.forEach(t=>P('task',t.id,'Tarefas','tasks',t.title,[t.notes,t.obs,t.where,t.link].join(' '),t.done?'concluída':(tDue(t)?fmtDM(tDue(t)):'')));
+  (S.lazer||[]).forEach(x=>P('lazer',x.id,'Lazer','film',x.title,[x.note,x.review,x.link,lzType(x.type).label,x.scope].join(' '),''));
   S.docs.forEach(d=>P('doc',d.id,'Documentos','file',d.title,[d.notes,d.link,d.source,d.srcLink,dstLabel(d.status),gsFlat(d.todo,SK).join(' ')].join(' '),dfolderPath(d.folderId).join(' › ')));
   S.goals.forEach(g=>P('goal',g.id,'Objetivos','target',g.title,'',HNAME[g.horizon]||''));
   S.dates.forEach(d=>P('date',d.id,'Datas e prazos','clock',d.title,[d.notes,d.cat,dcatChain(d.catId).map(c=>c.name).join(' ')].join(' '),d.date?fmtDM(d.date):''));
@@ -7841,6 +7875,7 @@ function openRef(ref){
   const i=String(ref||'').indexOf(':'),k=ref.slice(0,i),id=ref.slice(i+1);
   if(k==='act'){const a=actById(id);if(!a){toast('Esta atividade não existe mais.');return;}const o=nextOccOf(a);if(o)openOcc(a.id,o.key);}
   else if(k==='task'){if(!openTaskView(id))toast('Esta tarefa não existe mais.');}
+  else if(k==='lazer'){if(lzById(id)){closeModal();UI.tab='lazer';renderTabs();renderMain();window.scrollTo(0,0);}else toast('Este item não existe mais.');}
   else if(k==='doc'){if(docById(id))openDocView(id);else toast('Este documento não existe mais.');}
   else if(k==='goal'){if(goalById(id))openGoalView(id);else toast('Este objetivo não existe mais.');}
   else if(k==='date'){if(dateById(id))openDateView(id);else toast('Esta data não existe mais.');}
@@ -9963,7 +9998,7 @@ function printFallback(){
   w.document.close();
 }
 /* ----- imprimir a aba (ou subaba) que está na tela ----- */
-const TAB_LABEL={assuntos:'Assuntos',painel:'Painel',semana:'Semana',tarefas:'Tarefas',habitos:'Hábitos',docs:'Documentos',notas:'Notas',questoes:'Questões',metas:'Objetivos',datas:'Datas',links:'Links',saude:'Saúde',cul:'Culinária',fin:'Finanças',ajustes:'Ajustes'};
+const TAB_LABEL={assuntos:'Assuntos',painel:'Painel',semana:'Semana',tarefas:'Tarefas',habitos:'Hábitos',docs:'Documentos',notas:'Notas',questoes:'Questões',metas:'Objetivos',datas:'Datas',links:'Links',saude:'Saúde',cul:'Culinária',fin:'Finanças',lazer:'Lazer',ajustes:'Ajustes'};
 function printContext(){
   if(UI.tab==='semana'){printWeek();return;}
   if(UI.tab==='notas'&&UI.nview&&UI.nview.id&&noteById(UI.nview.id)){printNote(UI.nview.id);return;}
@@ -14281,7 +14316,7 @@ document.addEventListener('pointerup',e=>{
   gridMoveAsk(d.ev.dataset.aid,d.ev.dataset.key,nd,st);
 });
 // o clique que termina um arrasto não abre o evento
-document.addEventListener('click',e=>{if(Date.now()-GDRAG_SKIP<250&&e.target.closest&&e.target.closest('.wgrid .ev')){e.stopPropagation();e.preventDefault();}},true);
+document.addEventListener('click',e=>{if(Date.now()-GDRAG_SKIP<400&&e.target.closest&&e.target.closest('.wgrid')){e.stopPropagation();e.preventDefault();}},true);
 
 /* ==========================================================================
    CADERNO COM CANETA: páginas em branco, pautadas, quadriculadas ou de um PDF; caneta, marca-texto, borracha,
@@ -15201,6 +15236,196 @@ document.addEventListener('drop',e=>{
 // aviso de deslocamento no formulário: recalcula ao mudar horário ou local
 document.addEventListener('change',e=>{if(e.target&&e.target.closest&&e.target.closest('#fAct'))updTrvWarn();});
 document.addEventListener('input',e=>{if(e.target&&e.target.name==='place'&&e.target.closest&&e.target.closest('#fAct'))updTrvWarn();});
+
+
+/* ==========================================================================
+   LAZER: vídeos, livros, filmes, séries, músicas, locais… com progresso, estrelas e crítica
+   ========================================================================== */
+const LZ_TYPES=[
+  {k:'video',label:'Vídeo',icon:'play',color:'#E5484D',unit:'min',todo:'A assistir',done:'Assistidos',verb:'Assistir'},
+  {k:'filme',label:'Filme',icon:'film',color:'#8E4EC6',unit:'min',todo:'A ver',done:'Vistos',verb:'Assistir'},
+  {k:'serie',label:'Série',icon:'tv',color:'#3E63DD',unit:'episódios',todo:'A ver',done:'Vistas',verb:'Assistir'},
+  {k:'livro',label:'Livro',icon:'book',color:'#C77D0A',unit:'páginas',todo:'A ler',done:'Lidos',verb:'Ler'},
+  {k:'musica',label:'Música',icon:'music',color:'#12A594',unit:'faixas',todo:'A ouvir',done:'Ouvidas',verb:'Ouvir'},
+  {k:'podcast',label:'Podcast',icon:'mic',color:'#F76B15',unit:'min',todo:'A ouvir',done:'Ouvidos',verb:'Ouvir'},
+  {k:'jogo',label:'Jogo',icon:'gamepad',color:'#30A46C',unit:'horas',todo:'A jogar',done:'Jogados',verb:'Jogar'},
+  {k:'local',label:'Local',icon:'pin',color:'#0091FF',unit:'',todo:'A visitar',done:'Visitados',verb:'Visitar'},
+  {k:'outro',label:'Outro',icon:'star',color:'#6E56CF',unit:'',todo:'A fazer',done:'Feitos',verb:'Fazer'}
+];
+const LZ_UNITS=['','páginas','min','episódios','faixas','horas','capítulos'];
+const LZ_SCOPES=[['pessoal','Pessoal','#2F9E6A'],['profissional','Profissional','#3E63DD']];
+const lzType=k=>LZ_TYPES.find(t=>t.k===k)||LZ_TYPES[LZ_TYPES.length-1];
+const lzById=id=>(S.lazer||[]).find(x=>x.id===id);
+const lzScope=k=>LZ_SCOPES.find(x=>x[0]===k)||LZ_SCOPES[0];
+const lzStars=n=>{let h='';for(let i=1;i<=5;i++)h+='<span class="lzs '+(i<=n?'on':'')+'">★</span>';return h;};
+function lzPass(x,noType){
+  if(!noType&&UI.lzType&&x.type!==UI.lzType)return false;
+  if(UI.lzScope&&x.scope!==UI.lzScope)return false;
+  if(UI.lzCat&&catDesc(UI.lzCat).indexOf(x.catId)<0)return false;
+  if(UI.lzQ&&norm([x.title,x.note,x.review,x.link].join(' ')).indexOf(norm(UI.lzQ))<0)return false;
+  return true;
+}
+function lzCard(x){
+  const T=lzType(x.type),sc=lzScope(x.scope),done=x.status==='done',total=Number(x.total)||0,prog=Math.min(Number(x.progress)||0,total||Infinity)||0;
+  const pct=done?100:(total?Math.min(100,Math.round(prog/total*100)):0),unit=x.unit||'';
+  const note=x.noteId&&noteById(x.noteId);
+  const meta=[T.label,total?total+(unit?' '+unit:''):'',x.plannedMin?'previsto '+hm(x.plannedMin):'',done&&x.doneAt?'em '+fmtDM(new Date(x.doneAt).toISOString().slice(0,10)):''].filter(Boolean).join(' | ');
+  return '<article class="lzcard '+(done?'done':'')+'" style="--c:'+T.color+'">'+
+    '<div class="lzico" aria-hidden="true">'+ic(T.icon,22)+'</div>'+
+    '<div class="lzb"><div class="lzt"><b>'+esc(x.title)+'</b><span class="lzdot" style="--d:'+sc[2]+'" title="'+sc[1]+'"><i></i>'+sc[1]+'</span></div>'+
+    '<div class="lzm">'+esc(meta)+(x.catId?' '+tagHTML(x.catId):'')+'</div>'+
+    (total||done?'<div class="lzp"><div class="lzbar"><i style="width:'+pct+'%"></i></div><span class="muted small">'+(done?'Concluído':(total?'Parei em '+prog+' de '+total+(unit?' '+unit:'')+' ('+pct+'%)':''))+'</span></div>':'')+
+    (done?'<div class="lzrate" role="group" aria-label="Avaliação">'+[1,2,3,4,5].map(i=>'<button class="lzs '+(i<=(x.stars||0)?'on':'')+'" data-a="lz-star" data-id="'+x.id+'" data-n="'+i+'" aria-label="'+i+' estrela'+(i>1?'s':'')+'">★</button>').join('')+(x.stars?'<span class="muted small">'+x.stars+'/5</span>':'<span class="muted small">sem nota</span>')+'</div>':'')+
+    (done&&x.review?'<blockquote class="lzrev">'+esc(x.review)+'</blockquote>':'')+
+    (x.note&&!done?'<div class="muted small lzobs">'+esc(x.note)+'</div>':'')+
+    '</div><div class="lza">'+
+    (x.link?'<button class="btn sm" data-a="lz-link" data-id="'+x.id+'" title="Abrir o link">'+ic('external',14)+' Abrir</button>':'')+
+    (!done&&(total||T.unit)?'<button class="btn sm" data-a="lz-prog" data-id="'+x.id+'">'+ic('pulse',14)+' Onde parei</button>':'')+
+    (!done?'<button class="btn sm primary" data-a="lz-done" data-id="'+x.id+'">'+ic('check',14)+' Marcar como '+(x.type==='livro'?'lido':x.type==='local'?'visitado':x.type==='musica'||x.type==='podcast'?'ouvido':x.type==='jogo'?'jogado':'visto')+'</button>':'<button class="btn sm" data-a="lz-done" data-id="'+x.id+'">'+ic('edit',14)+' Avaliação</button><button class="btn sm ghost" data-a="lz-reopen" data-id="'+x.id+'">Voltar à lista</button>')+
+    '<button class="btn sm ghost" data-a="lz-sched" data-id="'+x.id+'" title="Agendar na semana usando o tempo previsto">'+ic('calendar',14)+' Agendar</button>'+
+    '<button class="btn sm ghost" data-a="lz-note" data-id="'+x.id+'" title="'+(note?'Abrir a nota':'Criar uma nota')+'">'+ic(note?'note':'filePlus',14)+' '+(note?'Nota':'Criar nota')+'</button>'+
+    '<button class="icon-btn" data-a="lz-edit" data-id="'+x.id+'" aria-label="Editar">'+ic('edit',17)+'</button><button class="icon-btn" data-a="lz-del" data-id="'+x.id+'" aria-label="Excluir">'+ic('trash',17)+'</button></div></article>';
+}
+function lzListHTML(){
+  const st=UI.lzSt==='done'?'done':'todo',base=(S.lazer||[]).filter(x=>lzPass(x)&&x.status===st);
+  const sort=UI.lzSort||'recent';
+  base.sort((a,b)=>sort==='stars'&&st==='done'?((b.stars||0)-(a.stars||0))||((b.doneAt||0)-(a.doneAt||0)):sort==='title'?String(a.title).localeCompare(String(b.title),'pt-BR'):(st==='done'?(b.doneAt||0)-(a.doneAt||0):(b.updated||0)-(a.updated||0)));
+  if(!base.length)return '<div class="empty">'+(st==='done'?'Nada concluído ainda.':'Nada por aqui.')+'<br><button class="btn primary" data-a="lz-new">'+ic('plus',15)+' Adicionar item</button></div>';
+  return base.map(lzCard).join('');
+}
+function renderLazer(){
+  const all=S.lazer||[],st=UI.lzSt==='done'?'done':'todo',Tp=UI.lzType?lzType(UI.lzType):null;
+  const pool=all.filter(x=>lzPass(x,true)),cnt=k=>pool.filter(x=>!k||x.type===k).length;
+  const sub=all.filter(x=>lzPass(x)),nTodo=sub.filter(x=>x.status==='todo').length,nDone=sub.filter(x=>x.status==='done').length;
+  const rated=all.filter(x=>x.status==='done'&&x.stars),avg=rated.length?(rated.reduce((a,x)=>a+x.stars,0)/rated.length).toFixed(1).replace('.',','):'';
+  let h='<div class="toolbar"><h2 class="vt" style="margin:0">Lazer</h2><span class="muted small">'+all.filter(x=>x.status==='todo').length+' na fila | '+all.filter(x=>x.status==='done').length+' concluídos'+(avg?' | média '+avg+' ★':'')+'</span><span class="sp"></span><button class="btn primary" data-a="lz-new">'+ic('plus',15)+' Novo item</button></div>';
+  h+='<div class="lztypes" role="group" aria-label="Tipo de mídia"><button class="lzchip '+(!UI.lzType?'on':'')+'" data-a="lz-type" data-v=""><span>Tudo</span><small>'+cnt('')+'</small></button>'+
+    LZ_TYPES.map(t=>'<button class="lzchip '+(UI.lzType===t.k?'on':'')+'" style="--c:'+t.color+'" data-a="lz-type" data-v="'+t.k+'">'+ic(t.icon,15)+'<span>'+t.label+'</span><small>'+cnt(t.k)+'</small></button>').join('')+'</div>';
+  h+='<div class="nfbar tfbar"><div class="frow"><span class="fl" style="min-width:auto">Tipo de uso</span><button class="chip '+(!UI.lzScope?'on':'')+'" data-a="lz-scope" data-v="">Todos</button>'+LZ_SCOPES.map(x=>'<button class="chip '+(UI.lzScope===x[0]?'on':'')+'" data-a="lz-scope" data-v="'+x[0]+'"><i class="lzd" style="background:'+x[2]+'"></i>'+x[1]+'</button>').join('')+'</div>'+
+    '<label class="nfsel"><span>Categoria</span><select id="lzcat"><option value="">Todas</option>'+catTreeOpts(UI.lzCat)+'</select></label>'+
+    '<div class="sbox" style="max-width:240px">'+ic('search',15)+'<input id="lzq" type="search" placeholder="Buscar" value="'+esc(UI.lzQ||'')+'" autocomplete="off"></div>'+
+    '<label class="nfsel"><span>Ordenar</span><select id="lzsort"><option value="recent" '+(UI.lzSort!=='stars'&&UI.lzSort!=='title'?'selected':'')+'>Mais recentes</option><option value="stars" '+(UI.lzSort==='stars'?'selected':'')+'>Melhor avaliados</option><option value="title" '+(UI.lzSort==='title'?'selected':'')+'>Título</option></select></label></div>';
+  h+='<div class="seg" style="margin:6px 0 12px"><button class="'+(st==='todo'?'on':'')+'" data-a="lz-st" data-v="todo">'+(Tp?Tp.todo:'A ver / ler')+' ('+nTodo+')</button><button class="'+(st==='done'?'on':'')+'" data-a="lz-st" data-v="done">'+(Tp?Tp.done:'Vistos / lidos')+' ('+nDone+')</button></div>';
+  h+='<div id="lzList" class="lzlist">'+lzListHTML()+'</div>';
+  return h;
+}
+function lzForm(id){
+  const x=id?lzById(id):null,T0=UI.lzType||'filme';
+  const p=Object.assign({type:T0,title:'',scope:UI.lzScope||'pessoal',status:UI.lzSt==='done'?'done':'todo',catId:'',link:'',total:'',progress:'',unit:'',plannedMin:'',stars:0,review:'',note:''},x||{});
+  openModal('<form id="fLz" class="form"><div class="fh"><h2>'+(x?'Editar item':'Novo item de lazer')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
+    '<div class="f"><span>Tipo de mídia</span><div class="frow">'+LZ_TYPES.map(t=>'<label class="chip cb lzt-opt" style="--c:'+t.color+'"><input type="radio" name="type" value="'+t.k+'" '+(p.type===t.k?'checked':'')+'><span>'+ic(t.icon,14)+t.label+'</span></label>').join('')+'</div></div>'+
+    '<label class="f">Título<input name="title" required value="'+esc(p.title)+'" autocomplete="off" placeholder="Nome do vídeo, livro, filme ou local"></label>'+
+    '<div class="fgrid"><div class="f"><span>Uso</span><div class="frow">'+LZ_SCOPES.map(sc=>'<label class="chip cb"><input type="radio" name="scope" value="'+sc[0]+'" '+(p.scope===sc[0]?'checked':'')+'><span><i class="lzd" style="background:'+sc[2]+'"></i>'+sc[1]+'</span></label>').join('')+'</div></div>'+
+    '<div class="f"><span>Situação</span><div class="frow"><label class="chip cb"><input type="radio" name="status" value="todo" '+(p.status!=='done'?'checked':'')+'><span>Na fila</span></label><label class="chip cb"><input type="radio" name="status" value="done" '+(p.status==='done'?'checked':'')+'><span>Já concluí</span></label></div></div></div>'+
+    '<div class="f"><span>Categoria</span>'+catPickHTML('lzcat',p.catId)+'</div>'+
+    '<label class="f">Link <small>botão que abre direto</small><input name="link" inputmode="url" value="'+esc(p.link)+'" autocomplete="off" placeholder="https://"></label>'+
+    '<div class="fgrid3"><label class="f">Total <small>páginas, minutos…</small><input type="number" name="total" min="0" step="1" value="'+esc(p.total||'')+'"></label>'+
+    '<label class="f">Unidade<select name="unit">'+LZ_UNITS.map(u=>'<option value="'+u+'" '+((p.unit||(x?'':lzType(p.type).unit))===u?'selected':'')+'>'+(u||'(nenhuma)')+'</option>').join('')+'</select></label>'+
+    '<label class="f">Parei em<input type="number" name="progress" min="0" step="1" value="'+esc(p.progress||'')+'"></label></div>'+
+    '<label class="f">Tempo previsto <small>min, opcional: usado para agendar</small><input type="number" name="plannedMin" min="0" step="5" value="'+esc(p.plannedMin||'')+'"></label>'+
+    '<label class="f">Observações<textarea name="note" rows="2" placeholder="Por que quero ver, quem indicou…">'+esc(p.note||'')+'</textarea></label>'+
+    '<details class="adv" '+(p.status==='done'||p.stars||p.review?'open':'')+'><summary>Avaliação e crítica</summary><div class="f"><span>Estrelas</span><div class="lzrate" id="lzfs">'+[1,2,3,4,5].map(i=>'<button type="button" class="lzs '+(i<=(p.stars||0)?'on':'')+'" data-a="lz-fstar" data-n="'+i+'" aria-label="'+i+' estrelas">★</button>').join('')+'</div><input type="hidden" name="stars" value="'+(p.stars||0)+'"></div>'+
+    '<label class="f">Minha crítica<textarea name="review" rows="3" placeholder="O que achei…">'+esc(p.review||'')+'</textarea></label></details>'+
+    '<div class="ff">'+(x?'<button type="button" class="btn danger" data-a="lz-del" data-id="'+x.id+'">Excluir</button>':'')+'<span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
+  const f=$('#fLz');mountCatPicks(f);
+  $$('input[name=type]',f).forEach(r=>r.addEventListener('change',()=>{const u=f.elements.unit;if(!f.elements.total.value)u.value=lzType(r.value).unit;}));
+  f.addEventListener('submit',e=>{
+    e.preventDefault();const E=f.elements,st=$('input[name=status]:checked',f).value,now=Date.now();
+    const d={type:$('input[name=type]:checked',f).value,title:E.title.value.trim(),scope:$('input[name=scope]:checked',f).value,status:st,catId:($('[data-catpick="lzcat"]',f)||{dataset:{}}).dataset.value||'',link:E.link.value.trim(),total:Math.max(0,Number(E.total.value)||0),unit:E.unit.value,progress:Math.max(0,Number(E.progress.value)||0),plannedMin:Math.max(0,Number(E.plannedMin.value)||0),note:E.note.value.trim(),stars:Number(E.stars.value)||0,review:E.review.value.trim(),updated:now};
+    if(!d.title)return;
+    if(st==='done'){d.progress=d.total||d.progress;}
+    if(x){if(x.status!=='done'&&st==='done')d.doneAt=now;if(st!=='done')d.doneAt=0;Object.assign(x,d);}
+    else{S.lazer=S.lazer||[];S.lazer.push(Object.assign({id:uid(),created:now,doneAt:st==='done'?now:0,noteId:''},d));}
+    save();closeModal();renderMain();toast('Item salvo.');
+  });
+}
+function lzProgDlg(id){
+  const x=lzById(id);if(!x)return;const T=lzType(x.type),u=x.unit||T.unit,steps=u==='páginas'?[10,25]:u==='min'?[5,15]:u==='episódios'||u==='faixas'||u==='capítulos'?[1,2]:[1,5];
+  openModal('<form id="fLzp" class="form"><div class="fh"><h2>Onde parei</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><p class="muted" style="margin:0 0 8px"><b>'+esc(x.title)+'</b></p>'+
+    '<div class="fgrid"><label class="f">Parei em ('+esc(u||'unidades')+')<input type="number" name="p" min="0" step="1" value="'+(Number(x.progress)||0)+'" required></label><label class="f">Total<input type="number" name="t" min="0" step="1" value="'+(Number(x.total)||'')+'"></label></div>'+
+    '<div class="frow" style="margin:6px 0">'+steps.map(n=>'<button type="button" class="chip" data-a="lz-bump" data-n="'+n+'">+'+n+'</button>').join('')+'<button type="button" class="chip" data-a="lz-bump" data-n="max">Terminei</button></div>'+
+    '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
+  $('#fLzp').addEventListener('submit',e=>{
+    e.preventDefault();const E=e.target.elements;x.total=Math.max(0,Number(E.t.value)||0);x.progress=Math.max(0,Number(E.p.value)||0);x.updated=Date.now();
+    const fin=x.total&&x.progress>=x.total&&x.status!=='done';save();closeModal();renderMain();
+    if(fin){toast('Chegou ao fim! Marque como concluído para avaliar.');setTimeout(()=>lzDoneDlg(x.id),250);}else toast('Progresso salvo.');
+  });
+}
+function lzDoneDlg(id){
+  const x=lzById(id);if(!x)return;
+  openModal('<form id="fLzd" class="form"><div class="fh"><h2>'+(x.status==='done'?'Minha avaliação':'Concluído! Como foi?')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><p class="muted" style="margin:0 0 8px"><b>'+esc(x.title)+'</b></p>'+
+    '<div class="f"><span>Estrelas</span><div class="lzrate big" id="lzfs">'+[1,2,3,4,5].map(i=>'<button type="button" class="lzs '+(i<=(x.stars||0)?'on':'')+'" data-a="lz-fstar" data-n="'+i+'" aria-label="'+i+' estrelas">★</button>').join('')+'</div><input type="hidden" name="stars" value="'+(x.stars||0)+'"></div>'+
+    '<label class="f">Minha crítica<textarea name="review" rows="4" placeholder="O que achei, o que ficou…">'+esc(x.review||'')+'</textarea></label>'+
+    '<div class="ff"><button type="button" class="btn" data-a="cancel">Cancelar</button><span class="sp"></span><button class="btn" name="n" value="1">Salvar e criar nota</button><button class="btn primary" name="n" value="">Salvar</button></div></form>');
+  $('#fLzd').addEventListener('submit',e=>{
+    e.preventDefault();const E=e.target.elements,mk=e.submitter&&e.submitter.value==='1';
+    x.stars=Number(E.stars.value)||0;x.review=E.review.value.trim();
+    if(x.status!=='done'){x.status='done';x.doneAt=Date.now();if(x.total)x.progress=x.total;}
+    x.updated=Date.now();save();closeModal();renderMain();
+    if(mk)lzNote(x.id);else toast('Avaliação salva.');
+  });
+}
+function lzNote(id){
+  const x=lzById(id);if(!x)return;
+  let n=x.noteId&&noteById(x.noteId);
+  if(!n){
+    const T=lzType(x.type),stars=x.stars?'★'.repeat(x.stars)+'☆'.repeat(5-x.stars)+' ('+x.stars+'/5)':'';
+    const html='<h2>'+esc(x.title)+'</h2><p><i>'+esc(T.label)+' | '+esc(lzScope(x.scope)[1])+'</i></p>'+(x.link?'<p>Link: <a href="'+esc(x.link)+'" target="_blank" rel="noopener">'+esc(x.link)+'</a></p>':'')+(stars?'<p>Minha nota: '+stars+'</p>':'')+
+      '<h3>Crítica</h3><p>'+(x.review?esc(x.review):'<br>')+'</p><h3>Anotações</h3><p><br></p>';
+    n=normNote({id:uid(),type:'nota',title:x.title,html:html,folderId:'',catId:x.catId||'',cd:null,created:Date.now(),updated:Date.now()});
+    S.notes.push(n);x.noteId=n.id;save();
+  }
+  flushNote();UI.tab='notas';UI.nsub='notas';UI.nview={type:'note',id:n.id,edit:false};closeModal();renderTabs();renderMain();window.scrollTo(0,0);
+}
+Object.assign(ACT,{
+  'lz-new'(){lzForm('');},
+  'lz-edit'(el){lzForm(el.dataset.id);},
+  'lz-del'(el){const x=lzById(el.dataset.id);if(!x)return;askConfirm('Excluir item?','“'+x.title+'” será removido do Lazer.',()=>{const i=S.lazer.indexOf(x);S.lazer=S.lazer.filter(y=>y!==x);save();closeModal();renderMain();toastUndo('Item excluído.',()=>{S.lazer.splice(Math.min(i,S.lazer.length),0,x);save();renderMain();});},'Excluir');},
+  'lz-type'(el){UI.lzType=el.dataset.v;renderMain();},
+  'lz-scope'(el){UI.lzScope=el.dataset.v;renderMain();},
+  'lz-st'(el){UI.lzSt=el.dataset.v;renderMain();},
+  'lz-link'(el){const x=lzById(el.dataset.id);if(x&&x.link)window.open(normUrl(x.link),'_blank','noopener');},
+  'lz-prog'(el){lzProgDlg(el.dataset.id);},
+  'lz-bump'(el){const f=$('#fLzp');if(!f)return;const E=f.elements,t=Number(E.t.value)||0;if(el.dataset.n==='max'){if(t)E.p.value=t;else toast('Informe o total para marcar que terminou.');}else E.p.value=(Number(E.p.value)||0)+Number(el.dataset.n);},
+  'lz-done'(el){lzDoneDlg(el.dataset.id);},
+  'lz-reopen'(el){const x=lzById(el.dataset.id);if(!x)return;x.status='todo';x.doneAt=0;x.updated=Date.now();save();renderMain();},
+  'lz-star'(el){const x=lzById(el.dataset.id),n=Number(el.dataset.n);if(!x)return;x.stars=x.stars===n?0:n;x.updated=Date.now();save();renderMain();},
+  'lz-fstar'(el){const f=el.closest('form'),n=Number(el.dataset.n),cur=Number(f.elements.stars.value)||0,v=cur===n?0:n;f.elements.stars.value=v;$$('.lzs',el.parentElement).forEach((b,i)=>b.classList.toggle('on',i<v));},
+  'lz-note'(el){lzNote(el.dataset.id);},
+  'lz-sched'(el){
+    const x=lzById(el.dataset.id);if(!x)return;const T=lzType(x.type),mins=Number(x.plannedMin)||60;
+    schedPicker(T.verb+': '+x.title,{title:T.verb+': '+x.title,theme:T.verb+': '+x.title,tipoAtv:'Lazer',kind:'Organização',blockType:'livre',catId:x.catId,link:x.link},mins,true);
+  }
+});
+document.addEventListener('input',e=>{
+  if(e.target&&e.target.id==='lzq'){UI.lzQ=e.target.value;const l=$('#lzList');if(l)l.innerHTML=lzListHTML();}
+});
+document.addEventListener('change',e=>{
+  const t=e.target;if(!t)return;
+  if(t.id==='lzcat'){UI.lzCat=t.value;renderMain();}
+  else if(t.id==='lzsort'){UI.lzSort=t.value;renderMain();}
+});
+
+
+/* ----- Calendário externo (.ics): o token e o link ficam em Ajustes > App e Widgets; o Worker serve o arquivo ----- */
+const icsBase=()=>String(S.prefs.pgApi||S.prefs.titleApi||'').trim().split('?')[0].replace(/\/+$/,'');
+const icsUrl=()=>{const b=icsBase(),t=S.prefs.icsToken;return b&&t?b+'/calendar.ics?token='+t:'';};
+function icsCardHTML(){
+  const t=S.prefs.icsToken,url=icsUrl();
+  return '<div class="card sec"><h3>Calendário externo (.ics)</h3><p class="muted small">Assine seus eventos e datas no Google Agenda, Outlook ou Apple Agenda. O link é somente leitura e atualiza sozinho. Quem tiver o link vê sua agenda: não compartilhe.</p>'+
+    (t?'<label class="f">Link de assinatura<input id="icsUrl" readonly value="'+esc(url||'Configure o endereço do Worker em Ajustes > Pingado')+'"></label>'+
+      '<div class="addrow"><button class="btn primary sm" data-a="ics-copy" '+(url?'':'disabled')+'>'+ic('copy',14)+' Copiar link</button><button class="btn sm" data-a="ics-gen">Gerar novo token</button><button class="btn sm ghost" data-a="ics-off">Desativar</button></div>':
+      '<div class="addrow"><button class="btn primary sm" data-a="ics-gen">'+ic('plus',14)+' Gerar link do calendário</button></div>')+
+    '<p class="muted small">No Google Agenda: Outras agendas > Por URL. É preciso que o Worker publicado tenha a rota <b>/calendar.ics</b> (faça o deploy da versão atual).</p></div>';
+}
+Object.assign(ACT,{
+  'ics-gen'(){
+    const go=()=>{const a=new Uint8Array(16);crypto.getRandomValues(a);S.prefs.icsToken=Array.from(a,b=>b.toString(16).padStart(2,'0')).join('');save();renderMain();toast('Link gerado.');};
+    if(S.prefs.icsToken)askConfirm('Gerar novo token?','O link antigo deixa de funcionar e as agendas assinadas precisam do novo link.',go,'Gerar');else go();
+  },
+  'ics-copy'(){const u=icsUrl();if(!u)return;const done=()=>toast('Link copiado.');if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(done,()=>{const i=$('#icsUrl');if(i){i.select();document.execCommand('copy');done();}});else{const i=$('#icsUrl');if(i){i.select();document.execCommand('copy');done();}}},
+  'ics-off'(){askConfirm('Desativar o calendário?','O link atual deixa de funcionar.',()=>{delete S.prefs.icsToken;save();renderMain();toast('Calendário desativado.');},'Desativar');}
+});
 
 /* ==========================================================================
    ASSUNTOS E PROGRESSO: Focos (aulas e temas) agrupados por Grande área e Módulo; notas, arquivos, eventos
