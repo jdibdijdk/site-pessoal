@@ -95,6 +95,66 @@ async function pingado(request, env, u) {
   } catch (e) { return out({ error: 'Falha ao falar com o Google: ' + (e && e.message || e) }, 502); }
 }
 
+// ----- Pluggy (agregador do Open Finance): lê o Nubank e devolve contas, cartão, faturas e dívidas -----
+// O Nubank não tem API pública para pessoas físicas; o caminho é um agregador autorizado pelo Open Finance.
+// Segredos: PLUGGY_CLIENT_ID e PLUGGY_CLIENT_SECRET (painel da Pluggy), PINGADO_TOKEN (a mesma senha do site) e ALLOWED_ORIGINS.
+// O "itemId" é o código da sua conexão com o Nubank na Pluggy; ele não dá acesso sozinho (a chave fica só aqui).
+const PL_API = 'https://api.pluggy.ai';
+const plNum = (v) => { const x = Number(v); return Number.isFinite(x) ? x : 0; };
+const plDay = (v) => String(v || '').slice(0, 10);
+export function plNormalize(raw) { // formato estável para o site, mesmo que a Pluggy mude campos opcionais
+  const accounts = (raw.accounts || []).map((a) => {
+    const cd = a.creditData || {};
+    return { id: a.id, type: a.type === 'CREDIT' ? 'credit' : 'bank', name: a.marketingName || a.name || 'Conta', balance: plNum(a.balance), limit: plNum(cd.creditLimit), available: plNum(cd.availableCreditLimit), closeDate: plDay(cd.balanceCloseDate), dueDate: plDay(cd.balanceDueDate), minPay: plNum(cd.minimumPayment) };
+  });
+  const txs = [];
+  Object.keys(raw.txs || {}).forEach((acc) => (raw.txs[acc] || []).forEach((t) => {
+    const m = t.creditCardMetadata || {};
+    txs.push({ id: t.id, account: acc, date: plDay(t.date), desc: t.description || t.descriptionRaw || '', amount: Math.abs(plNum(t.amount)), kind: t.type === 'CREDIT' ? 'in' : 'out', cat: t.category || '', parcela: m.installmentNumber ? m.installmentNumber + '/' + (m.totalInstallments || '?') : '' });
+  }));
+  const bills = [];
+  Object.keys(raw.bills || {}).forEach((acc) => (raw.bills[acc] || []).forEach((b) => bills.push({ id: b.id, account: acc, due: plDay(b.dueDate), total: plNum(b.totalAmount), min: plNum(b.minimumPaymentAmount) })));
+  const loans = (raw.loans || []).map((l) => ({ id: l.id, name: l.productName || l.type || 'Empréstimo', total: plNum(l.contractedAmount || l.totalAmount), balance: plNum(l.outstandingBalance != null ? l.outstandingBalance : (l.balance != null ? l.balance : l.contractedAmount)), due: plDay(l.dueDate), installments: plNum(l.installments && l.installments.length) }));
+  return { accounts, txs, bills, loans, at: Date.now() };
+}
+async function pluggy(request, env, u) {
+  const origins = String(env.ALLOWED_ORIGINS || '').split(',').map((x) => x.trim().replace(/\/$/, '')).filter(Boolean);
+  const origin = request.headers.get('Origin') || '';
+  const okOrigin = !origins.length || origins.includes(origin);
+  const cors = { 'Access-Control-Allow-Origin': okOrigin && origin ? origin : (origins[0] || 'null'), 'Access-Control-Allow-Headers': 'Content-Type, X-Pingado-Token', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Vary': 'Origin', 'Content-Type': 'application/json' };
+  const out = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: cors });
+  if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
+  if (!env.PLUGGY_CLIENT_ID || !env.PLUGGY_CLIENT_SECRET || !env.PINGADO_TOKEN) return out({ error: 'O Worker ainda não tem os segredos PLUGGY_CLIENT_ID, PLUGGY_CLIENT_SECRET e PINGADO_TOKEN.' }, 503);
+  if (!okOrigin) return out({ error: 'Origem não permitida.' }, 403);
+  if (request.headers.get('X-Pingado-Token') !== env.PINGADO_TOKEN) return out({ error: 'Token inválido.' }, 401);
+  if (u.pathname !== '/pluggy/sync' || request.method !== 'POST') return out({ error: 'Rota desconhecida.' }, 404);
+  let body = {}; try { body = JSON.parse(await request.text() || '{}'); } catch (e) { return out({ error: 'Pedido inválido.' }, 400); }
+  const itemId = String(body.itemId || '');
+  if (!/^[0-9a-fA-F-]{20,60}$/.test(itemId)) return out({ error: 'Item da Pluggy inválido.' }, 400);
+  const from = /^\d{4}-\d{2}-\d{2}$/.test(String(body.from || '')) ? body.from : new Date(Date.now() - 60 * 864e5).toISOString().slice(0, 10);
+  try {
+    const a = await fetch(PL_API + '/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId: env.PLUGGY_CLIENT_ID, clientSecret: env.PLUGGY_CLIENT_SECRET }) });
+    const aj = await a.json();
+    if (!a.ok || !aj.apiKey) return out({ error: 'A Pluggy recusou as credenciais (' + a.status + ').' }, 502);
+    const H = { 'X-API-KEY': aj.apiKey, 'Content-Type': 'application/json' };
+    const get = async (path) => { const r = await fetch(PL_API + path, { headers: H }); if (!r.ok) return null; return r.json(); };
+    const acc = await get('/accounts?itemId=' + encodeURIComponent(itemId));
+    if (!acc) return out({ error: 'Não achei essa conexão na Pluggy. Confira o item.' }, 404);
+    const accounts = acc.results || [], txs = {}, bills = {};
+    for (const ac of accounts) {
+      const list = [];
+      for (let page = 1; page <= 3; page++) {
+        const t = await get('/transactions?accountId=' + encodeURIComponent(ac.id) + '&from=' + from + '&pageSize=500&page=' + page);
+        if (!t) break; list.push(...(t.results || [])); if (page >= (t.totalPages || 1)) break;
+      }
+      txs[ac.id] = list;
+      if (ac.type === 'CREDIT') { const b = await get('/bills?accountId=' + encodeURIComponent(ac.id)); bills[ac.id] = (b && b.results) || []; }
+    }
+    const lo = await get('/loans?itemId=' + encodeURIComponent(itemId));
+    return out(plNormalize({ accounts, txs, bills, loans: (lo && lo.results) || [] }));
+  } catch (e) { return out({ error: 'Falha ao falar com a Pluggy: ' + (e && e.message || e) }, 502); }
+}
+
 // ----- Calendário .ics (somente leitura): GET /calendar.ics?token=… -----
 // O token é criado no site (Ajustes > App e Widgets) e fica em prefs.icsToken, no mesmo documento do Firestore.
 // Eventos (S.acts, com repetição semanal a cada N semanas, a cada N dias e exceções por dia) e datas (S.dates) viram um
@@ -236,5 +296,6 @@ export default {
     }
     // Pingado (assistente Gemini): a chave fica só aqui, nos segredos do Worker
     if (u.pathname.startsWith('/pingado/')) return pingado(request, env, u);
+    if (u.pathname.startsWith('/pluggy/')) return pluggy(request, env, u);
     return new Response(env.VAPID_PRIVATE ? 'Rotina de Estudos · avisos ativos (verifica a cada 5 minutos).' : 'Falta configurar o segredo VAPID_PRIVATE.', { headers: { 'content-type': 'text/plain; charset=utf-8' } }); },
 };
