@@ -5564,6 +5564,7 @@ function applyLook(){
 function hostAlive(){const v=UI.nview;return !!(UI.tab==='notas'&&v&&((v.type==='pdf'&&PV&&PV.p.id===v.id&&PV.frame&&PV.frame.isConnected)||(v.type==='slides'&&SL&&SL.x.id===v.id&&SL.frame&&SL.frame.isConnected)||(v.type==='ink'&&INK.x&&INK.x.id===v.id)));}
 function renderMain(){
   if(hostAlive())return;
+  fsrsSyncW();
   applyLook();
   const mn=$('#main');if(mn)mn.classList.toggle('wide',UI.tab==='semana'&&UI.view==='grade');
   const map={painel:renderPainel,semana:renderSemana,tarefas:renderTarefas,revisoes:renderRevisoes,assuntos:renderAssuntos,habitos:renderHabitos,docs:renderDocs,notas:renderNotas,questoes:renderQuestoes,metas:renderMetas,datas:renderDatas,links:renderLinks,cul:renderCul,fin:renderFin,lazer:renderLazer,desejos:renderDesejos,ajustes:renderAjustes};
@@ -8620,7 +8621,7 @@ function notifHTML(){
     '<div style="margin-top:14px"><b>Flashcards (FSRS)</b><div class="muted small" style="margin:2px 0 8px">Padrões de todos os baralhos; cada baralho pode ter os seus em Editar baralho.</div><div class="fgrid3">'+
     '<label class="f">Retenção desejada (%)<input type="number" data-fs="fsRet" min="70" max="99" value="'+Math.round((S.prefs.fsRet||FS_DEF.ret)*100)+'"></label>'+
     '<label class="f">Novos por dia<input type="number" data-fs="fsNew" min="1" max="999" value="'+(S.prefs.fsNew||FS_DEF.newPd)+'"></label>'+
-    '<label class="f">Revisões por dia<input type="number" data-fs="fsRev" min="1" max="9999" value="'+(S.prefs.fsRev||FS_DEF.revPd)+'"></label></div></div>'+
+    '<label class="f">Revisões por dia<input type="number" data-fs="fsRev" min="1" max="9999" value="'+(S.prefs.fsRev||FS_DEF.revPd)+'"></label></div></div>'+fsrsOptHTML()+
     '<div class="ntrows" '+(c.on?'':'style="opacity:.5;pointer-events:none"')+'>'+NT_KINDS.map(row).join('')+
     '<div class="ntrow"><label class="sw"><input type="checkbox" data-a="nt-quiet" '+(c.quiet.on?'checked':'')+'> <b>Horário de Silêncio</b></label><div class="muted small">Nada é avisado nesse intervalo.</div>'+
       (c.quiet.on?'<div class="addrow"><label class="f ntt"><span>Das</span><input type="time" data-ntq="from" value="'+c.quiet.from+'"></label><label class="f ntt"><span>Até</span><input type="time" data-ntq="to" value="'+c.quiet.to+'"></label></div>':'')+'</div></div>'+
@@ -9576,7 +9577,7 @@ function deckRowHTML(d,lv,tree){
 function studyHomeHTML(){
   const now=Date.now(),all=dueCardCount(),roots=deckRoots().sort((a,b)=>(a.name||'').localeCompare(b.name||'','pt-BR')),dense=S.prefs.dkDense!==false;
   let h='<div class="toolbar"><div><b style="font-size:17px">Estudar</b></div><span class="sp"></span>'+
-    '<button class="btn" data-a="deck-new">'+ic('plus',14)+' Novo baralho</button>'+pgBtn('flashcards','Sugestões do Pingado').replace('btn sm pgb','btn pgb')+
+    '<button class="btn" data-a="deck-new">'+ic('plus',14)+' Novo baralho</button><button class="btn" data-a="st-free-dlg" title="Revisar sem mexer nos intervalos do FSRS">'+ic('repeat',14)+' Revisão livre</button>'+pgBtn('flashcards','Sugestões do Pingado').replace('btn sm pgb','btn pgb')+
     '<button class="btn primary" data-a="st-start" '+(all?'':'disabled')+'>'+ic('play',14)+' Estudar tudo'+(all?' ('+all+')':'')+'</button></div>';
   if(!roots.length)return nSubBar()+h+'<div class="empty">Você ainda não tem baralhos.<br><button class="btn primary" data-a="deck-new">'+ic('plus',15)+' Criar baralho</button></div>';
   h+='<div class="dkbar"><span class="muted small"><b class="cn">novos</b> | <b class="cl">aprendendo</b> | <b class="cr">revisar</b></span><span class="sp"></span>'+
@@ -9586,6 +9587,7 @@ function studyHomeHTML(){
 }
 function studyHTML(){
   const st=UI.study;if(!st)return studyHomeHTML();
+  if(st.free)return freeHTML();
   const now=Date.now(),L=studyLists(st,now),rd=st.root&&deckById(st.root)?deckPath(deckById(st.root)).join(' › '):'Todos os pendentes';
   const cu=st.cur?(st.cur.cardId+'|'+st.cur.idx):'',kc=(a,k)=>'<b class="'+k+(cu&&a.some(x=>x.c.id+'|'+x.i===cu)?' on':'')+'">'+a.length+'</b>';
   let h='<div class="nhead"><button class="btn sm ghost" data-a="st-exit">'+ic('chevL',14)+' Sair do estudo</button><span class="sp"></span><span class="muted small">'+esc(rd)+'</span><span class="stcnt" title="Novos | Aprendendo | Revisar">'+kc(L.nw,'cn')+kc(L.lrn.concat(L.soon.filter(x=>x.due-now<=LEARN_AHEAD)),'cl')+kc(L.rv,'cr')+'</span><span class="muted small">revisados: <b>'+st.done+'</b></span></div>';
@@ -9696,8 +9698,10 @@ Object.assign(ACT,{
   },
   'st-rate'(el){
     const st=UI.study;if(!st||!st.cur||!st.revealed)return;
+    if(st.free){freeRate(Number(el.dataset.r));return;}
     const g=Number(el.dataset.r),c=cardById(st.cur.cardId);if(!(g>=1&&g<=4)||!c)return;
     const idx=st.cur.idx,now=Date.now(),prev=sch(c,idx),rd=deckOpt(deckById(c.deckId),'ret');
+    RvLog.add({t:now,c:c.id,i:idx,g:g,e:(prev.reps>0&&prev.lr)?(now-prev.lr)/DAY:null});
     const res=fsrsOne(prev,g,now,rd,c.id+idx+(prev.reps||0));delete res.ivd;
     st.undo=st.undo||[];st.undo.push({cardId:c.id,idx:idx,old:(c.s||{})[idx],rl:(c.rl||[]).length,seen:!!st.seen[c.id],upd:c.updated,leech:!!c.leech});if(st.undo.length>30)st.undo.shift();
     c.s=c.s||{};c.s[idx]=res;c.rl=c.rl||[];c.rl.push([now,idx,g,prev.st,Math.round((prev.S||0)*100)/100,Math.round((prev.D||0)*100)/100]);if(c.rl.length>200)c.rl.splice(0,c.rl.length-200);
@@ -9706,7 +9710,7 @@ Object.assign(ACT,{
     save();st.done++;studyAdvance();renderTabs();renderMain();
   },
   'st-undo'(){
-    const st=UI.study;if(!st||!(st.undo||[]).length)return;const u=st.undo.pop(),c=cardById(u.cardId);if(!c)return;
+    const st=UI.study;if(!st||st.free||!(st.undo||[]).length)return;const u=st.undo.pop(),c=cardById(u.cardId);if(!c)return;
     c.s=c.s||{};if(u.old===undefined)delete c.s[u.idx];else c.s[u.idx]=u.old;
     if(c.rl)c.rl.length=Math.min(c.rl.length,u.rl);c.updated=u.upd;c.leech=u.leech;if(!u.seen)delete st.seen[c.id];
     save();st.done=Math.max(0,st.done-1);clearInterval(st.timer);st.timer=null;st.wait=null;st.cur={cardId:u.cardId,idx:u.idx};st.revealed=false;renderTabs();renderMain();
@@ -15807,6 +15811,134 @@ Object.assign(ACT,{
   }
 });
 
+
+/* ==========================================================================
+   FLASHCARDS: revisão livre (pré-prova, sem mexer no FSRS) e calibração dos 19 pesos com o seu histórico
+   ========================================================================== */
+const FSRS_W0=FSRS.W.slice();
+function fsrsSyncW(){try{const w=S.prefs&&S.prefs.fsrsW;FSRS.W=(Array.isArray(w)&&w.length===19&&w.every(x=>typeof x==='number'&&isFinite(x)))?w.slice():FSRS_W0.slice();}catch(e){}}
+// registro completo das respostas no IndexedDB (a lista "rl" de cada card guarda só as 200 últimas)
+const RvLog={db:null,
+  open(){return new Promise((res,rej)=>{if(this.db)return res(this.db);if(!window.indexedDB)return rej(new Error('sem indexedDB'));const r=indexedDB.open('rotina_rvlog',1);r.onupgradeneeded=()=>r.result.createObjectStore('r',{autoIncrement:true});r.onsuccess=()=>{this.db=r.result;res(r.result);};r.onerror=()=>rej(r.error);});},
+  async add(e){try{const db=await this.open();await new Promise((res,rej)=>{const t=db.transaction('r','readwrite');t.objectStore('r').add(e);t.oncomplete=()=>res(true);t.onerror=()=>rej(t.error);});}catch(x){}},
+  async all(){try{const db=await this.open();return await new Promise((res,rej)=>{const q=db.transaction('r').objectStore('r').getAll();q.onsuccess=()=>res(q.result||[]);q.onerror=()=>rej(q.error);});}catch(x){return [];}}
+};
+const FSRS_LIM=[[.001,100],[.001,100],[.001,100],[.001,100],[1,10],[.001,4],[.001,4],[.001,.75],[0,4.5],[0,.8],[.001,3.5],[.001,5],[.001,.25],[.001,.9],[0,4],[0,1],[1,6],[0,2],[0,2]];
+// sequências por item (cards antigos entram pela lista rl; as respostas novas, pelo IndexedDB)
+async function fsrsSeqs(){
+  const map={},seen={};
+  const push=(c,i,t,g)=>{const k=c+'|'+i+'|'+t;if(seen[k]||!(g>=1&&g<=4))return;seen[k]=1;(map[c+'|'+i]=map[c+'|'+i]||[]).push({t:t,g:g});};
+  S.cards.forEach(c=>(c.rl||[]).forEach(r=>push(c.id,r[1],r[0],r[2])));
+  (await RvLog.all()).forEach(e=>push(e.c,e.i,e.t,e.g));
+  return Object.keys(map).map(k=>map[k].sort((a,b)=>a.t-b.t)).filter(a=>a.length>1);
+}
+function fsrsLoss(seqs,W){
+  const F=Object.assign(Object.create(FSRS),{W:W});let L=0,n=0;
+  seqs.forEach(sq=>{let St=0,D=0,last=0;
+    sq.forEach((r,k)=>{
+      if(k===0){St=F.s0(r.g);D=F.d0(r.g);last=r.t;return;}
+      const el=(r.t-last)/DAY;
+      if(el<1){St=F.sSame(St,r.g);D=F.nD(D,r.g);last=r.t;return;}
+      const R=Math.min(.9999,Math.max(.0001,F.R(el,St))),y=r.g>1?1:0,D2=F.nD(D,r.g);
+      L-=y?Math.log(R):Math.log(1-R);n++;
+      St=r.g===1?F.sFor(D,St,R):F.sRec(D,St,R,r.g);D=D2;last=r.t;
+    });});
+  let reg=0;for(let j=0;j<19;j++)reg+=Math.pow((W[j]-FSRS_W0[j])/(Math.abs(FSRS_W0[j])+.5),2);
+  return {loss:n?L/n:0,n:n,total:(n?L/n:0)+0.02*reg/19};
+}
+async function fsrsOptimize(seqs,onProg){
+  let W=FSRS_W0.slice(),best=fsrsLoss(seqs,W),step=.2;const before=fsrsLoss(seqs,FSRS_W0);
+  for(let it=0;it<28;it++){
+    let improved=false;
+    for(let j=0;j<19;j++){
+      for(const dir of [1,-1]){
+        const cand=W.slice();cand[j]=Math.min(FSRS_LIM[j][1],Math.max(FSRS_LIM[j][0],W[j]*(1+dir*step)+(W[j]===0?dir*step*.1:0)));
+        if(cand[j]===W[j])continue;const r=fsrsLoss(seqs,cand);
+        if(r.total<best.total-1e-7){W=cand;best=r;improved=true;break;}
+      }
+      if(j%4===3){await new Promise(r=>setTimeout(r,0));}
+    }
+    if(!improved)step*=.6;if(onProg)onProg((it+1)/28,best);if(step<.004)break;
+  }
+  return {W:W.map(x=>Math.round(x*100000)/100000),before:before,after:fsrsLoss(seqs,W),n:best.n};
+}
+function fsrsOptHTML(){
+  const custom=Array.isArray(S.prefs.fsrsW);
+  return '<div style="margin-top:14px"><b>Calibrar os pesos do FSRS</b><div class="muted small" style="margin:2px 0 8px">Recalcula os 19 pesos com a sua curva real de esquecimento. Usa o histórico das respostas (guardado no IndexedDB deste aparelho e nos cards).</div>'+
+    '<div class="addrow"><button class="btn" data-a="fsrs-opt">Otimizar com meu histórico</button>'+(custom?'<button class="btn ghost" data-a="fsrs-reset">Voltar ao padrão</button>':'')+'<span class="muted small">'+(custom?'Pesos personalizados em uso.':'Pesos padrão em uso.')+'</span></div><div id="fsrsOptOut" class="muted small" style="margin-top:6px"></div></div>';
+}
+// revisão livre: percorre os cards escolhidos sem alterar S nem due
+function freeCards(scope,filt){
+  let ids;
+  if(scope.indexOf('f:')===0){const fid=scope.slice(2);ids=[];S.decks.forEach(d=>{let q=d,g=0,ok=false;while(q&&g++<10&&!ok){if(focoIdsOf(q).indexOf(fid)>=0)ok=true;q=q.parentId?deckById(q.parentId):null;}if(ok)ids.push(d.id);});}
+  else if(scope.indexOf('d:')===0)ids=deckTree(scope.slice(2));
+  else ids=S.decks.map(d=>d.id);
+  const out=[];
+  S.cards.forEach(c=>{if(ids.indexOf(c.deckId)<0)return;cardItems(c).forEach(i=>{const st=sch(c,i);
+    if(filt==='leech'&&!(c.leech||(st.lapses||0)>=3))return;if(filt==='err'&&!((st.lapses||0)>0||c.leech))return;out.push({cardId:c.id,idx:i});});});
+  return out;
+}
+function freeStart(queue,title){
+  if(!queue.length){toast('Nenhum card com esse filtro.');return;}
+  studyStop();flushNote();pdfLeave();slLeave();UI.tab='notas';UI.nsub='estudar';UI.nview=null;
+  UI.study={free:true,title:title||'Revisão livre',q:queue.slice(),total:queue.length,cur:null,revealed:false,done:0,ok:0,bad:0,retry:{},wrong:[],seen:{},undo:[]};
+  freeNext();renderTabs();renderMain();window.scrollTo(0,0);
+}
+function freeNext(){const st=UI.study;if(!st||!st.free)return;st.revealed=false;st.cur=st.q.length?st.q[0]:null;}
+function freeHTML(){
+  const st=UI.study;
+  let h='<div class="nhead"><button class="btn sm ghost" data-a="st-exit">'+ic('chevL',14)+' Sair</button><span class="sp"></span><span class="muted small">'+esc(st.title)+' | revisão livre: não altera os intervalos do FSRS</span><span class="stcnt"><b class="cr">'+st.q.length+'</b></span><span class="muted small">feitos: <b>'+st.done+'</b></span></div>';
+  if(!st.cur){
+    const wr=st.wrong.length;
+    return h+'<div class="stwrap"><div class="panel-wait"><h3>Revisão concluída</h3><p class="muted">'+st.ok+' de '+st.done+' sem errar'+(wr?' | '+wr+(wr===1?' card errado':' cards errados'):'')+'. Nenhum intervalo foi alterado.</p>'+
+      (wr?'<button class="btn primary" data-a="st-free-again">'+ic('repeat',14)+' Rever só os errados ('+wr+')</button> ':'')+'<button class="btn" data-a="st-exit">Concluir</button></div></div>';
+  }
+  const c=cardById(st.cur.cardId);if(!c){st.q.shift();freeNext();return freeHTML();}
+  return h+'<div class="stwrap '+(st.revealed?'is-rev':'')+'">'+stFace(c,st.cur.idx)+
+    '<div class="st-actions"><button class="btn primary big" id="stshow" data-a="st-reveal" '+(st.revealed?'hidden':'')+'>'+(c.type==='basic'?'Virar o card':'Mostrar')+' <kbd>Espaço</kbd></button>'+
+    '<div id="strate" class="st-rate" '+(st.revealed?'':'hidden')+'>'+RATES.map(r=>'<button class="rate '+r.cls+'" data-a="st-rate" data-r="'+r.k+'"><b>'+r.label+'</b><span>'+(r.k<=2?'volta no fim':'ok')+'</span><kbd>'+r.k+'</kbd></button>').join('')+'</div>'+
+    '<div class="stkeys"><span><kbd>Espaço</kbd> virar</span><span><kbd>1</kbd> Errei</span><span><kbd>2</kbd> Difícil</span><span><kbd>3</kbd> Bom</span><span><kbd>4</kbd> Fácil</span><span><kbd>Esc</kbd> sair</span></div></div></div>';
+}
+function freeRate(g){
+  const st=UI.study;if(!st||!st.free||!st.cur||!st.revealed)return;
+  const it=st.q.shift(),key=it.cardId+'|'+it.idx;st.done++;
+  if(g<=2){st.retry[key]=(st.retry[key]||0)+1;if(st.wrong.indexOf(key)<0)st.wrong.push(key);if(st.retry[key]<=2)st.q.push(it);}else st.ok++;
+  freeNext();renderMain();
+}
+function freeDlg(pref){
+  pref=pref||{};
+  const focos=(S.focos||[]).filter(f=>S.decks.some(d=>focoIdsOf(d).indexOf(f.id)>=0)),roots=deckRoots();
+  const opt=(v,l,sel)=>'<option value="'+esc(v)+'" '+(sel===v?'selected':'')+'>'+esc(l)+'</option>';
+  openModal('<form id="fFree" class="form"><div class="fh"><h2>Revisão livre (pré-prova)</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
+    '<p class="muted small" style="margin:0 0 10px">Passa pelos cards que você escolher sem mexer nos intervalos do FSRS. Errou ou achou difícil: o card volta no fim da fila.</p>'+
+    '<label class="f">O que revisar<select name="scope">'+opt('all','Todos os baralhos',pref.scope)+(focos.length?'<optgroup label="Por Foco">'+focos.map(f=>opt('f:'+f.id,f.name,pref.scope)).join('')+'</optgroup>':'')+'<optgroup label="Por baralho">'+S.decks.map(d=>opt('d:'+d.id,deckPath(d).join(' › '),pref.scope)).join('')+'</optgroup></select></label>'+
+    '<label class="f">Quais cards<select name="filt">'+opt('all','Todos',pref.filt)+opt('leech','Só sanguessugas (3 ou mais esquecimentos)',pref.filt)+opt('err','Cards que já errei alguma vez',pref.filt)+'</select></label>'+
+    '<label class="chip cb" style="align-self:flex-start;margin:4px 0"><input type="checkbox" name="shuf" checked><span>Embaralhar</span></label>'+
+    '<div class="muted small" id="freeN"></div>'+
+    '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Começar</button></div></form>');
+  const f=$('#fFree'),upd=()=>{const n=freeCards(f.elements.scope.value,f.elements.filt.value).length;$('#freeN').textContent=n+(n===1?' card nesta seleção.':' cards nesta seleção.');};
+  f.elements.scope.addEventListener('change',upd);f.elements.filt.addEventListener('change',upd);upd();
+  f.addEventListener('submit',e=>{e.preventDefault();let q=freeCards(f.elements.scope.value,f.elements.filt.value);if(f.elements.shuf.checked)q=q.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);closeModal();const sel=f.elements.scope;freeStart(q,sel.options[sel.selectedIndex].text);});
+}
+Object.assign(ACT,{
+  'st-free-dlg'(){freeDlg();},
+  'st-free-foco'(el){closeModal();freeDlg({scope:'f:'+el.dataset.id});},
+  'st-free-again'(){const st=UI.study;if(!st||!st.free)return;const q=st.wrong.map(k=>{const p=k.split('|');return {cardId:p[0],idx:p[1]};}).filter(x=>cardById(x.cardId));freeStart(q,st.title+' (errados)');},
+  'fsrs-opt'(){
+    const out=$('#fsrsOptOut');if(out)out.textContent='Lendo o histórico…';
+    fsrsSeqs().then(async seqs=>{
+      const n=seqs.reduce((a,x)=>a+x.length-1,0);
+      if(n<300){if(out)out.textContent='Poucas respostas para calibrar: '+n+' de pelo menos 300. Continue estudando; cada resposta nova entra no histórico.';return;}
+      const r=await fsrsOptimize(seqs,(p,b)=>{if(out)out.textContent='Otimizando… '+Math.round(p*100)+'% (perda '+b.loss.toFixed(4)+')';});
+      const better=r.after.loss<r.before.loss-1e-5;
+      if(out)out.innerHTML='Com '+r.n+' respostas: perda <b>'+r.before.loss.toFixed(4)+'</b> (padrão) → <b>'+r.after.loss.toFixed(4)+'</b> (calibrado). '+(better?'<button class="btn sm primary" data-a="fsrs-apply">Aplicar os pesos calibrados</button>':'Os pesos padrão já se ajustam bem ao seu histórico.');
+      UI.fsrsOpt=r;
+    });
+  },
+  'fsrs-apply'(){const r=UI.fsrsOpt;if(!r)return;S.prefs.fsrsW=r.W.slice();fsrsSyncW();save();renderMain();toast('Pesos calibrados aplicados.');},
+  'fsrs-reset'(){delete S.prefs.fsrsW;fsrsSyncW();save();renderMain();toast('Pesos padrão restaurados.');}
+});
+
 /* ==========================================================================
    ASSUNTOS E PROGRESSO: Focos (aulas e temas) agrupados por Grande área e Módulo; notas, arquivos, eventos
    e tarefas podem citar um ou mais Focos, e cada Foco mostra tudo o que está ligado a ele.
@@ -15888,7 +16020,7 @@ function focoModalHTML(f,tab){
   else body=L.notes.map(n=>'<div class="ftit"><span data-a="n-goto" data-k="note" data-id="'+n.id+'">'+esc(n.title||'Sem título')+'</span><small>'+esc({questao:'Questão',caso:'Caso clínico',bula:'Bulário',fluxo:'Fluxograma'}[n.type]||'Nota')+'</small></div>').join('')+'<button class="btn sm ghost" data-a="ft-add" data-w="note" data-id="'+f.id+'">'+ic('plus',13)+' Nota deste foco</button>';
   if(!body.replace(/<button[^>]*>.*?<\/button>/g,'').trim())body='<div class="muted small" style="padding:8px 0">Nada vinculado ainda.</div>'+body;
   return '<div class="form"><div class="fh"><div style="min-width:0">'+focoPill(f)+'<h2 style="margin-top:6px">'+esc(f.name)+'</h2></div><span class="sp"></span><button class="icon-btn" data-a="ft-edit" data-id="'+f.id+'" aria-label="Editar">'+ic('edit',18)+'</button><button class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
-    ''+masHTML(f)+'<div class="ftbar big"><i style="width:'+p.pct+'%;background:'+esc(st.color)+'"></i></div><div class="muted small" style="margin:4px 0 10px">'+p.pct+'% | '+p.tdone+'/'+p.ttot+' tarefas | '+p.edone+'/'+p.etot+' eventos</div>'+
+    ''+masHTML(f)+'<div class="frow" style="margin:0 0 8px"><button class="btn sm" data-a="st-free-foco" data-id="'+f.id+'">'+ic('repeat',14)+' Revisão livre deste Foco (pré-prova)</button></div><div class="ftbar big"><i style="width:'+p.pct+'%;background:'+esc(st.color)+'"></i></div><div class="muted small" style="margin:4px 0 10px">'+p.pct+'% | '+p.tdone+'/'+p.ttot+' tarefas | '+p.edone+'/'+p.etot+' eventos</div>'+
     '<div class="seg">'+tabs.map(t=>'<button class="'+(tab===t[0]?'on':'')+'" data-a="ft-tab" data-id="'+f.id+'" data-v="'+t[0]+'">'+t[1]+' ('+t[2]+')</button>').join('')+'</div><div class="ftbody">'+body+'</div></div>';
 }
 function focoForm(id){
