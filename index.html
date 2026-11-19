@@ -2694,6 +2694,19 @@ button.lzico.lk:hover{transform:scale(1.06);box-shadow:0 0 0 3px color-mix(in sr
 @keyframes pgrec{0%,100%{box-shadow:0 0 0 0 rgba(229,72,77,.5)}50%{box-shadow:0 0 0 8px rgba(229,72,77,0)}}
 #pgSpk[aria-pressed=true]{color:var(--acc);background:var(--accs)}
 @media(prefers-reduced-motion:reduce){#pgMic.rec{animation:none}}
+
+/* ===== Revisões: checklist ===== */
+.rvchk{margin-top:4px;font-size:13px}.rvchk summary{cursor:pointer;color:var(--acc);font-weight:600}
+.rvchk-b{display:flex;flex-direction:column;gap:6px;padding:6px 0 2px;align-items:flex-start}
+
+/* ===== Assuntos: domínio e correlatos ===== */
+.masch{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:color-mix(in srgb,var(--c) 70%,var(--tx));background:color-mix(in srgb,var(--c) 14%,var(--card));border-radius:999px;padding:1px 9px 1px 8px;white-space:nowrap}
+.masch i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.mas{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0 10px}
+.mas-h{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.masbar{display:grid;grid-template-columns:130px 1fr 70px;align-items:center;gap:8px;font-size:12.5px;color:var(--mut);margin:3px 0}
+.masbar>div{height:6px;border-radius:99px;background:var(--soft);overflow:hidden}.masbar i{display:block;height:100%;background:var(--acc);border-radius:99px}.masbar b{text-align:right;color:var(--tx);font-weight:600}
+.relbox{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px}.relh{margin-bottom:4px}
 </style>
 </head>
 <body>
@@ -4471,10 +4484,39 @@ const RV_DEF=[{n:1,min:15},{n:7,min:20},{n:30,min:30},{n:60,min:30}];
 function rvCfg(){
   const u=S.prefs.rv||{};let days=(Array.isArray(u.days)&&u.days.length)?u.days:RV_DEF;
   days=days.map(d=>typeof d==='number'?{n:d,min:(RV_DEF.find(x=>x.n===d)||{min:20}).min}:{n:Math.round(Number(d&&d.n))||0,min:Math.round(Number(d&&d.min))||20}).filter(d=>d.n>0).sort((a,b)=>a.n-b.n);
-  return {on:u.on!==false,days:days,prep:u.prep==null?2:Math.max(0,Math.min(14,Number(u.prep)||0)),prepMin:Math.round(Number(u.prepMin))||10};
+  const num=(v,d,mn,mx)=>{const x=Number(v);return v==null||isNaN(x)?d:Math.max(mn,Math.min(mx,Math.round(x)));};
+  return {on:u.on!==false,days:days,prep:u.prep==null?2:Math.max(0,Math.min(14,Number(u.prep)||0)),prepMin:Math.round(Number(u.prepMin))||10,
+    adapt:u.adapt!==false,chk:u.chk!==false,q1:num(u.q1,5,0,100),qn:num(u.qn,15,0,100),cap:num(u.cap,90,0,600)};
 }
 const rvSt=k=>(S.rv=S.rv||{})[k]||((S.rv[k]={}));
+// nivelamento automático (anti-acúmulo): passando do teto diário, revisões D7 em diante vão para dias vizinhos mais livres
+let RVLV={k:'',m:{}};
+function rvLevelMap(){
+  const c=rvCfg(),T=todayISO(),k=(S.savedAt||0)+'|'+T+'|'+c.cap+'|'+c.on+'|'+JSON.stringify(c.days);
+  if(RVLV.k===k)return RVLV.m;
+  const m={};RVLV={k:k,m:m};
+  if(!c.on||!(c.cap>0))return m;
+  const all=reviewListRaw(T,addISO(T,370)).filter(r=>!r.done),load={};
+  all.forEach(r=>{load[r.date]=(load[r.date]||0)+(Number(r.min)||0);});
+  [...new Set(all.map(r=>r.date))].sort().forEach(d=>{
+    if(d<=T)return;
+    for(let g=0;g<40&&(load[d]||0)>c.cap;g++){
+      const cand=all.filter(r=>r.kind==='rv'&&r.date===d&&r.key.indexOf('rv|')===0&&r.n>=7&&!m[r.key]&&!(S.rv&&S.rv[r.key]&&S.rv[r.key].to)).sort((a,b)=>b.n-a.n)[0];
+      if(!cand)break;
+      let best=null;[1,-1,2,-2,3,-3].forEach(o=>{const nd=addISO(d,o);if(nd<=T)return;const l=load[nd]||0;if(!best||l<best.l)best={nd:nd,l:l};});
+      if(!best||best.l+cand.min>=(load[d]||0))break;
+      m[cand.key]=best.nd;load[d]-=cand.min;load[best.nd]=(load[best.nd]||0)+cand.min;
+      const pk='rp|'+cand.key.slice(3),pr=all.find(x=>x.key===pk);if(pr)m[pk]=addISO(pr.date,diffDays(best.nd,d));
+    }
+  });
+  return m;
+}
 function reviewList(from,to){
+  const lv=rvLevelMap();
+  return reviewListRaw(addISO(from,-4),addISO(to,4)).map(r=>lv[r.key]&&lv[r.key]!==r.date?Object.assign({},r,{date:lv[r.key],lv:true,moved:true}):r).filter(r=>r.date>=from&&r.date<=to)
+    .sort((x,y)=>x.date<y.date?-1:x.date>y.date?1:(x.kind===y.kind?x.n-y.n:x.kind==='rp'?-1:1));
+}
+function reviewListRaw(from,to){
   const c=rvCfg();if(!c.on||!c.days.length)return [];
   const done=S.prefs.rvDone||{},st=S.rv||{},out=[],mx=c.days[c.days.length-1].n;
   occurrences(addISO(from,-(mx+30)),to).forEach(o=>{
@@ -4559,6 +4601,42 @@ function rvLinkDlg(sk){
     '<label class="f">Ou um link<input id="rvlUrl" type="url" placeholder="https://" value="'+esc(cur.t==='link'?cur.v:'')+'"></label>'+
     '<div class="ff"><span class="sp"></span><button class="btn" data-a="cancel">Cancelar</button><button class="btn primary" data-a="rv-link-go" data-sk="'+esc(sk)+'">Salvar</button></div></div>');
 }
+
+// ----- revisões adaptativas, checklist e botões diretos -----
+const RV_FATOR={h:.5,b:1,f:1.5}; // Difícil encurta, Bom mantém, Fácil alonga o próximo intervalo
+function rvNextInfo(key,g){
+  const p=String(key).split('|');if(p[0]!=='rv')return null;
+  const n=Number(p[3]),days=rvCfg().days,nx=days.find(d=>d.n>n);if(!nx)return null;
+  const T=todayISO(),orig=addISO(p[2],nx.n),gap=nx.n-n,k='rv|'+p[1]+'|'+p[2]+'|'+nx.n;
+  const due=g==='b'?(orig>T?orig:addISO(T,1)):addISO(T,Math.max(1,Math.round(gap*RV_FATOR[g])));
+  return {key:k,due:due,orig:orig,n:nx.n};
+}
+function rvAdaptAsk(key){
+  const nd=g=>{const i=rvNextInfo(key,g);return i?'próxima em '+fmtDM(i.due):'última etapa fixa';};
+  openModal('<div class="form"><div class="fh"><h2>Como foi a revisão?</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><p class="muted small" style="margin:0 0 10px">A resposta ajusta o próximo intervalo: difícil encurta, fácil alonga.</p>'+
+    '<div class="rgrid">'+[['h','Difícil','nd'],['b','Bom','pr'],['f','Fácil','']].map(x=>'<button class="btn '+x[2]+'" data-a="rv-adapt" data-k="'+esc(key)+'" data-g="'+x[0]+'"><b>'+x[1]+'</b><span class="small">'+nd(x[0])+'</span></button>').join('')+'</div>'+
+    '<div class="f" style="margin-top:12px"><span>Ou use a taxa de acerto de um bloco de questões</span><div class="frow" style="flex-wrap:nowrap"><input type="number" id="rvAcc" min="0" max="100" placeholder="% de acerto" style="flex:1"><button type="button" class="btn" data-a="rv-adapt-acc" data-k="'+esc(key)+'">Usar acerto</button></div><span class="muted small">≥ 85% fácil, 65 a 84% bom, abaixo de 65% difícil</span></div>'+
+    '<div class="ff"><button type="button" class="btn ghost" data-a="rv-adapt" data-k="'+esc(key)+'" data-g="">Só concluir</button></div></div>');
+}
+function rvAdaptMark(key,g,acc){
+  const T=todayISO();S.prefs.rvDone=S.prefs.rvDone||{};S.prefs.rvDone[key]=T;
+  const st=rvSt(key);if(g){st.g=g;}if(acc!=null)st.acc=acc;
+  const i=g?rvNextInfo(key,g):null;
+  if(i){const ns=rvSt(i.key);if(i.due===i.orig)delete ns.to;else ns.to=i.due;}
+  return i;
+}
+const rvChkItems=r=>{const c=rvCfg(),it=[];if(r.n<=1)it.push({k:'rev',t:'Revisão estruturada (resumo, notas ou slides)'});const q=r.n<=1?c.q1:c.qn;if(q>0)it.push({k:'q',t:q+' questões do Foco'});return it;};
+const rvChkOk=r=>{const c=rvCfg();if(!c.chk||r.kind!=='rv'||String(r.key).indexOf('rv|')!==0)return true;const st=rvSt(r.key).chk||{};return rvChkItems(r).every(i=>st[i.k]);};
+function rvChkHTML(r){
+  if(r.kind!=='rv'||String(r.key).indexOf('rv|')!==0||r.done||!rvCfg().chk)return '';
+  const items=rvChkItems(r),st=rvSt(r.key).chk||{},nd=items.filter(i=>st[i.k]).length;
+  if(!items.length)return '';
+  return '<details class="rvchk"><summary>Checklist <span class="count">'+nd+'/'+items.length+'</span></summary><div class="rvchk-b">'+
+    items.map(i=>'<label class="chip cb"><input type="checkbox" data-a="rv-chk" data-k="'+esc(r.key)+'" data-c="'+i.k+'" '+(st[i.k]?'checked':'')+'><span>'+esc(i.t)+'</span></label>').join('')+
+    '<div class="frow"><button type="button" class="btn sm" data-a="rv-flash" data-k="'+esc(r.key)+'">'+ic('cards',14)+' Abrir flashcards</button><button type="button" class="btn sm" data-a="rv-mfq" data-k="'+esc(r.key)+'">'+ic('cap',14)+' Questões do Foco</button></div></div></details>';
+}
+function rvActOf(key){const p=String(key).split('|');return actById(p[1]);}
+
 const rvDayTxt=r=>fmtDM(addISO(r.date,rvCfg().prep));
 const rvLabel=r=>(r.kind==='rp'?'Organizar revisão: ':'Revisar ')+r.theme+(r.kind==='rp'?'':' | D+'+r.n);
 function rvRow(r){return '<div class="lrow rvrow '+(r.done?'done':'')+'"><button class="chk sm '+(r.done?'on':'')+'" data-a="rv-done" data-k="'+esc(r.key)+'" aria-label="Marcar revisão">'+ic('check',12)+'</button><div class="lt">'+(r.kind==='rp'?'Org.':'D+'+r.n)+'</div><div class="lm"><b>'+esc((r.kind==='rp'?'Organizar revisão: ':'Revisar: ')+r.theme)+'</b>'+focoChips(r.act)+'<div class="small muted">'+esc(actParts(r.act).tipo||'')+' de '+fmtDM(r.src)+' | '+r.min+' min</div></div></div>';}
@@ -4573,7 +4651,7 @@ function rvItem(r){
   const T=todayISO(),late=!r.done&&r.date<T;
   return '<div class="rvi '+(r.done?'done':'')+(late?' late':'')+'"><button class="chk '+(r.done?'on':'')+'" data-a="rv-done" data-k="'+esc(r.key)+'" aria-label="Marcar como feita">'+ic('check',15)+'</button>'+
     '<span class="rvn '+(r.kind==='rp'?'org':'')+(r.fs?' fs':'')+'">'+(r.kind==='rp'?'Organizar':'D+'+r.n)+'</span>'+
-    '<div class="rvm"><b>'+esc(r.theme)+'</b>'+(focoChips(r.act)?'<span class="rvfo">'+focoChips(r.act)+'</span>':'')+'<span class="muted small">'+esc(actParts(r.act).tipo||r.act.kind||'Evento')+' de '+fmtDM(r.src)+(r.fs?' | série contínua (FSRS)':'')+(r.moved?' | adiada':'')+(late?' | atrasada':'')+'</span>'+rvLinkHTML(r)+'</div>'+
+    '<div class="rvm"><b>'+esc(r.theme)+'</b>'+(focoChips(r.act)?'<span class="rvfo">'+focoChips(r.act)+'</span>':'')+'<span class="muted small">'+esc(actParts(r.act).tipo||r.act.kind||'Evento')+' de '+fmtDM(r.src)+(r.fs?' | série contínua (FSRS)':'')+(r.lv?' | reorganizada (teto diário)':r.moved?' | adiada':'')+(late?' | atrasada':'')+'</span>'+rvLinkHTML(r)+rvChkHTML(r)+'</div>'+
     '<select class="rvcat" data-k="'+esc(r.key)+'" aria-label="Categoria"><option value="">Sem categoria</option>'+catTreeOpts(r.catId)+'</select>'+
     '<span class="rvmin"><button class="icon-btn sm" data-a="rv-min" data-k="'+esc(r.key)+'" data-d="-5" aria-label="Menos 5 minutos">−</button><b>'+r.min+' min</b><button class="icon-btn sm" data-a="rv-min" data-k="'+esc(r.key)+'" data-d="5" aria-label="Mais 5 minutos">+</button></span>'+
     '<span class="rvact">'+(r.kind==='rv'&&!r.done?'<button class="btn sm ghost" data-a="rv-snz" data-k="'+esc(r.key)+'">Adiar</button>':'')+(r.done?'':'<button class="btn sm" data-a="rv-sched" data-k="'+esc(r.key)+'">'+ic('calendar',13)+' Agendar</button>')+'</span></div>';
@@ -4588,6 +4666,11 @@ function rvSettingsHTML(){
     
     c.days.map(d=>'<div class="rvset"><b>D+'+d.n+'</b><span class="muted small">'+(d.n<=30?'Principal':'Posterior')+'</span><span class="sp"></span><span class="rvmin"><button class="icon-btn sm" data-a="rv-cfgmin" data-n="'+d.n+'" data-d="-5">−</button><b>'+d.min+' min</b><button class="icon-btn sm" data-a="rv-cfgmin" data-n="'+d.n+'" data-d="5">+</button></span><button class="icon-btn sm" data-a="rv-int-del" data-n="'+d.n+'" aria-label="Remover intervalo">'+ic('trash',14)+'</button></div>').join('')+
     '<div class="addrow"><input type="number" min="1" max="365" id="rvNewN" placeholder="Novo intervalo (dias)"><button class="btn primary sm" data-a="rv-int-add">Adicionar</button></div></div>'+
+    '<div class="card sec"><h3>Revisão inteligente</h3>'+
+    '<label class="sw" style="margin-bottom:8px"><input type="checkbox" data-a="rv-opt" data-k="adapt" '+(c.adapt?'checked':'')+'> <b>Perguntar como foi e adaptar o próximo intervalo</b></label>'+
+    '<label class="sw" style="margin-bottom:8px"><input type="checkbox" data-a="rv-opt" data-k="chk" '+(c.chk?'checked':'')+'> <b>Exigir checklist antes de concluir</b></label>'+
+    [['q1','Questões na D1',0,100,1],['qn','Questões na D7 em diante',0,100,5],['cap','Teto diário de revisões (min)',0,600,15]].map(x=>'<div class="rvset"><b>'+x[1]+'</b><span class="sp"></span><span class="rvmin"><button class="icon-btn sm" data-a="rv-num" data-k="'+x[0]+'" data-d="-'+x[4]+'" data-mn="'+x[2]+'" data-mx="'+x[3]+'">−</button><b>'+(x[0]==='cap'?(c.cap?c.cap+' min':'Desligado'):c[x[0]])+'</b><button class="icon-btn sm" data-a="rv-num" data-k="'+x[0]+'" data-d="'+x[4]+'" data-mn="'+x[2]+'" data-mx="'+x[3]+'">+</button></span></div>').join('')+
+    '<p class="muted small" style="margin:6px 0 0">Com o teto ligado, as revisões D7 em diante que passarem dele vão para dias vizinhos mais livres. A D1 nunca muda.</p></div>'+
     '<div class="card sec"><h3>Organizar revisão</h3>'+
     '<div class="rvset"><b>Antecedência</b><span class="sp"></span><span class="rvmin"><button class="icon-btn sm" data-a="rv-prep" data-d="-1">−</button><b>'+(c.prep?c.prep+(c.prep===1?' dia':' dias'):'Desligado')+'</b><button class="icon-btn sm" data-a="rv-prep" data-d="1">+</button></span></div>'+
     '<div class="rvset"><b>Tempo para organizar</b><span class="sp"></span><span class="rvmin"><button class="icon-btn sm" data-a="rv-prepmin" data-d="-5">−</button><b>'+c.prepMin+' min</b><button class="icon-btn sm" data-a="rv-prepmin" data-d="5">+</button></span></div></div>'+
@@ -8534,8 +8617,28 @@ function notifHTML(){
 Object.assign(ACT,{
   'rv-done'(el){const k=el.dataset.k;S.prefs.rvDone=S.prefs.rvDone||{};const p=k.split('|'),was=p[0]==='rf'?el.closest('.done'):S.prefs.rvDone[k];
     if(was){rvUndo(k);save();renderMain();return;}
+    const rr=reviewList(addISO(todayISO(),-45),addISO(todayISO(),60)).find(x=>x.key===k);
+    if(rr&&!rvChkOk(rr)){toast('Complete o checklist antes de concluir (abra “Checklist” na revisão).');return;}
     if(rvTerminal(k)){rvGradeAsk(k);return;}
+    if(rvCfg().adapt&&p[0]==='rv'){rvAdaptAsk(k);return;}
     S.prefs.rvDone[k]=todayISO();save();renderMain();},
+  'rv-adapt'(el){const k=el.dataset.k,i=rvAdaptMark(k,el.dataset.g||'');save();closeModal();renderMain();toast(i?'Revisão concluída. Próxima: '+fmtDM(i.due)+'.':'Revisão concluída.');},
+  'rv-adapt-acc'(el){const v=Number(($('#rvAcc')||{}).value);if(isNaN(v)||v<0||v>100||($('#rvAcc')||{}).value===''){toast('Informe a taxa de acerto de 0 a 100.');return;}const g=v>=85?'f':v>=65?'b':'h',k=el.dataset.k,i=rvAdaptMark(k,g,Math.round(v));save();closeModal();renderMain();toast('Acerto de '+Math.round(v)+'% ('+(g==='f'?'fácil':g==='b'?'bom':'difícil')+')'+(i?'. Próxima: '+fmtDM(i.due)+'.':'.'));},
+  'rv-chk'(el){const st=rvSt(el.dataset.k);st.chk=st.chk||{};st.chk[el.dataset.c]=!!el.checked;save();const d=el.closest('details'),b=d&&$('.count',d);if(b){const t=$$('input[type=checkbox]',d);b.textContent=t.filter(i=>i.checked).length+'/'+t.length;}},
+  'rv-flash'(el){
+    const a=rvActOf(el.dataset.k);if(!a){toast('Evento não encontrado.');return;}
+    const fi=focoIdsOf(a),ds=S.decks.filter(d=>d.actId===a.id||(a.deckIds||[]).indexOf(d.id)>=0||focoIdsOf(d).some(f=>fi.indexOf(f)>=0));
+    if(!ds.length){toast('Nenhum baralho ligado a este evento ou ao Foco dele.');return;}
+    UI.tab='notas';UI.nsub='estudar';UI.nview=null;renderTabs();renderMain();ACT['st-start']({dataset:{id:ds[0].id}});
+  },
+  'rv-mfq'(el){
+    const a=rvActOf(el.dataset.k);if(!a){toast('Evento não encontrado.');return;}
+    const f=focoIdsOf(a).map(focoById).filter(Boolean)[0],nome=f?f.name:(actParts(a).theme||'');
+    const m=MFF();m.areas=[];m.provas=[];m.ano='';m.sub='';m.foco=nome;m.nao=m.err=m.cer=m.fav=m.rev=false;m.anul=false;
+    UI.tab='questoes';renderTabs();renderMain();toast('Filtro: '+nome+'.');
+  },
+  'rv-opt'(el){const c=rvCfg();c[el.dataset.k]=!!el.checked;S.prefs.rv=c;save();renderMain();},
+  'rv-num'(el){const c=rvCfg(),k=el.dataset.k;c[k]=Math.max(Number(el.dataset.mn),Math.min(Number(el.dataset.mx),(Number(c[k])||0)+Number(el.dataset.d)));S.prefs.rv=c;save();renderMain();},
   'rv-grade'(el){const k=el.dataset.k,p=k.split('|');rvMark(k,Number(el.dataset.g));save();closeModal();renderMain();const c=S.rvc[p[1]+'|'+p[2]];toast('Revisão concluída'+(c?'. Próxima em '+fmtDM(rvSim(c.h,rvRet()).due):'')+'.');},
   'rv-link'(el){rvLinkDlg(el.dataset.sk);},
   'rv-link-go'(el){const sk=el.dataset.sk,u=($('#rvlUrl')||{}).value||'',v=($('#rvlSel')||{}).value||'';S.rvl=S.rvl||{};
@@ -15546,6 +15649,52 @@ Object.assign(ACT,{
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='wsq'){UI.wsQ=e.target.value;const l=$('#wsList');if(l)l.innerHTML=wsListHTML();}});
 document.addEventListener('change',e=>{const t=e.target;if(!t)return;if(t.id==='wscat'){UI.wsCat=t.value;renderMain();}else if(t.id==='wssort'){UI.wsSort=t.value;renderMain();}});
 
+
+/* ----- Assuntos: termômetro de domínio (aulas, notas, estabilidade dos cards e acerto no MedFisher) e Focos correlatos ----- */
+let MAST={k:'',m:null};
+const MAS_ST={nunca:['Nunca estudado','#8A94A6'],risco:['Em risco','#E5484D'],and:['Em andamento','#E0A030'],cons:['Consolidado','#2F9E6A']};
+function focoMasteryAll(){
+  const T=todayISO(),k=(S.savedAt||0)+'|'+T+'|'+((MFD.idx&&MFD.idx.length)||0)+'|'+MFD.st+'|'+((S.focos||[]).length);
+  if(MAST.k===k&&MAST.m)return MAST.m;
+  const m={};(S.focos||[]).forEach(f=>{m[f.id]={aulaDone:0,aulaTot:0,notes:0,cardsN:0,cardsRev:0,sumS:0,nS:0,mf:null};});
+  const byAct={};occurrences(addISO(T,-365),addISO(T,120)).forEach(o=>{const e=byAct[o.act.id]||(byAct[o.act.id]={d:0,t:0});e.t++;if(o.done)e.d++;});
+  S.acts.forEach(a=>{const e=byAct[a.id];if(!e)return;focoIdsOf(a).forEach(id=>{if(m[id]){m[id].aulaTot+=e.t;m[id].aulaDone+=e.d;}});});
+  S.notes.forEach(n=>focoIdsOf(n).forEach(id=>{if(m[id])m[id].notes++;}));
+  const deckFoco=d=>{const ids=new Set(focoIdsOf(d));let p=d,g=0;while(p&&p.parentId&&g++<10){p=deckById(p.parentId);if(p)focoIdsOf(p).forEach(i=>ids.add(i));}return ids;};
+  const dm={};S.decks.forEach(d=>{dm[d.id]=deckFoco(d);});
+  S.cards.forEach(c=>{const fs=dm[c.deckId];if(!fs||!fs.size)return;const st=c.s||{};Object.keys(st).forEach(k2=>{const it=st[k2];if(!it)return;fs.forEach(id=>{const e=m[id];if(!e)return;e.cardsN++;if(it.reps>0){e.cardsRev++;if(it.S>0){e.sumS+=it.S;e.nS++;}}});});});
+  if(MFD.idx){const by={};MFD.idx.forEach(q=>{const kk=norm(q.foco);if(kk)(by[kk]=by[kk]||[]).push(q);});(S.focos||[]).forEach(f=>{const l=by[norm(f.name)];if(l)m[f.id].mf=mfStatOf(l);});}
+  (S.focos||[]).forEach(f=>{
+    const e=m[f.id],parts={},w={};
+    if(e.aulaTot){parts.aula=Math.min(1,e.aulaDone/e.aulaTot);w.aula=.2;}
+    if(e.notes){parts.notas=Math.min(1,e.notes/3);w.notas=.15;}
+    if(e.nS){parts.cards=Math.min(1,(e.sumS/e.nS)/30);w.cards=.3;} // estabilidade média de 30 dias ou mais = 100%
+    if(e.mf&&e.mf.pct!=null){parts.quest=e.mf.pct/100;w.quest=.35;}
+    const ws=Object.keys(parts).reduce((a,x)=>a+w[x],0);
+    e.parts=parts;e.idx=ws?Math.round(Object.keys(parts).reduce((a,x)=>a+parts[x]*w[x],0)/ws*100):null;
+    const ans=e.mf?e.mf.ok+e.mf.err:0,touched=e.aulaDone||e.notes||e.cardsRev||ans;
+    const risk=(e.mf&&e.mf.pct!=null&&ans>=3&&e.mf.pct<65)||(e.nS>=3&&e.sumS/e.nS<4);
+    e.status=!touched?'nunca':risk?'risco':(e.idx!=null&&e.idx>=75&&Object.keys(parts).length>=2)?'cons':'and';
+  });
+  MAST={k:k,m:m};return m;
+}
+const focoMastery=f=>focoMasteryAll()[f.id]||{status:'nunca',idx:null,parts:{}};
+function masChip(f){
+  const e=focoMastery(f),st=MAS_ST[e.status];
+  return '<span class="masch" style="--c:'+st[1]+'" title="'+st[0]+(e.idx!=null?' | índice '+e.idx+'%':'')+'"><i></i>'+(e.status==='nunca'?st[0]:(e.idx!=null?e.idx+'% ':'')+st[0])+'</span>';
+}
+function masHTML(f){
+  const e=focoMastery(f),st=MAS_ST[e.status],P=e.parts||{};
+  const bar=(l,v,txt)=>'<div class="masbar"><span>'+l+'</span><div><i style="width:'+Math.round((v||0)*100)+'%"></i></div><b>'+(v==null?'—':txt)+'</b></div>';
+  return '<div class="mas"><div class="mas-h"><span class="masch" style="--c:'+st[1]+'"><i></i>'+st[0]+'</span><b>'+(e.idx!=null?'Domínio '+e.idx+'%':'Sem dados ainda')+'</b></div>'+
+    bar('Aulas',P.aula,e.aulaDone+'/'+e.aulaTot)+bar('Notas',P.notas,e.notes+(e.notes===1?' nota':' notas'))+bar('Cards (estabilidade)',P.cards,e.nS?Math.round(e.sumS/e.nS)+' d':'')+bar('Questões',P.quest,e.mf&&e.mf.pct!=null?e.mf.pct+'%':'')+'</div>';
+}
+// focos correlatos: a relação vale nos dois sentidos
+function focoRelated(f){
+  const ids=new Set(f.relatedFocoIds||[]);(S.focos||[]).forEach(g=>{if((g.relatedFocoIds||[]).indexOf(f.id)>=0)ids.add(g.id);});ids.delete(f.id);
+  return [...ids].map(focoById).filter(Boolean);
+}
+
 /* ==========================================================================
    ASSUNTOS E PROGRESSO: Focos (aulas e temas) agrupados por Grande área e Módulo; notas, arquivos, eventos
    e tarefas podem citar um ou mais Focos, e cada Foco mostra tudo o que está ligado a ele.
@@ -15581,10 +15730,12 @@ function focoProg(f){
 }
 function renderAssuntos(){
   const q=norm(UI.ftq||''),ar=UI.ftArea||'';
-  const list=(S.focos||[]).filter(f=>(!ar||f.area===ar)&&(!q||norm(f.name+' '+f.mod).includes(q)));
+  const mast=focoMasteryAll(),stc={};(S.focos||[]).forEach(f=>{stc[mast[f.id].status]=(stc[mast[f.id].status]||0)+1;});
+  const list=(S.focos||[]).filter(f=>(!ar||f.area===ar)&&(!q||norm(f.name+' '+f.mod).includes(q))&&(!UI.ftSt||mast[f.id].status===UI.ftSt));
   let h='<div class="toolbar"><div class="sbox" style="max-width:300px">'+ic('search',15)+'<input id="ftq" type="search" placeholder="Buscar foco" value="'+esc(UI.ftq||'')+'"></div><span class="sp"></span>'+
     '<button class="btn sm ghost" data-a="ar-manage">'+ic('settings',14)+' Áreas</button><button class="btn primary" data-a="ft-new">'+ic('plus',15)+' Novo foco</button></div>'+
     '<div class="seg" style="margin-bottom:12px">'+[['','Todas']].concat((S.areas||[]).map(a=>[a.id,a.name])).map(v=>'<button class="'+(ar===v[0]?'on':'')+'" data-a="set" data-k="ftArea" data-v="'+esc(v[0])+'">'+esc(v[1])+'</button>').join('')+'</div>';
+  h+='<div class="frow" style="margin-bottom:12px"><span class="fl" style="min-width:auto">Domínio</span><button class="chip '+(!UI.ftSt?'on':'')+'" data-a="set" data-k="ftSt" data-v="">Todos</button>'+Object.keys(MAS_ST).map(k=>'<button class="chip '+(UI.ftSt===k?'on':'')+'" data-a="set" data-k="ftSt" data-v="'+k+'"><i class="lzd" style="background:'+MAS_ST[k][1]+'"></i>'+MAS_ST[k][0]+' ('+(stc[k]||0)+')</button>').join('')+'</div>';
   if(!list.length)return h+'<div class="empty">Nenhum foco.<br><button class="btn primary" data-a="ft-new">'+ic('plus',15)+' Novo foco</button></div>';
   (S.areas||[]).forEach(a=>{
     const fs=list.filter(f=>f.area===a.id);if(!fs.length)return;
@@ -15594,7 +15745,7 @@ function renderAssuntos(){
       const ms=MOD_ICO.find(x=>m!=='Princípios'&&x[0].test(m));
       h+='<div class="ftmod">'+(ms?ic(ms[1],14):'')+esc(m)+'</div><div class="ftlist">'+mods[m].sort((x,y)=>x.name.localeCompare(y.name,'pt-BR')).map(f=>{
         const p=focoProg(f);
-        return '<button class="ftrow" data-a="ft-open" data-id="'+f.id+'"><span class="ftn">'+esc(f.name)+'</span>'+(p.any?'<span class="ftm">'+(p.ttot?ic('tasks',12)+p.tdone+'/'+p.ttot:'')+(p.etot?ic('calendar',12)+p.edone+'/'+p.etot:'')+(p.L.notes.length?ic('note',12)+p.L.notes.length:'')+(p.L.files.length?ic('file',12)+p.L.files.length:'')+'</span>'+(p.mf.pct!=null?'<span class="ftm acc" title="Acerto no banco MedFisher">'+p.mf.pct+'% acerto</span>':'')+'<span class="ftbar"><i style="width:'+p.pct+'%"></i></span>':'<span class="ftm"></span><span></span>')+'</button>';
+        return '<button class="ftrow" data-a="ft-open" data-id="'+f.id+'"><span class="ftn">'+esc(f.name)+'</span>'+(p.any?'<span class="ftm">'+(p.ttot?ic('tasks',12)+p.tdone+'/'+p.ttot:'')+(p.etot?ic('calendar',12)+p.edone+'/'+p.etot:'')+(p.L.notes.length?ic('note',12)+p.L.notes.length:'')+(p.L.files.length?ic('file',12)+p.L.files.length:'')+'</span>'+masChip(f)+(p.mf.pct!=null?'<span class="ftm acc" title="Acerto no banco MedFisher">'+p.mf.pct+'% acerto</span>':'')+'<span class="ftbar"><i style="width:'+p.pct+'%"></i></span>':'<span class="ftm"></span><span></span>')+'</button>';
       }).join('')+'</div>';
     });
     h+='</section>';
@@ -15603,12 +15754,19 @@ function renderAssuntos(){
 }
 function focoModalHTML(f,tab){
   const p=focoProg(f),L=p.L,st=focoStyle(f);tab=tab||'tarefas';
-  const qn=focoQNotes(f),qe=p.mf.err;
-  const tabs=[['tarefas','Tarefas',L.tasks.length],['eventos','Eventos',L.acts.length],['arquivos','Arquivos',L.files.length],['notas','Notas',L.notes.length],['questoes','Questões',qn.length+qe]];
+  const qn=focoQNotes(f),qe=p.mf.err,rel=focoRelated(f);
+  const tabs=[['tarefas','Tarefas',L.tasks.length],['eventos','Eventos',L.acts.length],['arquivos','Arquivos',L.files.length],['notas','Notas',L.notes.length],['questoes','Questões',qn.length+qe],['rel','Relacionados',rel.length]];
   let body='';
   if(tab==='tarefas')body=L.tasks.map(t=>'<div class="ftit"><button class="chk sm '+(t.done?'on':'')+'" data-a="toggle-task" data-id="'+t.id+'" aria-label="Concluir">'+ic('check',12)+'</button><span class="'+(t.done?'done':'')+'" data-a="view-task" data-id="'+t.id+'">'+esc(t.title)+'</span><small>'+(tDue(t)?fmtDM(tDue(t)):'')+'</small></div>').join('')+'<button class="btn sm ghost" data-a="ft-add" data-w="task" data-id="'+f.id+'">'+ic('plus',13)+' Tarefa deste foco</button>';
   else if(tab==='eventos')body=L.acts.map(a=>'<div class="ftit"><span data-a="view-act" data-aid="'+a.id+'">'+esc(aT(a))+'</span><small>'+esc(a.slots[0]?(a.slots[0].mode==='date'?fmtDM(a.slots[0].date):'semanal'):'')+'</small></div>').join('')+'<button class="btn sm ghost" data-a="ft-add" data-w="act" data-id="'+f.id+'">'+ic('plus',13)+' Evento deste foco</button>';
   else if(tab==='arquivos')body=L.files.map(x=>'<div class="ftit"><span data-a="n-goto" data-k="'+x.k+'" data-id="'+x.o.id+'">'+esc(x.o.title||x.o.name||'Arquivo')+'</span><small>'+({doc:'Documento',pdf:'PDF',slides:'Apresentação',ink:'Caderno',deck:'Baralho'}[x.k])+'</small></div>').join('');
+  else if(tab==='rel'){
+    body=rel.map(g=>{const ns=S.notes.filter(n=>focoIdsOf(n).indexOf(g.id)>=0),ds=S.decks.filter(d=>focoIdsOf(d).indexOf(g.id)>=0);
+      return '<div class="relbox"><div class="relh">'+focoPill(g)+'</div>'+
+        ns.map(n=>'<div class="ftit"><span data-a="n-goto" data-k="note" data-id="'+n.id+'">'+esc(n.title||'Sem título')+'</span><small>'+esc({questao:'Questão',caso:'Caso clínico',bula:'Bulário',fluxo:'Fluxograma'}[n.type]||'Nota')+'</small></div>').join('')+
+        ds.map(d=>'<div class="ftit"><span data-a="rel-study" data-id="'+d.id+'">'+ic('cards',13)+' '+esc(d.name)+'</span><small>'+S.cards.filter(c=>c.deckId===d.id).length+' cards | estudar</small></div>').join('')+
+        (!ns.length&&!ds.length?'<div class="muted small">Nada ligado a este foco ainda.</div>':'')+'</div>';}).join('')||'<div class="muted small" style="padding:8px 0">Nenhum foco correlato. Edite este foco e escolha “Focos correlatos”.</div>';
+  }
   else if(tab==='questoes'){
     const wr=mfFocoErr(f),m=p.mf;
     body='<div class="fstat"><b>'+(m.pct==null?'—':m.pct+'%')+'</b> de acerto no banco MedFisher | '+m.ok+' certas, '+m.err+' erradas, '+m.nr+' não respondidas de '+m.tot+(MFD.st!=='ok'?' <span class="muted">(abra a aba Questões para carregar o banco)</span>':'')+'</div>'+
@@ -15618,7 +15776,7 @@ function focoModalHTML(f,tab){
   else body=L.notes.map(n=>'<div class="ftit"><span data-a="n-goto" data-k="note" data-id="'+n.id+'">'+esc(n.title||'Sem título')+'</span><small>'+esc({questao:'Questão',caso:'Caso clínico',bula:'Bulário',fluxo:'Fluxograma'}[n.type]||'Nota')+'</small></div>').join('')+'<button class="btn sm ghost" data-a="ft-add" data-w="note" data-id="'+f.id+'">'+ic('plus',13)+' Nota deste foco</button>';
   if(!body.replace(/<button[^>]*>.*?<\/button>/g,'').trim())body='<div class="muted small" style="padding:8px 0">Nada vinculado ainda.</div>'+body;
   return '<div class="form"><div class="fh"><div style="min-width:0">'+focoPill(f)+'<h2 style="margin-top:6px">'+esc(f.name)+'</h2></div><span class="sp"></span><button class="icon-btn" data-a="ft-edit" data-id="'+f.id+'" aria-label="Editar">'+ic('edit',18)+'</button><button class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+
-    '<div class="ftbar big"><i style="width:'+p.pct+'%;background:'+esc(st.color)+'"></i></div><div class="muted small" style="margin:4px 0 10px">'+p.pct+'% | '+p.tdone+'/'+p.ttot+' tarefas | '+p.edone+'/'+p.etot+' eventos</div>'+
+    ''+masHTML(f)+'<div class="ftbar big"><i style="width:'+p.pct+'%;background:'+esc(st.color)+'"></i></div><div class="muted small" style="margin:4px 0 10px">'+p.pct+'% | '+p.tdone+'/'+p.ttot+' tarefas | '+p.edone+'/'+p.etot+' eventos</div>'+
     '<div class="seg">'+tabs.map(t=>'<button class="'+(tab===t[0]?'on':'')+'" data-a="ft-tab" data-id="'+f.id+'" data-v="'+t[0]+'">'+t[1]+' ('+t[2]+')</button>').join('')+'</div><div class="ftbody">'+body+'</div></div>';
 }
 function focoForm(id){
@@ -15627,11 +15785,12 @@ function focoForm(id){
     '<label class="f">Nome<input name="name" required value="'+esc(f?f.name:'')+'" autocomplete="off"></label>'+
     '<div class="fgrid"><label class="f">Grande área<select name="area">'+areas.map(a=>'<option value="'+a.id+'" '+((f?f.area:UI.ftArea||areas[0].id)===a.id?'selected':'')+'>'+esc(a.name)+'</option>').join('')+'</select></label>'+
     '<label class="f">Módulo<input name="mod" list="ftmods" value="'+esc(f?f.mod:'')+'" autocomplete="off"><datalist id="ftmods">'+Array.from(new Set((S.focos||[]).map(x=>x.mod))).map(m=>'<option value="'+esc(m)+'">').join('')+'</datalist></label></div>'+
+    '<div class="f"><span>Focos correlatos <small>temas que se sobrepõem em outras áreas</small></span>'+pickerHTML('relf',focoItems().filter(i=>!f||i.id!==f.id),(f&&f.relatedFocoIds)||[],'Escolher focos correlatos')+'</div>'+
     iconPickHTML(f&&f.icon,'')+
     '<div class="ff">'+(f?'<button type="button" class="btn danger" data-a="ft-del" data-id="'+f.id+'">Excluir</button>':'')+'<span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
   iconPickBind($('#fFoco'));
   $('#fFoco').addEventListener('submit',e=>{
-    e.preventDefault();const E=e.target.elements,d={name:E.name.value.trim(),area:E.area.value,mod:E.mod.value.trim()||'Princípios',icon:E.icon.value||''};if(!d.name)return;
+    e.preventDefault();const E=e.target.elements,d={name:E.name.value.trim(),area:E.area.value,mod:E.mod.value.trim()||'Princípios',icon:E.icon.value||'',relatedFocoIds:pickedValues(e.target,'relf')};if(!d.name)return;
     if(f)Object.assign(f,d);else S.focos.push(Object.assign({id:uid()},d));
     save();closeModal();renderMain();
   });
@@ -15642,6 +15801,7 @@ Object.assign(ACT,{
   'ft-open'(el){const f=focoById(el.dataset.id);if(f)openModal(focoModalHTML(f,'tarefas'));},
   'ft-tab'(el){const f=focoById(el.dataset.id);if(f)openModal(focoModalHTML(f,el.dataset.v));},
   'ft-new'(){focoForm('');},
+  'rel-study'(el){closeModal();UI.tab='notas';UI.nsub='estudar';UI.nview=null;renderTabs();renderMain();ACT['st-start']({dataset:{id:el.dataset.id}});},
   'ft-edit'(el){focoForm(el.dataset.id);},
   'ft-del'(el){const f=focoById(el.dataset.id);if(!f)return;askConfirm('Excluir o foco "'+f.name+'"?','Os itens ligados continuam, só perdem o vínculo.',()=>{S.focos=S.focos.filter(x=>x!==f);[].concat(S.tasks,S.acts,S.notes,S.docs,S.pdfs,S.slides||[],S.inks||[]).forEach(o=>{if(o.focoIds)o.focoIds=o.focoIds.filter(i=>i!==f.id);});save();closeModal();renderMain();},'Excluir');},
   'ft-add'(el){
