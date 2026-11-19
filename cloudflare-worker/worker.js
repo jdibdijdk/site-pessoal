@@ -127,6 +127,19 @@ async function pluggy(request, env, u) {
   if (!env.PLUGGY_CLIENT_ID || !env.PLUGGY_CLIENT_SECRET || !env.PINGADO_TOKEN) return out({ error: 'O Worker ainda não tem os segredos PLUGGY_CLIENT_ID, PLUGGY_CLIENT_SECRET e PINGADO_TOKEN.' }, 503);
   if (!okOrigin) return out({ error: 'Origem não permitida.' }, 403);
   if (request.headers.get('X-Pingado-Token') !== env.PINGADO_TOKEN) return out({ error: 'Token inválido.' }, 401);
+  // token para abrir o widget de conexão da Pluggy (o site usa o accessToken para autorizar o banco)
+  if (u.pathname === '/pluggy/connect-token' && request.method === 'POST') {
+    let cb = {}; try { cb = JSON.parse(await request.text() || '{}'); } catch (e) { cb = {}; }
+    try {
+      const a = await fetch(PL_API + '/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId: env.PLUGGY_CLIENT_ID, clientSecret: env.PLUGGY_CLIENT_SECRET }) });
+      const aj = await a.json();
+      if (!a.ok || !aj.apiKey) return out({ error: 'A Pluggy recusou as credenciais (' + a.status + ').' }, 502);
+      const r = await fetch(PL_API + '/connect_token', { method: 'POST', headers: { 'X-API-KEY': aj.apiKey, 'Content-Type': 'application/json' }, body: JSON.stringify({ options: { clientUserId: String(cb.clientUserId || 'dono').slice(0, 64) } }) });
+      const j = await r.json();
+      if (!r.ok || !j.accessToken) return out({ error: 'Não consegui gerar o token de conexão (' + r.status + ').' }, 502);
+      return out({ accessToken: j.accessToken });
+    } catch (e) { return out({ error: 'Falha ao falar com a Pluggy: ' + (e && e.message || e) }, 502); }
+  }
   if (u.pathname !== '/pluggy/sync' || request.method !== 'POST') return out({ error: 'Rota desconhecida.' }, 404);
   let body = {}; try { body = JSON.parse(await request.text() || '{}'); } catch (e) { return out({ error: 'Pedido inválido.' }, 400); }
   const itemId = String(body.itemId || '');
