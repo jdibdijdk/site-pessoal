@@ -2707,6 +2707,17 @@ button.lzico.lk:hover{transform:scale(1.06);box-shadow:0 0 0 3px color-mix(in sr
 .masbar{display:grid;grid-template-columns:130px 1fr 70px;align-items:center;gap:8px;font-size:12.5px;color:var(--mut);margin:3px 0}
 .masbar>div{height:6px;border-radius:99px;background:var(--soft);overflow:hidden}.masbar i{display:block;height:100%;background:var(--acc);border-radius:99px}.masbar b{text-align:right;color:var(--tx);font-weight:600}
 .relbox{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px}.relh{margin-bottom:4px}
+
+/* ===== Notas: oclusão, menções ===== */
+.ned.editing .nhide{background:rgba(110,86,207,.16);border-bottom:2px dashed #6E56CF}
+.ned.editing td.nhide,.ned.editing th.nhide{box-shadow:inset 0 0 0 2px rgba(110,86,207,.45);background:rgba(110,86,207,.1)}
+.ned:not(.editing) .nhide:not(.shown){cursor:pointer;user-select:none;-webkit-user-select:none;border-radius:4px;color:transparent!important;background:color-mix(in srgb,var(--tx) 78%,transparent)}
+.ned:not(.editing) .nhide:not(.shown) *{color:transparent!important}
+.ned:not(.editing) td.nhide:not(.shown),.ned:not(.editing) th.nhide:not(.shown){border-radius:0}
+.ned:not(.editing) .nhide.shown{cursor:pointer;background:rgba(110,86,207,.14);border-radius:4px}
+.prn .nhide,#printSheet .nhide{color:inherit!important;background:none!important;border-bottom:1px dotted #888}
+.nbk{padding:6px 0;border-bottom:1px solid var(--line2)}.nbk:last-child{border-bottom:0}.nbk-t{margin-left:8px}
+.nbk-s{font-size:13px;color:var(--mut);margin-top:2px;padding-left:2px}
 </style>
 </head>
 <body>
@@ -6285,7 +6296,8 @@ function cleanHTML(html,opt){
       Array.from(ch.attributes).forEach(at=>{
         const n=at.name,t=ch.tagName;let keep=false;
         if(t==='DIV'&&n==='class'){const c=at.value.split(/\s+/).filter(x=>x==='obj'||x==='obj-h'||x==='tp'||x==='cols2'||x==='toc').join(' ');if(c)ch.setAttribute('class',c);else ch.removeAttribute('class');return;}
-        if(t==='SPAN'&&n==='class'){if(/(^|\s)tpn(\s|$)/.test(at.value))ch.setAttribute('class','tpn');else if(/(^|\s)cm(\s|$)/.test(at.value))ch.setAttribute('class','cm');else ch.removeAttribute('class');return;}
+        if(t==='SPAN'&&n==='class'){if(/(^|\s)tpn(\s|$)/.test(at.value))ch.setAttribute('class','tpn');else if(/(^|\s)cm(\s|$)/.test(at.value))ch.setAttribute('class','cm');else if(/(^|\s)nhide(\s|$)/.test(at.value))ch.setAttribute('class','nhide');else ch.removeAttribute('class');return;}
+        if((t==='TD'||t==='TH')&&n==='class'){if(/(^|\s)nhide(\s|$)/.test(at.value))ch.setAttribute('class','nhide');else ch.removeAttribute('class');return;}
         if(t==='SPAN'&&n==='data-c'){if(/(^|\s)cm(\s|$)/.test(ch.getAttribute('class')||'')){ch.setAttribute('data-c',at.value.slice(0,800));}else ch.removeAttribute(n);return;}
         if(t==='SUP'){
           if(n==='class'){ch.setAttribute('class','fnm');return;}
@@ -6570,7 +6582,7 @@ function noteToolbarHTML(){
       mi('data-a="n-space"','lineSp','Espaçamento','')+'<span class="ntmsep"></span>'+mi('data-a="n-cmd" data-cmd="ul"','list','Marcadores','')+mi('data-a="n-cmd" data-cmd="ol"','listOl','Lista numerada','')+'<span class="ntmsep"></span>'+
       mi('data-a="n-cols" data-v="sec"','columns','Trecho em duas colunas','')+mi('data-a="n-cols" data-v="doc"','columns','Documento em duas colunas',''))+
     menu('ins','Inserir',mi('data-a="n-img"','image','Imagem','')+mi('data-a="n-gif"','film','GIF','')+mi('data-a="n-table"','table','Tabela','')+mi('data-a="n-cmd" data-cmd="hr"','minus','Linha horizontal','')+'<span class="ntmsep"></span>'+
-      mi('data-a="n-link"','link','Link','')+mi('data-a="n-wl"','wlink','Ligar a outra nota',K+'+K')+mi('data-a="n-cite"','at','Citar evento, tarefa…','')+mi('data-a="n-fn"','note','Nota de rodapé','')+mi('data-a="n-cm"','msg','Comentário',''))+
+      mi('data-a="n-link"','link','Link','')+mi('data-a="n-wl"','wlink','Ligar a outra nota',K+'+K')+mi('data-a="n-cite"','at','Citar evento, tarefa…','')+mi('data-a="n-fn"','note','Nota de rodapé','')+mi('data-a="n-hide"','eyeOff','Ocultar trecho ou célula','')+mi('data-a="n-cm"','msg','Comentário',''))+
     menu('est','Estrutura',mi('data-a="n-toc"','listOl','Sumário','')+mi('data-a="n-obj"','target','Objetivos','')+mi('data-a="n-topic"','square','Tópico',''))+
     '</div>'+
     '<span class="tblops" id="tblops" hidden><button class="btn sm ghost" data-a="tb-row" title="Adicionar linha abaixo">+ Linha</button><button class="btn sm ghost" data-a="tb-col" title="Adicionar coluna à direita">+ Coluna</button><button class="btn sm ghost" data-a="tb-delrow" title="Excluir a linha">− Linha</button><button class="btn sm ghost" data-a="tb-delcol" title="Excluir a coluna">− Coluna</button><button class="btn sm ghost" data-a="tb-del" title="Excluir a tabela inteira">Excluir tabela</button>'+cellMenuHTML()+'</span>'+
@@ -6614,8 +6626,8 @@ function mfStatOf(list){let ok=0,err=0,nr=0;const e=mfR();list.forEach(q=>{const
 function focoQNotes(f){return S.notes.filter(n=>n.type==='questao'&&(focoIdsOf(n).indexOf(f.id)>=0||(!!n.qgroup&&norm(n.qgroup)===norm(f.name))));}
 function noteViewHTML(n){
   if(n.type==='simulado')return simViewHTML(n);
-  const edit=UI.nview.edit,isQ=n.type==='questao',isC=n.type==='caso',isF=n.type==='fluxo',isB=n.type==='bula';
-  let h='<div class="nhead"><button class="btn sm ghost" data-a="n-back">'+ic('chevL',14)+' Notas</button><span class="sp"></span>'+(isC?'<button class="btn sm soapbtn '+(n.soapOn?'on':'')+'" data-a="soap-toggle" aria-pressed="'+(n.soapOn?'true':'false')+'" title="Mostra os campos S, O, A e P do caso">'+ic('layers',14)+' Modo SOAP</button>':'')+
+  const edit=UI.nview.edit,hasHide=!UI.nview.edit&&/class="nhide"/.test(n.html||''),isQ=n.type==='questao',isC=n.type==='caso',isF=n.type==='fluxo',isB=n.type==='bula';
+  let h='<div class="nhead"><button class="btn sm ghost" data-a="n-back">'+ic('chevL',14)+' Notas</button><span class="sp"></span>'+(hasHide?'<button class="btn sm" data-a="n-hide-all" data-v="show">'+ic('eye',14)+' Revelar tudo</button>':'')+(isC?'<button class="btn sm soapbtn '+(n.soapOn?'on':'')+'" data-a="soap-toggle" aria-pressed="'+(n.soapOn?'true':'false')+'" title="Mostra os campos S, O, A e P do caso">'+ic('layers',14)+' Modo SOAP</button>':'')+
     '<button class="btn sm ghost serifbtn '+(((S.prefs.noteFont||(S.prefs.noteSerif?'serif':'poppins'))!=='poppins')?'on':'')+'" data-a="n-serif" aria-pressed="'+(((S.prefs.noteFont||(S.prefs.noteSerif?'serif':'poppins'))!=='poppins')?'true':'false')+'" title="Alternar a fonte do texto das notas: Poppins, Serifada (Crimson Pro) ou Montserrat">'+ic('type',14)+' '+({poppins:'Poppins',serif:'Serifada',montserrat:'Montserrat'}[S.prefs.noteFont||(S.prefs.noteSerif?'serif':'poppins')])+'</button>'+
     (isF||isQ?'':pgBtn('nota_cards','Flashcards',' data-id="'+n.id+'"'))+'<button class="icon-btn" data-a="n-pdf" title="Exportar esta nota em PDF" aria-label="Exportar em PDF">'+ic('download',18)+'</button>'+
     (edit?'<button class="btn sm primary" data-a="n-edit">'+ic('check',14)+' Concluir edição</button>':'<button class="icon-btn" data-a="n-edit" title="Editar" aria-label="Editar">'+ic('edit',19)+'</button>')+
@@ -8339,7 +8351,7 @@ setTimeout(()=>{try{pdfBackfill();}catch(e){}},12000);
 /* ----- Leitor de PDF: o PdfCraft (pdfcraft/, compilado do projeto storytold/pdfcraft) roda num iframe da mesma origem e fala com a página por mensagens ----- */
 const PDFCRAFT_URL='pdfcraft/index.html';
 function pdfViewHTML(p){
-  return '<div class="nhead"><button class="btn sm ghost" data-a="n-back">'+ic('chevL',14)+' Notas</button><span class="sp"></span><span id="pdfSync" class="pdfsync"></span>'+
+  return '<div class="nhead"><button class="btn sm ghost" data-a="n-back">'+ic('chevL',14)+' Notas</button><span class="sp"></span><span id="pdfSync" class="pdfsync"></span><button class="btn sm" data-a="pdf-hl-note" title="Reúne os trechos grifados numa nota">'+ic('highlighter',14)+' Nota dos grifos</button>'+
     '<button class="icon-btn" data-a="pdf-info" title="Nome, pasta e categoria" aria-label="Editar informações">'+ic('edit',19)+'</button><button class="icon-btn" data-a="n-del" title="Excluir" aria-label="Excluir">'+ic('trash',18)+'</button></div>'+
     '<h2 class="vt" id="pdfTitle" style="margin:0 0 6px">'+esc(p.title)+'</h2><div class="muted small" id="pdfStatus" style="margin-bottom:8px">Carregando o PdfCraft…</div>'+
     '<div class="hostbox" id="pdfHost"></div>';
@@ -11703,12 +11715,26 @@ function refsOfNote(n){
 }
 function noteLinksHTML(n){
   const cites=refsOfNote(n).map(r=>({k:r[0],id:r[1],label:refInfo(r[0],r[1])})).filter(x=>x.label!=null);
-  const by=[];notesCiting('note',n.id).forEach(x=>by.push(refPill('note',x.id,x.title||'Sem título')));
+  const by=[],back=backlinksOf(n);
   S.docs.filter(d=>(d.noteIds||[]).indexOf(n.id)>=0).forEach(d=>by.push(refPill('doc',d.id,d.title)));
-  if(!cites.length&&!by.length)return '';
-  return '<section class="dsec nlinks"><h5>Ligações</h5>'+
+  if(!cites.length&&!by.length&&!back.length)return '';
+  return (back.length?'<section class="dsec nlinks nback"><h5>Mencionado em <span class="count">'+back.length+'</span></h5>'+back.map(b=>'<div class="nbk"><div>'+refPill('note',b.m.id,b.m.title||'Sem título')+'<span class="muted small nbk-t">'+esc(NB_TIPO[b.m.type]||'Nota')+'</span></div>'+(b.snip?'<div class="nbk-s">“'+esc(b.snip)+'”</div>':'')+'</div>').join('')+'</section>':'')+(cites.length||by.length?'<section class="dsec nlinks"><h5>Ligações</h5>'+
     (cites.length?'<div class="nl-row"><span class="muted small">Esta nota cita</span>'+cites.map(c=>refPill(c.k,c.id,c.label)).join('')+'</div>':'')+
-    (by.length?'<div class="nl-row"><span class="muted small">Citada em</span>'+by.join('')+'</div>':'')+'</section>';
+    (by.length?'<div class="nl-row"><span class="muted small">Citada em</span>'+by.join('')+'</div>':'')+'</section>':'');
+}
+const NB_TIPO={nota:'Nota',caso:'Caso clínico',bula:'Bulário',questao:'Questão',fluxo:'Fluxograma',simulado:'Simulado'};
+// outras notas, casos clínicos, bulários, questões e fluxogramas que apontam para esta nota (com o trecho em volta do link)
+function backlinksOf(n){
+  const out=[],key='note:'+n.id;
+  S.notes.forEach(m=>{
+    if(m.id===n.id)return;let hit=false,snip='';
+    NOTE_FIELDS.forEach(f=>{const h=m[f];if(!h||h.indexOf('data-ref="'+key+'"')<0)return;hit=true;if(snip)return;
+      const d=document.createElement('div');d.innerHTML=h;const a=d.querySelector('[data-ref="'+key+'"]'),blk=a&&a.closest('p,li,h1,h2,h3,td,th,div');
+      snip=(blk?blk.textContent:'').replace(/\s+/g,' ').trim();});
+    if(!hit&&m.type==='fluxo'&&m.fx&&m.fx.nodes.some(x=>x.refs.some(r=>r.k==='note'&&r.id===n.id)))hit=true;
+    if(hit)out.push({m:m,snip:snip.length>140?snip.slice(0,137)+'…':snip});
+  });
+  return out.sort((a,b)=>(b.m.updated||0)-(a.m.updated||0));
 }
 function docLinksHTML(d){
   const own=(d.noteIds||[]).map(id=>noteById(id)).filter(Boolean),ownIds=own.map(n=>n.id);
@@ -15694,6 +15720,92 @@ function focoRelated(f){
   const ids=new Set(f.relatedFocoIds||[]);(S.focos||[]).forEach(g=>{if((g.relatedFocoIds||[]).indexOf(f.id)>=0)ids.add(g.id);});ids.delete(f.id);
   return [...ids].map(focoById).filter(Boolean);
 }
+
+
+/* ----- Notas: oclusão ativa de trechos e células (clique para revelar na leitura) ----- */
+Object.assign(ACT,{
+  'n-hide'(){
+    saveRange();const rg=UI.range,ned=UI.edEl;
+    if(!rg||!ned){toast('Selecione um trecho ou clique numa célula da tabela.');return;}
+    const el0=rg.startContainer&&(rg.startContainer.nodeType===1?rg.startContainer:rg.startContainer.parentElement),cell=el0&&el0.closest('td,th');
+    if(cell&&ned.contains(cell)&&(rg.collapsed||cell.contains(rg.endContainer))){cell.classList.toggle('nhide');onNoteInput();toast(cell.classList.contains('nhide')?'Célula oculta na leitura.':'Célula visível.');return;}
+    if(!rg.collapsed&&String(rg.toString()).trim()){
+      const ca=rg.commonAncestorContainer,ex=(ca.nodeType===1?ca:ca.parentElement).closest('span.nhide');
+      if(ex&&ned.contains(ex)){while(ex.firstChild)ex.parentNode.insertBefore(ex.firstChild,ex);ex.remove();onNoteInput();toast('Trecho visível.');return;}
+      const a=blockOf(rg.startContainer,ned),b=blockOf(rg.endContainer,ned);if(a!==b){toast('Selecione um trecho dentro de um mesmo parágrafo.');return;}
+      const sp=document.createElement('span');sp.className='nhide';
+      try{rg.surroundContents(sp);}catch(e){sp.appendChild(rg.extractContents());rg.insertNode(sp);}
+      onNoteInput();toast('Trecho oculto na leitura. Clique nele para revelar.');return;
+    }
+    toast('Selecione um trecho ou clique numa célula da tabela.');
+  },
+  'n-hide-all'(el){const reveal=el.dataset.v==='show';$$('#main .nhide').forEach(x=>x.classList.toggle('shown',reveal));el.dataset.v=reveal?'hide':'show';el.innerHTML=ic(reveal?'eyeOff':'eye',14)+' '+(reveal?'Ocultar tudo':'Revelar tudo');}
+});
+document.addEventListener('click',e=>{const t=e.target;if(!t||!t.closest)return;const h=t.closest('.ned:not(.editing) .nhide');if(h&&!t.closest('a')){h.classList.toggle('shown');}});
+/* ----- Leitor de PDF: junta os grifos do arquivo numa nota ----- */
+const PDF_CORES=[['Amarelo',[255,224,102]],['Verde',[120,220,140]],['Azul',[120,180,255]],['Rosa',[255,150,190]],['Laranja',[255,170,90]],['Roxo',[190,150,255]]];
+function pdfCorNome(c){if(!c||c.length<3)return 'Sem cor';let b=null,d=1e9;PDF_CORES.forEach(x=>{const e=Math.pow(c[0]-x[1][0],2)+Math.pow(c[1]-x[1][1],2)+Math.pow(c[2]-x[1][2],2);if(e<d){d=e;b=x[0];}});return d>60000?'Outra':b;}
+function pdfQuadBoxes(a){
+  const q=a.quadPoints,out=[];
+  if(Array.isArray(q)&&q.length){
+    if(typeof q[0]==='object'&&q[0]!==null&&'x' in q[0]){for(let i=0;i+3<q.length;i+=4){const xs=[q[i],q[i+1],q[i+2],q[i+3]].map(p=>p.x),ys=[q[i],q[i+1],q[i+2],q[i+3]].map(p=>p.y);out.push([Math.min.apply(null,xs),Math.min.apply(null,ys),Math.max.apply(null,xs),Math.max.apply(null,ys)]);}}
+    else if(Array.isArray(q[0])&&q[0][0]&&typeof q[0][0]==='object'){q.forEach(g=>{const xs=g.map(p=>p.x),ys=g.map(p=>p.y);out.push([Math.min.apply(null,xs),Math.min.apply(null,ys),Math.max.apply(null,xs),Math.max.apply(null,ys)]);});}
+    else if(Array.isArray(q[0])){q.forEach(g=>{const xs=[g[0],g[2],g[4],g[6]],ys=[g[1],g[3],g[5],g[7]];out.push([Math.min.apply(null,xs),Math.min.apply(null,ys),Math.max.apply(null,xs),Math.max.apply(null,ys)]);});}
+    else if(typeof q[0]==='number'){for(let i=0;i+7<q.length;i+=8){const xs=[q[i],q[i+2],q[i+4],q[i+6]],ys=[q[i+1],q[i+3],q[i+5],q[i+7]];out.push([Math.min.apply(null,xs),Math.min.apply(null,ys),Math.max.apply(null,xs),Math.max.apply(null,ys)]);}}
+  }
+  if(!out.length&&a.rect)out.push([Math.min(a.rect[0],a.rect[2]),Math.min(a.rect[1],a.rect[3]),Math.max(a.rect[0],a.rect[2]),Math.max(a.rect[1],a.rect[3])]);
+  return out;
+}
+// texto dentro de uma caixa: cada trecho do PDF entra na proporção em que a caixa o cobre
+function pdfTextoNaCaixa(items,b){
+  const linhas=[];
+  items.forEach(it=>{
+    if(!it.str||!it.str.trim()&&it.str!==' ')return;
+    const x=it.transform[4],y=it.transform[5],w=it.width||0,h=it.height||Math.abs(it.transform[3])||10;
+    const cy=y+h*.35;if(cy<b[1]-1||cy>b[3]+1)return;
+    const ox1=Math.max(x,b[0]),ox2=Math.min(x+w,b[2]);if(ox2<=ox1)return;
+    const L=it.str.length,i1=Math.max(0,Math.round((ox1-x)/Math.max(w,1)*L)),i2=Math.min(L,Math.round((ox2-x)/Math.max(w,1)*L));
+    if(i2>i1)linhas.push({y:y,x:x,t:it.str.slice(i1,i2)});
+  });
+  linhas.sort((a,c)=>Math.abs(c.y-a.y)>3?c.y-a.y:a.x-c.x);
+  return linhas.map(l=>l.t).join(' ').replace(/\s+/g,' ').trim();
+}
+async function pdfHighlights(p){
+  const lib=await loadPdfLib(),bytes=await pdfBytes(p);if(!bytes)throw new Error('o arquivo não está disponível neste aparelho');
+  const doc=await lib.getDocument({data:bytes.slice(0)}).promise,out=[];
+  for(let i=1;i<=doc.numPages;i++){
+    const pg=await doc.getPage(i),anns=(await pg.getAnnotations()).filter(a=>a.subtype==='Highlight');
+    if(!anns.length)continue;
+    const tc=await pg.getTextContent();
+    anns.forEach(a=>{
+      const txt=pdfQuadBoxes(a).map(b=>pdfTextoNaCaixa(tc.items,b)).filter(Boolean).join(' ').replace(/\s+/g,' ').trim();
+      const nota=(a.contentsObj&&a.contentsObj.str)||a.contents||'';
+      if(txt||nota)out.push({page:i,color:pdfCorNome(a.color),text:txt,note:String(nota).trim()});
+    });
+  }
+  return out;
+}
+function pdfHlNoteHTML(p,list,by){
+  const g={},ord=[];list.forEach(x=>{const k=by==='cor'?x.color:'Página '+x.page;if(!g[k]){g[k]=[];ord.push(k);}g[k].push(x);});
+  if(by==='pagina')ord.sort((a,b)=>Number(a.slice(7))-Number(b.slice(7)));
+  return '<h1>Grifos: '+esc(p.title)+'</h1><p>Fonte: <a class="ref" data-k="pdf" data-ref="pdf:'+p.id+'">'+esc(p.title)+'</a> | '+list.length+(list.length===1?' trecho':' trechos')+'</p>'+
+    ord.map(k=>'<h2>'+esc(k)+'</h2><ul>'+g[k].map(x=>'<li>'+esc(x.text||'(sem texto)')+(by==='cor'?' <i>(p. '+x.page+')</i>':'')+(x.note?'<br><i>Comentário: '+esc(x.note)+'</i>':'')+'</li>').join('')+'</ul>').join('');
+}
+Object.assign(ACT,{
+  'pdf-hl-note'(){
+    const p=pdfById(UI.nview&&UI.nview.id);if(!p)return;
+    openModal('<div class="form"><div class="fh"><h2>Gerar nota dos grifos</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><p class="muted small" style="margin:0 0 10px">Reúne os trechos marcados com o marca-texto neste PDF numa nota ligada ao mesmo Foco. Só entram marcações já salvas.</p>'+
+      '<button class="mm-row" data-a="pdf-hl-go" data-by="pagina">'+ic('list',17)+'Organizar por página</button><button class="mm-row" data-a="pdf-hl-go" data-by="cor">'+ic('palette',17)+'Organizar por cor do destaque</button></div>');
+  },
+  'pdf-hl-go'(el){
+    const p=pdfById(UI.nview&&UI.nview.id);if(!p)return;const by=el.dataset.by;closeModal();toast('Lendo os grifos…');
+    pdfHighlights(p).then(list=>{
+      if(!list.length){toast('Nenhum grifo encontrado. Use o marca-texto e aguarde o salvamento do PDF.');return;}
+      const n=normNote({id:uid(),type:'nota',title:'Grifos: '+p.title,html:pdfHlNoteHTML(p,list,by),folderId:p.folderId||'',catId:p.catId||'',cd:null,created:Date.now(),updated:Date.now(),focoIds:(p.focoIds||[]).slice()});
+      S.notes.push(n);save();pdfLeave();UI.nview={type:'note',id:n.id,edit:false};renderMain();window.scrollTo(0,0);toast('Nota criada com '+list.length+(list.length===1?' grifo.':' grifos.'));
+    }).catch(e=>toast('Não consegui ler os grifos: '+(e&&e.message||e)));
+  }
+});
 
 /* ==========================================================================
    ASSUNTOS E PROGRESSO: Focos (aulas e temas) agrupados por Grande área e Módulo; notas, arquivos, eventos
