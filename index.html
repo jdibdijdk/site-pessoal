@@ -2727,6 +2727,9 @@ button.lzico.lk:hover{transform:scale(1.06);box-shadow:0 0 0 3px color-mix(in sr
 .mfexn{min-width:30px;height:28px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--tx);font-size:12px;cursor:pointer}
 .mfexn.ok{background:var(--accs);border-color:var(--acc);color:var(--acc)}.mfexn.cur{outline:2px solid var(--acc)}
 .mfbol{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:8px}.mfbol th,.mfbol td{text-align:left;padding:5px 8px;border-bottom:1px solid var(--line2)}.mfbol th{color:var(--mut);font-weight:600;font-size:12px}
+
+.inkcardprev{border:1px solid var(--line);border-radius:10px;padding:6px;background:#fff;max-height:240px;overflow:auto;text-align:center;margin-bottom:8px}.inkcardprev img{max-width:100%;max-height:220px}
+.ikb.on#inkSnapB{background:var(--accs);color:var(--acc)}
 </style>
 </head>
 <body>
@@ -14507,6 +14510,7 @@ function inkLeave(){
   INK.placing=null;INK.penDown=false;cancelAnimationFrame(INK.inRaf||0);
   clearTimeout(INK.timer);cancelAnimationFrame(INK.laserRaf);cancelAnimationFrame(INK.zraf||0);
   if(INK.x&&INK.dirty){INK.x.updated=Date.now();save();}
+  if(INK.x)inkBackupNow();
   INK.x=null;INK.cur=null;INK.undo=[];INK.redo=[];INK.pages=[];INK.dirty=false;INK.sel=null;INK.tp.clear();INK.pinch=null;INK.pinchHold=false;INK.scr=null;INK.mv=null;INK.sm=null;INK.er=null;INK.lz=null;INK.rd=null;INK.trail=[];
   document.body.classList.remove('inkopen');
 }
@@ -14564,7 +14568,7 @@ function inkViewHTML(x){
   const tb=t=>t?'<button class="ikb inkt" data-a="ink-tool" data-t="'+t[0]+'" title="'+t[1]+'" aria-label="'+t[1]+'">'+ic(t[2],19)+'</button>':'<span class="iksep"></span>';
   return '<div class="inkroot" id="inkRoot" data-mode="'+INK.mode+'">'+
     '<div class="inkh"><button class="ikb" data-a="ink-back" title="Voltar às notas" aria-label="Voltar às notas">'+ic('chevL',20)+'</button>'+
-    '<input id="inkTitle" class="inktitle" value="'+esc(x.title)+'" aria-label="Título do caderno" autocomplete="off"><span id="pdfSync" class="pdfsync"></span><span class="sp"></span>'+
+    '<input id="inkTitle" class="inktitle" value="'+esc(x.title)+'" aria-label="Título do caderno" autocomplete="off"><span id="pdfSync" class="pdfsync"></span><span id="inkBk" class="pdfsync"></span><button class="icon-btn sm" data-a="ink-restore" title="Restaurar do backup na nuvem" aria-label="Restaurar do backup na nuvem">'+ic('cloud',16)+'</button><span class="sp"></span>'+
     '<button class="ikb" data-a="ink-undo" title="Desfazer" aria-label="Desfazer">'+ic('undo',19)+'</button><button class="ikb" data-a="ink-redo" title="Refazer" aria-label="Refazer">'+ic('redo',19)+'</button><span class="iksep"></span>'+
     '<button class="ikb" data-a="ink-zoom" data-d="-1" title="Diminuir" aria-label="Diminuir">'+ic('zoomOut',19)+'</button><button class="ikz" data-a="ink-zoom100" id="inkZl" title="Voltar a 100%">100%</button><button class="ikb" data-a="ink-zoom" data-d="1" title="Ampliar" aria-label="Ampliar">'+ic('zoomIn',19)+'</button>'+
     '<button class="ikb" data-a="ink-fit" title="Ajustar à largura" aria-label="Ajustar à largura">'+ic('fit',18)+'</button><span class="iksep"></span>'+
@@ -14578,7 +14582,7 @@ function inkViewHTML(x){
       '<button class="btn sm" data-a="ink-print">'+ic('printer',14)+' Imprimir / salvar em PDF</button>'+
       '<button class="btn sm" data-a="ink-info">'+ic('tag',14)+' Pasta, categoria e assuntos</button>'+
       '<button class="btn sm danger" data-a="ink-del">'+ic('trash',14)+' Excluir caderno</button></div></span></div>'+
-    '<div class="inktools" id="inkTools">'+INK_TOOLS.map(tb).join('')+'<span class="iksep"></span><button class="ikb" id="inkRulerB" data-a="ink-ruler" title="Régua" aria-label="Régua">'+ic('igRuler',19)+'</button></div>'+
+    '<div class="inktools" id="inkTools">'+INK_TOOLS.map(tb).join('')+'<span class="iksep"></span><button class="ikb '+(S.prefs.inkSnap!==false?'on':'')+'" id="inkSnapB" data-a="ink-snap" title="Alinhar formas: segure a caneta parada por meio segundo" aria-label="Alinhar formas">'+ic('sparkle',16)+'</button><button class="ikb" id="inkRulerB" data-a="ink-ruler" title="Régua" aria-label="Régua">'+ic('igRuler',19)+'</button></div>'+
     '<div class="inkopt" id="inkOpt"></div>'+
     '<div class="inktop" id="inkTopics">'+inkTopicsHTML(x)+'</div>'+
     '<div class="inkstage" id="inkStage"><div class="inkscroll" id="inkScroll"><div id="inkPages"></div></div><button class="inkfab" id="inkFab" data-a="ink-mode"></button></div></div>'+
@@ -14802,7 +14806,7 @@ function inkSzPrev(){
   const p=$('#inkSzP');if(!p)return;const w=INK.sz[INK.tool]||2,d=Math.max(2,Math.min(30,w*Math.min(INK.iz,3)));
   p.style.width=d+'px';p.style.height=d+'px';p.style.background=INK.tool==='erase'?'transparent':(INK.tool==='hl'?INK.hl:INK.color);p.style.border=INK.tool==='erase'?'1.5px dashed var(--mut)':'0';
 }
-function inkDirty(){INK.dirty=true;clearTimeout(INK.timer);INK.timer=setTimeout(()=>{if(INK.x){INK.x.updated=Date.now();INK.dirty=false;save();}},700);}
+function inkDirty(){INK.dirty=true;clearTimeout(INK.timer);INK.timer=setTimeout(()=>{if(INK.x){INK.x.updated=Date.now();INK.dirty=false;save();inkBackupSoon();}},700);}
 function inkPush(a){INK.undo.push(a);if(INK.undo.length>200)INK.undo.shift();INK.redo=[];}
 function inkApply(a,rev){ // aplica (ou desfaz) uma ação registrada
   const x=INK.x;if(!x)return;
@@ -14880,7 +14884,7 @@ function inkSelBuild(){
   $$('#inkStage .isel').forEach(n=>n.remove());
   if(!INK.sel||INK.mode==='view')return;
   const d=document.createElement('div');d.className='isel';
-  d.innerHTML='<i class="sh" data-c="nw"></i><i class="sh" data-c="ne"></i><i class="sh" data-c="sw"></i><i class="sh" data-c="se"></i><div class="sbar"><button data-a="ink-seldup" title="Duplicar" aria-label="Duplicar">'+ic('copy',16)+'</button><button data-a="ink-seldel" title="Apagar" aria-label="Apagar">'+ic('trash',16)+'</button></div>';
+  d.innerHTML='<i class="sh" data-c="nw"></i><i class="sh" data-c="ne"></i><i class="sh" data-c="sw"></i><i class="sh" data-c="se"></i><div class="sbar"><button data-a="ink-selcard" title="Enviar como flashcard" aria-label="Enviar como flashcard">'+ic('cards',16)+'</button><button data-a="ink-seldup" title="Duplicar" aria-label="Duplicar">'+ic('copy',16)+'</button><button data-a="ink-seldel" title="Apagar" aria-label="Apagar">'+ic('trash',16)+'</button></div>';
   $('#inkStage').appendChild(d);inkSelPos();
 }
 function inkSelPos(){
@@ -15039,6 +15043,8 @@ document.addEventListener('pointermove',e=>{
   if(INK.trail.length&&INK.lz){const P=INK.pages[INK.lz.i];if(P){const pt=inkPos(e,P);INK.trail.push({x:pt[0],y:pt[1],t:Date.now(),i:INK.lz.i});}return;}
   if(INK.er){const P=INK.pages[INK.er.i];if(P)inkErase(INK.er.i,inkPos(e,P));return;}
   const c=INK.cur;if(!c||e.pointerId!==c.pid)return;
+  if(c.locked)return;
+  inkHoldWatch(e,c);
   const P=INK.pages[c.i];if(!P||!P.win)return;
   if(c.snap){const q=inkRulerProj(c.snap,e);c.s.p=inkShape('line',c.snapA,inkPos(q,P),c.s.w);inkDraw(c.i);return;}
   if(c.shape){const pt=inkPos(e,P);c.s.p=inkShape(c.shape,c.a,pt,c.s.w);inkDraw(c.i);return;}
@@ -16036,6 +16042,110 @@ Object.assign(ACT,{
   'mf-ex-end'(){const m=UI.mfq;if(!m||!m.exam)return;const bl=m.ids.filter(x=>!m.ans[x]).length;if(bl){askConfirm('Entregar a prova?',bl+(bl===1?' questão está em branco.':' questões estão em branco.'),mfExamFinish,'Entregar');}else mfExamFinish();},
   'mf-ex-cancel'(){askConfirm('Cancelar o simulado?','As respostas desta prova não serão salvas.',()=>{clearInterval(MF_EX_T);UI.mfq=null;closeModal();renderMain();},'Cancelar simulado');},
   'mf-ex-review'(){mfShowQ();}
+});
+
+
+/* ==========================================================================
+   CADERNO: backup (IndexedDB + Firebase Storage), alinhar formas ao segurar a caneta e recorte para flashcard
+   ========================================================================== */
+const InkDB={db:null,
+  open(){return new Promise((res,rej)=>{if(this.db)return res(this.db);if(!window.indexedDB)return rej(new Error('sem indexedDB'));const r=indexedDB.open('rotina_inks',1);r.onupgradeneeded=()=>r.result.createObjectStore('i');r.onsuccess=()=>{this.db=r.result;res(r.result);};r.onerror=()=>rej(r.error);});},
+  async put(id,v){try{const db=await this.open();return await new Promise((res,rej)=>{const t=db.transaction('i','readwrite');t.objectStore('i').put(v,id);t.oncomplete=()=>res(true);t.onerror=()=>rej(t.error);});}catch(e){return false;}},
+  async get(id){try{const db=await this.open();return await new Promise((res,rej)=>{const q=db.transaction('i').objectStore('i').get(id);q.onsuccess=()=>res(q.result||null);q.onerror=()=>rej(q.error);});}catch(e){return null;}}
+};
+const INK_BK={m:(function(){try{return JSON.parse(localStorage.getItem('rotina_inkbk')||'{}');}catch(e){return {};}})(),
+  get(id){return this.m[id]||{};},set(id,o){this.m[id]=Object.assign(this.m[id]||{},o);try{localStorage.setItem('rotina_inkbk',JSON.stringify(this.m));}catch(e){}}};
+let INK_BK_T=0;
+function inkBackupSoon(){clearTimeout(INK_BK_T);INK_BK_T=setTimeout(inkBackupNow,6000);}
+function inkBkPaint(){
+  const el=$('#inkBk'),x=INK.x;if(!el||!x)return;const b=INK_BK.get(x.id);
+  el.innerHTML=b.err?ic('x',13)+' Backup na nuvem falhou':b.cloud&&b.cloud>=x.updated?ic('cloud',13)+' Backup na nuvem: ok':b.idb&&b.idb>=x.updated?ic('cloud',13)+(RF.ok()?' Enviando backup…':' Backup só neste aparelho'):'';
+}
+async function inkBackupNow(){
+  const x=INK.x;if(!x)return;clearTimeout(INK_BK_T);
+  const payload={v:1,id:x.id,title:x.title,updated:x.updated,pages:x.pages},stamp=x.updated;
+  const ok=await InkDB.put(x.id,payload);if(ok)INK_BK.set(x.id,{idb:stamp,err:0});
+  if(INK.x===x)inkBkPaint();
+  let sdk=false;try{sdk=RF.ok();}catch(e){}
+  if(sdk){try{await RF.put('inks/'+x.id+'.json',JSON.stringify(payload));INK_BK.set(x.id,{cloud:stamp,err:0});}catch(e){INK_BK.set(x.id,{err:1});}}
+  if(INK.x===x)inkBkPaint();
+}
+Object.assign(ACT,{
+  'ink-restore'(){
+    const x=INK.x;if(!x)return;
+    const ask=(pl,origem)=>askConfirm('Restaurar o backup?','Substitui os traços atuais pelos do backup '+origem+' (salvo em '+new Date(pl.updated||0).toLocaleString('pt-BR')+').',()=>{x.pages=pl.pages;x.updated=Date.now();save();inkLeave();renderMain();toast('Backup restaurado.');},'Restaurar');
+    let sdk=false;try{sdk=RF.ok();}catch(e){}
+    (async()=>{
+      let pl=null,origem='da nuvem';
+      if(sdk){const t=await RF.get('inks/'+x.id+'.json');if(t){try{pl=JSON.parse(t);}catch(e){}}}
+      if(!pl){pl=await InkDB.get(x.id);origem='deste aparelho';}
+      if(!pl||!Array.isArray(pl.pages)||!pl.pages.length){toast('Não há backup deste caderno ainda.');return;}
+      ask(pl,origem);
+    })();
+  },
+  'ink-snap'(el){S.prefs.inkSnap=S.prefs.inkSnap===false;save();const b=$('#inkSnapB');if(b)b.classList.toggle('on',S.prefs.inkSnap!==false);toast(S.prefs.inkSnap===false?'Alinhar formas desligado.':'Segure a caneta parada por meio segundo para alinhar a forma.');}
+});
+// reconhece reta, retângulo e oval num traço livre
+function inkRecognize(p){
+  const pts=[];for(let i=0;i+2<p.length;i+=3)pts.push([p[i],p[i+1]]);
+  if(pts.length<8)return null;
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9,len=0;
+  pts.forEach((q,i)=>{x0=Math.min(x0,q[0]);y0=Math.min(y0,q[1]);x1=Math.max(x1,q[0]);y1=Math.max(y1,q[1]);if(i)len+=Math.hypot(q[0]-pts[i-1][0],q[1]-pts[i-1][1]);});
+  const w=x1-x0,h=y1-y0,diag=Math.hypot(w,h);if(len<14||diag<10)return null;
+  const a=pts[0],b=pts[pts.length-1],chord=Math.hypot(b[0]-a[0],b[1]-a[1]),dx=b[0]-a[0],dy=b[1]-a[1],L=chord||1;
+  let dev=0;pts.forEach(q=>{dev=Math.max(dev,Math.abs(dy*q[0]-dx*q[1]+b[0]*a[1]-b[1]*a[0])/L);});
+  if(chord>.8*len&&dev<Math.max(2.5,.07*chord))return {kind:'line',a:a,b:b};
+  if(chord<.3*len&&len>diag*1.3&&w>8&&h>8){
+    const cx=(x0+x1)/2,cy=(y0+y1)/2,rx=w/2,ry=h/2;let e=0,edge=0;
+    pts.forEach(q=>{const u=(q[0]-cx)/rx,v=(q[1]-cy)/ry;e+=Math.abs(Math.hypot(u,v)-1);const m=Math.min(Math.abs(q[0]-x0),Math.abs(q[0]-x1),Math.abs(q[1]-y0),Math.abs(q[1]-y1));if(m<.12*Math.min(w,h))edge++;});
+    e/=pts.length;
+    if(edge/pts.length>.85&&e>.12)return {kind:'rect',a:[x0,y0],b:[x1,y1]};
+    if(e<.2){if(Math.abs(w-h)<.14*Math.max(w,h)){const r=(w+h)/4,mx=cx,my=cy;return {kind:'oval',a:[mx-r,my-r],b:[mx+r,my+r]};}return {kind:'oval',a:[x0,y0],b:[x1,y1]};}
+  }
+  return null;
+}
+function inkHoldWatch(e,c){
+  if(S.prefs.inkSnap===false||c.shape||c.snap||c.locked||!c.s||c.s.t==='laser')return;
+  const xy=INK.holdXY;
+  if(!xy||Math.hypot(e.clientX-xy[0],e.clientY-xy[1])>4){INK.holdXY=[e.clientX,e.clientY];clearTimeout(INK.holdT);INK.holdT=setTimeout(inkHoldSnap,500);}
+}
+function inkHoldSnap(){
+  const c=INK.cur;if(!c||c.shape||c.snap||c.locked||!c.s||!c.s.p)return;
+  const r=inkRecognize(c.s.p);if(!r)return;
+  c.s.p=inkShape(r.kind,r.a,r.b,c.s.w);c.locked=true;inkDraw(c.i);
+  try{if(navigator.vibrate)navigator.vibrate(14);}catch(e){}
+}
+['pointerup','pointercancel'].forEach(t=>document.addEventListener(t,()=>{clearTimeout(INK.holdT);INK.holdXY=null;},true));
+// recorte da seleção (laço ou retângulo) vira imagem de um flashcard
+async function inkSelPng(){
+  const S0=INK.sel;if(!S0)return null;const b=inkSelBox(S0);if(!b)return null;
+  const pad=10;let sc=2;const W=(b.w+pad*2)*sc,H=(b.h+pad*2)*sc,k=Math.min(1,3000/Math.max(W,H));sc*=k;
+  const cv=document.createElement('canvas');cv.width=Math.max(8,Math.round((b.w+pad*2)*sc));cv.height=Math.max(8,Math.round((b.h+pad*2)*sc));
+  const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);ctx.scale(sc,sc);ctx.translate(pad-b.x,pad-b.y);
+  for(const m of S0.im){await new Promise(res=>{const im=new Image();im.onload=()=>{try{ctx.drawImage(im,m.x,m.y,m.w,inkImgH(m));}catch(e){}res();};im.onerror=res;im.src=m.src;});}
+  S0.st.forEach(s=>inkStroke(ctx,s,'light'));
+  return cv.toDataURL('image/jpeg',.9);
+}
+Object.assign(ACT,{
+  'ink-selcard'(){
+    const x=INK.x;if(!x||!INK.sel)return;
+    inkSelPng().then(png=>{
+      if(!png){toast('Selecione algo no caderno primeiro.');return;}
+      const fi=(x.focoIds||[]),pref=S.decks.filter(d=>focoIdsOf(d).some(f=>fi.indexOf(f)>=0)),others=S.decks.filter(d=>pref.indexOf(d)<0);
+      const opt=d=>'<option value="'+d.id+'">'+esc(deckPath(d).join(' › '))+'</option>';
+      openModal('<form id="fInkCard" class="form"><div class="fh"><h2>Enviar para um flashcard</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
+        '<div class="inkcardprev"><img src="'+png+'" alt="Recorte do caderno"></div>'+
+        '<label class="f">Baralho<select name="deck">'+(pref.length?'<optgroup label="Do Foco deste caderno">'+pref.map(opt).join('')+'</optgroup>':'')+(others.length?'<optgroup label="Outros baralhos">'+others.map(opt).join('')+'</optgroup>':'')+'<option value="__new">+ Novo baralho</option></select></label>'+
+        '<label class="f">Resposta (verso) <small>o recorte vai na frente</small><textarea name="back" rows="2" placeholder="Ex.: nome da estrutura, o que o esquema mostra…"></textarea></label>'+
+        '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Criar flashcard</button></div></form>');
+      $('#fInkCard').addEventListener('submit',e=>{
+        e.preventDefault();const E=e.target.elements,now=Date.now();let did=E.deck.value;
+        if(did==='__new'||!did){const d={id:uid(),name:(fi.length&&focoById(fi[0])?focoById(fi[0]).name:x.title||'Caderno'),parentId:'',folderId:'',catId:x.catId||'',goalId:'',actId:'',noteId:'',focoIds:fi.slice(),created:now,updated:now,ret:0,newPd:0,revPd:0};S.decks.push(d);did=d.id;}
+        S.cards.push({id:uid(),deckId:did,type:'basic',front:'',back:E.back.value.trim(),frontImg:png,backImg:'',text:'',extra:'Do caderno: '+(x.title||''),s:{},rl:[],created:now,updated:now});
+        save();closeModal();toast('Flashcard criado.');
+      });
+    });
+  }
 });
 
 /* ==========================================================================
