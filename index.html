@@ -2727,6 +2727,28 @@ button.lzico.lk:hover{transform:scale(1.06);box-shadow:0 0 0 3px color-mix(in sr
 .artfig figcaption{padding:8px 10px;font-size:13.5px}
 @media(max-width:760px){.artcard{grid-template-columns:auto minmax(0,1fr)}.artact{grid-column:1/-1;flex-direction:row;justify-content:flex-start}.artdl{grid-template-columns:1fr;gap:2px}.artdl dd{margin-bottom:8px}}
 
+.artfold{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:0;color:var(--tx);cursor:pointer;font:inherit}
+.artinl{width:100%;box-sizing:border-box;margin:2px 0 8px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--tx);font:inherit;font-size:14px;resize:vertical}
+.artql{width:100%;box-sizing:border-box;margin:4px 0 6px;padding:7px 10px;border:1px dashed var(--line3);border-radius:8px;background:transparent;color:var(--tx);font:inherit;font-size:13.5px}
+.artqa{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0 8px;padding:8px;border:1px dashed var(--line3);border-radius:10px}
+.artqa input,.artqa select{padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--tx);font:inherit;font-size:13.5px}
+.artcmp .artcard{padding:7px 12px;border-left-width:4px;border-radius:10px;align-items:center}
+.artcmp .artchips,.artcmp .artq,.artcmp .artmeta{display:none}
+.artcmp .artt b{font-size:14px}.artcmp .artact{flex-direction:row}.artcmp{gap:6px}
+.artcmpx{display:none}.artcmp .artcmpx{display:inline}
+.arttwrap{overflow:auto;border:1px solid var(--line);border-radius:12px;max-height:72vh}
+.arttbl{border-collapse:separate;border-spacing:0;font-size:13px;min-width:100%}
+.arttbl th,.arttbl td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left;min-width:160px;max-width:280px;background:var(--card)}
+.arttbl thead th{position:sticky;top:0;z-index:2;background:var(--soft)}
+.arttbl .artstk{position:sticky;left:0;z-index:1;min-width:240px;max-width:300px;box-shadow:1px 0 0 var(--line)}
+.arttbl thead .artstk{z-index:3}
+.arttbl tr.sel td{background:var(--accs)}
+.arttbl td.artstk b{cursor:pointer}.arttbl td.artstk b:hover{color:var(--acc)}
+.artcell{display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap}.artcell:hover{-webkit-line-clamp:unset}
+.artth{text-align:left;border:0;background:none;font:inherit;font-weight:600;color:var(--tx);cursor:pointer;padding:0}
+.artsel{margin-right:6px;vertical-align:middle}
+.artdl2{margin-top:6px}.artfields{display:flex;flex-wrap:wrap;gap:6px}.artfields .chip{margin:0}
+.artsec mark,.artmres mark{background:#FFE58A;color:#222;border-radius:3px;padding:0 2px}
 /* ===== Revisões: checklist ===== */
 .rvchk{margin-top:4px;font-size:13px}.rvchk summary{cursor:pointer;color:var(--acc);font-weight:600}
 .rvchk-b{display:flex;flex-direction:column;gap:6px;padding:6px 0 2px;align-items:flex-start}
@@ -12436,7 +12458,7 @@ Object.assign(ACT,{
    PINGADO: assistente com Gemini (a chave fica no Worker; aqui só o token)
    Lê os dados por ferramentas e só ESCREVE depois da sua aprovação.
    ========================================================================== */
-const PG_DOMS=[['agenda','Agenda e eventos'],['tarefas','Tarefas e datas'],['disc','Disciplinas e focos'],['notas','Notas'],['docs','Documentos'],['cul','Culinária e despensa'],['mat','Materiais'],['fin','Finanças'],['hab','Hábitos e objetivos'],['quest','Questões (MedFisher)'],['cards','Flashcards e revisões']];
+const PG_DOMS=[['agenda','Agenda e eventos'],['tarefas','Tarefas e datas'],['disc','Disciplinas e focos'],['notas','Notas'],['docs','Documentos'],['cul','Culinária e despensa'],['mat','Materiais'],['fin','Finanças'],['hab','Hábitos e objetivos'],['art','Artigos científicos'],['quest','Questões (MedFisher)'],['cards','Flashcards e revisões']];
 const PG_KEY='pg_chat_v1',PG_TOK='pg_token';
 const pgMem=()=>Array.isArray(S.prefs.pgMem)?S.prefs.pgMem:(S.prefs.pgMem=[]);
 const pgCfg=()=>{const c=Object.assign({on:false,model:'',read:{},write:{}},S.prefs.pg||{});return c;};
@@ -12487,8 +12509,10 @@ function pgTools(){
   add('cards','exemplos_de_cards','Amostra de flashcards existentes para imitar o estilo (tipo, tamanho, formatação). Opcional: baralho (id ou nome).',pgP({baralho:PG_STR}));
   add('cul','ver_cardapio','Refeições planejadas (data, momento, receita, porções) a partir de uma data (padrão: hoje, 14 dias).',pgP({de:PG_STR}));
   add('fin','ver_orcamento','Resumo financeiro: entradas e saídas dos próximos 30 dias, contas a vencer, gasto por categoria e custo estimado do mercado da semana.');
+  add('art','buscar_artigos','Busca nos artigos científicos fichados no site. consulta: termos (todos precisam aparecer no mesmo artigo). campo: tudo, metodos, testes, estatistica, resultados ou citacoes. projeto: nome parcial opcional. Sem consulta, lista os artigos. Devolve os trechos que bateram.',pgP({consulta:PG_STR,campo:PG_STR,projeto:PG_STR}));
+  add('art','ler_artigo','Devolve o fichamento completo de um artigo (id): referência, pergunta, tópicos, métodos, resultados, autores citados na introdução e na discussão, leitura crítica.',pgP({id:PG_STR},['id']));
   D.push({name:'dados_gerais',description:'Data e hora atuais, categorias e contagens gerais do site.',parameters:pgP({})});
-  const tipos=[['cards','criar_cards'],['cards','criar_baralho'],['cards','mover_card'],['cards','reagendar_revisao'],['agenda','reagendar_evento'],['agenda','editar_evento'],['agenda','excluir_evento'],['tarefas','editar_tarefa'],['tarefas','concluir_tarefa'],['tarefas','adiar_tarefa'],['tarefas','editar_data'],['notas','criar_nota'],['notas','acrescentar_nota'],['cul','registrar_consumo'],['cul','ajustar_despensa'],['cul','registrar_preco']].filter(x=>pgCan(x[0],'write')).map(x=>x[1]);
+  const tipos=[['cards','criar_cards'],['cards','criar_baralho'],['cards','mover_card'],['cards','reagendar_revisao'],['agenda','reagendar_evento'],['agenda','editar_evento'],['agenda','excluir_evento'],['tarefas','editar_tarefa'],['tarefas','concluir_tarefa'],['tarefas','adiar_tarefa'],['tarefas','editar_data'],['notas','criar_nota'],['notas','acrescentar_nota'],['art','artigo_criar'],['art','artigo_editar'],['art','artigo_citacao'],['cul','registrar_consumo'],['cul','ajustar_despensa'],['cul','registrar_preco']].filter(x=>pgCan(x[0],'write')).map(x=>x[1]);
   const criar=['agenda','tarefas','cul','fin','hab'].some(d=>pgCan(d,'write'));if(criar)tipos.unshift('criar');tipos.push('lembrar','esquecer');
   if(tipos.length)D.push({name:'propor_mudancas',description:'ÚNICA forma de alterar dados. Nada é gravado: o usuário vê cada item e aprova antes. Use "criar" com criar_json (formato combinado) para novos eventos, tarefas, datas, finanças, refeições/receitas, mercado, hábitos e objetivos.',
     parameters:pgP({resumo:PG_STR,itens:{type:'ARRAY',items:pgP({tipo:{type:'STRING',enum:tipos},id:PG_STR,alvo_data:PG_STR,nova_data:PG_STR,novo_inicio:PG_STR,novo_fim:PG_STR,titulo:PG_STR,descricao:PG_STR,observacoes:PG_STR,local:PG_STR,prazo:PG_STR,hora:PG_STR,concluida:{type:'BOOLEAN'},ingrediente:PG_STR,quantidade:PG_NUM,unidade:PG_STR,validade:PG_STR,valor:PG_NUM,texto:PG_STR,criar_json:PG_STR,motivo:PG_STR,baralho:PG_STR,baralho_pai:PG_STR,chave:PG_STR,cards:{type:'ARRAY',items:pgP({tipo:PG_STR,frente:PG_STR,verso:PG_STR,texto:PG_STR,extra:PG_STR},['tipo'])}},['tipo'])}},['itens'])});
@@ -12499,6 +12523,7 @@ const pgNorm=s=>norm(String(s||''));
 const pgClip=(s,n)=>{s=String(s||'').replace(/\s+/g,' ').trim();return s.length>n?s.slice(0,n)+'…':s;};
 function pgRead(name,a){
   const today=todayISO();
+  if(name==='buscar_artigos'||name==='ler_artigo')return artPgRead(name,a);
   if(name==='dados_gerais'){const n=new Date();return {hoje:today,dia_da_semana:WDL[n.getDay()],hora:pad(n.getHours())+':'+pad(n.getMinutes()),fuso:Intl.DateTimeFormat().resolvedOptions().timeZone,categorias:catNamesForPrompt(),contagens:{eventos:S.acts.length,tarefas:S.tasks.length,notas:S.notes.length,documentos:S.docs.length,receitas:S.recipes.length,baralhos:S.decks.length}};}
   if(name==='ver_agenda'){
     let de=a.de||today,ate=a.ate||de;if(parseISO(ate)-parseISO(de)>31*864e5)ate=addISO(de,31);
@@ -12604,6 +12629,7 @@ function pgBuild(it){
     if(!ch.length)return bad('Nada a alterar');
     return [{label:(t==='adiar_tarefa'?'Adiar':'Editar')+' tarefa: '+x.title,detail:ch.join(' | '),cols:['tasks'],apply:()=>{if(it.titulo)x.title=it.titulo;if(it.descricao)x.notes=it.descricao;if(nd)x.deadline=nd;if(it.hora)x.deadlineTime=it.hora;}}];
   }
+  if(t.indexOf('artigo_')===0)return artPgBuild(it,bad);
   if(t==='editar_data'){
     const d=S.dates.find(x=>x.id===it.id);if(!d)return bad('Data não encontrada');const nd=it.nova_data||it.prazo;
     return [{label:'Editar data: '+d.title,detail:[it.titulo?'título: '+it.titulo:'',nd?pgDM(d.date)+' → '+pgDM(nd):'',it.hora?'hora: '+it.hora:''].filter(Boolean).join(' | '),cols:['dates'],apply:()=>{if(it.titulo)d.title=it.titulo;if(nd)d.date=nd;if(it.hora)d.time=it.hora;}}];
@@ -12657,7 +12683,7 @@ function pgBuild(it){
   }
   return bad('Tipo de mudança desconhecido: '+t);
 }
-const PG_WRITE_DOM={criar_cards:'cards',criar_baralho:'cards',mover_card:'cards',reagendar_revisao:'cards',criar:'agenda',reagendar_evento:'agenda',editar_evento:'agenda',excluir_evento:'agenda',editar_tarefa:'tarefas',concluir_tarefa:'tarefas',adiar_tarefa:'tarefas',editar_data:'tarefas',criar_nota:'notas',acrescentar_nota:'notas',registrar_consumo:'cul',ajustar_despensa:'cul',registrar_preco:'cul'};
+const PG_WRITE_DOM={criar_cards:'cards',criar_baralho:'cards',mover_card:'cards',reagendar_revisao:'cards',criar:'agenda',reagendar_evento:'agenda',editar_evento:'agenda',excluir_evento:'agenda',editar_tarefa:'tarefas',concluir_tarefa:'tarefas',adiar_tarefa:'tarefas',editar_data:'tarefas',criar_nota:'notas',acrescentar_nota:'notas',registrar_consumo:'cul',ajustar_despensa:'cul',registrar_preco:'cul',artigo_criar:'art',artigo_editar:'art',artigo_citacao:'art'};
 function pgPropose(a){
   const props=[],rej=[];
   (a.itens||[]).forEach(it=>{
@@ -12685,6 +12711,7 @@ function pgSystem(){
   (PG.mode==='cul'?'CONTEXTO: o usuário abriu o Pingado Culinária. Foque em alimentação, despensa (validades), receitas, cardápio, mercado e o orçamento da comida; ele pode pedir qualquer coisa a mais.\n':'')+
   (pgMem().length?'MEMÓRIAS DO USUÁRIO (siga sempre: estilo de formatação, metodologias, preferências; use-as ao criar ou editar eventos, tarefas, notas e receitas):\n'+pgMem().map(m=>'- ['+m.id+'] '+m.topic+': '+m.text).join('\n')+'\n':'')+
   '8) Quando o usuário pedir para você lembrar de algo ("sempre faça assim", "lembre que…"), proponha o tipo "lembrar" (titulo = tema curto, texto = a regra completa); para apagar uma memória use "esquecer" com o id.\n'+
+  artPgSys()+
   'FORMATO DO campo criar_json (apenas o bloco JSON, sem texto em volta): '+iaFormatPrompt().replace(/^FORMATO DA RESPOSTA[^.]*\./,'');
 }
 function pgTrim(){
@@ -15631,8 +15658,9 @@ const ART_LISTS={intro:'Citados na introdução',disc:'Citados na discussão',qu
 const ART_MEDIA=[['figura','Figura'],['tabela','Tabela'],['grafico','Gráfico'],['fluxo','Fluxograma'],['outro','Outro']];
 const ART_SEC={
   resumo:{title:'Pergunta central e resumo',f:[['question','Objetivo ou pergunta central que o artigo responde','ta',3],['topics','Principais tópicos (um por linha)','ta',5,1],['conclusion','Conclusão ou mensagem principal dos autores','ta',3],['limits','Limitações','ta',2],['apply','Como posso usar isto (aplicabilidade)','ta',2]]},
-  metodos:{title:'Métodos',f:[['m.design','Delineamento','in'],['m.setting','Local e período','in'],['m.sample','População e amostra (n)','ta',2],['m.criteria','Critérios de inclusão e exclusão','ta',2],['m.groups','Grupos e intervenções','ta',2],['m.collection','Modo de coleta de dados','ta',2],['m.tests','Testes e exames solicitados','ta',2],['m.outcomes','Desfechos (primário e secundários)','ta',2],['m.stats','Análise estatística','ta',2],['m.duration','Duração e seguimento','in'],['m.ethics','Aspectos éticos','in']]},
+  metodos:{title:'Métodos',f:[['m.design','Delineamento','in'],['m.setting','Local e período','in'],['m.sample','População e amostra (n)','ta',2],['m.criteria','Critérios de inclusão e exclusão','ta',2],['m.groups','Grupos e intervenções','ta',2],['m.collection','Modo de coleta de dados','ta',2],['m.tests','Testes e exames solicitados','ta',2],['m.outcomes','Desfechos (primário e secundários)','ta',2],['m.stats','Análise estatística','ta',2],['m.why','Por que escolheram esse método? (justificativa)','ta',2],['m.duration','Duração e seguimento','in'],['m.ethics','Aspectos éticos','in']]},
   resultados:{title:'Resultados',f:[['results','Resultados principais','ta',6],['resKey','Números-chave (um por linha)','ta',4,1]]},
+  critica:{title:'Leitura crítica',f:[['similar','Por que se parece com o meu caso','ta',3],['strengths','Pontos fortes','ta',3],['weaknesses','Fragilidades, vieses e confundidores','ta',3],['extern','A população é parecida com a minha? Os achados valem para mim?','ta',3],['diff','O que eu faria diferente','ta',3],['qs','Perguntas que ficaram (para os autores ou para a literatura)','ta',3]]},
   notas:{title:'Minhas anotações',f:[['notes','Anotações livres, críticas e ideias','ta',6]]}
 };
 const artById=id=>(S.arts||[]).find(a=>a.id===id);
@@ -15643,8 +15671,8 @@ const artImg=id=>{const x=(S.artimg||[]).find(i=>i.id===id);return x?x.src:'';};
 const artGet=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
 const artSet=(o,p,v)=>{const ks=p.split('.');let a=o;ks.slice(0,-1).forEach(k=>{if(!a[k]||typeof a[k]!=='object')a[k]={};a=a[k];});a[ks[ks.length-1]]=v;};
 function normArt(a){
-  const o=Object.assign({title:'',authors:'',year:'',journal:'',vol:'',issue:'',pages:'',doi:'',pmid:'',link:'',pdfId:'',design:'',status:'a_ler',fav:false,projIds:[],focoIds:[],catId:'',question:'',topics:[],conclusion:'',limits:'',apply:'',results:'',resKey:[],notes:'',stars:0,noteId:'',intro:[],disc:[],quotes:[],media:[],created:Date.now(),updated:Date.now(),readAt:0},a||{});
-  o.m=Object.assign({design:'',setting:'',sample:'',criteria:'',groups:'',collection:'',tests:'',outcomes:'',stats:'',duration:'',ethics:''},(a&&a.m)||{});
+  const o=Object.assign({title:'',authors:'',year:'',journal:'',vol:'',issue:'',pages:'',doi:'',pmid:'',link:'',pdfId:'',design:'',status:'a_ler',fav:false,projIds:[],focoIds:[],catId:'',question:'',topics:[],conclusion:'',limits:'',apply:'',results:'',resKey:[],notes:'',introSum:'',discSum:'',similar:'',strengths:'',weaknesses:'',extern:'',diff:'',qs:'',stars:0,noteId:'',intro:[],disc:[],quotes:[],media:[],created:Date.now(),updated:Date.now(),readAt:0},a||{});
+  o.m=Object.assign({design:'',setting:'',sample:'',criteria:'',groups:'',collection:'',tests:'',outcomes:'',stats:'',duration:'',ethics:'',why:''},(a&&a.m)||{});
   ['projIds','focoIds','topics','resKey','intro','disc','quotes','media'].forEach(k=>{if(!Array.isArray(o[k]))o[k]=[];});
   return o;
 }
@@ -15678,16 +15706,18 @@ function artRef(a,fmt){
   const jr=[a.journal,a.vol&&'v. '+a.vol,a.issue&&'n. '+a.issue,a.pages&&'p. '+a.pages,y].filter(Boolean).join(', ');
   return [n&&(/\.$/.test(n)?n:n+'.'),t+'.',jr+'.',doi&&'DOI: '+doi+'.'].filter(Boolean).join(' ');
 }
-function artIn(a,fmt,inner){
+function artIn(a,fmt,inner,page){
   const L=artAuthors(a.authors),y=a.year||'s.d.';let s;
-  if(!L.length)s=(a.title||'').split(/\s+/).slice(0,3).join(' ').toUpperCase()+', '+y;
-  else if(fmt==='abnt'){const u=L.map(x=>x.last.toUpperCase());s=(u.length>3?u[0]+' et al.':u.join('; '))+', '+y;}
-  else{const u=L.map(x=>artNm(x.last));s=(u.length>2?u[0]+' et al.':u.join(' & '))+', '+y;}
+  if(!L.length)s=artNm((a.title||'').split(/\s+/).slice(0,3).join(' '))+', '+y;
+  else{const u=L.map(x=>artNm(x.last));
+    if(fmt==='abnt')s=(u.length>3?u[0]+' et al.':u.join('; '))+', '+y; // NBR 10520:2023: só a inicial maiúscula, também entre parênteses
+    else s=(u.length>2?u[0]+' et al.':u.join(' & '))+', '+y;}
+  if(page)s+=', p. '+page;
   return inner?s:'('+s+')';
 }
 function artApud(a,it,fmt){
-  const base=artIn(a,fmt,true),au=fmt==='abnt'?String(it.author||'').toUpperCase():artNm(String(it.author||'')),y=it.year?', '+it.year:'';
-  return fmt==='apa'?'('+au+y+', citado em '+base+')':fmt==='vancouver'?au+(it.year?' ('+it.year+')':'')+', citado por '+base:'('+au+y+' apud '+base+')';
+  const base=artIn(a,fmt,true),au=artNm(String(it.author||'')),y=it.year?', '+it.year:'',pg=it.page?', p. '+it.page:'';
+  return fmt==='apa'?'('+au+y+', citado em '+base+pg+')':fmt==='vancouver'?au+(it.year?' ('+it.year+')':'')+', citado por '+base:'('+au+y+' apud '+base+pg+')';
 }
 function artCopy(text,msg){
   const done=()=>toast(msg||'Copiado.');
@@ -15715,8 +15745,73 @@ function artPass(a,skip){
   if(UI.arCat&&catDesc(UI.arCat).indexOf(a.catId)<0)return false;
   if(UI.arFoco&&a.focoIds.indexOf(UI.arFoco)<0)return false;
   if(UI.arDes&&a.design!==UI.arDes)return false;
-  if(UI.arQ){const q=norm(UI.arQ);if(norm([a.title,a.authors,a.journal,a.year,a.question,a.topics.join(' '),a.conclusion,a.results,a.notes,a.doi].join(' ')).indexOf(q)<0)return false;}
+  if(UI.arQ){const q=norm(UI.arQ);if(norm([a.title,a.authors,a.journal,a.year,a.question,a.topics.join(' '),a.conclusion,a.results,a.notes,a.doi,a.m.tests,a.m.stats,a.m.design].join(' ')).indexOf(q)<0)return false;}
   return true;
+}
+/* ----- Busca nos métodos e na leitura crítica ----- */
+const ART_MF=[['m.design','Delineamento'],['m.setting','Local e período'],['m.sample','Amostra'],['m.criteria','Critérios'],['m.groups','Grupos e intervenções'],['m.collection','Coleta de dados'],['m.tests','Testes e exames'],['m.outcomes','Desfechos'],['m.stats','Estatística'],['m.duration','Duração'],['m.why','Justificativa do método'],['results','Resultados'],['resKey','Números-chave'],['introSum','Resumo da introdução'],['discSum','Resumo da discussão'],['citacoes','Autores citados e trechos'],['limits','Limitações'],['weaknesses','Fragilidades e vieses'],['similar','Parecido com o meu caso']];
+const ART_MF_DEF=['m.design','m.setting','m.sample','m.criteria','m.groups','m.collection','m.tests','m.outcomes','m.stats','m.duration','m.why'];
+const artGetF=(a,p)=>{if(p==='citacoes')return a.intro.concat(a.disc).map(i=>[i.author,i.year,i.point].join(' ')).concat(a.quotes.map(q=>q.text+' '+(q.note||''))).join(' | ');const v=artGet(a,p);return Array.isArray(v)?v.join(' | '):String(v||'');};
+function artSearch(q,fields,raw){
+  const terms=norm(q).split(/\s+/).filter(Boolean),F=ART_MF.filter(f=>fields.indexOf(f[0])>=0);
+  if(!terms.length)return [];
+  const out=[];
+  (S.arts||[]).filter(a=>raw||artPass(a,'st')).forEach(a=>{
+    const txt=F.map(f=>({f:f[0],label:f[1],text:artGetF(a,f[0])})).filter(x=>x.text.trim());
+    const all=norm(txt.map(x=>x.text).join(' \n '));
+    if(!terms.every(t=>all.indexOf(t)>=0))return;
+    const hits=txt.filter(x=>{const n=norm(x.text);return terms.some(t=>n.indexOf(t)>=0);});
+    out.push({a:a,hits:hits});
+  });
+  return out;
+}
+function artHL(text,terms){
+  const t=String(text||''),n=norm(t);if(n.length!==t.length)return esc(t);
+  const rg=[];terms.forEach(w=>{let i=0;while(w&&(i=n.indexOf(w,i))>=0){rg.push([i,i+w.length]);i+=w.length;}});
+  rg.sort((x,y)=>x[0]-y[0]);const m=[];rg.forEach(r=>{const l=m[m.length-1];if(l&&r[0]<=l[1])l[1]=Math.max(l[1],r[1]);else m.push(r.slice());});
+  let h='',p=0;m.forEach(r=>{h+=esc(t.slice(p,r[0]))+'<mark>'+esc(t.slice(r[0],r[1]))+'</mark>';p=r[1];});return h+esc(t.slice(p));
+}
+function artTermsCloud(){
+  const c={};(S.arts||[]).forEach(a=>{const seen={};[a.m.tests,a.m.stats,a.m.design,a.m.collection,a.m.groups].forEach(v=>String(v||'').split(/[;,\n]+/).forEach(x=>{x=x.trim();if(x.length<3||x.length>48)return;const k=norm(x);if(seen[k])return;seen[k]=1;(c[k]=c[k]||{t:x,n:0}).n++;}));});
+  return Object.values(c).sort((x,y)=>y.n-x.n||x.t.localeCompare(y.t,'pt-BR')).slice(0,36);
+}
+function artMethodsHTML(){
+  const F=Array.isArray(UI.amF)&&UI.amF.length?UI.amF:ART_MF_DEF,q=(UI.amQ2||'').trim();
+  let h='<p class="muted small" style="margin:0 0 8px">Procure por qualquer termo (teste, exame, população, abordagem…) nos campos que você preencheu. Todos os termos precisam aparecer no mesmo artigo. Útil para achar quem trabalhou com dados parecidos com os seus.</p>'+
+    '<div class="addrow"><div class="sbox" style="flex:1;max-width:520px">'+ic('search',15)+'<input id="amq2" type="search" placeholder="Ex.: regressão logística, coorte retrospectiva, Mann-Whitney, USG…" value="'+esc(q)+'" autocomplete="off"></div><button class="btn sm pgb" data-a="art-pg" data-t="art_metodo"><span class="pgbi16">'+pgMascot('idle',16)+'</span> Qual método usar?</button></div>'+
+    '<div class="frow artfields" style="margin:8px 0">'+ART_MF.map(f=>'<button class="chip '+(F.indexOf(f[0])>=0?'on':'')+'" data-a="art-amf" data-k="'+f[0]+'">'+f[1]+'</button>').join('')+'<button class="chip" data-a="art-amf" data-k="__def">Só métodos</button><button class="chip" data-a="art-amf" data-k="__all">Tudo</button></div>';
+  if(!q){
+    const cl=artTermsCloud();
+    return h+(cl.length?'<h4 style="margin:14px 0 6px">Mais usados no seu acervo (clique para buscar)</h4><div class="frow">'+cl.map(x=>'<button class="chip" data-a="art-amt" data-t="'+esc(x.t)+'">'+esc(x.t)+' <small class="muted">'+x.n+'</small></button>').join('')+'</div>':'<div class="empty">Preencha os métodos dos artigos (testes e exames, estatística, grupos…) para poder buscar aqui.</div>');
+  }
+  const r=artSearch(q,F),terms=norm(q).split(/\s+/).filter(Boolean);
+  h+='<div class="muted small" style="margin:6px 0 10px">'+r.length+' artigo(s) encontrado(s)</div>';
+  if(!r.length)return h+'<div class="empty">Nada com esses termos nos campos escolhidos.<br><span class="muted small">Tente menos termos, inclua “Tudo” nos campos ou peça ajuda ao Pingado.</span></div>';
+  return h+'<div class="lzlist">'+r.map(x=>{const a=x.a,L=artAuthors(a.authors);
+    return '<article class="artcard artmres" style="--c:'+artSt(a.status)[2]+'"><div class="artb" style="grid-column:1/-1"><div class="artt"><b data-a="art-open" data-id="'+a.id+'" role="button" tabindex="0">'+esc(a.title||'Sem título')+'</b></div><div class="artm">'+esc([L.length?artNm(L[0].last)+(L.length>1?' et al.':''):'',a.journal,a.year,a.design].filter(Boolean).join(' | '))+'</div>'+
+      '<dl class="artdl artdl2">'+x.hits.map(hh=>'<dt>'+esc(hh.label)+'</dt><dd>'+artHL(hh.text,terms)+'</dd>').join('')+'</dl></div></article>';}).join('')+'</div>';
+}
+/* ----- Lista, compacto e tabela ----- */
+function artFiltered(){
+  const base=(S.arts||[]).filter(a=>artPass(a)&&(!UI.arOnlySel||(UI.arSel||{})[a.id])),sort=UI.arSort||'recent';
+  base.sort((a,b)=>sort==='year'?(Number(b.year)||0)-(Number(a.year)||0):sort==='title'?String(a.title).localeCompare(String(b.title),'pt-BR'):sort==='stars'?(b.stars||0)-(a.stars||0)||(b.updated||0)-(a.updated||0):(b.updated||0)-(a.updated||0));
+  return base;
+}
+const ART_COLS=[['aut','Autores e ano',a=>{const L=artAuthors(a.authors);return (L.length?L.slice(0,3).map(x=>artNm(x.last)).join(', ')+(L.length>3?' et al.':''):'')+(a.year?' ('+a.year+')':'');}],['rev','Revista',a=>a.journal],['des','Tipo de estudo',a=>a.design||a.m.design],['sam','Amostra',a=>a.m.sample],['gru','Grupos e intervenções',a=>a.m.groups],['col','Coleta de dados',a=>a.m.collection],['tes','Testes e exames',a=>a.m.tests],['sta','Estatística',a=>a.m.stats],['out','Desfechos',a=>a.m.outcomes],['dur','Duração',a=>a.m.duration],['cri','Critérios',a=>a.m.criteria],['res','Resultados',a=>a.results],['num','Números-chave',a=>a.resKey.join('; ')],['con','Conclusão',a=>a.conclusion],['lim','Limitações',a=>a.limits],['fra','Fragilidades e vieses',a=>a.weaknesses],['que','Pergunta central',a=>a.question],['sit','Situação',a=>artSt(a.status)[1]],['rel','Relevância',a=>a.stars?'★'.repeat(a.stars):''],['pro','Projetos',a=>a.projIds.map(artProjById).filter(Boolean).map(p=>p.name).join(', ')]];
+const ART_COLS_DEF=['aut','rev','des','sam','gru','tes','sta','dur','res','con'];
+const artCols=()=>{const c=Array.isArray(S.prefs.artCols)?S.prefs.artCols.filter(k=>ART_COLS.some(x=>x[0]===k)):[];return c.length?c:ART_COLS_DEF;};
+function artTableRows(list){
+  const ts=UI.arTS||'',td=UI.arTD==='desc'?-1:1;
+  if(ts){const c=ts==='__t'?['__t','',a=>a.title]:ART_COLS.find(x=>x[0]===ts);if(c)list=list.slice().sort((x,y)=>td*String(c[2](x)||'').localeCompare(String(c[2](y)||''),'pt-BR',{numeric:true}));}
+  return list;
+}
+function artTableHTML(list){
+  const cols=artCols().map(k=>ART_COLS.find(x=>x[0]===k)),ts=UI.arTS||'',td=UI.arTD==='desc'?-1:1;list=artTableRows(list);
+  if(!list.length)return '<div class="empty">Nenhum artigo com esses filtros.</div>';
+  const sel=UI.arSel||{};
+  return '<div class="arttwrap"><table class="arttbl"><thead><tr><th class="artstk"><button class="artth" data-a="art-tsort" data-k="__t">Artigo'+(ts==='__t'?(td>0?' ▲':' ▼'):'')+'</button></th>'+cols.map(c=>'<th><button class="artth" data-a="art-tsort" data-k="'+c[0]+'">'+c[1]+(ts===c[0]?(td>0?' ▲':' ▼'):'')+'</button></th>').join('')+'</tr></thead><tbody>'+
+    list.map(a=>'<tr class="'+(sel[a.id]?'sel':'')+'"><td class="artstk"><label class="artsel"><input type="checkbox" data-a="art-sel" data-id="'+a.id+'" '+(sel[a.id]?'checked':'')+' aria-label="Selecionar"></label><b data-a="art-open" data-id="'+a.id+'" role="button" tabindex="0">'+esc(a.title||'Sem título')+'</b>'+(a.fav?' <span style="color:#E9A100">★</span>':'')+'</td>'+
+      cols.map(c=>{const v=String(c[2](a)||'').trim();return '<td>'+(v?'<div class="artcell">'+esc(v)+'</div>':'<span class="muted">-</span>')+'</td>';}).join('')+'</tr>').join('')+'</tbody></table></div>';
 }
 function artCard(a){
   const st=artSt(a.status),fo=a.focoIds.map(focoById).filter(Boolean),L=artAuthors(a.authors);
@@ -15724,7 +15819,7 @@ function artCard(a){
   const nc=a.intro.length+a.disc.length+a.quotes.length;
   return '<article class="artcard" style="--c:'+st[2]+'"><button class="artfav '+(a.fav?'on':'')+'" data-a="art-fav" data-id="'+a.id+'" aria-label="'+(a.fav?'Remover dos favoritos':'Favoritar')+'" title="Favorito">'+(a.fav?'★':'☆')+'</button>'+
     '<div class="artb"><div class="artt"><b data-a="art-open" data-id="'+a.id+'" role="button" tabindex="0">'+esc(a.title||'Sem título')+'</b></div>'+
-    '<div class="artm">'+esc([au,a.journal,a.year].filter(Boolean).join(' | '))+'</div>'+
+    '<div class="artm">'+esc([au,a.journal,a.year].filter(Boolean).join(' | '))+'<span class="artcmpx"> | '+st[1]+(a.design?' | '+esc(a.design):'')+'</span></div>'+
     '<div class="artchips"><span class="lzdot" style="--d:'+st[2]+'"><i></i>'+st[1]+'</span>'+(a.design?'<span class="lzdot" style="--d:#8E8C99"><i></i>'+esc(a.design)+'</span>':'')+
     a.projIds.map(artProjById).filter(Boolean).map(p=>'<span class="lzdot" style="--d:'+esc(p.color)+'"><i></i>'+esc(p.name)+'</span>').join('')+(a.catId?tagHTML(a.catId):'')+fo.map(f=>focoPill(f,true)).join('')+'</div>'+
     (a.question?'<div class="artq">'+esc(a.question)+'</div>':'')+
@@ -15732,40 +15827,44 @@ function artCard(a){
     '<div class="artact"><button class="btn sm primary" data-a="art-open" data-id="'+a.id+'">Abrir</button>'+(a.pdfId&&pdfById(a.pdfId)?'<button class="btn sm" data-a="art-pdf" data-id="'+a.id+'">'+ic('file',14)+' PDF</button>':a.link?'<button class="btn sm" data-a="art-link" data-id="'+a.id+'">'+ic('external',14)+' Link</button>':'')+'</div></article>';
 }
 function artListHTML(){
-  const base=(S.arts||[]).filter(a=>artPass(a)),sort=UI.arSort||'recent';
-  base.sort((a,b)=>sort==='year'?(Number(b.year)||0)-(Number(a.year)||0):sort==='title'?String(a.title).localeCompare(String(b.title),'pt-BR'):sort==='stars'?(b.stars||0)-(a.stars||0)||(b.updated||0)-(a.updated||0):(b.updated||0)-(a.updated||0));
+  const base=artFiltered();
   if(!base.length)return '<div class="empty">'+((S.arts||[]).length?'Nenhum artigo com esses filtros.':'Nenhum artigo ainda.')+'<br><button class="btn primary" data-a="art-new">'+ic('plus',15)+' Adicionar artigo</button></div>';
   return base.map(artCard).join('');
 }
+const artView=()=>['cards','cmp','tbl'].indexOf(S.prefs.artView)>=0?S.prefs.artView:'cards';
 function renderArtigos(){
   const a=UI.artView&&artById(UI.artView);if(a)return artDetail(a);UI.artView='';
   const all=S.arts||[],sub=UI.artSub||'artigos';
   const nCit=all.reduce((n,x)=>n+x.intro.length+x.disc.length+x.quotes.length,0),nMed=all.reduce((n,x)=>n+x.media.length,0);
   let h='<div class="toolbar"><h2 class="vt" style="margin:0">Artigos</h2><span class="muted small">'+all.length+' artigos | '+all.filter(x=>x.status==='a_ler').length+' a ler | '+all.filter(x=>x.status==='lendo').length+' em leitura | '+all.filter(x=>x.status==='lido').length+' lidos | '+all.filter(x=>x.fav).length+' favoritos</span><span class="sp"></span>'+
-    '<button class="btn sm" data-a="art-exp" title="Baixar a lista filtrada para Zotero ou Mendeley">'+ic('download',14)+' Exportar</button><button class="btn sm" data-a="art-proj">'+ic('folder',14)+' Projetos</button><button class="btn primary" data-a="art-new">'+ic('plus',15)+' Novo artigo</button></div>';
-  h+='<div class="seg" style="margin:6px 0 12px"><button class="'+(sub==='artigos'?'on':'')+'" data-a="art-sub" data-v="artigos">Artigos ('+all.length+')</button><button class="'+(sub==='citacoes'?'on':'')+'" data-a="art-sub" data-v="citacoes">Banco de citações ('+nCit+')</button><button class="'+(sub==='midia'?'on':'')+'" data-a="art-sub" data-v="midia">Figuras e tabelas ('+nMed+')</button></div>';
+    '<button class="btn sm pgb" data-a="art-pgmenu"><span class="pgbi16">'+pgMascot('idle',16)+'</span> Pingado</button><button class="btn sm" data-a="art-exp" title="Baixar a lista filtrada para Zotero ou Mendeley">'+ic('download',14)+' Exportar</button><button class="btn sm" data-a="art-proj">'+ic('folder',14)+' Projetos</button><button class="btn primary" data-a="art-new">'+ic('plus',15)+' Novo artigo</button></div>';
+  h+='<div class="seg" style="margin:6px 0 12px"><button class="'+(sub==='artigos'?'on':'')+'" data-a="art-sub" data-v="artigos">Artigos ('+all.length+')</button><button class="'+(sub==='metodos'?'on':'')+'" data-a="art-sub" data-v="metodos">Buscar métodos</button><button class="'+(sub==='citacoes'?'on':'')+'" data-a="art-sub" data-v="citacoes">Banco de citações ('+nCit+')</button><button class="'+(sub==='midia'?'on':'')+'" data-a="art-sub" data-v="midia">Figuras e tabelas ('+nMed+')</button></div>';
+  if(sub==='metodos')return h+artMethodsHTML();
   const pool=all.filter(x=>artPass(x,'proj')),cp=id=>pool.filter(x=>id==='__none'?!x.projIds.length:x.projIds.indexOf(id)>=0).length;
   h+='<div class="lztypes" role="group" aria-label="Projeto"><button class="lzchip '+(!UI.arProj?'on':'')+'" data-a="art-pf" data-v=""><span>Todos os projetos</span><small>'+pool.length+'</small></button>'+(S.artproj||[]).map(p=>'<button class="lzchip '+(UI.arProj===p.id?'on':'')+'" style="--c:'+esc(p.color)+'" data-a="art-pf" data-v="'+p.id+'"><span>'+esc(p.name)+'</span><small>'+cp(p.id)+'</small></button>').join('')+'<button class="lzchip '+(UI.arProj==='__none'?'on':'')+'" data-a="art-pf" data-v="__none"><span>Sem projeto</span><small>'+cp('__none')+'</small></button></div>';
   if(sub==='citacoes')return h+artBankHTML();
   if(sub==='midia')return h+artGalleryHTML();
   const js={};all.forEach(x=>{const j=(x.journal||'').trim();if(j)js[j]=(js[j]||0)+1;});
-  const stc=k=>all.filter(x=>artPass(x,'st')&&(!k||x.status===k)).length;
+  const stc=k=>all.filter(x=>artPass(x,'st')&&(!k||x.status===k)).length,V=artView(),nsel=Object.keys(UI.arSel||{}).filter(k=>UI.arSel[k]).length;
   h+='<div class="nfbar tfbar"><div class="frow"><span class="fl" style="min-width:auto">Leitura</span><button class="chip '+(!UI.arSt?'on':'')+'" data-a="art-stf" data-v="">Todos ('+stc('')+')</button>'+ART_ST.map(s=>'<button class="chip '+(UI.arSt===s[0]?'on':'')+'" data-a="art-stf" data-v="'+s[0]+'"><i class="lzd" style="background:'+s[2]+'"></i>'+s[1]+' ('+stc(s[0])+')</button>').join('')+'<button class="chip '+(UI.arFav?'on':'')+'" data-a="art-favf">'+(UI.arFav?'★':'☆')+' Favoritos</button></div>'+
     '<label class="nfsel"><span>Revista</span><select id="arj"><option value="">Todas</option>'+Object.keys(js).sort((x,y)=>x.localeCompare(y,'pt-BR')).map(j=>'<option value="'+esc(j)+'" '+(UI.arJ===j?'selected':'')+'>'+esc(j)+' ('+js[j]+')</option>').join('')+'</select></label>'+
     '<label class="nfsel"><span>Disciplina</span><select id="arcat"><option value="">Todas</option>'+catTreeOpts(UI.arCat)+'</select></label>'+
     '<label class="nfsel"><span>Foco</span><select id="arfoco"><option value="">Todos</option>'+(S.focos||[]).map(f=>'<option value="'+f.id+'" '+(UI.arFoco===f.id?'selected':'')+'>'+esc(f.name)+'</option>').join('')+'</select></label>'+
     '<label class="nfsel"><span>Tipo de estudo</span><select id="ardes"><option value="">Todos</option>'+ART_DESIGNS.map(d=>'<option '+(UI.arDes===d?'selected':'')+'>'+esc(d)+'</option>').join('')+'</select></label>'+
     '<div class="sbox" style="max-width:240px">'+ic('search',15)+'<input id="arq" type="search" placeholder="Buscar" value="'+esc(UI.arQ||'')+'" autocomplete="off"></div>'+
-    '<label class="nfsel"><span>Ordenar</span><select id="arsort"><option value="recent" '+((UI.arSort||'recent')==='recent'?'selected':'')+'>Mais recentes</option><option value="year" '+(UI.arSort==='year'?'selected':'')+'>Ano</option><option value="stars" '+(UI.arSort==='stars'?'selected':'')+'>Relevância</option><option value="title" '+(UI.arSort==='title'?'selected':'')+'>Título</option></select></label></div>';
-  return h+'<div id="arList" class="lzlist">'+artListHTML()+'</div>';
+    '<label class="nfsel"><span>Ordenar</span><select id="arsort"><option value="recent" '+((UI.arSort||'recent')==='recent'?'selected':'')+'>Mais recentes</option><option value="year" '+(UI.arSort==='year'?'selected':'')+'>Ano</option><option value="stars" '+(UI.arSort==='stars'?'selected':'')+'>Relevância</option><option value="title" '+(UI.arSort==='title'?'selected':'')+'>Título</option></select></label>'+
+    '<div class="seg" role="group" aria-label="Modo de exibição"><button class="'+(V==='cards'?'on':'')+'" data-a="art-view" data-v="cards">Cartões</button><button class="'+(V==='cmp'?'on':'')+'" data-a="art-view" data-v="cmp">Compacto</button><button class="'+(V==='tbl'?'on':'')+'" data-a="art-view" data-v="tbl">Tabela</button></div></div>';
+  if(V==='tbl'){
+    h+='<div class="frow" style="margin:0 0 8px;align-items:center"><details class="picker" style="min-width:210px" '+(UI.arColsOpen?'open':'')+'><summary>Colunas<span class="pc">'+artCols().length+' visíveis</span>'+ic('chevD',14)+'</summary><div class="plist">'+ART_COLS.map(c=>'<label class="pitem"><input type="checkbox" data-acol="'+c[0]+'" '+(artCols().indexOf(c[0])>=0?'checked':'')+'><span>'+c[1]+'</span></label>').join('')+'</div></details>'+
+      '<button class="chip '+(UI.arOnlySel?'on':'')+'" data-a="art-onlysel">Só os selecionados (<span id="arSelN">'+nsel+'</span>)</button><button class="btn sm" data-a="art-csv">'+ic('download',14)+' Baixar a tabela (CSV)</button><span class="muted small">Clique no título da coluna para ordenar; marque artigos para comparar.</span></div>';
+    return h+'<div id="arList">'+artTableHTML(artFiltered())+'</div>';
+  }
+  return h+'<div id="arList" class="lzlist '+(V==='cmp'?'artcmp':'')+'">'+artListHTML()+'</div>';
 }
 /* ----- Detalhe ----- */
 function artRows(rows){
   const r=rows.filter(x=>x[1]&&String(x[1]).trim());
   return r.length?'<dl class="artdl">'+r.map(x=>'<dt>'+esc(x[0])+'</dt><dd>'+esc(x[1])+'</dd>').join('')+'</dl>':'';
-}
-function artSecHead(a,key,title,extra){
-  return '<div class="arth"><h3>'+title+'</h3><span class="sp"></span>'+(extra||'')+(ART_SEC[key]?'<button class="btn sm" data-a="art-sec" data-id="'+a.id+'" data-k="'+key+'">'+ic('edit',14)+' Editar</button>':'')+'</div>';
 }
 function artItemHTML(a,list,it,bank){
   if(list==='quotes')return '<div class="artit"><blockquote class="lzrev" style="--c:#3E63DD">'+esc(it.text)+'</blockquote><div class="artitm">'+(it.page?'p. '+esc(it.page)+' ':'')+(it.note?esc(it.note):'')+'</div>'+
@@ -15776,10 +15875,24 @@ function artItemHTML(a,list,it,bank){
     '<div class="artitact"><button class="btn sm ghost" data-a="art-apud" data-id="'+a.id+'" data-l="'+list+'" data-i="'+it.id+'" title="Copia a citação indireta (apud)">'+ic('copy',13)+' Copiar apud</button>'+(it.ref?'<button class="btn sm ghost" data-a="art-iref" data-id="'+a.id+'" data-l="'+list+'" data-i="'+it.id+'">Copiar referência</button>':'')+
     (bank?'<button class="btn sm ghost" data-a="art-open" data-id="'+a.id+'">Abrir artigo</button>':'<button class="icon-btn" data-a="art-item" data-id="'+a.id+'" data-l="'+list+'" data-i="'+it.id+'" aria-label="Editar">'+ic('edit',16)+'</button><button class="icon-btn" data-a="art-idel" data-id="'+a.id+'" data-l="'+list+'" data-i="'+it.id+'" aria-label="Excluir">'+ic('trash',16)+'</button>')+'</div></div>';
 }
-function artListSec(a,list,hint){
+const artFolded=k=>S.prefs.artCmp?(UI.artFold||{})[k]!==false:(UI.artFold||{})[k]===true;
+function artBox(k,title,count,btns,body){
+  const f=artFolded(k);
+  return '<section class="card sec artsec"><div class="arth"><button class="artfold" data-a="art-fold" data-k="'+k+'" aria-expanded="'+(!f)+'">'+ic(f?'chevR':'chevD',15)+'<h3>'+title+(count!=null?' <small class="muted">'+count+'</small>':'')+'</h3></button><span class="sp"></span>'+(btns||'')+'</div>'+(f?'':body)+'</section>';
+}
+const artEditBtn=(a,k)=>'<button class="btn sm" data-a="art-sec" data-id="'+a.id+'" data-k="'+k+'">'+ic('edit',14)+' Editar</button>';
+const artInl=(a,f,ph,rows)=>'<textarea class="artinl" data-aedit="'+f+'" data-id="'+a.id+'" rows="'+(rows||3)+'" placeholder="'+esc(ph)+'">'+esc(a[f]||'')+'</textarea>';
+const artQLine=(a,f,ph)=>'<input class="artql" data-ql="'+f+'" data-id="'+a.id+'" placeholder="'+esc(ph)+'" autocomplete="off">';
+function artQuick(a,list){
+  if(list==='quotes')return '<div class="artqa" data-id="'+a.id+'" data-l="quotes"><input data-q="text" placeholder="Cole o trecho literal e tecle Enter" autocomplete="off" style="flex:1;min-width:200px"><input data-q="page" placeholder="pág." autocomplete="off" style="width:72px"><button class="btn sm primary" data-a="art-qadd" aria-label="Adicionar">'+ic('plus',14)+'</button></div>';
+  return '<div class="artqa" data-id="'+a.id+'" data-l="'+list+'"><input data-q="author" placeholder="Autor citado" autocomplete="off" style="width:150px"><input data-q="year" placeholder="Ano" autocomplete="off" style="width:64px" inputmode="numeric">'+
+    '<select data-q="kind" aria-label="Tipo de citação">'+ART_KINDS.map(k=>'<option value="'+k[0]+'" '+((UI.artQKind||'conceito')===k[0]?'selected':'')+'>'+k[1]+'</option>').join('')+'</select>'+
+    '<input data-q="point" placeholder="O ponto dele (Enter adiciona)" autocomplete="off" style="flex:1;min-width:200px"><button class="btn sm primary" data-a="art-qadd" aria-label="Adicionar">'+ic('plus',14)+'</button></div>';
+}
+function artListSec(a,list,hint,sumField,sumPh){
   const arr=a[list];
-  return '<section class="card sec artsec"><div class="arth"><h3>'+ART_LISTS[list]+' <small class="muted">'+arr.length+'</small></h3><span class="sp"></span><button class="btn sm" data-a="art-item" data-id="'+a.id+'" data-l="'+list+'">'+ic('plus',14)+' Adicionar</button></div>'+
-    (arr.length?arr.map(it=>artItemHTML(a,list,it)).join(''):'<p class="muted small" style="margin:6px 0">'+hint+'</p>')+'</section>';
+  const btns='<button class="btn sm" data-a="art-batch" data-id="'+a.id+'" data-l="'+list+'" title="Cole várias linhas de uma vez">'+ic('list',14)+' Colar em lote</button><button class="btn sm" data-a="art-item" data-id="'+a.id+'" data-l="'+list+'">'+ic('plus',14)+' Detalhado</button>';
+  return artBox(list,ART_LISTS[list],arr.length,btns,(sumField?artInl(a,sumField,sumPh,3):'')+artQuick(a,list)+(arr.length?arr.map(it=>artItemHTML(a,list,it)).join(''):'<p class="muted small" style="margin:6px 0">'+hint+'</p>'));
 }
 function artMediaCard(a,m,bank){
   const src=artImg(m.id),k=(ART_MEDIA.find(x=>x[0]===m.kind)||ART_MEDIA[4])[1];
@@ -15789,9 +15902,11 @@ function artMediaCard(a,m,bank){
 }
 function artDetail(a){
   const st=artSt(a.status),fmt=artFmt(),fo=a.focoIds.map(focoById).filter(Boolean),pd=a.pdfId&&pdfById(a.pdfId);
-  const lk=a.link?(/drive\.google|docs\.google/i.test(a.link)?'Abrir no Drive':'Abrir link'):'';
-  const doiUrl=a.doi?'https://doi.org/'+artDoi(a.doi):'';
-  let h='<div class="toolbar"><button class="btn sm" data-a="art-back">'+ic('chevL',14)+' Artigos</button><span class="sp"></span><button class="btn sm" data-a="art-edit" data-id="'+a.id+'">'+ic('edit',14)+' Dados do artigo</button><button class="btn sm danger" data-a="art-del" data-id="'+a.id+'">'+ic('trash',14)+' Excluir</button></div>';
+  const lk=a.link?(/drive\.google|docs\.google/i.test(a.link)?'Abrir no Drive':'Abrir link'):'',doiUrl=a.doi?'https://doi.org/'+artDoi(a.doi):'',cmp=!!S.prefs.artCmp;
+  let h='<div class="toolbar"><button class="btn sm" data-a="art-back">'+ic('chevL',14)+' Artigos</button><span class="sp"></span>'+
+    '<button class="btn sm" data-a="art-foldall" data-v="1">Recolher tudo</button><button class="btn sm" data-a="art-foldall" data-v="0">Expandir tudo</button>'+
+    '<button class="chip '+(cmp?'on':'')+'" data-a="art-cmp" title="Abre o artigo com as seções recolhidas">Compacto</button>'+
+    '<button class="btn sm" data-a="art-edit" data-id="'+a.id+'">'+ic('edit',14)+' Dados do artigo</button><button class="btn sm danger" data-a="art-del" data-id="'+a.id+'">'+ic('trash',14)+' Excluir</button></div>';
   h+='<div class="card sec artsec arthero" style="--c:'+st[2]+'"><div class="arth"><h2 class="vt" style="margin:0;flex:1">'+esc(a.title||'Sem título')+'</h2><button class="artfav '+(a.fav?'on':'')+'" data-a="art-fav" data-id="'+a.id+'" title="Favorito">'+(a.fav?'★':'☆')+'</button></div>'+
     '<div class="artm">'+esc([a.authors.replace(/\n/g,'; '),a.journal,[a.year,a.vol&&'v. '+a.vol,a.issue&&'n. '+a.issue,a.pages&&'p. '+a.pages].filter(Boolean).join(', ')].filter(Boolean).join(' | '))+'</div>'+
     '<div class="artchips">'+(a.design?'<span class="lzdot" style="--d:#8E8C99"><i></i>'+esc(a.design)+'</span>':'')+a.projIds.map(artProjById).filter(Boolean).map(p=>'<span class="lzdot" style="--d:'+esc(p.color)+'"><i></i>'+esc(p.name)+'</span>').join('')+(a.catId?tagHTML(a.catId):'')+fo.map(f=>focoPill(f)).join('')+'</div>'+
@@ -15799,23 +15914,66 @@ function artDetail(a){
     '<div class="lzrate" role="group" aria-label="Relevância para mim"><span class="muted small" style="margin-right:6px">Relevância</span>'+[1,2,3,4,5].map(i=>'<button class="lzs '+(i<=(a.stars||0)?'on':'')+'" data-a="art-star" data-id="'+a.id+'" data-n="'+i+'" aria-label="'+i+' estrelas">★</button>').join('')+'</div>'+
     '<div class="artbar">'+(pd?'<button class="btn sm primary" data-a="art-pdf" data-id="'+a.id+'">'+ic('file',14)+' Abrir PDF</button><button class="btn sm ghost" data-a="art-pdfdel" data-id="'+a.id+'">Remover PDF</button>':'<button class="btn sm" data-a="art-attach" data-id="'+a.id+'">'+ic('paperclip',14)+' Anexar PDF</button>')+
     (lk?'<button class="btn sm '+(pd?'':'primary')+'" data-a="art-link" data-id="'+a.id+'">'+ic('external',14)+' '+lk+'</button>':'')+(doiUrl?'<a class="btn sm" href="'+esc(doiUrl)+'" target="_blank" rel="noopener">DOI</a>':'')+
-    '<button class="btn sm ghost" data-a="art-sched" data-id="'+a.id+'">'+ic('calendar',14)+' Agendar leitura</button><button class="btn sm ghost" data-a="art-note" data-id="'+a.id+'">'+ic(a.noteId&&noteById(a.noteId)?'note':'filePlus',14)+' '+(a.noteId&&noteById(a.noteId)?'Abrir nota':'Criar nota')+'</button></div></div>';
-  h+='<section class="card sec artsec"><div class="arth"><h3>Como citar este artigo</h3><span class="sp"></span><div class="seg">'+[['abnt','ABNT'],['vancouver','Vancouver'],['apa','APA']].map(f=>'<button class="'+(fmt===f[0]?'on':'')+'" data-a="art-fmt" data-v="'+f[0]+'">'+f[1]+'</button>').join('')+'</div></div>'+
-    '<p class="artcite" id="artRefTxt">'+esc(artRef(a,fmt))+'</p><div class="artbar"><button class="btn sm primary" data-a="art-cref" data-id="'+a.id+'">'+ic('copy',14)+' Copiar referência</button><button class="btn sm" data-a="art-cin" data-id="'+a.id+'">'+ic('copy',14)+' Copiar '+esc(artIn(a,fmt))+'</button><button class="btn sm ghost" data-a="art-cbib" data-id="'+a.id+'">BibTeX</button><button class="btn sm ghost" data-a="art-cris" data-id="'+a.id+'">RIS</button></div></section>';
+    '<button class="btn sm ghost" data-a="art-sched" data-id="'+a.id+'">'+ic('calendar',14)+' Agendar leitura</button><button class="btn sm ghost" data-a="art-note" data-id="'+a.id+'">'+ic(a.noteId&&noteById(a.noteId)?'note':'filePlus',14)+' '+(a.noteId&&noteById(a.noteId)?'Abrir nota':'Criar nota')+'</button>'+
+    '<button class="btn sm pgb" data-a="art-pg" data-t="art_extrair" data-id="'+a.id+'" title="O Pingado lê o texto que você colar e propõe o fichamento"><span class="pgbi16">'+pgMascot('idle',16)+'</span> Preencher</button><button class="btn sm pgb" data-a="art-pg" data-t="art_critica" data-id="'+a.id+'" title="Leitura crítica com o Pingado"><span class="pgbi16">'+pgMascot('idle',16)+'</span> Ler criticamente</button></div></div>';
+  h+=artBox('cite','Como citar este artigo',null,'<div class="seg">'+[['abnt','ABNT'],['vancouver','Vancouver'],['apa','APA']].map(f=>'<button class="'+(fmt===f[0]?'on':'')+'" data-a="art-fmt" data-v="'+f[0]+'">'+f[1]+'</button>').join('')+'</div>',
+    '<p class="artcite" id="artRefTxt">'+esc(artRef(a,fmt))+'</p><div class="artbar"><button class="btn sm primary" data-a="art-cref" data-id="'+a.id+'">'+ic('copy',14)+' Copiar referência</button><button class="btn sm" data-a="art-cin" data-id="'+a.id+'">'+ic('copy',14)+' Copiar '+esc(artIn(a,fmt))+'</button><button class="btn sm ghost" data-a="art-cbib" data-id="'+a.id+'">BibTeX</button><button class="btn sm ghost" data-a="art-cris" data-id="'+a.id+'">RIS</button></div>');
   const topics=a.topics.length?'<ul class="artul">'+a.topics.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'';
-  const resumo=(a.question?'<div class="artlead"><span>Pergunta central</span>'+esc(a.question)+'</div>':'')+(topics?'<h4>Principais tópicos</h4>'+topics:'')+artRows([['Conclusão dos autores',a.conclusion],['Limitações',a.limits],['Como posso usar',a.apply]]);
-  h+='<section class="card sec artsec">'+artSecHead(a,'resumo','Pergunta central e resumo')+(resumo||'<p class="muted small" style="margin:6px 0">Registre o objetivo do artigo e os principais tópicos.</p>')+'</section>';
-  const M=a.m,met=artRows([['Delineamento',M.design],['Local e período',M.setting],['População e amostra',M.sample],['Critérios de inclusão e exclusão',M.criteria],['Grupos e intervenções',M.groups],['Modo de coleta de dados',M.collection],['Testes e exames solicitados',M.tests],['Desfechos',M.outcomes],['Análise estatística',M.stats],['Duração e seguimento',M.duration],['Aspectos éticos',M.ethics]]);
-  h+='<section class="card sec artsec">'+artSecHead(a,'metodos','Métodos')+(met||'<p class="muted small" style="margin:6px 0">Delineamento, amostra, grupos, coleta, exames, estatística e duração.</p>')+'</section>';
+  const resumo=(a.question?'<div class="artlead"><span>Pergunta central</span>'+esc(a.question)+'</div>':'')+(topics?'<h4>Principais tópicos</h4>'+topics:'')+artQLine(a,'topics','Adicionar um tópico (Enter)')+artRows([['Conclusão dos autores',a.conclusion],['Limitações',a.limits],['Como posso usar',a.apply]]);
+  h+=artBox('resumo','Pergunta central e resumo',null,artEditBtn(a,'resumo'),resumo);
+  const M=a.m,met=artRows([['Delineamento',M.design],['Local e período',M.setting],['População e amostra',M.sample],['Critérios de inclusão e exclusão',M.criteria],['Grupos e intervenções',M.groups],['Modo de coleta de dados',M.collection],['Testes e exames solicitados',M.tests],['Desfechos',M.outcomes],['Análise estatística',M.stats],['Duração e seguimento',M.duration],['Por que esse método (justificativa)',M.why],['Aspectos éticos',M.ethics]]);
+  h+=artBox('metodos','Métodos',null,artEditBtn(a,'metodos'),met||'<p class="muted small" style="margin:6px 0">Delineamento, amostra, grupos, coleta, exames, estatística e duração. Tudo o que escrever aqui pode ser buscado em “Buscar métodos”.</p>');
   const rk=a.resKey.length?'<h4>Números-chave</h4><ul class="artul">'+a.resKey.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'';
-  h+='<section class="card sec artsec">'+artSecHead(a,'resultados','Resultados')+(a.results?'<div class="artpre">'+esc(a.results)+'</div>':'')+rk+((a.results||rk)?'':'<p class="muted small" style="margin:6px 0">Resultados principais e números que valem citar.</p>')+'</section>';
-  h+=artListSec(a,'intro','Autores citados na introdução e o ponto de cada um: dá para reaproveitar em outros artigos como citação indireta (apud).');
-  h+=artListSec(a,'disc','Autores citados na discussão e o ponto de cada um.');
+  h+=artBox('resultados','Resultados principais',null,artEditBtn(a,'resultados'),artInl(a,'results','Cole ou escreva os resultados principais',4)+rk+artQLine(a,'resKey','Adicionar um número-chave, ex.: OR 2,3 (IC95% 1,4-3,8) (Enter)'));
+  h+=artListSec(a,'intro','Autores citados na introdução e o ponto de cada um: dá para reaproveitar em outros artigos como citação indireta (apud).','introSum','Resumo da introdução: qual a lacuna e a justificativa dos autores');
+  h+=artListSec(a,'disc','Autores citados na discussão e o ponto de cada um.','discSum','Resumo da discussão: como os autores interpretam os achados');
   h+=artListSec(a,'quotes','Frases do artigo que quero citar literalmente, com a página.');
-  h+='<section class="card sec artsec"><div class="arth"><h3>Figuras e tabelas <small class="muted">'+a.media.length+'</small></h3><span class="sp"></span><button class="btn sm" data-a="art-media" data-id="'+a.id+'">'+ic('plus',14)+' Adicionar</button></div>'+
-    (a.media.length?'<div class="artgrid">'+a.media.map(m=>artMediaCard(a,m)).join('')+'</div>':'<p class="muted small" style="margin:6px 0">Guarde aqui as imagens e tabelas de que gostou (envie um arquivo ou cole um print).</p>')+'</section>';
-  h+='<section class="card sec artsec">'+artSecHead(a,'notas','Minhas anotações')+(a.notes?'<div class="artpre">'+esc(a.notes)+'</div>':'<p class="muted small" style="margin:6px 0">Críticas, ideias e ligações com outros trabalhos.</p>')+'</section>';
+  const crit=artRows([['Parecido com o meu caso',a.similar],['Pontos fortes',a.strengths],['Fragilidades, vieses e confundidores',a.weaknesses],['Vale para a minha população?',a.extern],['O que eu faria diferente',a.diff],['Perguntas que ficaram',a.qs]]);
+  h+=artBox('critica','Leitura crítica',null,artEditBtn(a,'critica'),crit||'<p class="muted small" style="margin:6px 0">Por que esse artigo se parece com o seu caso, o que é forte e frágil nele, se vale para a sua população e o que você faria diferente.</p>');
+  h+=artBox('media','Figuras e tabelas',a.media.length,'<button class="btn sm" data-a="art-media" data-id="'+a.id+'">'+ic('plus',14)+' Adicionar</button>',a.media.length?'<div class="artgrid">'+a.media.map(m=>artMediaCard(a,m)).join('')+'</div>':'<p class="muted small" style="margin:6px 0">Guarde aqui as imagens e tabelas de que gostou (envie um arquivo ou cole um print).</p>');
+  h+=artBox('notas','Minhas anotações',null,artEditBtn(a,'notas'),a.notes?'<div class="artpre">'+esc(a.notes)+'</div>':'<p class="muted small" style="margin:6px 0">Ideias e ligações com outros trabalhos.</p>');
   return h;
+}
+/* ----- Colar em lote ----- */
+function artParseBatch(txt,list){
+  return String(txt||'').split(/\n+/).map(l=>l.trim()).filter(Boolean).map(l=>{
+    const pg=s=>{const m=s.match(/\s*\((?:p\.?|pág\.?)\s*([\d\-–]+)\)\s*$/i);return m?[s.slice(0,m.index).trim(),m[1]]:[s,''];};
+    if(list==='quotes'){const r=pg(l.replace(/^["“]+|["”]+$/g,''));return {text:r[0].replace(/["”]+$/,''),page:r[1],note:''};}
+    let kind='conceito';const km=l.match(/^\[([^\]]+)\]\s*/);
+    if(km){const q=norm(km[1]),k=ART_KINDS.find(x=>x[0]===q||norm(x[1]).indexOf(q)===0);if(k)kind=k[0];l=l.slice(km[0].length);}
+    let author,year='',point;const m=l.match(/^(.+?)[\s,]*\(?\b((?:19|20)\d{2})[a-z]?\)?\s*[:\-–—.]?\s*(.*)$/);
+    if(m){author=m[1].replace(/[\s,(]+$/,'');year=m[2];point=m[3];}
+    else{const c=l.match(/^([^:–—-]{2,60}?)\s*[:–—-]\s*(.+)$/);if(!c)return null;author=c[1];point=c[2];}
+    const r=pg(point.trim());
+    return {author:author.replace(/\s+et\s+al\.?$/i,' et al.').trim(),year:year,kind:kind,point:r[0],page:r[1],ref:''};
+  });
+}
+function artBatchPrev(list,txt){
+  const it=artParseBatch(txt,list);if(!txt.trim())return '<span class="muted small">Nada colado ainda.</span>';
+  const ok=it.filter(Boolean).length;
+  return '<div class="muted small" style="margin-bottom:4px">'+ok+' de '+it.length+' linha(s) reconhecida(s)</div>'+it.map(x=>!x?'<div class="artit" style="--c:#E5484D"><span class="muted small">Não entendi esta linha. Use “Autor ano: ponto”.</span></div>':list==='quotes'?'<div class="artit"><div class="artpt">'+esc(x.text)+'</div>'+(x.page?'<div class="artitm">p. '+esc(x.page)+'</div>':'')+'</div>':'<div class="artit" style="--c:'+artKind(x.kind)[2]+'"><div class="artith"><span class="artkind">'+esc(artKind(x.kind)[1])+'</span><b>'+esc(x.author)+(x.year?' ('+esc(x.year)+')':'')+'</b>'+(x.page?'<span class="muted small">p. '+esc(x.page)+'</span>':'')+'</div><div class="artpt">'+esc(x.point)+'</div></div>').join('');
+}
+function artBatchDlg(id,list){
+  const a=artById(id);if(!a)return;const q=list==='quotes';
+  openModal('<form id="fArtB" class="form"><div class="fh"><h2>Colar em lote | '+ART_LISTS[list]+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
+    '<p class="muted small" style="margin:0 0 6px">'+(q?'Um trecho por linha. Termine com (p. 12) para registrar a página.':'Uma citação por linha, no formato <b>Autor ano: ponto</b>. Opcional: <b>[critério]</b> no início para o tipo (conceito, dado, critério, observação, descrição, método, epidemiologia…). Exemplos:<br><i>Rotterdam 2004: critérios diagnósticos da SOP (p. 3)</i><br><i>[epi] Silva et al., 2019 - prevalência de 8% no Brasil</i>')+'</p>'+
+    '<label class="f"><textarea name="txt" rows="8" placeholder="'+esc(q?'“A prevalência foi de 8%.” (p. 103)':'Rotterdam 2004: critérios diagnósticos da SOP')+'"></textarea></label><div id="artBP" style="max-height:220px;overflow:auto"></div>'+
+    '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Adicionar</button></div></form>',true);
+  const f=$('#fArtB'),run=()=>{$('#artBP').innerHTML=artBatchPrev(list,f.elements.txt.value);};
+  f.elements.txt.addEventListener('input',run);run();
+  f.addEventListener('submit',e=>{
+    e.preventDefault();const it=artParseBatch(f.elements.txt.value,list).filter(Boolean).filter(x=>q?x.text:x.author);
+    if(!it.length){toast('Nenhuma linha reconhecida.');return;}
+    it.forEach(x=>a[list].push(Object.assign({id:uid()},x)));a.updated=Date.now();save();closeModal();renderMain();toast(it.length+' item(ns) adicionado(s).');
+  });
+}
+function artQuickAdd(box){
+  const a=artById(box.dataset.id),l=box.dataset.l;if(!a)return;
+  const v=n=>{const i=$('[data-q="'+n+'"]',box);return i?i.value.trim():'';};
+  if(l==='quotes'){if(!v('text')){toast('Cole o trecho.');return;}a.quotes.push({id:uid(),text:v('text'),page:v('page'),note:''});}
+  else{if(!v('author')){toast('Informe o autor citado.');return;}UI.artQKind=v('kind');const pm=v('point').match(/\s*\((?:p\.?|pág\.?)\s*([\d\-–]+)\)\s*$/i);a[l].push({id:uid(),author:v('author'),year:v('year'),kind:v('kind'),point:pm?v('point').slice(0,pm.index).trim():v('point'),page:pm?pm[1]:'',ref:''});}
+  a.updated=Date.now();save();renderMain();
+  const nb=$('.artqa[data-l="'+l+'"] [data-q="'+(l==='quotes'?'text':'author')+'"]');if(nb)nb.focus();
 }
 /* ----- Banco de citações e galeria ----- */
 function artBankItems(){
@@ -16010,7 +16168,7 @@ Object.assign(ACT,{
   'art-cris'(el){const a=artById(el.dataset.id);if(a)artCopy(artRis(a),'RIS copiado.');},
   'art-apud'(el){const a=artById(el.dataset.id),it=a&&a[el.dataset.l].find(z=>z.id===el.dataset.i);if(it)artCopy(artApud(a,it,artFmt()),'Citação indireta copiada.');},
   'art-iref'(el){const a=artById(el.dataset.id),it=a&&a[el.dataset.l].find(z=>z.id===el.dataset.i);if(it)artCopy(it.ref,'Referência copiada.');},
-  'art-qcopy'(el){const a=artById(el.dataset.id),it=a&&a.quotes.find(z=>z.id===el.dataset.i);if(it)artCopy('“'+it.text+'” '+artIn(a,artFmt()).replace(/\)$/,it.page?', p. '+it.page+')':')'),'Trecho copiado.');},
+  'art-qcopy'(el){const a=artById(el.dataset.id),it=a&&a.quotes.find(z=>z.id===el.dataset.i);if(it)artCopy('“'+it.text+'” '+artIn(a,artFmt(),false,it.page),'Trecho copiado.');},
   'art-acl'(el){UI.acList=el.dataset.v;renderMain();},
   'art-amk'(el){UI.amKind=el.dataset.v;renderMain();},
   'art-note'(el){artNote(el.dataset.id);},
@@ -16027,7 +16185,7 @@ Object.assign(ACT,{
 });
 document.addEventListener('input',e=>{
   const t=e.target;if(!t)return;
-  if(t.id==='arq'){UI.arQ=t.value;const l=$('#arList');if(l)l.innerHTML=artListHTML();}
+  if(t.id==='arq'){UI.arQ=t.value;const l=$('#arList');if(l)l.innerHTML=artView()==='tbl'?artTableHTML(artFiltered()):artListHTML();}
   else if(t.id==='acq'){UI.acQ=t.value;const l=$('#acList');if(l)l.innerHTML=artBankListHTML();}
   else if(t.id==='amq'){UI.amQ=t.value;renderMain();const i=$('#amq');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length);}}
 });
@@ -16037,6 +16195,105 @@ document.addEventListener('change',e=>{
   else if(t.id==='ardes'){UI.arDes=t.value;renderMain();}else if(t.id==='arsort'){UI.arSort=t.value;renderMain();}else if(t.id==='ackind'){UI.acKind=t.value;renderMain();}
 });
 
+
+/* ----- Artigos: Pingado, tabela, lote e atalhos ----- */
+const ART_PGMAP={pergunta:'question',topicos:'topics',conclusao:'conclusion',limitacoes:'limits',aplicabilidade:'apply',resumo_introducao:'introSum',resumo_discussao:'discSum',resultados:'results',numeros_chave:'resKey',notas:'notes',pontos_fortes:'strengths',fragilidades:'weaknesses',validade_externa:'extern',faria_diferente:'diff',perguntas:'qs',parecido_com_o_meu:'similar',delineamento:'m.design',local:'m.setting',amostra:'m.sample',criterios:'m.criteria',grupos:'m.groups',coleta:'m.collection',testes:'m.tests',desfechos:'m.outcomes',estatistica:'m.stats',duracao:'m.duration',etica:'m.ethics',justificativa_metodo:'m.why',titulo:'title',autores:'authors',revista:'journal',ano:'year',volume:'vol',numero:'issue',paginas:'pages',doi:'doi',link:'link',tipo_estudo:'design'};
+function artPgJson(s){try{return JSON.parse(String(s||'').trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,''));}catch(e){return null;}}
+function artPgApply(a,o){
+  Object.keys(o||{}).forEach(k=>{
+    const p=ART_PGMAP[k];if(!p)return;let v=o[k];
+    if(p==='topics'||p==='resKey'){const add=(Array.isArray(v)?v:String(v||'').split('\n')).map(x=>String(x).trim()).filter(Boolean),cur=artGet(a,p)||[];artSet(a,p,cur.concat(add.filter(x=>cur.indexOf(x)<0)));}
+    else artSet(a,p,Array.isArray(v)?v.join('\n'):String(v==null?'':v).trim());
+  });
+  a.updated=Date.now();
+}
+function artPgRead(name,a){
+  if(name==='ler_artigo'){
+    const x=artById(a.id);if(!x)return {erro:'Artigo não encontrado'};
+    const o={id:x.id,situacao:artSt(x.status)[1],favorito:x.fav,projetos:x.projIds.map(artProjById).filter(Boolean).map(p=>p.name),referencia_abnt:artRef(x,'abnt')};
+    Object.keys(ART_PGMAP).forEach(k=>{const v=artGet(x,ART_PGMAP[k]);if(Array.isArray(v)?v.length:String(v||'').trim())o[k]=v;});
+    const mp=i=>({autor:i.author,ano:i.year,tipo:artKind(i.kind)[1],ponto:i.point,pagina:i.page});
+    o.citados_introducao=x.intro.map(mp);o.citados_discussao=x.disc.map(mp);o.trechos_literais=x.quotes.map(q=>({texto:q.text,pagina:q.page}));
+    return o;
+  }
+  const F=({testes:['m.tests','m.stats'],estatistica:['m.stats'],metodos:ART_MF_DEF,resultados:['results','resKey'],citacoes:['citacoes','introSum','discSum']})[norm(a.campo||'')]||ART_MF.map(f=>f[0]);
+  const q=String(a.consulta||'').trim(),pj=norm(a.projeto||'');
+  let list=q?artSearch(q,F,true):(S.arts||[]).map(x=>({a:x,hits:[]}));
+  if(pj)list=list.filter(r=>r.a.projIds.map(artProjById).some(p=>p&&norm(p.name).indexOf(pj)>=0));
+  return {total:list.length,artigos:list.slice(0,25).map(r=>{const x=r.a,t={};r.hits.slice(0,6).forEach(h=>{t[h.label]=pgClip(h.text,320);});return {id:x.id,titulo:x.title,autores:pgClip(x.authors.replace(/\n/g,'; '),80),revista:x.journal,ano:x.year,tipo_estudo:x.design||x.m.design,situacao:artSt(x.status)[1],trechos:t};})};
+}
+function artPgBuild(it,bad){
+  const t=it.tipo,o=artPgJson(it.criar_json),a=it.id?artById(it.id):null;
+  if(t==='artigo_criar'){if(!o||!o.titulo)return bad('criar_json inválido ou sem "titulo"');return [{label:'Criar artigo: '+pgClip(o.titulo,70),detail:'campos: '+Object.keys(o).filter(k=>ART_PGMAP[k]).join(', '),cols:['arts'],apply:()=>{const x=normArt({id:uid(),created:Date.now()});artPgApply(x,o);S.arts=S.arts||[];S.arts.push(x);}}];}
+  if(!a)return bad('Artigo não encontrado');
+  if(t==='artigo_editar'){if(!o||Array.isArray(o))return bad('criar_json inválido');const ks=Object.keys(o).filter(k=>ART_PGMAP[k]);if(!ks.length)return bad('Nenhum campo reconhecido');return [{label:'Editar fichamento: '+pgClip(a.title,60),detail:'campos: '+ks.join(', '),cols:['arts'],apply:()=>artPgApply(a,o)}];}
+  if(t==='artigo_citacao'){
+    const arr=(Array.isArray(o)?o:o?[o]:[]).filter(x=>x&&(x.autor||x.texto));if(!arr.length)return bad('Nenhuma citação válida');
+    const lst=x=>{const l=norm(x.lista||'');return /disc/.test(l)?'disc':/trecho|liter|quote|citac/.test(l)?'quotes':'intro';};
+    return [{label:'Adicionar '+arr.length+' citação(ões) em: '+pgClip(a.title,50),detail:arr.slice(0,4).map(x=>(x.autor||pgClip(x.texto,30))+(x.ano?' ('+x.ano+')':'')+' > '+({intro:'introdução',disc:'discussão',quotes:'trecho'})[lst(x)]).join('; '),cols:['arts'],apply:()=>{
+      arr.forEach(x=>{const l=lst(x);if(l==='quotes')a.quotes.push({id:uid(),text:String(x.texto||x.ponto||'').trim(),page:String(x.pagina||''),note:String(x.nota||'')});
+        else{const q=norm(x.tipo||''),k=ART_KINDS.find(z=>z[0]===q||norm(z[1]).indexOf(q)===0);a[l].push({id:uid(),author:String(x.autor||'').trim(),year:String(x.ano||''),kind:k?k[0]:'conceito',point:String(x.ponto||'').trim(),page:String(x.pagina||''),ref:String(x.referencia||'')});}});
+      a.updated=Date.now();}}];
+  }
+  return bad('Tipo de mudança desconhecido');
+}
+const artPgSys=()=>'ARTIGOS CIENTÍFICOS: o usuário mantém fichamentos de artigos (métodos, resultados, autores citados, leitura crítica). Use buscar_artigos e ler_artigo antes de opinar e NUNCA invente artigos, autores ou números que não estejam no acervo (conhecimento geral é permitido se você avisar que não vem do acervo). Para registrar use propor_mudancas com artigo_criar (criar_json: objeto), artigo_editar (id + criar_json: objeto) ou artigo_citacao (id + criar_json: objeto ou lista de objetos {lista:"introducao"|"discussao"|"trecho", autor, ano, tipo (conceito, dado solto, critério, observação, descrição, método, frase epidemiológica, definição, diretriz, hipótese, limitação), ponto, pagina, referencia, texto}). Chaves aceitas em artigo_criar e artigo_editar: '+Object.keys(ART_PGMAP).join(', ')+' (topicos e numeros_chave são listas). Ao ler criticamente, seja honesto: aponte vieses, confundidores, tamanho de amostra, poder estatístico, validade externa e conflitos entre resultado e conclusão.\n';
+Object.assign(PG_TASKS,{
+  art_metodo:{label:'Qual método ou teste usar?',prompt:c=>'Preciso decidir a abordagem, o teste estatístico ou o método do meu estudo. Minha descrição: """'+c.text+'"""\nUse buscar_artigos (varie os termos e o campo: testes, estatistica, metodos) e ler_artigo nos mais parecidos para ver como os artigos do MEU acervo resolveram problemas semelhantes. Responda: 1) quais artigos do acervo se parecem com o meu caso e o que cada um fez; 2) opções de teste ou abordagem com prós, contras e pressupostos; 3) perguntas críticas que devo me fazer antes de escolher; 4) o que falta eu definir. Não invente artigos; se usar conhecimento geral, avise.'},
+  art_critica:{label:'Ler criticamente este artigo',prompt:c=>'Leia o artigo id="'+c.id+'" com ler_artigo e me ajude a ler criticamente'+(c.text?'. Foco do meu pedido: """'+c.text+'"""':'')+'. Avalie: a pergunta é respondida pelo desenho? amostra, seleção, vieses, confundidores, análise estatística, resultados x conclusão, validade externa, limitações não declaradas. Termine com perguntas que eu deveria fazer aos autores. Depois proponha, com artigo_editar, preencher pontos_fortes, fragilidades, validade_externa e perguntas, para eu aprovar.'},
+  art_extrair:{label:'Preencher o fichamento deste artigo',prompt:c=>'Estou fichando o artigo id="'+c.id+'". Abaixo está o texto dele. Leia e proponha em propor_mudancas: (1) artigo_editar com pergunta, topicos, delineamento, local, amostra, criterios, grupos, coleta, testes, desfechos, estatistica, duracao, resultados, numeros_chave, conclusao, limitacoes, resumo_introducao e resumo_discussao (só o que o texto sustenta; não invente); (2) artigo_citacao com os autores citados na introdução e na discussão e o ponto de cada um (tipo, ano e página quando houver). Não repita o que já está no fichamento (confira com ler_artigo). Texto do artigo:\n"""\n'+String(c.text||'').slice(0,24000)+'\n"""'},
+  art_comparar:{label:'Comparar os artigos da tela',prompt:c=>'Compare criticamente estes artigos do meu acervo (ids: '+(c.ids||[]).join(', ')+')'+(c.text?', com foco em: """'+c.text+'"""':'')+'. Use ler_artigo em cada um. Monte uma comparação (delineamento, amostra, método, estatística, resultados, limitações), diga onde concordam e discordam, qual é mais robusto e por quê, e o que ainda falta responder.'}
+});
+const ART_PGDLG={art_metodo:['Qual método ou teste usar?','Descreva seus dados e sua pergunta: tipo das variáveis, tamanho da amostra, grupos, desfecho, o que já tentou…',true],art_critica:['Ler criticamente com o Pingado','(Opcional) algo específico que você quer avaliar neste artigo.',false],art_extrair:['Preencher o fichamento com o Pingado','Cole aqui o texto do artigo (resumo, introdução, métodos, resultados e discussão). Cada item proposto é aprovado por você antes de gravar.',true],art_comparar:['Comparar os artigos da tela','(Opcional) em que aspecto comparar? Ex.: métodos estatísticos, população, resultados.',false]};
+function artPgDlg(task,id){
+  const D=ART_PGDLG[task];if(!D)return;
+  if(!pgReady()){ACT['pg-setup']();toast('Configure o Pingado primeiro.');return;}
+  openModal('<form id="fArtPg" class="form"><div class="fh"><h2>'+D[0]+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><label class="f"><textarea name="txt" rows="'+(task==='art_extrair'?12:6)+'" placeholder="'+esc(D[1])+'"></textarea></label>'+
+    '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Enviar ao Pingado</button></div></form>',true);
+  $('#fArtPg').addEventListener('submit',e=>{
+    e.preventDefault();const txt=e.target.elements.txt.value.trim();
+    if(D[2]&&!txt){toast('Escreva ou cole o texto primeiro.');return;}
+    closeModal();pgDelegate(task,{id:id,text:txt,ids:task==='art_comparar'?artFiltered().slice(0,15).map(x=>x.id):[]});
+  });
+}
+function artCsv(){
+  const cols=artCols().map(k=>ART_COLS.find(x=>x[0]===k)),q=v=>'"'+String(v==null?'':v).replace(/"/g,'""').replace(/\r?\n/g,' ')+'"';
+  const rows=[['Título'].concat(cols.map(c=>c[1]))].concat(artTableRows(artFiltered()).map(a=>[a.title].concat(cols.map(c=>c[2](a)))));
+  downloadBuf(new TextEncoder().encode('﻿'+rows.map(r=>r.map(q).join(';')).join('\r\n')),'artigos-comparacao.csv','text/csv;charset=utf-8');
+}
+Object.assign(ACT,{
+  'art-pgmenu'(){openModal('<div class="form"><div class="fh"><h2>Pingado e os artigos</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><p class="muted small">O Pingado consulta o seu acervo e só grava algo depois da sua aprovação.</p><div class="ff" style="flex-direction:column;align-items:stretch;gap:8px"><button class="btn" data-a="art-pg" data-t="art_metodo">Qual método ou teste usar? (acha artigos parecidos com o meu caso)</button><button class="btn" data-a="art-pg" data-t="art_comparar">Comparar os artigos da tela</button></div></div>');},
+  'art-pg'(el){closeModal();artPgDlg(el.dataset.t,el.dataset.id||'');},
+  'art-fold'(el){UI.artFold=UI.artFold||{};UI.artFold[el.dataset.k]=!artFolded(el.dataset.k);renderMain();},
+  'art-foldall'(el){UI.artFold={};['cite','resumo','metodos','resultados','intro','disc','quotes','critica','media','notas'].forEach(k=>{UI.artFold[k]=el.dataset.v==='1';});renderMain();},
+  'art-cmp'(){S.prefs.artCmp=!S.prefs.artCmp;UI.artFold={};save();renderMain();},
+  'art-view'(el){S.prefs.artView=el.dataset.v;save();renderMain();},
+  'art-tsort'(el){const k=el.dataset.k;if(UI.arTS===k)UI.arTD=UI.arTD==='desc'?'asc':'desc';else{UI.arTS=k;UI.arTD='asc';}renderMain();},
+  'art-sel'(el){UI.arSel=UI.arSel||{};UI.arSel[el.dataset.id]=!!el.checked;const tr=el.closest('tr');if(tr)tr.classList.toggle('sel',!!el.checked);const n=$('#arSelN');if(n)n.textContent=Object.keys(UI.arSel).filter(k=>UI.arSel[k]).length;},
+  'art-onlysel'(){UI.arOnlySel=!UI.arOnlySel;renderMain();},
+  'art-csv'(){artCsv();},
+  'art-amf'(el){const k=el.dataset.k;if(k==='__def')UI.amF=[];else if(k==='__all')UI.amF=ART_MF.map(f=>f[0]);else{const cur=(UI.amF&&UI.amF.length?UI.amF:ART_MF_DEF).slice(),i=cur.indexOf(k);if(i>=0)cur.splice(i,1);else cur.push(k);UI.amF=cur;}renderMain();},
+  'art-amt'(el){UI.amQ2=el.dataset.t;renderMain();},
+  'art-batch'(el){artBatchDlg(el.dataset.id,el.dataset.l);},
+  'art-qadd'(el){const b=el.closest('.artqa');if(b)artQuickAdd(b);}
+});
+document.addEventListener('keydown',e=>{
+  const t=e.target;if(!t||e.key!=='Enter'||e.isComposing)return;
+  const box=t.closest&&t.closest('.artqa');
+  if(box&&t.tagName==='INPUT'){e.preventDefault();artQuickAdd(box);return;}
+  if(t.dataset&&t.dataset.ql){
+    e.preventDefault();const a=artById(t.dataset.id),v=t.value.trim();if(!a||!v)return;
+    a[t.dataset.ql].push(v);a.updated=Date.now();save();const f=t.dataset.ql;renderMain();const n=$('[data-ql="'+f+'"]');if(n)n.focus();
+  }
+});
+document.addEventListener('change',e=>{
+  const t=e.target;if(!t)return;
+  if(t.dataset&&t.dataset.aedit){const a=artById(t.dataset.id);if(a){a[t.dataset.aedit]=t.value.trim();a.updated=Date.now();save();}}
+  else if(t.dataset&&t.dataset.acol){const cur=artCols().slice(),k=t.dataset.acol,i=cur.indexOf(k);if(t.checked&&i<0)cur.push(k);else if(!t.checked&&i>=0)cur.splice(i,1);S.prefs.artCols=cur.length?cur:ART_COLS_DEF;UI.arColsOpen=true;save();renderMain();}
+});
+document.addEventListener('input',e=>{
+  const t=e.target;if(t&&t.id==='amq2'){UI.amQ2=t.value;renderMain();const i=$('#amq2');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length);}}
+});
 
 /* ----- Calendário externo (.ics): o token e o link ficam em Ajustes > App e Widgets; o Worker serve o arquivo ----- */
 const icsBase=()=>String(S.prefs.pgApi||S.prefs.titleApi||'').trim().split('?')[0].replace(/\/+$/,'');
