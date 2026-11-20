@@ -9045,7 +9045,7 @@ function finImportDialog(){
     '<div class="fgrid"><label class="f">É da fatura de qual cartão?<select name="card"><option value="">Não é cartão (conta)</option>'+F.cards.map(c=>'<option value="'+c.id+'">'+esc(c.name)+'</option>').join('')+'</select></label>'+
     '<label class="f">Conta (saídas e débitos)<select name="acc">'+F.accounts.map(a=>'<option value="'+a.id+'">'+esc(a.name)+'</option>').join('')+'</select></label></div>'+
     '<label class="f">Arquivo<input type="file" name="file" accept=".csv,.ofx,.txt,text/csv"></label><div id="nuPrev" class="muted small"></div>'+
-    '<div class="addrow"><button type="button" class="btn sm" data-a="pl-cfg">'+ic('settings',14)+' Conexão automática com o Nubank (Pluggy)</button></div><details class="adv"><summary>Por que não conecta direto?</summary><p class="muted small" style="margin:6px 0 0">O Nubank não tem API pública para pessoas físicas e não oferece conexão por MCP. O Open Finance só entrega dados a instituições autorizadas pelo Banco Central; para uso pessoal o caminho é um agregador (por exemplo, o Meu Pluggy) que lê a sua conta e exporta os dados. Se você quiser, posso ligar o site a um agregador depois; por enquanto, a importação de arquivo cobre o mesmo resultado em poucos toques.</p></details>'+
+    '<details class="adv"><summary>Por que não conecta direto?</summary><p class="muted small" style="margin:6px 0 0">O Nubank não tem API pública para pessoas físicas e não oferece conexão por MCP. O Open Finance só entrega dados a instituições autorizadas pelo Banco Central; para uso pessoal, a importação de arquivo cobre o caso em poucos toques.</p></details>'+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary" id="nuGo" disabled>Importar</button></div></form>');
   const f=$('#fNu');let items=[];
   f.elements.file.addEventListener('change',async()=>{
@@ -9081,8 +9081,6 @@ function finSpends(){
 function renderFin(){
   const tabs=[['resumo','Resumo'],['saidas','Saídas'],['cartoes','Cartões'],['pagar','Contas e dívidas'],['receber','Entradas'],['contas','Contas']];
   let h='<div class="toolbar"><div class="seg">'+tabs.map(t=>'<button class="'+(UI.fTab===t[0]?'on':'')+'" data-a="set" data-k="fTab" data-v="'+t[0]+'">'+t[1]+'</button>').join('')+'</div><span class="sp"></span><button class="btn sm" data-a="fin-import" title="Importar fatura ou extrato do Nubank (CSV/OFX)">'+ic('upload',14)+' Importar Nubank</button>'+pgBtn('fin_plano','Planejar com o Pingado')+'</div>';
-  if(S.prefs.plItem&&S.prefs.plAuto!==false&&!PL_BUSY&&Date.now()-(S.prefs.plAt||0)>20*60e3)setTimeout(()=>plSync(false),50);
-  if(!UI.fTab||UI.fTab==='resumo')h+=plLiveHTML();
   h+=({resumo:finSummary,saidas:finSpends,cartoes:finCards,pagar:finPay,receber:finIn,contas:finAccounts}[UI.fTab]||finSummary)();
   return h+'<p class="muted small" style="margin-top:14px">Marque o círculo ao pagar ou receber: o saldo da conta é atualizado. Gastos e entradas lançados em atividades e tarefas aparecem aqui sozinhos, com o sinal certo.</p>';
 }
@@ -16343,64 +16341,6 @@ Object.assign(ACT,{
   }
 });
 
-
-/* ==========================================================================
-   NUBANK ao vivo (via Pluggy/Open Finance, pelo Worker): saldo, fatura, limite, dívidas e lançamentos
-   ========================================================================== */
-const PL_CAT={groceries:'Mercado',supermarket:'Mercado',transport:'Locomoção','ride-hailing':'Locomoção','taxi':'Locomoção',eating:'Alimentação','eating out':'Alimentação',restaurants:'Alimentação',food:'Alimentação',health:'Saúde',pharmacy:'Saúde',shopping:'Vestuário',clothing:'Vestuário',education:'Educação',subscriptions:'Assinatura',entertainment:'Lazer',leisure:'Lazer',travel:'Lazer','utilities':'Utilitários','services':'Utilitários',housing:'Moradia',rent:'Moradia'};
-let PL_BUSY=false;
-const plAgo=t=>{const m=Math.round((Date.now()-t)/60000);return m<1?'agora há pouco':m<60?'há '+m+' min':m<1440?'há '+Math.round(m/60)+' h':'há '+Math.round(m/1440)+' d';};
-function plLiveHTML(){
-  const sn=S.prefs.plSnap,cfg=S.prefs.plItem;
-  if(!sn&&!cfg)return '<div class="card sec plcard"><h3>Nubank ao vivo</h3><p class="muted small">Conecte o Nubank pelo Open Finance (agregador Pluggy) para ver saldo, fatura, limite e dívidas aqui, e lançar as saídas sozinho.</p><div class="addrow"><button class="btn primary sm" data-a="pl-cfg">'+ic('settings',14)+' Configurar conexão</button></div></div>';
-  const a=sn?sn.accounts||[]:[],bank=a.filter(x=>x.type==='bank'),cc=a.filter(x=>x.type==='credit'),sum=(l,k)=>l.reduce((n,x)=>n+(Number(x[k])||0),0);
-  const loans=sn?sn.loans||[]:[],bills=sn?(sn.bills||[]).filter(b=>b.due>=todayISO()).sort((x,y)=>x.due<y.due?-1:1):[],next=bills[0];
-  const debt=sum(loans,'balance')+sum(cc,'balance');
-  return '<div class="card sec plcard"><h3 style="display:flex;gap:8px;align-items:center">'+ic('wallet',16)+' Nubank <span class="muted small">'+(sn?'atualizado '+plAgo(sn.at):'ainda não sincronizado')+'</span></h3>'+
-    (sn?'<div class="hcards"><div class="hcard"><span class="hl">Saldo da conta</span><b>'+money(sum(bank,'balance'))+'</b></div><div class="hcard"><span class="hl">Fatura do cartão</span><b class="neg">'+money(sum(cc,'balance'))+'</b><span class="muted small">'+(next?'vence '+fmtDM(next.due):(cc[0]&&cc[0].dueDate?'vence '+fmtDM(cc[0].dueDate):''))+'</span></div><div class="hcard"><span class="hl">Limite disponível</span><b>'+money(sum(cc,'available'))+'</b><span class="muted small">de '+money(sum(cc,'limit'))+'</span></div><div class="hcard"><span class="hl">Dívidas</span><b class="neg">'+money(debt)+'</b><span class="muted small">'+loans.length+(loans.length===1?' empréstimo':' empréstimos')+' + fatura</span></div></div>':'')+
-    '<div class="addrow"><button class="btn primary sm" data-a="pl-sync">'+ic('repeat',14)+' Sincronizar agora</button><button class="btn sm ghost" data-a="pl-cfg">'+ic('settings',14)+' Conexão</button></div></div>';
-}
-async function plSync(manual){
-  if(PL_BUSY)return;
-  const api=pgApi(),tok=pgTok(),item=String(S.prefs.plItem||'').trim();
-  if(!item||!api||!tok){if(manual){toast(!item?'Cole o item da Pluggy em Conexão.':'Falta o endereço do Worker e a senha em Ajustes > Pingado.');}return;}
-  PL_BUSY=true;S.prefs.plAt=Date.now();
-  try{
-    const r=await fetch(api+'/pluggy/sync',{method:'POST',headers:{'Content-Type':'application/json','X-Pingado-Token':tok},body:JSON.stringify({itemId:item,from:addISO(todayISO(),-60)})});
-    const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||('HTTP '+r.status));
-    const n=plApply(j);if(manual)toast('Nubank sincronizado'+(n?': '+n+(n===1?' saída nova.':' saídas novas.'):'.'));
-  }catch(e){if(manual)toast('Não consegui sincronizar: '+(e&&e.message||e));}
-  PL_BUSY=false;save();if(UI.tab==='fin')renderMain();
-}
-function plApply(j){
-  const F=S.fin;S.prefs.plSnap={at:Date.now(),accounts:j.accounts||[],bills:j.bills||[],loans:j.loans||[]};
-  const accById={};(j.accounts||[]).forEach(a=>{accById[a.id]=a;});
-  const have=new Set(F.spends.map(x=>x.ext).filter(Boolean));let n=0;
-  const cardOf=a=>{let c=F.cards.find(x=>x.plId===a.id)||F.cards.find(x=>/nubank|nu\b/i.test(x.name||''));if(!c){const day=d=>Math.max(1,Math.min(31,Number(String(d||'').slice(8,10))||1));c={id:uid(),name:a.name||'Nubank',close:day(a.closeDate),due:day(a.dueDate),limit:a.limit||0,plId:a.id};F.cards.push(c);}else if(!c.plId)c.plId=a.id;return c;};
-  (j.txs||[]).forEach(t=>{
-    if(t.kind!=='out'||!t.date||!(t.amount>0))return;const ext='pl|'+t.id;if(have.has(ext))return;
-    const a=accById[t.account]||{type:'bank'},credit=a.type==='credit';
-    const raw=String(t.cat||'').toLowerCase(),cat=PL_CAT[raw]||(t.cat?t.cat.charAt(0).toUpperCase()+t.cat.slice(1):'Outros');
-    if(F.spendCats.indexOf(cat)<0&&SPEND_DEF.indexOf(cat)<0)F.spendCats.push(cat);
-    F.spends.push({id:uid(),ext:ext,date:t.date,desc:(t.desc||'')+(t.parcela?' ('+t.parcela+')':''),amount:r2(t.amount),cat:cat,pay:credit?'credit':'debit',card:credit?cardOf(a).id:'',acc:credit?'':(F.accounts[0]||{}).id||'',n:1});
-    have.add(ext);n++;
-  });
-  return n;
-}
-function plCfgDlg(){
-  openModal('<form id="fPl" class="form"><div class="fh"><h2>Conexão com o Nubank</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
-    '<p class="muted small" style="margin:0 0 8px">O Nubank não tem API pública para pessoa física. O caminho é o <b>Open Finance</b> por um agregador autorizado, a <b>Pluggy</b>, que lê a sua conta com o seu consentimento. A leitura é só de consulta; as chaves ficam no seu Worker, nunca no site.</p>'+
-    '<ol class="muted small" style="margin:0 0 10px 18px"><li>Crie uma conta na Pluggy e conecte o Nubank pelo Open Finance. Copie o <b>ID do item</b> dessa conexão.</li><li>No Worker, guarde os segredos <code>PLUGGY_CLIENT_ID</code> e <code>PLUGGY_CLIENT_SECRET</code> (do painel da Pluggy) e faça o deploy da versão atual.</li><li>Em Ajustes > Pingado, confira o endereço do Worker e a senha (a mesma é usada aqui).</li></ol>'+
-    '<label class="f">ID do item na Pluggy<input name="plitem" value="'+esc(S.prefs.plItem||'')+'" placeholder="00000000-0000-0000-0000-000000000000" autocomplete="off"></label>'+
-    '<label class="chip cb" style="align-self:flex-start;margin:4px 0"><input type="checkbox" name="auto" '+(S.prefs.plAuto!==false?'checked':'')+'><span>Sincronizar sozinho ao abrir Finanças (no máximo a cada 20 min)</span></label>'+
-    '<div class="ff">'+(S.prefs.plItem?'<button type="button" class="btn danger" data-a="pl-off">Desconectar</button>':'')+'<span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar e sincronizar</button></div></form>');
-  $('#fPl').addEventListener('submit',e=>{e.preventDefault();const E=e.target.elements;S.prefs.plItem=E.plitem.value.trim();S.prefs.plAuto=E.auto.checked;save();closeModal();renderMain();plSync(true);});
-}
-Object.assign(ACT,{
-  'pl-cfg'(){plCfgDlg();},
-  'pl-sync'(){plSync(true);},
-  'pl-off'(){askConfirm('Desconectar o Nubank?','Os lançamentos já importados continuam; só a leitura ao vivo para.',()=>{delete S.prefs.plItem;delete S.prefs.plSnap;save();closeModal();renderMain();},'Desconectar');}
-});
 
 /* ==========================================================================
    ASSUNTOS E PROGRESSO: Focos (aulas e temas) agrupados por Grande área e Módulo; notas, arquivos, eventos
