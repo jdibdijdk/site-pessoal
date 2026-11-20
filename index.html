@@ -2695,6 +2695,38 @@ button.lzico.lk:hover{transform:scale(1.06);box-shadow:0 0 0 3px color-mix(in sr
 #pgSpk[aria-pressed=true]{color:var(--acc);background:var(--accs)}
 @media(prefers-reduced-motion:reduce){#pgMic.rec{animation:none}}
 
+/* ===== Artigos ===== */
+.artcard{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:start;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--c);border-radius:14px;padding:13px 16px}
+.artfav{border:0;background:none;font-size:22px;line-height:1;color:var(--line3);cursor:pointer;padding:0 2px}.artfav.on{color:#E9A100}
+.artt b{font-size:15.5px;cursor:pointer}.artt b:hover{color:var(--acc)}
+.artm{color:var(--mut);font-size:13px;margin-top:2px}
+.artchips{display:flex;flex-wrap:wrap;gap:6px 4px;align-items:center;margin-top:6px}.artchips .lzdot{margin-left:0}
+.artq{margin-top:6px;font-size:13.5px;color:var(--tx);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.artmeta{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px;color:var(--mut);font-size:12.5px}.artmeta span{display:inline-flex;align-items:center;gap:4px}
+.artact{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.artsec{margin:0 0 12px}a.btn{text-decoration:none}
+.arth{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}.arth h3{margin:0;font-size:16px}
+.arthero{border-left:5px solid var(--c)}
+.artbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+.artcite{margin:6px 0 0;padding:10px 12px;background:var(--soft);border-radius:10px;font-size:14px;line-height:1.5;user-select:all}
+.artdl{margin:4px 0 0;display:grid;grid-template-columns:minmax(140px,220px) minmax(0,1fr);gap:8px 16px}.artdl dt{color:var(--mut);font-size:13px}.artdl dd{margin:0;white-space:pre-wrap}
+.artlead{background:var(--accs);border-radius:10px;padding:10px 12px;margin:4px 0 8px;white-space:pre-wrap}.artlead span{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut);margin-bottom:2px}
+.artul{margin:4px 0 8px;padding-left:20px}.artul li{margin:3px 0}
+.artpre{white-space:pre-wrap;margin:4px 0 8px}
+.artsec h4{margin:10px 0 2px;font-size:13.5px;color:var(--mut)}
+.artit{border:1px solid var(--line);border-left:4px solid var(--c,var(--acc));border-radius:10px;padding:10px 12px;margin:8px 0;background:var(--card)}
+.artith{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.artkind{font-size:11.5px;font-weight:600;color:var(--c);border:1px solid var(--c);border-radius:999px;padding:1px 9px}
+.artpt{margin-top:4px;white-space:pre-wrap;font-size:14px}
+.artitm{font-size:12.5px;color:var(--mut);margin-top:2px}
+.artitact{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}
+.artbk{margin-bottom:6px}.artsrc{margin:-2px 0 0 4px}
+.artgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:6px}
+.artfig{margin:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card)}
+.artimg{display:block;width:100%;border:0;padding:0;background:var(--soft);cursor:zoom-in;min-height:90px}.artimg img{display:block;width:100%;max-height:230px;object-fit:contain}
+.artfig figcaption{padding:8px 10px;font-size:13.5px}
+@media(max-width:760px){.artcard{grid-template-columns:auto minmax(0,1fr)}.artact{grid-column:1/-1;flex-direction:row;justify-content:flex-start}.artdl{grid-template-columns:1fr;gap:2px}.artdl dd{margin-bottom:8px}}
+
 /* ===== Revisões: checklist ===== */
 .rvchk{margin-top:4px;font-size:13px}.rvchk summary{cursor:pointer;color:var(--acc);font-weight:600}
 .rvchk-b{display:flex;flex-direction:column;gap:6px;padding:6px 0 2px;align-items:flex-start}
@@ -3155,7 +3187,7 @@ function normalize(o){
     items:(Array.isArray(o.items)?o.items:seedItems()).map(i=>{const x=Object.assign({apps:[],inside:[]},i);if(!Array.isArray(x.inside))x.inside=[];if(x.container===undefined)x.container=/^bolsa/i.test(x.name)||norm(x.group||'')==='bolsas';if(ver<5&&x.group==='Eletrônicos'&&(x.name==='Mouse Logitech'||x.name==='Extensão'))x.group='Acessórios';return x;}),
     links:arr('links'),
     linkCats:(Array.isArray(o.linkCats)&&o.linkCats.length)?o.linkCats:LINKCATS.slice(),
-    packed:o.packed||{},kits:Array.isArray(o.kits)?o.kits.filter(k=>k&&k.id):[],mfCause:(o.mfCause&&typeof o.mfCause==='object'&&!Array.isArray(o.mfCause))?o.mfCause:{},mfSims:Array.isArray(o.mfSims)?o.mfSims.slice(-100):[],wishes:arr('wishes').map(x=>Object.assign({title:'',url:'',price:0,qty:1,store:'',priority:2,catId:'',note:'',status:'quero',paid:0,created:Date.now(),updated:Date.now(),boughtAt:0},x)),lazer:arr('lazer').map(x=>Object.assign({type:'outro',title:'',scope:'pessoal',status:'todo',catId:'',link:'',total:0,progress:0,unit:'',plannedMin:0,stars:0,review:'',noteId:'',note:'',created:Date.now(),updated:Date.now(),doneAt:0},x)),templates:Array.isArray(o.templates)?o.templates.filter(t=>t&&t.id):[],taskHist:Array.isArray(o.taskHist)?o.taskHist.slice(-500):[],revx:(o.revx&&typeof o.revx==='object'&&!Array.isArray(o.revx))?o.revx:{},bagRules:(Array.isArray(o.bagRules)?o.bagRules:[]).filter(r=>r&&r.value&&Array.isArray(r.itemIds)),health:arr('health'),hprefs:Object.assign({weeklyMin:150,sleepH:7,heightCm:''},o.hprefs||{}),fin:normFin(o.fin),
+    packed:o.packed||{},kits:Array.isArray(o.kits)?o.kits.filter(k=>k&&k.id):[],mfCause:(o.mfCause&&typeof o.mfCause==='object'&&!Array.isArray(o.mfCause))?o.mfCause:{},mfSims:Array.isArray(o.mfSims)?o.mfSims.slice(-100):[],wishes:arr('wishes').map(x=>Object.assign({title:'',url:'',price:0,qty:1,store:'',priority:2,catId:'',note:'',status:'quero',paid:0,created:Date.now(),updated:Date.now(),boughtAt:0},x)),arts:arr('arts').map(normArt),artimg:arr('artimg').filter(x=>x&&x.id),artproj:arr('artproj').filter(x=>x&&x.id),lazer:arr('lazer').map(x=>Object.assign({type:'outro',title:'',scope:'pessoal',status:'todo',catId:'',link:'',total:0,progress:0,unit:'',plannedMin:0,stars:0,review:'',noteId:'',note:'',created:Date.now(),updated:Date.now(),doneAt:0},x)),templates:Array.isArray(o.templates)?o.templates.filter(t=>t&&t.id):[],taskHist:Array.isArray(o.taskHist)?o.taskHist.slice(-500):[],revx:(o.revx&&typeof o.revx==='object'&&!Array.isArray(o.revx))?o.revx:{},bagRules:(Array.isArray(o.bagRules)?o.bagRules:[]).filter(r=>r&&r.value&&Array.isArray(r.itemIds)),health:arr('health'),hprefs:Object.assign({weeklyMin:150,sleepH:7,heightCm:''},o.hprefs||{}),fin:normFin(o.fin),
     acts:arr('acts').map(a=>{const x=Object.assign({actualMin:0,kitIds:[],overrides:{},deckIds:[],title:'',kind:'Atividade',tipoAtv:'',blockType:'estudo',catId:'',teacher:'',noTeacher:false,obs:'',place:'',link:'',doWhat:'',where:'',plan:{},bring:'',slots:[],done:{},miss:{},goalIds:[],docIds:[],relId:'',itemIds:[],linkIds:[],stow:{},extras:[],moneys:[],noArea:false,themeNA:false},a);if(x.theme==null)x.theme=x.title;return x;}),
     tasks:arr('tasks').map(t=>Object.assign({actualMin:0,repeat:null,blockedBy:'',deckIds:[],title:'',notes:'',obs:'',deadline:'',catId:'',docId:'',link:'',done:false,activityIds:[],goalIds:[],linkIds:[],itemIds:[],where:'',plan:{},deadlineTime:'',dateIds:[],moneys:[],group:'',subs:[]},t)),
     docs:arr('docs').map(d=>Object.assign({title:'',catId:'',link:'',notes:'',todo:[],goalIds:[],linkIds:[],noteIds:[],folderId:'',ext:'',status:'',source:'',srcLink:'',starnote:false,driveId:'',driveMod:0},d)),
@@ -3281,7 +3313,7 @@ function save(){try{Watch.touch();}catch(e){}HBMEMO={};DAYMEMO={};S.savedAt=Math
 
 const UNSENT_KEY='rotina_unsent';
 // Listas que nunca devem encolher de repente sem você saber (a nuvem e o site checam as duas).
-const PROT=[['inks','Cadernos'],['acts','Eventos'],['tasks','Tarefas'],['docs','Documentos'],['lazer','Lazer'],['wishes','Desejos'],['goals','Objetivos'],['notes','Notas'],['pdfs','PDFs'],['decks','Baralhos'],['cards','Questões e cards'],['recipes','Receitas'],['pantry','Estoque'],['meals','Refeições'],['health','Saúde'],['links','Links'],['dates','Datas'],['habits','Hábitos'],['slides','Apresentações'],['docTpls','Modelos de documento'],['spends','Saídas']];
+const PROT=[['inks','Cadernos'],['acts','Eventos'],['tasks','Tarefas'],['docs','Documentos'],['arts','Artigos'],['lazer','Lazer'],['wishes','Desejos'],['goals','Objetivos'],['notes','Notas'],['pdfs','PDFs'],['decks','Baralhos'],['cards','Questões e cards'],['recipes','Receitas'],['pantry','Estoque'],['meals','Refeições'],['health','Saúde'],['links','Links'],['dates','Datas'],['habits','Hábitos'],['slides','Apresentações'],['docTpls','Modelos de documento'],['spends','Saídas']];
 const getL=(st,k)=>k==='spends'?(st&&st.fin&&st.fin.spends)||[]:(st&&st[k])||[];
 function lossInfo(L,R){ // listas em que um lado tem menos da metade do outro (com pelo menos 3 no maior)
   const out=[];
@@ -5448,7 +5480,7 @@ function renderAjustes(){
 /* ==========================================================================
    17. RENDERIZAÇÃO GERAL
    ========================================================================== */
-const TABS=[['painel','Painel','home'],['semana','Semana','calendar'],['tarefas','Tarefas','tasks'],['revisoes','Revisões','repeat'],['assuntos','Assuntos','tag'],['habitos','Hábitos','sprout'],['docs','Documentos','book'],['notas','Notas','note'],['questoes','Questões','cap'],['metas','Objetivos','target'],['datas','Datas','clock'],['links','Links','link'],['cul','Culinária','chef'],['fin','Finanças','wallet'],['lazer','Lazer','film'],['desejos','Desejos','gift'],['ajustes','Ajustes','settings']];
+const TABS=[['painel','Painel','home'],['semana','Semana','calendar'],['tarefas','Tarefas','tasks'],['revisoes','Revisões','repeat'],['assuntos','Assuntos','tag'],['artigos','Artigos','flask'],['habitos','Hábitos','sprout'],['docs','Documentos','book'],['notas','Notas','note'],['questoes','Questões','cap'],['metas','Objetivos','target'],['datas','Datas','clock'],['links','Links','link'],['cul','Culinária','chef'],['fin','Finanças','wallet'],['lazer','Lazer','film'],['desejos','Desejos','gift'],['ajustes','Ajustes','settings']];
 // Transição suave ao trocar de aba (o conteúdo entra deslizando de leve; sem movimento se o aparelho pedir)
 function tabAnim(dir){
   const m=$('#main');if(!m||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))return;
@@ -5481,7 +5513,7 @@ applyAppMode();
     ACT.tab({dataset:{v:TABS[j][0]}});
   },{passive:true});
 })();
-const SB_GROUPS=[['Execução',['painel','semana','tarefas']],['Estudo',['revisoes','assuntos','notas','questoes','docs']],['Estratégia',['metas','habitos','datas']],['Gestão',['fin','cul','lazer','desejos']],['Sistema',['links','ajustes']]];
+const SB_GROUPS=[['Execução',['painel','semana','tarefas']],['Estudo',['revisoes','assuntos','notas','questoes','artigos','docs']],['Estratégia',['metas','habitos','datas']],['Gestão',['fin','cul','lazer','desejos']],['Sistema',['links','ajustes']]];
 function renderTabs(){
   const bar=$('#sbnav');if(!bar)return;
   const due=S.prefs.hideDueBadge?0:dueCardCount();
@@ -5591,7 +5623,7 @@ function renderMain(){
   fsrsSyncW();
   applyLook();
   const mn=$('#main');if(mn)mn.classList.toggle('wide',UI.tab==='semana'&&UI.view==='grade');
-  const map={painel:renderPainel,semana:renderSemana,tarefas:renderTarefas,revisoes:renderRevisoes,assuntos:renderAssuntos,habitos:renderHabitos,docs:renderDocs,notas:renderNotas,questoes:renderQuestoes,metas:renderMetas,datas:renderDatas,links:renderLinks,cul:renderCul,fin:renderFin,lazer:renderLazer,desejos:renderDesejos,ajustes:renderAjustes};
+  const map={painel:renderPainel,semana:renderSemana,tarefas:renderTarefas,revisoes:renderRevisoes,assuntos:renderAssuntos,artigos:renderArtigos,habitos:renderHabitos,docs:renderDocs,notas:renderNotas,questoes:renderQuestoes,metas:renderMetas,datas:renderDatas,links:renderLinks,cul:renderCul,fin:renderFin,lazer:renderLazer,desejos:renderDesejos,ajustes:renderAjustes};
   computeAttention();
   $('#main').innerHTML=map[UI.tab]();
   try{NC.badge();}catch(e){}
@@ -7866,6 +7898,7 @@ function gsBuild(){
   S.acts.forEach(a=>P('act',a.id,'Atividades','calendar',aT(a),[a.teacher,a.obs,a.place,a.doWhat,a.where,a.bring,a.link,a.kind,gsFlat(a.extras,SK).join(' ')].join(' '),a.slots&&a.slots[0]&&a.slots[0].mode==='date'?fmtDM(a.slots[0].date):'semanal'));
   S.tasks.forEach(t=>P('task',t.id,'Tarefas','tasks',t.title,[t.notes,t.obs,t.where,t.link].join(' '),t.done?'concluída':(tDue(t)?fmtDM(tDue(t)):'')));
   (S.wishes||[]).forEach(x=>P('wish',x.id,'Desejos','gift',x.title,[x.note,x.store,x.url].join(' '),''));
+  (S.arts||[]).forEach(a=>P('art',a.id,'Artigos','flask',a.title,[a.authors,a.journal,a.year,a.question,a.topics.join(' '),a.conclusion,a.results,a.notes,a.doi,a.intro.concat(a.disc).map(i=>i.author+' '+i.point).join(' ')].join(' '),a.journal||''));
   (S.lazer||[]).forEach(x=>P('lazer',x.id,'Lazer','film',x.title,[x.note,x.review,x.link,lzType(x.type).label,x.scope].join(' '),''));
   S.docs.forEach(d=>P('doc',d.id,'Documentos','file',d.title,[d.notes,d.link,d.source,d.srcLink,dstLabel(d.status),gsFlat(d.todo,SK).join(' ')].join(' '),dfolderPath(d.folderId).join(' › ')));
   S.goals.forEach(g=>P('goal',g.id,'Objetivos','target',g.title,'',HNAME[g.horizon]||''));
@@ -8015,6 +8048,7 @@ function openRef(ref){
   if(k==='act'){const a=actById(id);if(!a){toast('Esta atividade não existe mais.');return;}const o=nextOccOf(a);if(o)openOcc(a.id,o.key);}
   else if(k==='task'){if(!openTaskView(id))toast('Esta tarefa não existe mais.');}
   else if(k==='wish'){if((S.wishes||[]).some(x=>x.id===id)){closeModal();UI.tab='desejos';renderTabs();renderMain();window.scrollTo(0,0);}else toast('Este item não existe mais.');}
+  else if(k==='art'){if(artById(id)){closeModal();UI.tab='artigos';UI.artView=id;renderTabs();renderMain();window.scrollTo(0,0);}else toast('Este artigo não existe mais.');}
   else if(k==='lazer'){if(lzById(id)){closeModal();UI.tab='lazer';renderTabs();renderMain();window.scrollTo(0,0);}else toast('Este item não existe mais.');}
   else if(k==='doc'){if(docById(id))openDocView(id);else toast('Este documento não existe mais.');}
   else if(k==='goal'){if(goalById(id))openGoalView(id);else toast('Este objetivo não existe mais.');}
@@ -10161,7 +10195,7 @@ function printFallback(){
   w.document.close();
 }
 /* ----- imprimir a aba (ou subaba) que está na tela ----- */
-const TAB_LABEL={assuntos:'Assuntos',painel:'Painel',semana:'Semana',tarefas:'Tarefas',habitos:'Hábitos',docs:'Documentos',notas:'Notas',questoes:'Questões',metas:'Objetivos',datas:'Datas',links:'Links',saude:'Saúde',cul:'Culinária',fin:'Finanças',lazer:'Lazer',desejos:'Desejos',ajustes:'Ajustes'};
+const TAB_LABEL={assuntos:'Assuntos',artigos:'Artigos',painel:'Painel',semana:'Semana',tarefas:'Tarefas',habitos:'Hábitos',docs:'Documentos',notas:'Notas',questoes:'Questões',metas:'Objetivos',datas:'Datas',links:'Links',saude:'Saúde',cul:'Culinária',fin:'Finanças',lazer:'Lazer',desejos:'Desejos',ajustes:'Ajustes'};
 function printContext(){
   if(UI.tab==='semana'){printWeek();return;}
   if(UI.tab==='notas'&&UI.nview&&UI.nview.id&&noteById(UI.nview.id)){printNote(UI.nview.id);return;}
@@ -15586,6 +15620,421 @@ document.addEventListener('change',e=>{
   const t=e.target;if(!t)return;
   if(t.id==='lzcat'){UI.lzCat=t.value;renderMain();}
   else if(t.id==='lzsort'){UI.lzSort=t.value;renderMain();}
+});
+
+
+/* ===== Artigos científicos: fichamento citável ===== */
+const ART_ST=[['a_ler','A ler','#6E56CF'],['lendo','Em leitura','#E9A100'],['lido','Lido','#2F9E6A']];
+const ART_DESIGNS=['Ensaio clínico randomizado','Coorte','Caso-controle','Transversal','Série ou relato de caso','Revisão sistemática','Metanálise','Revisão narrativa','Diretriz ou consenso','Estudo experimental','Estudo qualitativo','Outro'];
+const ART_KINDS=[['conceito','Conceito','#3E63DD'],['dado','Dado solto','#12A594'],['criterio','Critério','#C77D0A'],['obs','Observação','#8E8C99'],['descricao','Descrição','#6E56CF'],['metodo','Método','#F76B15'],['epi','Frase epidemiológica','#E5484D'],['definicao','Definição','#0091FF'],['diretriz','Diretriz ou recomendação','#30A46C'],['hipotese','Hipótese','#AB4ABA'],['limite','Limitação','#978365'],['outro','Outro','#5B6B85']];
+const ART_LISTS={intro:'Citados na introdução',disc:'Citados na discussão',quotes:'Trechos para citar'};
+const ART_MEDIA=[['figura','Figura'],['tabela','Tabela'],['grafico','Gráfico'],['fluxo','Fluxograma'],['outro','Outro']];
+const ART_SEC={
+  resumo:{title:'Pergunta central e resumo',f:[['question','Objetivo ou pergunta central que o artigo responde','ta',3],['topics','Principais tópicos (um por linha)','ta',5,1],['conclusion','Conclusão ou mensagem principal dos autores','ta',3],['limits','Limitações','ta',2],['apply','Como posso usar isto (aplicabilidade)','ta',2]]},
+  metodos:{title:'Métodos',f:[['m.design','Delineamento','in'],['m.setting','Local e período','in'],['m.sample','População e amostra (n)','ta',2],['m.criteria','Critérios de inclusão e exclusão','ta',2],['m.groups','Grupos e intervenções','ta',2],['m.collection','Modo de coleta de dados','ta',2],['m.tests','Testes e exames solicitados','ta',2],['m.outcomes','Desfechos (primário e secundários)','ta',2],['m.stats','Análise estatística','ta',2],['m.duration','Duração e seguimento','in'],['m.ethics','Aspectos éticos','in']]},
+  resultados:{title:'Resultados',f:[['results','Resultados principais','ta',6],['resKey','Números-chave (um por linha)','ta',4,1]]},
+  notas:{title:'Minhas anotações',f:[['notes','Anotações livres, críticas e ideias','ta',6]]}
+};
+const artById=id=>(S.arts||[]).find(a=>a.id===id);
+const artProjById=id=>(S.artproj||[]).find(p=>p.id===id);
+const artKind=k=>ART_KINDS.find(x=>x[0]===k)||ART_KINDS[ART_KINDS.length-1];
+const artSt=k=>ART_ST.find(x=>x[0]===k)||ART_ST[0];
+const artImg=id=>{const x=(S.artimg||[]).find(i=>i.id===id);return x?x.src:'';};
+const artGet=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
+const artSet=(o,p,v)=>{const ks=p.split('.');let a=o;ks.slice(0,-1).forEach(k=>{if(!a[k]||typeof a[k]!=='object')a[k]={};a=a[k];});a[ks[ks.length-1]]=v;};
+function normArt(a){
+  const o=Object.assign({title:'',authors:'',year:'',journal:'',vol:'',issue:'',pages:'',doi:'',pmid:'',link:'',pdfId:'',design:'',status:'a_ler',fav:false,projIds:[],focoIds:[],catId:'',question:'',topics:[],conclusion:'',limits:'',apply:'',results:'',resKey:[],notes:'',stars:0,noteId:'',intro:[],disc:[],quotes:[],media:[],created:Date.now(),updated:Date.now(),readAt:0},a||{});
+  o.m=Object.assign({design:'',setting:'',sample:'',criteria:'',groups:'',collection:'',tests:'',outcomes:'',stats:'',duration:'',ethics:''},(a&&a.m)||{});
+  ['projIds','focoIds','topics','resKey','intro','disc','quotes','media'].forEach(k=>{if(!Array.isArray(o[k]))o[k]=[];});
+  return o;
+}
+/* ----- Autores e referências (ABNT, Vancouver, APA) ----- */
+function artAuthors(s){
+  s=String(s||'').trim();if(!s)return [];
+  let parts;
+  if(/[;\n]/.test(s))parts=s.split(/\s*[;\n]\s*/);else if((s.match(/,/g)||[]).length>=2)parts=s.split(/\s*,\s*/);else parts=[s];
+  return parts.map(x=>x.trim()).filter(Boolean).map(p=>{
+    let last,first;
+    if(p.indexOf(',')>=0){const i=p.indexOf(',');last=p.slice(0,i).trim();first=p.slice(i+1).trim();}
+    else{const w=p.split(/\s+/);if(w.length>1&&/^[A-Z]{1,3}$/.test(w[w.length-1])){last=w.slice(0,-1).join(' ');first=w[w.length-1];}else{last=w[w.length-1];first=w.slice(0,-1).join(' ');}}
+    const ini=first.replace(/\./g,' ').split(/\s+/).filter(Boolean).reduce((r,t)=>r.concat(t.length<=3&&t===t.toUpperCase()?t.split(''):[t[0].toUpperCase()]),[]);
+    return {last:last,ini:ini};
+  });
+}
+const artNm=s=>s&&s===s.toUpperCase()?s.toLowerCase().replace(/(^|[\s-])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase()):s;
+const artDoi=d=>String(d||'').trim().replace(/^https?:\/\/(dx\.)?doi\.org\//i,'');
+function artRef(a,fmt){
+  const L=artAuthors(a.authors),t=String(a.title||'').replace(/[.\s]+$/,''),y=a.year||'s.d.',doi=artDoi(a.doi);
+  if(fmt==='vancouver'){
+    const n=L.slice(0,6).map(x=>artNm(x.last)+(x.ini.length?' '+x.ini.join(''):'')).join(', ')+(L.length>6?', et al':'');
+    return [n&&n+'.',t+'.',a.journal&&a.journal+'.',(a.year||'')+(a.vol?';'+a.vol:'')+(a.issue?'('+a.issue+')':'')+(a.pages?':'+a.pages:'')+'.',doi&&'doi:'+doi].filter(Boolean).join(' ');
+  }
+  if(fmt==='apa'){
+    const f=L.slice(0,20).map(x=>artNm(x.last)+(x.ini.length?', '+x.ini.map(i=>i+'.').join(' '):''));
+    const n=f.length>2?f.slice(0,-1).join(', ')+', & '+f[f.length-1]:f.join(' & ');
+    return [n&&n+' ('+y+').',t+'.',a.journal&&a.journal+(a.vol?', '+a.vol+(a.issue?'('+a.issue+')':''):'')+(a.pages?', '+a.pages:'')+'.',doi&&'https://doi.org/'+doi].filter(Boolean).join(' ');
+  }
+  const f=L.map(x=>x.last.toUpperCase()+(x.ini.length?', '+x.ini.map(i=>i+'.').join(' '):'')),n=f.length>3?f[0]+' et al.':f.join('; ');
+  const jr=[a.journal,a.vol&&'v. '+a.vol,a.issue&&'n. '+a.issue,a.pages&&'p. '+a.pages,y].filter(Boolean).join(', ');
+  return [n&&(/\.$/.test(n)?n:n+'.'),t+'.',jr+'.',doi&&'DOI: '+doi+'.'].filter(Boolean).join(' ');
+}
+function artIn(a,fmt,inner){
+  const L=artAuthors(a.authors),y=a.year||'s.d.';let s;
+  if(!L.length)s=(a.title||'').split(/\s+/).slice(0,3).join(' ').toUpperCase()+', '+y;
+  else if(fmt==='abnt'){const u=L.map(x=>x.last.toUpperCase());s=(u.length>3?u[0]+' et al.':u.join('; '))+', '+y;}
+  else{const u=L.map(x=>artNm(x.last));s=(u.length>2?u[0]+' et al.':u.join(' & '))+', '+y;}
+  return inner?s:'('+s+')';
+}
+function artApud(a,it,fmt){
+  const base=artIn(a,fmt,true),au=fmt==='abnt'?String(it.author||'').toUpperCase():artNm(String(it.author||'')),y=it.year?', '+it.year:'';
+  return fmt==='apa'?'('+au+y+', citado em '+base+')':fmt==='vancouver'?au+(it.year?' ('+it.year+')':'')+', citado por '+base:'('+au+y+' apud '+base+')';
+}
+function artCopy(text,msg){
+  const done=()=>toast(msg||'Copiado.');
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(done,()=>{const t=document.createElement('textarea');t.value=text;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();done();});
+  else{const t=document.createElement('textarea');t.value=text;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();done();}
+}
+const artFmt=()=>['abnt','vancouver','apa'].indexOf(S.prefs.artFmt)>=0?S.prefs.artFmt:'abnt';
+function artBib(a){
+  const L=artAuthors(a.authors).map(x=>x.last+(x.ini.length?', '+x.ini.join(' '):'')).join(' and '),key=(artAuthors(a.authors)[0]||{last:'art'}).last.replace(/\W+/g,'')+(a.year||'')+a.id.slice(0,3);
+  return '@article{'+key+',\n  author = {'+L+'},\n  title = {'+a.title+'},\n  journal = {'+a.journal+'},\n  year = {'+a.year+'},\n  volume = {'+a.vol+'},\n  number = {'+a.issue+'},\n  pages = {'+String(a.pages||'').replace(/-/g,'--')+'},\n  doi = {'+artDoi(a.doi)+'}\n}\n';
+}
+function artRis(a){
+  const r=['TY  - JOUR'];artAuthors(a.authors).forEach(x=>r.push('AU  - '+x.last+(x.ini.length?', '+x.ini.join(''):'')));
+  r.push('TI  - '+a.title,'JO  - '+a.journal,'PY  - '+a.year,'VL  - '+a.vol,'IS  - '+a.issue);
+  const pg=String(a.pages||'').split(/[-–]/);if(pg[0])r.push('SP  - '+pg[0].trim());if(pg[1])r.push('EP  - '+pg[1].trim());
+  if(artDoi(a.doi))r.push('DO  - '+artDoi(a.doi));if(a.link)r.push('UR  - '+normUrl(a.link));if(a.question)r.push('AB  - '+a.question);r.push('ER  - ','');
+  return r.join('\n');
+}
+/* ----- Filtros e lista ----- */
+function artPass(a,skip){
+  if(skip!=='st'&&UI.arSt&&a.status!==UI.arSt)return false;
+  if(UI.arFav&&!a.fav)return false;
+  if(skip!=='proj'&&UI.arProj){if(UI.arProj==='__none'){if(a.projIds.length)return false;}else if(a.projIds.indexOf(UI.arProj)<0)return false;}
+  if(UI.arJ&&(a.journal||'').trim()!==UI.arJ)return false;
+  if(UI.arCat&&catDesc(UI.arCat).indexOf(a.catId)<0)return false;
+  if(UI.arFoco&&a.focoIds.indexOf(UI.arFoco)<0)return false;
+  if(UI.arDes&&a.design!==UI.arDes)return false;
+  if(UI.arQ){const q=norm(UI.arQ);if(norm([a.title,a.authors,a.journal,a.year,a.question,a.topics.join(' '),a.conclusion,a.results,a.notes,a.doi].join(' ')).indexOf(q)<0)return false;}
+  return true;
+}
+function artCard(a){
+  const st=artSt(a.status),fo=a.focoIds.map(focoById).filter(Boolean),L=artAuthors(a.authors);
+  const au=L.length?(L.length>3?L.slice(0,3).map(x=>artNm(x.last)).join(', ')+' et al.':L.map(x=>artNm(x.last)).join(', ')):'';
+  const nc=a.intro.length+a.disc.length+a.quotes.length;
+  return '<article class="artcard" style="--c:'+st[2]+'"><button class="artfav '+(a.fav?'on':'')+'" data-a="art-fav" data-id="'+a.id+'" aria-label="'+(a.fav?'Remover dos favoritos':'Favoritar')+'" title="Favorito">'+(a.fav?'★':'☆')+'</button>'+
+    '<div class="artb"><div class="artt"><b data-a="art-open" data-id="'+a.id+'" role="button" tabindex="0">'+esc(a.title||'Sem título')+'</b></div>'+
+    '<div class="artm">'+esc([au,a.journal,a.year].filter(Boolean).join(' | '))+'</div>'+
+    '<div class="artchips"><span class="lzdot" style="--d:'+st[2]+'"><i></i>'+st[1]+'</span>'+(a.design?'<span class="lzdot" style="--d:#8E8C99"><i></i>'+esc(a.design)+'</span>':'')+
+    a.projIds.map(artProjById).filter(Boolean).map(p=>'<span class="lzdot" style="--d:'+esc(p.color)+'"><i></i>'+esc(p.name)+'</span>').join('')+(a.catId?tagHTML(a.catId):'')+fo.map(f=>focoPill(f,true)).join('')+'</div>'+
+    (a.question?'<div class="artq">'+esc(a.question)+'</div>':'')+
+    '<div class="artmeta">'+(a.stars?'<span class="lzrate">'+lzStars(a.stars)+'</span>':'')+(nc?'<span>'+ic('msg',13)+nc+' citações</span>':'')+(a.media.length?'<span>'+ic('image',13)+a.media.length+' figuras</span>':'')+((a.pdfId&&pdfById(a.pdfId))?'<span>'+ic('file',13)+'PDF</span>':'')+(a.link?'<span>'+ic('link',13)+'Link</span>':'')+'</div></div>'+
+    '<div class="artact"><button class="btn sm primary" data-a="art-open" data-id="'+a.id+'">Abrir</button>'+(a.pdfId&&pdfById(a.pdfId)?'<button class="btn sm" data-a="art-pdf" data-id="'+a.id+'">'+ic('file',14)+' PDF</button>':a.link?'<button class="btn sm" data-a="art-link" data-id="'+a.id+'">'+ic('external',14)+' Link</button>':'')+'</div></article>';
+}
+function artListHTML(){
+  const base=(S.arts||[]).filter(a=>artPass(a)),sort=UI.arSort||'recent';
+  base.sort((a,b)=>sort==='year'?(Number(b.year)||0)-(Number(a.year)||0):sort==='title'?String(a.title).localeCompare(String(b.title),'pt-BR'):sort==='stars'?(b.stars||0)-(a.stars||0)||(b.updated||0)-(a.updated||0):(b.updated||0)-(a.updated||0));
+  if(!base.length)return '<div class="empty">'+((S.arts||[]).length?'Nenhum artigo com esses filtros.':'Nenhum artigo ainda.')+'<br><button class="btn primary" data-a="art-new">'+ic('plus',15)+' Adicionar artigo</button></div>';
+  return base.map(artCard).join('');
+}
+function renderArtigos(){
+  const a=UI.artView&&artById(UI.artView);if(a)return artDetail(a);UI.artView='';
+  const all=S.arts||[],sub=UI.artSub||'artigos';
+  const nCit=all.reduce((n,x)=>n+x.intro.length+x.disc.length+x.quotes.length,0),nMed=all.reduce((n,x)=>n+x.media.length,0);
+  let h='<div class="toolbar"><h2 class="vt" style="margin:0">Artigos</h2><span class="muted small">'+all.length+' artigos | '+all.filter(x=>x.status==='a_ler').length+' a ler | '+all.filter(x=>x.status==='lendo').length+' em leitura | '+all.filter(x=>x.status==='lido').length+' lidos | '+all.filter(x=>x.fav).length+' favoritos</span><span class="sp"></span>'+
+    '<button class="btn sm" data-a="art-exp" title="Baixar a lista filtrada para Zotero ou Mendeley">'+ic('download',14)+' Exportar</button><button class="btn sm" data-a="art-proj">'+ic('folder',14)+' Projetos</button><button class="btn primary" data-a="art-new">'+ic('plus',15)+' Novo artigo</button></div>';
+  h+='<div class="seg" style="margin:6px 0 12px"><button class="'+(sub==='artigos'?'on':'')+'" data-a="art-sub" data-v="artigos">Artigos ('+all.length+')</button><button class="'+(sub==='citacoes'?'on':'')+'" data-a="art-sub" data-v="citacoes">Banco de citações ('+nCit+')</button><button class="'+(sub==='midia'?'on':'')+'" data-a="art-sub" data-v="midia">Figuras e tabelas ('+nMed+')</button></div>';
+  const pool=all.filter(x=>artPass(x,'proj')),cp=id=>pool.filter(x=>id==='__none'?!x.projIds.length:x.projIds.indexOf(id)>=0).length;
+  h+='<div class="lztypes" role="group" aria-label="Projeto"><button class="lzchip '+(!UI.arProj?'on':'')+'" data-a="art-pf" data-v=""><span>Todos os projetos</span><small>'+pool.length+'</small></button>'+(S.artproj||[]).map(p=>'<button class="lzchip '+(UI.arProj===p.id?'on':'')+'" style="--c:'+esc(p.color)+'" data-a="art-pf" data-v="'+p.id+'"><span>'+esc(p.name)+'</span><small>'+cp(p.id)+'</small></button>').join('')+'<button class="lzchip '+(UI.arProj==='__none'?'on':'')+'" data-a="art-pf" data-v="__none"><span>Sem projeto</span><small>'+cp('__none')+'</small></button></div>';
+  if(sub==='citacoes')return h+artBankHTML();
+  if(sub==='midia')return h+artGalleryHTML();
+  const js={};all.forEach(x=>{const j=(x.journal||'').trim();if(j)js[j]=(js[j]||0)+1;});
+  const stc=k=>all.filter(x=>artPass(x,'st')&&(!k||x.status===k)).length;
+  h+='<div class="nfbar tfbar"><div class="frow"><span class="fl" style="min-width:auto">Leitura</span><button class="chip '+(!UI.arSt?'on':'')+'" data-a="art-stf" data-v="">Todos ('+stc('')+')</button>'+ART_ST.map(s=>'<button class="chip '+(UI.arSt===s[0]?'on':'')+'" data-a="art-stf" data-v="'+s[0]+'"><i class="lzd" style="background:'+s[2]+'"></i>'+s[1]+' ('+stc(s[0])+')</button>').join('')+'<button class="chip '+(UI.arFav?'on':'')+'" data-a="art-favf">'+(UI.arFav?'★':'☆')+' Favoritos</button></div>'+
+    '<label class="nfsel"><span>Revista</span><select id="arj"><option value="">Todas</option>'+Object.keys(js).sort((x,y)=>x.localeCompare(y,'pt-BR')).map(j=>'<option value="'+esc(j)+'" '+(UI.arJ===j?'selected':'')+'>'+esc(j)+' ('+js[j]+')</option>').join('')+'</select></label>'+
+    '<label class="nfsel"><span>Disciplina</span><select id="arcat"><option value="">Todas</option>'+catTreeOpts(UI.arCat)+'</select></label>'+
+    '<label class="nfsel"><span>Foco</span><select id="arfoco"><option value="">Todos</option>'+(S.focos||[]).map(f=>'<option value="'+f.id+'" '+(UI.arFoco===f.id?'selected':'')+'>'+esc(f.name)+'</option>').join('')+'</select></label>'+
+    '<label class="nfsel"><span>Tipo de estudo</span><select id="ardes"><option value="">Todos</option>'+ART_DESIGNS.map(d=>'<option '+(UI.arDes===d?'selected':'')+'>'+esc(d)+'</option>').join('')+'</select></label>'+
+    '<div class="sbox" style="max-width:240px">'+ic('search',15)+'<input id="arq" type="search" placeholder="Buscar" value="'+esc(UI.arQ||'')+'" autocomplete="off"></div>'+
+    '<label class="nfsel"><span>Ordenar</span><select id="arsort"><option value="recent" '+((UI.arSort||'recent')==='recent'?'selected':'')+'>Mais recentes</option><option value="year" '+(UI.arSort==='year'?'selected':'')+'>Ano</option><option value="stars" '+(UI.arSort==='stars'?'selected':'')+'>Relevância</option><option value="title" '+(UI.arSort==='title'?'selected':'')+'>Título</option></select></label></div>';
+  return h+'<div id="arList" class="lzlist">'+artListHTML()+'</div>';
+}
+/* ----- Detalhe ----- */
+function artRows(rows){
+  const r=rows.filter(x=>x[1]&&String(x[1]).trim());
+  return r.length?'<dl class="artdl">'+r.map(x=>'<dt>'+esc(x[0])+'</dt><dd>'+esc(x[1])+'</dd>').join('')+'</dl>':'';
+}
+function artSecHead(a,key,title,extra){
+  return '<div class="arth"><h3>'+title+'</h3><span class="sp"></span>'+(extra||'')+(ART_SEC[key]?'<button class="btn sm" data-a="art-sec" data-id="'+a.id+'" data-k="'+key+'">'+ic('edit',14)+' Editar</button>':'')+'</div>';
+}
+function artItemHTML(a,list,it,bank){
+  if(list==='quotes')return '<div class="artit"><blockquote class="lzrev" style="--c:#3E63DD">'+esc(it.text)+'</blockquote><div class="artitm">'+(it.page?'p. '+esc(it.page)+' ':'')+(it.note?esc(it.note):'')+'</div>'+
+    '<div class="artitact"><button class="btn sm ghost" data-a="art-qcopy" data-id="'+a.id+'" data-i="'+it.id+'">'+ic('copy',13)+' Copiar com citação</button>'+(bank?'<button class="btn sm ghost" data-a="art-open" data-id="'+a.id+'">Abrir artigo</button>':'<button class="icon-btn" data-a="art-item" data-id="'+a.id+'" data-l="'+list+'" data-i="'+it.id+'" aria-label="Editar">'+ic('edit',16)+'</button><button class="icon-btn" data-a="art-idel" data-id="'+a.id+'" data-l="'+list+'" data-i="'+it.id+'" aria-label="Excluir">'+ic('trash',16)+'</button>')+'</div></div>';
+  const k=artKind(it.kind);
+  return '<div class="artit" style="--c:'+k[2]+'"><div class="artith"><span class="artkind">'+esc(k[1])+'</span><b>'+esc(it.author||'Sem autor')+(it.year?' ('+esc(it.year)+')':'')+'</b>'+(it.page?'<span class="muted small">p. '+esc(it.page)+'</span>':'')+'</div>'+
+    (it.point?'<div class="artpt">'+esc(it.point)+'</div>':'')+(it.ref?'<details class="rvchk"><summary>Referência completa</summary><div class="small">'+esc(it.ref)+'</div></details>':'')+
+    '<div class="artitact"><button class="btn sm ghost" data-a="art-apud" data-id="'+a.id+'" data-l="'+list+'" data-i="'+it.id+'" title="Copia a citação indireta (apud)">'+ic('copy',13)+' Copiar apud</button>'+(it.ref?'<button class="btn sm ghost" data-a="art-iref" data-id="'+a.id+'" data-l="'+list+'" data-i="'+it.id+'">Copiar referência</button>':'')+
+    (bank?'<button class="btn sm ghost" data-a="art-open" data-id="'+a.id+'">Abrir artigo</button>':'<button class="icon-btn" data-a="art-item" data-id="'+a.id+'" data-l="'+list+'" data-i="'+it.id+'" aria-label="Editar">'+ic('edit',16)+'</button><button class="icon-btn" data-a="art-idel" data-id="'+a.id+'" data-l="'+list+'" data-i="'+it.id+'" aria-label="Excluir">'+ic('trash',16)+'</button>')+'</div></div>';
+}
+function artListSec(a,list,hint){
+  const arr=a[list];
+  return '<section class="card sec artsec"><div class="arth"><h3>'+ART_LISTS[list]+' <small class="muted">'+arr.length+'</small></h3><span class="sp"></span><button class="btn sm" data-a="art-item" data-id="'+a.id+'" data-l="'+list+'">'+ic('plus',14)+' Adicionar</button></div>'+
+    (arr.length?arr.map(it=>artItemHTML(a,list,it)).join(''):'<p class="muted small" style="margin:6px 0">'+hint+'</p>')+'</section>';
+}
+function artMediaCard(a,m,bank){
+  const src=artImg(m.id),k=(ART_MEDIA.find(x=>x[0]===m.kind)||ART_MEDIA[4])[1];
+  return '<figure class="artfig"><button class="artimg" data-a="art-zoom" data-m="'+m.id+'" aria-label="Ampliar">'+(src?'<img alt="" src="'+src+'" loading="lazy">':'<span class="muted small">imagem indisponível</span>')+'</button>'+
+    '<figcaption><b>'+esc(k)+'</b>'+(m.page?' <span class="muted small">p. '+esc(m.page)+'</span>':'')+'<div>'+esc(m.caption||'')+'</div>'+(m.note?'<div class="muted small">'+esc(m.note)+'</div>':'')+(bank?'<div class="muted small">'+esc(a.title)+'</div>':'')+
+    '<div class="artitact">'+(bank?'<button class="btn sm ghost" data-a="art-open" data-id="'+a.id+'">Abrir artigo</button>':'<button class="icon-btn" data-a="art-media" data-id="'+a.id+'" data-m="'+m.id+'" aria-label="Editar">'+ic('edit',16)+'</button><button class="icon-btn" data-a="art-mdel" data-id="'+a.id+'" data-m="'+m.id+'" aria-label="Excluir">'+ic('trash',16)+'</button>')+'</div></figcaption></figure>';
+}
+function artDetail(a){
+  const st=artSt(a.status),fmt=artFmt(),fo=a.focoIds.map(focoById).filter(Boolean),pd=a.pdfId&&pdfById(a.pdfId);
+  const lk=a.link?(/drive\.google|docs\.google/i.test(a.link)?'Abrir no Drive':'Abrir link'):'';
+  const doiUrl=a.doi?'https://doi.org/'+artDoi(a.doi):'';
+  let h='<div class="toolbar"><button class="btn sm" data-a="art-back">'+ic('chevL',14)+' Artigos</button><span class="sp"></span><button class="btn sm" data-a="art-edit" data-id="'+a.id+'">'+ic('edit',14)+' Dados do artigo</button><button class="btn sm danger" data-a="art-del" data-id="'+a.id+'">'+ic('trash',14)+' Excluir</button></div>';
+  h+='<div class="card sec artsec arthero" style="--c:'+st[2]+'"><div class="arth"><h2 class="vt" style="margin:0;flex:1">'+esc(a.title||'Sem título')+'</h2><button class="artfav '+(a.fav?'on':'')+'" data-a="art-fav" data-id="'+a.id+'" title="Favorito">'+(a.fav?'★':'☆')+'</button></div>'+
+    '<div class="artm">'+esc([a.authors.replace(/\n/g,'; '),a.journal,[a.year,a.vol&&'v. '+a.vol,a.issue&&'n. '+a.issue,a.pages&&'p. '+a.pages].filter(Boolean).join(', ')].filter(Boolean).join(' | '))+'</div>'+
+    '<div class="artchips">'+(a.design?'<span class="lzdot" style="--d:#8E8C99"><i></i>'+esc(a.design)+'</span>':'')+a.projIds.map(artProjById).filter(Boolean).map(p=>'<span class="lzdot" style="--d:'+esc(p.color)+'"><i></i>'+esc(p.name)+'</span>').join('')+(a.catId?tagHTML(a.catId):'')+fo.map(f=>focoPill(f)).join('')+'</div>'+
+    '<div class="seg" style="margin:10px 0 6px">'+ART_ST.map(s=>'<button class="'+(a.status===s[0]?'on':'')+'" data-a="art-st" data-id="'+a.id+'" data-v="'+s[0]+'">'+s[1]+'</button>').join('')+'</div>'+
+    '<div class="lzrate" role="group" aria-label="Relevância para mim"><span class="muted small" style="margin-right:6px">Relevância</span>'+[1,2,3,4,5].map(i=>'<button class="lzs '+(i<=(a.stars||0)?'on':'')+'" data-a="art-star" data-id="'+a.id+'" data-n="'+i+'" aria-label="'+i+' estrelas">★</button>').join('')+'</div>'+
+    '<div class="artbar">'+(pd?'<button class="btn sm primary" data-a="art-pdf" data-id="'+a.id+'">'+ic('file',14)+' Abrir PDF</button><button class="btn sm ghost" data-a="art-pdfdel" data-id="'+a.id+'">Remover PDF</button>':'<button class="btn sm" data-a="art-attach" data-id="'+a.id+'">'+ic('paperclip',14)+' Anexar PDF</button>')+
+    (lk?'<button class="btn sm '+(pd?'':'primary')+'" data-a="art-link" data-id="'+a.id+'">'+ic('external',14)+' '+lk+'</button>':'')+(doiUrl?'<a class="btn sm" href="'+esc(doiUrl)+'" target="_blank" rel="noopener">DOI</a>':'')+
+    '<button class="btn sm ghost" data-a="art-sched" data-id="'+a.id+'">'+ic('calendar',14)+' Agendar leitura</button><button class="btn sm ghost" data-a="art-note" data-id="'+a.id+'">'+ic(a.noteId&&noteById(a.noteId)?'note':'filePlus',14)+' '+(a.noteId&&noteById(a.noteId)?'Abrir nota':'Criar nota')+'</button></div></div>';
+  h+='<section class="card sec artsec"><div class="arth"><h3>Como citar este artigo</h3><span class="sp"></span><div class="seg">'+[['abnt','ABNT'],['vancouver','Vancouver'],['apa','APA']].map(f=>'<button class="'+(fmt===f[0]?'on':'')+'" data-a="art-fmt" data-v="'+f[0]+'">'+f[1]+'</button>').join('')+'</div></div>'+
+    '<p class="artcite" id="artRefTxt">'+esc(artRef(a,fmt))+'</p><div class="artbar"><button class="btn sm primary" data-a="art-cref" data-id="'+a.id+'">'+ic('copy',14)+' Copiar referência</button><button class="btn sm" data-a="art-cin" data-id="'+a.id+'">'+ic('copy',14)+' Copiar '+esc(artIn(a,fmt))+'</button><button class="btn sm ghost" data-a="art-cbib" data-id="'+a.id+'">BibTeX</button><button class="btn sm ghost" data-a="art-cris" data-id="'+a.id+'">RIS</button></div></section>';
+  const topics=a.topics.length?'<ul class="artul">'+a.topics.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'';
+  const resumo=(a.question?'<div class="artlead"><span>Pergunta central</span>'+esc(a.question)+'</div>':'')+(topics?'<h4>Principais tópicos</h4>'+topics:'')+artRows([['Conclusão dos autores',a.conclusion],['Limitações',a.limits],['Como posso usar',a.apply]]);
+  h+='<section class="card sec artsec">'+artSecHead(a,'resumo','Pergunta central e resumo')+(resumo||'<p class="muted small" style="margin:6px 0">Registre o objetivo do artigo e os principais tópicos.</p>')+'</section>';
+  const M=a.m,met=artRows([['Delineamento',M.design],['Local e período',M.setting],['População e amostra',M.sample],['Critérios de inclusão e exclusão',M.criteria],['Grupos e intervenções',M.groups],['Modo de coleta de dados',M.collection],['Testes e exames solicitados',M.tests],['Desfechos',M.outcomes],['Análise estatística',M.stats],['Duração e seguimento',M.duration],['Aspectos éticos',M.ethics]]);
+  h+='<section class="card sec artsec">'+artSecHead(a,'metodos','Métodos')+(met||'<p class="muted small" style="margin:6px 0">Delineamento, amostra, grupos, coleta, exames, estatística e duração.</p>')+'</section>';
+  const rk=a.resKey.length?'<h4>Números-chave</h4><ul class="artul">'+a.resKey.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'';
+  h+='<section class="card sec artsec">'+artSecHead(a,'resultados','Resultados')+(a.results?'<div class="artpre">'+esc(a.results)+'</div>':'')+rk+((a.results||rk)?'':'<p class="muted small" style="margin:6px 0">Resultados principais e números que valem citar.</p>')+'</section>';
+  h+=artListSec(a,'intro','Autores citados na introdução e o ponto de cada um: dá para reaproveitar em outros artigos como citação indireta (apud).');
+  h+=artListSec(a,'disc','Autores citados na discussão e o ponto de cada um.');
+  h+=artListSec(a,'quotes','Frases do artigo que quero citar literalmente, com a página.');
+  h+='<section class="card sec artsec"><div class="arth"><h3>Figuras e tabelas <small class="muted">'+a.media.length+'</small></h3><span class="sp"></span><button class="btn sm" data-a="art-media" data-id="'+a.id+'">'+ic('plus',14)+' Adicionar</button></div>'+
+    (a.media.length?'<div class="artgrid">'+a.media.map(m=>artMediaCard(a,m)).join('')+'</div>':'<p class="muted small" style="margin:6px 0">Guarde aqui as imagens e tabelas de que gostou (envie um arquivo ou cole um print).</p>')+'</section>';
+  h+='<section class="card sec artsec">'+artSecHead(a,'notas','Minhas anotações')+(a.notes?'<div class="artpre">'+esc(a.notes)+'</div>':'<p class="muted small" style="margin:6px 0">Críticas, ideias e ligações com outros trabalhos.</p>')+'</section>';
+  return h;
+}
+/* ----- Banco de citações e galeria ----- */
+function artBankItems(){
+  const out=[];
+  (S.arts||[]).filter(a=>artPass(a,'st')).forEach(a=>['intro','disc','quotes'].forEach(l=>{if(UI.acList&&UI.acList!==l)return;a[l].forEach(it=>{
+    if(UI.acKind&&(l==='quotes'||it.kind!==UI.acKind))return;
+    if(UI.acQ&&norm([it.author,it.point,it.text,it.note,it.ref,a.title].join(' ')).indexOf(norm(UI.acQ))<0)return;
+    out.push({a:a,l:l,it:it});});}));
+  return out;
+}
+function artBankListHTML(){
+  const it=artBankItems();if(!it.length)return '<div class="empty">Nenhuma citação encontrada.<br><span class="muted small">Adicione autores citados na introdução, na discussão ou trechos dentro de cada artigo.</span></div>';
+  it.sort((x,y)=>String(x.it.author||x.it.text||'').localeCompare(String(y.it.author||y.it.text||''),'pt-BR'));
+  return it.map(r=>'<div class="artbk">'+artItemHTML(r.a,r.l,r.it,true)+'<div class="muted small artsrc">'+({intro:'Introdução',disc:'Discussão',quotes:'Trecho literal'}[r.l])+' em '+esc(artIn(r.a,artFmt()))+' | '+esc(r.a.title)+'</div></div>').join('');
+}
+function artBankHTML(){
+  const cnt=k=>artBankItems().length;
+  return '<div class="nfbar tfbar"><div class="frow"><span class="fl" style="min-width:auto">Origem</span>'+[['','Todas'],['intro','Introdução'],['disc','Discussão'],['quotes','Trechos literais']].map(x=>'<button class="chip '+((UI.acList||'')===x[0]?'on':'')+'" data-a="art-acl" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>'+
+    '<label class="nfsel"><span>Tipo de citação</span><select id="ackind"><option value="">Todos</option>'+ART_KINDS.map(k=>'<option value="'+k[0]+'" '+(UI.acKind===k[0]?'selected':'')+'>'+k[1]+'</option>').join('')+'</select></label>'+
+    '<div class="sbox" style="max-width:260px">'+ic('search',15)+'<input id="acq" type="search" placeholder="Buscar autor, ponto ou artigo" value="'+esc(UI.acQ||'')+'" autocomplete="off"></div>'+
+    '<div class="seg"><button class="'+(artFmt()==='abnt'?'on':'')+'" data-a="art-fmt" data-v="abnt">ABNT</button><button class="'+(artFmt()==='vancouver'?'on':'')+'" data-a="art-fmt" data-v="vancouver">Vancouver</button><button class="'+(artFmt()==='apa'?'on':'')+'" data-a="art-fmt" data-v="apa">APA</button></div></div>'+
+    '<p class="muted small" style="margin:0 0 10px">Reúne tudo o que você marcou nos artigos. “Copiar apud” gera a citação indireta já no formato escolhido (por exemplo: Autor, 2010 apud Silva et al., 2020).</p><div id="acList" class="lzlist">'+artBankListHTML()+'</div>';
+}
+function artGalleryHTML(){
+  const items=[];(S.arts||[]).filter(a=>artPass(a,'st')).forEach(a=>a.media.forEach(m=>{if(UI.amKind&&m.kind!==UI.amKind)return;if(UI.amQ&&norm([m.caption,m.note,a.title].join(' ')).indexOf(norm(UI.amQ))<0)return;items.push({a:a,m:m});}));
+  return '<div class="nfbar tfbar"><div class="frow"><span class="fl" style="min-width:auto">Tipo</span><button class="chip '+(!UI.amKind?'on':'')+'" data-a="art-amk" data-v="">Todos</button>'+ART_MEDIA.map(x=>'<button class="chip '+(UI.amKind===x[0]?'on':'')+'" data-a="art-amk" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div><div class="sbox" style="max-width:240px">'+ic('search',15)+'<input id="amq" type="search" placeholder="Buscar legenda ou artigo" value="'+esc(UI.amQ||'')+'" autocomplete="off"></div></div>'+
+    (items.length?'<div class="artgrid" id="amList">'+items.map(r=>artMediaCard(r.a,r.m,true)).join('')+'</div>':'<div class="empty">Nenhuma figura ou tabela guardada.<br><span class="muted small">Abra um artigo e use “Adicionar” em Figuras e tabelas.</span></div>');
+}
+/* ----- Formulários ----- */
+const artF=(n,l,v,k,r,ph)=>k==='ta'?'<label class="f">'+l+'<textarea name="'+n+'" rows="'+(r||3)+'"'+(ph?' placeholder="'+esc(ph)+'"':'')+'>'+esc(v||'')+'</textarea></label>':'<label class="f">'+l+'<input name="'+n+'" value="'+esc(v||'')+'" autocomplete="off"'+(k==='req'?' required':'')+(ph?' placeholder="'+esc(ph)+'"':'')+'></label>';
+function artForm(id){
+  const x=id?artById(id):null,p=normArt(x||{projIds:UI.arProj&&UI.arProj!=='__none'?[UI.arProj]:[]});
+  openModal('<form id="fArt" class="form"><div class="fh"><h2>'+(x?'Dados do artigo':'Novo artigo')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
+    '<div class="f"><span>Preencher sozinho pelo DOI ou PMID</span><div class="frow" style="flex-wrap:nowrap"><input name="lookup" placeholder="10.1000/xyz123 ou 12345678" autocomplete="off" style="flex:1"><button type="button" class="btn sm" data-a="art-lookup">Buscar</button></div><small class="muted" id="artLkSt"></small></div>'+
+    artF('title','Título',p.title,'req')+artF('authors','Autores (um por linha ou separados por ponto e vírgula)',p.authors,'ta',3,'Silva, João A.; Souza, Maria B.')+
+    '<div class="fgrid"><div>'+artF('journal','Revista',p.journal,'in')+'</div><div>'+artF('year','Ano',p.year,'in')+'</div></div>'+
+    '<div class="fgrid3">'+artF('vol','Volume',p.vol,'in')+artF('issue','Número',p.issue,'in')+artF('pages','Páginas',p.pages,'in',0,'123-130')+'</div>'+
+    '<div class="fgrid">'+artF('doi','DOI',p.doi,'in')+artF('pmid','PMID',p.pmid,'in')+'</div>'+
+    artF('link','Link (Google Drive, site da revista…)',p.link,'in',0,'https://')+
+    '<div class="fgrid"><label class="f">Tipo de estudo<select name="design"><option value="">(não informado)</option>'+ART_DESIGNS.map(d=>'<option '+(p.design===d?'selected':'')+'>'+esc(d)+'</option>').join('')+'</select></label>'+
+    '<div class="f"><span>Situação</span><div class="frow">'+ART_ST.map(s=>'<label class="chip cb"><input type="radio" name="status" value="'+s[0]+'" '+(p.status===s[0]?'checked':'')+'><span>'+s[1]+'</span></label>').join('')+'</div></div></div>'+
+    '<div class="f"><span>Projetos</span>'+pickerHTML('aprj',(S.artproj||[]).map(q=>({id:q.id,label:q.name})),p.projIds,'Projetos')+'<input name="newproj" placeholder="Novo projeto (opcional)" autocomplete="off" style="margin-top:6px"></div>'+
+    '<div class="f"><span>Disciplina (categoria)</span>'+catPickHTML('arcatp',p.catId)+'</div><div class="f"><span>Foco</span>'+focoPickHTML('afoco',p.focoIds)+'</div>'+
+    '<label class="chip cb" style="align-self:flex-start"><input type="checkbox" name="fav" '+(p.fav?'checked':'')+'><span>★ Favorito</span></label>'+
+    '<div class="ff">'+(x?'<button type="button" class="btn danger" data-a="art-del" data-id="'+x.id+'">Excluir</button>':'')+'<span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>',true);
+  const f=$('#fArt');mountCatPicks(f);
+  f.addEventListener('submit',e=>{
+    e.preventDefault();const E=f.elements,now=Date.now();
+    let pr=pickedValues(f,'aprj');const np=E.newproj.value.trim();
+    if(np){let q=(S.artproj||[]).find(z=>norm(z.name)===norm(np));if(!q){S.artproj=S.artproj||[];q={id:uid(),name:np,color:ART_PCOL[S.artproj.length%ART_PCOL.length]};S.artproj.push(q);}if(pr.indexOf(q.id)<0)pr.push(q.id);}
+    const d={title:E.title.value.trim(),authors:E.authors.value.trim(),journal:E.journal.value.trim(),year:E.year.value.trim(),vol:E.vol.value.trim(),issue:E.issue.value.trim(),pages:E.pages.value.trim(),doi:artDoi(E.doi.value),pmid:E.pmid.value.trim(),link:E.link.value.trim(),design:E.design.value,status:$('input[name=status]:checked',f).value,projIds:pr,catId:($('[data-catpick="arcatp"]',f)||{dataset:{}}).dataset.value||'',focoIds:pickedValues(f,'afoco'),fav:E.fav.checked,updated:now};
+    if(!d.title)return;
+    let a=x;
+    if(x){if(x.status!=='lido'&&d.status==='lido')d.readAt=now;Object.assign(x,d);}
+    else{a=normArt(Object.assign({id:uid(),created:now,readAt:d.status==='lido'?now:0},d));S.arts=S.arts||[];S.arts.push(a);UI.artView=a.id;UI.artSub='artigos';}
+    save();closeModal();renderMain();toast('Artigo salvo.');
+  });
+}
+const ART_PCOL=['#3E63DD','#12A594','#F76B15','#AB4ABA','#30A46C','#E5484D','#C77D0A','#0091FF'];
+async function artLookup(){
+  const f=$('#fArt');if(!f)return;const st=$('#artLkSt'),q=f.elements.lookup.value.trim();if(!q)return;
+  const set=(n,v)=>{if(v!=null&&String(v).trim())f.elements[n].value=String(v).trim();};
+  st.textContent='Buscando…';
+  try{
+    if(/^\d{5,9}$/.test(q)){
+      const r=await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id='+q),j=await r.json(),d=j.result&&j.result[q];if(!d)throw new Error('não achei');
+      set('title',String(d.title||'').replace(/\.$/,''));set('authors',(d.authors||[]).map(x=>x.name).join('; '));set('journal',d.fulljournalname||d.source);set('year',(d.pubdate||'').slice(0,4));set('vol',d.volume);set('issue',d.issue);set('pages',d.pages);set('pmid',q);
+      const di=(d.articleids||[]).find(x=>x.idtype==='doi');if(di)set('doi',di.value);
+    }else{
+      const doi=artDoi(q),r=await fetch('https://api.crossref.org/works/'+encodeURIComponent(doi)),j=await r.json(),d=j.message;if(!d)throw new Error('não achei');
+      set('title',(d.title||[])[0]);set('authors',(d.author||[]).map(x=>(x.family||x.name||'')+(x.given?', '+x.given:'')).join('; '));set('journal',(d['container-title']||[])[0]);
+      const dp=((d.issued||d.published||{})['date-parts']||[[]])[0];set('year',dp[0]);set('vol',d.volume);set('issue',d.issue);set('pages',d.page);set('doi',d.DOI);
+    }
+    st.textContent='Dados preenchidos. Confira antes de salvar.';
+  }catch(e){st.textContent='Não consegui buscar ('+(e&&e.message||'erro')+'). Confira o número ou preencha à mão.';}
+}
+function artSecForm(id,key){
+  const a=artById(id),S0=ART_SEC[key];if(!a||!S0)return;
+  openModal('<form id="fArtS" class="form"><div class="fh"><h2>'+S0.title+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
+    S0.f.map(f=>{const v=artGet(a,f[0]);return artF(f[0],f[1],f[4]?(v||[]).join('\n'):v,f[2],f[3]);}).join('')+
+    '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>',true);
+  $('#fArtS').addEventListener('submit',e=>{
+    e.preventDefault();const E=e.target.elements;
+    S0.f.forEach(f=>{const v=E[f[0]].value;artSet(a,f[0],f[4]?v.split('\n').map(s=>s.trim()).filter(Boolean):v.trim());});
+    a.updated=Date.now();save();closeModal();renderMain();toast('Salvo.');
+  });
+}
+function artItemForm(id,list,iid){
+  const a=artById(id);if(!a)return;const it=iid?a[list].find(z=>z.id===iid):null,q=list==='quotes';
+  const p=Object.assign({author:'',year:'',kind:'conceito',point:'',page:'',ref:'',text:'',note:''},it||{});
+  openModal('<form id="fArtI" class="form"><div class="fh"><h2>'+(it?'Editar':'Adicionar')+' | '+ART_LISTS[list]+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
+    (q?artF('text','Trecho do artigo (literal)',p.text,'ta',4)+'<div class="fgrid">'+artF('page','Página',p.page,'in')+'</div>'+artF('note','Por que vale citar',p.note,'ta',2):
+    '<div class="fgrid"><div>'+artF('author','Autor citado (sobrenome)',p.author,'req')+'</div><div>'+artF('year','Ano',p.year,'in')+'</div></div>'+
+    '<div class="f"><span>Tipo de citação</span><div class="frow">'+ART_KINDS.map(k=>'<label class="chip cb"><input type="radio" name="kind" value="'+k[0]+'" '+(p.kind===k[0]?'checked':'')+'><span>'+k[1]+'</span></label>').join('')+'</div></div>'+
+    artF('point','O ponto: o que esse autor afirma ou mostra',p.point,'ta',4)+'<div class="fgrid">'+artF('page','Página ou trecho do artigo',p.page,'in')+'</div>'+
+    artF('ref','Referência completa do autor citado (opcional, para citar depois)',p.ref,'ta',2))+
+    '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn" name="more" value="1">Salvar e adicionar outro</button><button class="btn primary">Salvar</button></div></form>',true);
+  $('#fArtI').addEventListener('submit',e=>{
+    e.preventDefault();const E=e.target.elements,more=e.submitter&&e.submitter.value==='1';
+    const d=q?{text:E.text.value.trim(),page:E.page.value.trim(),note:E.note.value.trim()}:{author:E.author.value.trim(),year:E.year.value.trim(),kind:$('input[name=kind]:checked',e.target).value,point:E.point.value.trim(),page:E.page.value.trim(),ref:E.ref.value.trim()};
+    if(q?!d.text:!d.author)return;
+    if(it)Object.assign(it,d);else a[list].push(Object.assign({id:uid()},d));
+    a.updated=Date.now();save();closeModal();renderMain();toast('Salvo.');if(more&&!it)setTimeout(()=>artItemForm(id,list,''),120);
+  });
+}
+function artMediaForm(id,mid){
+  const a=artById(id);if(!a)return;const m=mid?a.media.find(z=>z.id===mid):null,p=Object.assign({kind:'figura',caption:'',page:'',note:''},m||{});
+  const pend=[];
+  openModal('<form id="fArtM" class="form"><div class="fh"><h2>'+(m?'Editar figura ou tabela':'Adicionar figura ou tabela')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
+    '<div class="f"><span>Tipo</span><div class="frow">'+ART_MEDIA.map(k=>'<label class="chip cb"><input type="radio" name="kind" value="'+k[0]+'" '+(p.kind===k[0]?'checked':'')+'><span>'+k[1]+'</span></label>').join('')+'</div></div>'+
+    '<div class="f"><span>'+(m?'Trocar a imagem (opcional)':'Imagem')+'</span><input type="file" name="img" accept="image/*" '+(m?'':'multiple')+'><small class="muted" id="artMSt">Escolha o arquivo ou cole um print com Ctrl+V nesta janela.</small></div>'+
+    (m&&artImg(m.id)?'<img alt="" src="'+artImg(m.id)+'" style="max-width:100%;max-height:180px;border-radius:8px;border:1px solid var(--line)">':'')+
+    artF('caption','Legenda',p.caption,'in')+'<div class="fgrid">'+artF('page','Página',p.page,'in')+'</div>'+artF('note','Por que gostei / como usar',p.note,'ta',2)+
+    '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>',true);
+  const f=$('#fArtM'),sync=()=>{$('#artMSt').textContent=pend.length?pend.length+' imagem(ns) pronta(s) para salvar.':'Escolha o arquivo ou cole um print com Ctrl+V nesta janela.';};
+  f.addEventListener('paste',e=>{const fs=Array.from((e.clipboardData&&e.clipboardData.files)||[]).filter(x=>/^image\//.test(x.type));if(fs.length){e.preventDefault();fs.forEach(x=>pend.push(x));sync();}});
+  f.elements.img.addEventListener('change',()=>{Array.from(f.elements.img.files).forEach(x=>pend.push(x));sync();});
+  f.addEventListener('submit',async e=>{
+    e.preventDefault();const E=f.elements,kind=$('input[name=kind]:checked',f).value;
+    if(!m&&!pend.length){toast('Escolha ou cole uma imagem.');return;}
+    try{
+      const files=m?pend.slice(0,1):pend;
+      if(m){Object.assign(m,{kind:kind,caption:E.caption.value.trim(),page:E.page.value.trim(),note:E.note.value.trim()});if(files[0]){const c=await compressImage(files[0],{max:1600,limit:700000}),im=(S.artimg=S.artimg||[]).find(z=>z.id===m.id);if(im)im.src=c.src;else S.artimg.push({id:m.id,src:c.src});}}
+      else for(const fl of files){const c=await compressImage(fl,{max:1600,limit:700000}),mm={id:uid(),kind:kind,caption:E.caption.value.trim(),page:E.page.value.trim(),note:E.note.value.trim()};(S.artimg=S.artimg||[]).push({id:mm.id,src:c.src});a.media.push(mm);}
+      a.updated=Date.now();save();closeModal();renderMain();toast('Salvo.');
+    }catch(err){toast(err&&err.message||'Não consegui salvar a imagem.');}
+  });
+}
+function artProjDlg(){
+  const rows=(S.artproj||[]).map(p=>'<div class="addrow"><input data-pid="'+p.id+'" value="'+esc(p.name)+'" aria-label="Nome do projeto"><input type="color" data-pcol="'+p.id+'" value="'+esc(p.color)+'" aria-label="Cor"><button type="button" class="icon-btn" data-a="art-pdel" data-id="'+p.id+'" aria-label="Excluir">'+ic('trash',16)+'</button></div>').join('');
+  openModal('<form id="fArtP" class="form"><div class="fh"><h2>Projetos de artigos</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><p class="muted small" style="margin:0 0 8px">Agrupe os artigos por trabalho: TCC, revisão, aula, projeto de pesquisa.</p>'+(rows||'<p class="muted small">Nenhum projeto ainda.</p>')+
+    '<div class="addrow" style="margin-top:8px"><input name="np" placeholder="Novo projeto" autocomplete="off"></div><div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
+  $('#fArtP').addEventListener('submit',e=>{
+    e.preventDefault();const f=e.target;
+    $$('[data-pid]',f).forEach(i=>{const p=artProjById(i.dataset.pid);if(p&&i.value.trim())p.name=i.value.trim();});$$('[data-pcol]',f).forEach(i=>{const p=artProjById(i.dataset.pcol);if(p)p.color=i.value;});
+    const n=f.elements.np.value.trim();if(n){S.artproj=S.artproj||[];S.artproj.push({id:uid(),name:n,color:ART_PCOL[S.artproj.length%ART_PCOL.length]});}
+    save();closeModal();renderMain();
+  });
+}
+function artNote(id){
+  const a=artById(id);if(!a)return;let n=a.noteId&&noteById(a.noteId);
+  if(!n){
+    const li=arr=>arr.length?'<ul>'+arr.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'<p><br></p>';
+    const html='<h2>'+esc(a.title)+'</h2><p><i>'+esc(artRef(a,artFmt()))+'</i></p>'+(a.link?'<p>Link: <a href="'+esc(normUrl(a.link))+'" target="_blank" rel="noopener">'+esc(a.link)+'</a></p>':'')+
+      '<h3>Pergunta central</h3><p>'+(a.question?esc(a.question):'<br>')+'</p><h3>Principais tópicos</h3>'+li(a.topics)+'<h3>Conclusão</h3><p>'+(a.conclusion?esc(a.conclusion):'<br>')+'</p><h3>Anotações</h3><p>'+(a.notes?esc(a.notes):'<br>')+'</p>';
+    n=normNote({id:uid(),type:'nota',title:a.title,html:html,folderId:'',catId:a.catId||'',cd:null,created:Date.now(),updated:Date.now()});
+    S.notes.push(n);a.noteId=n.id;save();
+  }
+  flushNote();UI.tab='notas';UI.nsub='notas';UI.nview={type:'note',id:n.id,edit:false};closeModal();renderTabs();renderMain();window.scrollTo(0,0);
+}
+function artAttachPdf(id){
+  const a=artById(id);if(!a)return;
+  const inp=document.createElement('input');inp.type='file';inp.accept='application/pdf,.pdf';
+  inp.onchange=()=>{const file=inp.files[0];if(!file)return;
+    file.arrayBuffer().then(async buf=>{
+      const p={id:uid(),title:a.title||file.name.replace(/\.pdf$/i,''),folderId:'',catId:a.catId||'',src:'local',driveId:'',name:file.name,annots:[],created:Date.now(),updated:Date.now(),artId:a.id};
+      S.pdfs.push(p);a.pdfId=p.id;a.updated=Date.now();save();
+      PdfMem[p.id]=buf;await PdfDB.put(p.id,buf.slice(0));pdfPush(p,buf);renderMain();toast('PDF anexado.');
+    }).catch(()=>toast('Não foi possível ler o arquivo.'));};
+  inp.click();
+}
+Object.assign(ACT,{
+  'art-new'(){artForm('');},
+  'art-edit'(el){artForm(el.dataset.id);},
+  'art-open'(el){UI.artView=el.dataset.id;renderMain();window.scrollTo(0,0);},
+  'art-back'(){UI.artView='';renderMain();window.scrollTo(0,0);},
+  'art-sub'(el){UI.artSub=el.dataset.v;renderMain();},
+  'art-pf'(el){UI.arProj=el.dataset.v;renderMain();},
+  'art-stf'(el){UI.arSt=el.dataset.v;renderMain();},
+  'art-favf'(){UI.arFav=!UI.arFav;renderMain();},
+  'art-fav'(el){const a=artById(el.dataset.id);if(!a)return;a.fav=!a.fav;a.updated=Date.now();save();renderMain();},
+  'art-st'(el){const a=artById(el.dataset.id);if(!a)return;const v=el.dataset.v;if(a.status!==v&&v==='lido')a.readAt=Date.now();a.status=v;a.updated=Date.now();save();renderMain();},
+  'art-star'(el){const a=artById(el.dataset.id),n=Number(el.dataset.n);if(!a)return;a.stars=a.stars===n?0:n;a.updated=Date.now();save();renderMain();},
+  'art-sec'(el){artSecForm(el.dataset.id,el.dataset.k);},
+  'art-item'(el){artItemForm(el.dataset.id,el.dataset.l,el.dataset.i||'');},
+  'art-idel'(el){const a=artById(el.dataset.id);if(!a)return;const l=el.dataset.l,i=a[l].findIndex(z=>z.id===el.dataset.i);if(i<0)return;const it=a[l][i];a[l].splice(i,1);a.updated=Date.now();save();renderMain();toastUndo('Item excluído.',()=>{a[l].splice(Math.min(i,a[l].length),0,it);save();renderMain();});},
+  'art-media'(el){artMediaForm(el.dataset.id,el.dataset.m||'');},
+  'art-mdel'(el){const a=artById(el.dataset.id);if(!a)return;const m=a.media.find(z=>z.id===el.dataset.m);if(!m)return;askConfirm('Excluir a imagem?','Ela será removida deste artigo.',()=>{a.media=a.media.filter(z=>z!==m);S.artimg=(S.artimg||[]).filter(z=>z.id!==m.id);a.updated=Date.now();save();closeModal();renderMain();},'Excluir');},
+  'art-zoom'(el){const s=artImg(el.dataset.m);if(s)fxZoomImg(s);},
+  'art-link'(el){const a=artById(el.dataset.id);if(a&&a.link)window.open(normUrl(a.link),'_blank','noopener');},
+  'art-attach'(el){artAttachPdf(el.dataset.id);},
+  'art-pdf'(el){const a=artById(el.dataset.id);if(!a||!a.pdfId||!pdfById(a.pdfId)){toast('O PDF não está mais disponível.');return;}UI.tab='notas';UI.nsub='notas';UI.nview={type:'pdf',id:a.pdfId,edit:false};renderTabs();renderMain();window.scrollTo(0,0);},
+  'art-pdfdel'(el){const a=artById(el.dataset.id);if(!a)return;askConfirm('Remover o PDF?','O arquivo anexado será apagado. O artigo e o fichamento continuam.',()=>{const id=a.pdfId;S.pdfs=S.pdfs.filter(p=>p.id!==id);try{PdfDB.del(id);delete PdfMem[id];}catch(e){}a.pdfId='';a.updated=Date.now();save();closeModal();renderMain();},'Remover');},
+  'art-del'(el){const a=artById(el.dataset.id);if(!a)return;askConfirm('Excluir artigo?','“'+a.title+'” será removido com o fichamento, as citações e as imagens.',()=>{(a.media||[]).forEach(m=>{S.artimg=(S.artimg||[]).filter(z=>z.id!==m.id);});if(a.pdfId){const id=a.pdfId;S.pdfs=S.pdfs.filter(p=>p.id!==id);try{PdfDB.del(id);delete PdfMem[id];}catch(e){}}S.arts=S.arts.filter(y=>y!==a);UI.artView='';save();closeModal();renderMain();toast('Artigo excluído.');},'Excluir');},
+  'art-lookup'(){artLookup();},
+  'art-proj'(){artProjDlg();},
+  'art-pdel'(el){const p=artProjById(el.dataset.id);if(!p)return;askConfirm('Excluir o projeto “'+p.name+'”?','Os artigos continuam, só saem do projeto.',()=>{S.artproj=S.artproj.filter(z=>z!==p);S.arts.forEach(a=>{a.projIds=a.projIds.filter(i=>i!==p.id);});if(UI.arProj===p.id)UI.arProj='';save();closeModal();renderMain();},'Excluir');},
+  'art-fmt'(el){S.prefs.artFmt=el.dataset.v;save();renderMain();},
+  'art-cref'(el){const a=artById(el.dataset.id);if(a)artCopy(artRef(a,artFmt()),'Referência copiada.');},
+  'art-cin'(el){const a=artById(el.dataset.id);if(a)artCopy(artIn(a,artFmt()),'Citação copiada.');},
+  'art-cbib'(el){const a=artById(el.dataset.id);if(a)artCopy(artBib(a),'BibTeX copiado.');},
+  'art-cris'(el){const a=artById(el.dataset.id);if(a)artCopy(artRis(a),'RIS copiado.');},
+  'art-apud'(el){const a=artById(el.dataset.id),it=a&&a[el.dataset.l].find(z=>z.id===el.dataset.i);if(it)artCopy(artApud(a,it,artFmt()),'Citação indireta copiada.');},
+  'art-iref'(el){const a=artById(el.dataset.id),it=a&&a[el.dataset.l].find(z=>z.id===el.dataset.i);if(it)artCopy(it.ref,'Referência copiada.');},
+  'art-qcopy'(el){const a=artById(el.dataset.id),it=a&&a.quotes.find(z=>z.id===el.dataset.i);if(it)artCopy('“'+it.text+'” '+artIn(a,artFmt()).replace(/\)$/,it.page?', p. '+it.page+')':')'),'Trecho copiado.');},
+  'art-acl'(el){UI.acList=el.dataset.v;renderMain();},
+  'art-amk'(el){UI.amKind=el.dataset.v;renderMain();},
+  'art-note'(el){artNote(el.dataset.id);},
+  'art-sched'(el){const a=artById(el.dataset.id);if(!a)return;const t='Ler: '+a.title;schedPicker(t,{title:t,theme:t,tipoAtv:'Estudo Individual',kind:'Organização',blockType:'estudo',catId:a.catId,link:a.link},60,true);},
+  'art-exp'(){
+    const l=(S.arts||[]).filter(a=>artPass(a));if(!l.length){toast('Nenhum artigo para exportar.');return;}
+    openModal('<div class="form"><div class="fh"><h2>Exportar '+l.length+' artigo(s)</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><p class="muted small">Baixa a lista que está na tela, para importar no Zotero, Mendeley ou EndNote.</p><div class="ff"><button class="btn" data-a="art-dl" data-v="ris">RIS (Zotero, Mendeley, EndNote)</button><button class="btn" data-a="art-dl" data-v="bib">BibTeX (LaTeX, Overleaf)</button><button class="btn" data-a="art-dl" data-v="txt">Referências em texto ('+artFmt().toUpperCase()+')</button></div></div>');
+  },
+  'art-dl'(el){
+    const l=(S.arts||[]).filter(a=>artPass(a)),v=el.dataset.v;
+    const txt=v==='ris'?l.map(artRis).join('\n'):v==='bib'?l.map(artBib).join('\n'):l.map(a=>artRef(a,artFmt())).sort((x,y)=>x.localeCompare(y,'pt-BR')).join('\n\n');
+    downloadBuf(new TextEncoder().encode(txt),'artigos.'+(v==='txt'?'txt':v),'text/plain;charset=utf-8');closeModal();
+  }
+});
+document.addEventListener('input',e=>{
+  const t=e.target;if(!t)return;
+  if(t.id==='arq'){UI.arQ=t.value;const l=$('#arList');if(l)l.innerHTML=artListHTML();}
+  else if(t.id==='acq'){UI.acQ=t.value;const l=$('#acList');if(l)l.innerHTML=artBankListHTML();}
+  else if(t.id==='amq'){UI.amQ=t.value;renderMain();const i=$('#amq');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length);}}
+});
+document.addEventListener('change',e=>{
+  const t=e.target;if(!t)return;
+  if(t.id==='arj'){UI.arJ=t.value;renderMain();}else if(t.id==='arcat'){UI.arCat=t.value;renderMain();}else if(t.id==='arfoco'){UI.arFoco=t.value;renderMain();}
+  else if(t.id==='ardes'){UI.arDes=t.value;renderMain();}else if(t.id==='arsort'){UI.arSort=t.value;renderMain();}else if(t.id==='ackind'){UI.acKind=t.value;renderMain();}
 });
 
 
