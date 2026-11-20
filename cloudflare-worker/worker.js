@@ -244,6 +244,18 @@ const liType = (o) => [].concat(o['@type'] || []).join(',');
 const liName = (a) => [].concat(a || []).map((p) => (typeof p === 'string' ? p : (p && p.name) || '')).filter(Boolean).join('; ');
 const liMoney = (v) => { let s = String(v == null ? '' : v).replace(/[^\d.,]/g, ''); if (!s) return 0; if (/,\d{1,2}$/.test(s)) s = s.replace(/\./g, '').replace(',', '.'); else s = s.replace(/,/g, ''); const n = parseFloat(s); return Number.isFinite(n) ? n : 0; };
 const liMin = (d) => { const m = String(d || '').match(/^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/i); return m ? Math.round(((+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0)) / 60) : 0; };
+async function liYoutube(id) {
+  try {
+    const r = await fetch('https://www.youtube.com/youtubei/v1/player?prettyPrint=false', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'User-Agent': 'com.google.android.youtube/19.09.37 (Linux; U; Android 13) gzip' },
+      body: JSON.stringify({ videoId: id, context: { client: { clientName: 'ANDROID', clientVersion: '19.09.37', androidSdkVersion: 33, hl: 'pt', gl: 'BR' } } }),
+    });
+    if (!r.ok) return null;
+    const d = (await r.json()).videoDetails || {};
+    return { sec: Number(d.lengthSeconds) || 0, title: liDec(d.title), author: liDec(d.author) };
+  } catch (e) { return null; }
+}
 async function linkinfo(request, env, u) {
   const origins = String(env.ALLOWED_ORIGINS || '').split(',').map((x) => x.trim().replace(/\/$/, '')).filter(Boolean);
   const origin = request.headers.get('Origin') || '';
@@ -257,8 +269,14 @@ async function linkinfo(request, env, u) {
   let t; try { t = new URL(u.searchParams.get('url') || ''); } catch (e) { return out({ error: 'Endereço inválido.' }, 400); }
   if (!/^https?:$/.test(t.protocol) || LI_BAD_HOST.test(t.hostname)) return out({ error: 'Endereço não permitido.' }, 400);
   try {
-    const r = await fetch(t, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; RotinaLink/1.0)', 'Accept-Language': 'pt-BR,pt;q=0.9,en;q=0.7', 'Accept': 'text/html,application/xhtml+xml' }, redirect: 'follow' });
-    const html = (await r.text()).slice(0, 700000);
+    const host = t.hostname.replace(/^www\./, '');
+    const yid = (host === 'youtu.be' ? t.pathname.slice(1) : /(^|\.)youtube\.com$/.test(host) ? (t.searchParams.get('v') || (t.pathname.match(/^\/(?:shorts|embed|live)\/([\w-]{11})/) || [])[1] || '') : '').slice(0, 11);
+    const yt0 = /^[\w-]{11}$/.test(yid) ? await liYoutube(yid) : null; // duração, título e canal pelo player do YouTube
+    let r = { url: t.href }, html = '';
+    try {
+      r = await fetch(t, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; RotinaLink/1.0)', 'Accept-Language': 'pt-BR,pt;q=0.9,en;q=0.7', 'Accept': 'text/html,application/xhtml+xml', 'Cookie': 'CONSENT=YES+1' }, redirect: 'follow' });
+      html = (await r.text()).slice(0, 700000);
+    } catch (e) { if (!yt0) throw e; }
     const mt = liMetas(html), g = (...ks) => { for (const k of ks) if (mt[k] && mt[k][0]) return mt[k][0]; return ''; };
     const ld = liLd(html), pick = (re) => ld.find((o) => re.test(liType(o)));
     const prod = pick(/Product|Book/i), vid = pick(/VideoObject|Movie|MusicRecording|MusicAlbum|PodcastEpisode|Episode|TVSeries/i), art = pick(/ScholarlyArticle|Article/i);
@@ -269,9 +287,10 @@ async function linkinfo(request, env, u) {
     let img = g('og:image', 'twitter:image') || (typeof main.image === 'string' ? main.image : liName([].concat(main.image || []).map((i) => (i && i.url) || i)));
     try { if (img) img = new URL(img, r.url).href; } catch (e) { img = ''; }
     const yt = (html.match(/"lengthSeconds":"(\d+)"/) || [])[1];
-    const dur = liMin(main.duration) || (g('video:duration', 'og:video:duration') ? Math.round(Number(g('video:duration', 'og:video:duration')) / 60) : 0) || (yt ? Math.round(Number(yt) / 60) : 0);
-    const title = g('og:title', 'twitter:title', 'citation_title') || liDec(main.name) || liDec((html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1]);
-    const author = g('music:musician', 'og:audio:artist', 'book:author', 'article:author', 'author') || liName(main.author) || liName(main.director) || liDec((html.match(/<link itemprop="name" content="([^"]*)"/i) || [])[1]);
+    const secMin = (s) => (Number(s) > 0 ? Math.max(1, Math.round(Number(s) / 60)) : 0);
+    const dur = secMin(yt0 && yt0.sec) || liMin(main.duration) || liMin(g('duration')) || secMin(g('video:duration', 'og:video:duration', 'music:duration')) || secMin(yt);
+    const title = (yt0 && yt0.title) || g('og:title', 'twitter:title', 'citation_title') || liDec(main.name) || liDec((html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1]);
+    const author = (yt0 && yt0.author) || g('music:musician', 'og:audio:artist', 'book:author', 'article:author', 'author') || liName(main.author) || liName(main.director) || liDec((html.match(/<link itemprop="name" content="([^"]*)"/i) || [])[1]);
     const pages = [g('citation_firstpage'), g('citation_lastpage')].filter(Boolean).join('-');
     return out({
       title: liDec(title).slice(0, 300), author: liDec(author).slice(0, 200), image: img, desc: g('og:description', 'description', 'twitter:description').slice(0, 600) || liDec(main.description).slice(0, 600),
