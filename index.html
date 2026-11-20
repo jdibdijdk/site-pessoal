@@ -2680,7 +2680,7 @@ html[data-theme="dark"] .lzico{background:color-mix(in srgb,var(--c) 24%,#1A1D25
 html[data-theme="dark"] .lzs{color:#3A3F4C}html[data-theme="dark"] .lzs.on{color:#F5B93A}
 
 /* ===== Desejos, voz do Pingado, ícone do Lazer clicável ===== */
-button.lzico.lk{border:0;cursor:pointer;transition:transform .12s,box-shadow .12s}
+button.lzico.lk{border:0;overflow:hidden;padding:0;cursor:pointer;transition:transform .12s,box-shadow .12s}
 button.lzico.lk:hover{transform:scale(1.06);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 30%,transparent)}
 .wscard{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--c);border-radius:14px;padding:13px 16px}
 .wscard.done{opacity:.75}
@@ -2749,6 +2749,8 @@ button.lzico.lk:hover{transform:scale(1.06);box-shadow:0 0 0 3px color-mix(in sr
 .artsel{margin-right:6px;vertical-align:middle}
 .artdl2{margin-top:6px}.artfields{display:flex;flex-wrap:wrap;gap:6px}.artfields .chip{margin:0}
 .artsec mark,.artmres mark{background:#FFE58A;color:#222;border-radius:3px;padding:0 2px}
+.lzico{overflow:hidden}.lzth{width:100%;height:100%;object-fit:cover;display:block}
+.wsimg{float:left;width:58px;height:58px;object-fit:cover;border-radius:10px;margin-right:12px;background:var(--soft)}
 /* ===== Revisões: checklist ===== */
 .rvchk{margin-top:4px;font-size:13px}.rvchk summary{cursor:pointer;color:var(--acc);font-weight:600}
 .rvchk-b{display:flex;flex-direction:column;gap:6px;padding:6px 0 2px;align-items:flex-start}
@@ -3209,7 +3211,7 @@ function normalize(o){
     items:(Array.isArray(o.items)?o.items:seedItems()).map(i=>{const x=Object.assign({apps:[],inside:[]},i);if(!Array.isArray(x.inside))x.inside=[];if(x.container===undefined)x.container=/^bolsa/i.test(x.name)||norm(x.group||'')==='bolsas';if(ver<5&&x.group==='Eletrônicos'&&(x.name==='Mouse Logitech'||x.name==='Extensão'))x.group='Acessórios';return x;}),
     links:arr('links'),
     linkCats:(Array.isArray(o.linkCats)&&o.linkCats.length)?o.linkCats:LINKCATS.slice(),
-    packed:o.packed||{},kits:Array.isArray(o.kits)?o.kits.filter(k=>k&&k.id):[],mfCause:(o.mfCause&&typeof o.mfCause==='object'&&!Array.isArray(o.mfCause))?o.mfCause:{},mfSims:Array.isArray(o.mfSims)?o.mfSims.slice(-100):[],wishes:arr('wishes').map(x=>Object.assign({title:'',url:'',price:0,qty:1,store:'',priority:2,catId:'',note:'',status:'quero',paid:0,created:Date.now(),updated:Date.now(),boughtAt:0},x)),arts:arr('arts').map(normArt),artimg:arr('artimg').filter(x=>x&&x.id),artproj:arr('artproj').filter(x=>x&&x.id),lazer:arr('lazer').map(x=>Object.assign({type:'outro',title:'',scope:'pessoal',status:'todo',catId:'',link:'',total:0,progress:0,unit:'',plannedMin:0,stars:0,review:'',noteId:'',note:'',created:Date.now(),updated:Date.now(),doneAt:0},x)),templates:Array.isArray(o.templates)?o.templates.filter(t=>t&&t.id):[],taskHist:Array.isArray(o.taskHist)?o.taskHist.slice(-500):[],revx:(o.revx&&typeof o.revx==='object'&&!Array.isArray(o.revx))?o.revx:{},bagRules:(Array.isArray(o.bagRules)?o.bagRules:[]).filter(r=>r&&r.value&&Array.isArray(r.itemIds)),health:arr('health'),hprefs:Object.assign({weeklyMin:150,sleepH:7,heightCm:''},o.hprefs||{}),fin:normFin(o.fin),
+    packed:o.packed||{},kits:Array.isArray(o.kits)?o.kits.filter(k=>k&&k.id):[],mfCause:(o.mfCause&&typeof o.mfCause==='object'&&!Array.isArray(o.mfCause))?o.mfCause:{},mfSims:Array.isArray(o.mfSims)?o.mfSims.slice(-100):[],wishes:arr('wishes').map(x=>Object.assign({img:'',title:'',url:'',price:0,qty:1,store:'',priority:2,catId:'',note:'',status:'quero',paid:0,created:Date.now(),updated:Date.now(),boughtAt:0},x)),arts:arr('arts').map(normArt),artimg:arr('artimg').filter(x=>x&&x.id),artproj:arr('artproj').filter(x=>x&&x.id),lazer:arr('lazer').map(x=>Object.assign({thumb:'',type:'outro',title:'',scope:'pessoal',status:'todo',catId:'',link:'',total:0,progress:0,unit:'',plannedMin:0,stars:0,review:'',noteId:'',note:'',created:Date.now(),updated:Date.now(),doneAt:0},x)),templates:Array.isArray(o.templates)?o.templates.filter(t=>t&&t.id):[],taskHist:Array.isArray(o.taskHist)?o.taskHist.slice(-500):[],revx:(o.revx&&typeof o.revx==='object'&&!Array.isArray(o.revx))?o.revx:{},bagRules:(Array.isArray(o.bagRules)?o.bagRules:[]).filter(r=>r&&r.value&&Array.isArray(r.itemIds)),health:arr('health'),hprefs:Object.assign({weeklyMin:150,sleepH:7,heightCm:''},o.hprefs||{}),fin:normFin(o.fin),
     acts:arr('acts').map(a=>{const x=Object.assign({actualMin:0,kitIds:[],overrides:{},deckIds:[],title:'',kind:'Atividade',tipoAtv:'',blockType:'estudo',catId:'',teacher:'',noTeacher:false,obs:'',place:'',link:'',doWhat:'',where:'',plan:{},bring:'',slots:[],done:{},miss:{},goalIds:[],docIds:[],relId:'',itemIds:[],linkIds:[],stow:{},extras:[],moneys:[],noArea:false,themeNA:false},a);if(x.theme==null)x.theme=x.title;return x;}),
     tasks:arr('tasks').map(t=>Object.assign({actualMin:0,repeat:null,blockedBy:'',deckIds:[],title:'',notes:'',obs:'',deadline:'',catId:'',docId:'',link:'',done:false,activityIds:[],goalIds:[],linkIds:[],itemIds:[],where:'',plan:{},deadlineTime:'',dateIds:[],moneys:[],group:'',subs:[]},t)),
     docs:arr('docs').map(d=>Object.assign({title:'',catId:'',link:'',notes:'',todo:[],goalIds:[],linkIds:[],noteIds:[],folderId:'',ext:'',status:'',source:'',srcLink:'',starnote:false,driveId:'',driveMod:0},d)),
@@ -15514,7 +15516,7 @@ function lzCard(x){
   const note=x.noteId&&noteById(x.noteId);
   const meta=[T.label,total?total+(unit?' '+unit:''):'',x.plannedMin?'previsto '+hm(x.plannedMin):'',done&&x.doneAt?'em '+fmtDM(new Date(x.doneAt).toISOString().slice(0,10)):''].filter(Boolean).join(' | ');
   return '<article class="lzcard '+(done?'done':'')+'" style="--c:'+T.color+'">'+
-    (x.link?'<button class="lzico lk" data-a="lz-link" data-id="'+x.id+'" title="Abrir '+esc(x.title)+'" aria-label="Abrir '+esc(x.title)+'">'+ic(T.icon,22)+'</button>':'<div class="lzico" aria-hidden="true">'+ic(T.icon,22)+'</div>')+
+    (x.link?'<button class="lzico lk" data-a="lz-link" data-id="'+x.id+'" title="Abrir '+esc(x.title)+'" aria-label="Abrir '+esc(x.title)+'">'+(x.thumb?'<img class="lzth" alt="" loading="lazy" referrerpolicy="no-referrer" src="'+esc(x.thumb)+'">':ic(T.icon,22))+'</button>':'<div class="lzico" aria-hidden="true">'+(x.thumb?'<img class="lzth" alt="" loading="lazy" referrerpolicy="no-referrer" src="'+esc(x.thumb)+'">':ic(T.icon,22))+'</div>')+
     '<div class="lzb"><div class="lzt"><b>'+esc(x.title)+'</b><span class="lzdot" style="--d:'+sc[2]+'" title="'+sc[1]+'"><i></i>'+sc[1]+'</span></div>'+
     '<div class="lzm">'+esc(meta)+(x.catId?' '+tagHTML(x.catId):'')+'</div>'+
     (total||done?'<div class="lzp"><div class="lzbar"><i style="width:'+pct+'%"></i></div><span class="muted small">'+(done?'Concluído':(total?'Parei em '+prog+' de '+total+(unit?' '+unit:'')+' ('+pct+'%)':''))+'</span></div>':'')+
@@ -15561,7 +15563,7 @@ function lzForm(id){
     '<div class="fgrid"><div class="f"><span>Uso</span><div class="frow">'+LZ_SCOPES.map(sc=>'<label class="chip cb"><input type="radio" name="scope" value="'+sc[0]+'" '+(p.scope===sc[0]?'checked':'')+'><span><i class="lzd" style="background:'+sc[2]+'"></i>'+sc[1]+'</span></label>').join('')+'</div></div>'+
     '<div class="f"><span>Situação</span><div class="frow"><label class="chip cb"><input type="radio" name="status" value="todo" '+(p.status!=='done'?'checked':'')+'><span>Na fila</span></label><label class="chip cb"><input type="radio" name="status" value="done" '+(p.status==='done'?'checked':'')+'><span>Já concluí</span></label></div></div></div>'+
     '<div class="f"><span>Categoria</span>'+catPickHTML('lzcat',p.catId)+'</div>'+
-    '<label class="f">Link <small>botão que abre direto</small><input name="link" inputmode="url" value="'+esc(p.link)+'" autocomplete="off" placeholder="https://"></label>'+
+    '<div class="f"><span>Link <small>botão que abre direto</small></span><div class="frow" style="flex-wrap:nowrap"><input name="link" inputmode="url" value="'+esc(p.link)+'" autocomplete="off" placeholder="https://" style="flex:1"><button type="button" class="btn sm" data-a="li-fetch" data-k="lz" title="Preenche título, duração e capa a partir do link (YouTube, Spotify, sites)">Puxar dados</button></div><small class="muted" id="liSt"></small><input type="hidden" name="thumb" value="'+esc(p.thumb||'')+'"></div>'+
     '<div class="fgrid3"><label class="f">Total <small>páginas, minutos…</small><input type="number" name="total" min="0" step="1" value="'+esc(p.total||'')+'"></label>'+
     '<label class="f">Unidade<select name="unit">'+LZ_UNITS.map(u=>'<option value="'+u+'" '+((p.unit||(x?'':lzType(p.type).unit))===u?'selected':'')+'>'+(u||'(nenhuma)')+'</option>').join('')+'</select></label>'+
     '<label class="f">Parei em<input type="number" name="progress" min="0" step="1" value="'+esc(p.progress||'')+'"></label></div>'+
@@ -15574,7 +15576,7 @@ function lzForm(id){
   $$('input[name=type]',f).forEach(r=>r.addEventListener('change',()=>{const u=f.elements.unit;if(!f.elements.total.value)u.value=lzType(r.value).unit;}));
   f.addEventListener('submit',e=>{
     e.preventDefault();const E=f.elements,st=$('input[name=status]:checked',f).value,now=Date.now();
-    const d={type:$('input[name=type]:checked',f).value,title:E.title.value.trim(),scope:$('input[name=scope]:checked',f).value,status:st,catId:($('[data-catpick="lzcat"]',f)||{dataset:{}}).dataset.value||'',link:E.link.value.trim(),total:Math.max(0,Number(E.total.value)||0),unit:E.unit.value,progress:Math.max(0,Number(E.progress.value)||0),plannedMin:Math.max(0,Number(E.plannedMin.value)||0),note:E.note.value.trim(),stars:Number(E.stars.value)||0,review:E.review.value.trim(),updated:now};
+    const d={type:$('input[name=type]:checked',f).value,title:E.title.value.trim(),scope:$('input[name=scope]:checked',f).value,status:st,catId:($('[data-catpick="lzcat"]',f)||{dataset:{}}).dataset.value||'',link:E.link.value.trim(),total:Math.max(0,Number(E.total.value)||0),unit:E.unit.value,progress:Math.max(0,Number(E.progress.value)||0),plannedMin:Math.max(0,Number(E.plannedMin.value)||0),note:E.note.value.trim(),thumb:E.thumb.value||'',stars:Number(E.stars.value)||0,review:E.review.value.trim(),updated:now};
     if(!d.title)return;
     if(st==='done'){d.progress=d.total||d.progress;}
     if(x){if(x.status!=='done'&&st==='done')d.doneAt=now;if(st!=='done')d.doneAt=0;Object.assign(x,d);}
@@ -16007,7 +16009,7 @@ const artF=(n,l,v,k,r,ph)=>k==='ta'?'<label class="f">'+l+'<textarea name="'+n+'
 function artForm(id){
   const x=id?artById(id):null,p=normArt(x||{projIds:UI.arProj&&UI.arProj!=='__none'?[UI.arProj]:[]});
   openModal('<form id="fArt" class="form"><div class="fh"><h2>'+(x?'Dados do artigo':'Novo artigo')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
-    '<div class="f"><span>Preencher sozinho pelo DOI ou PMID</span><div class="frow" style="flex-wrap:nowrap"><input name="lookup" placeholder="10.1000/xyz123 ou 12345678" autocomplete="off" style="flex:1"><button type="button" class="btn sm" data-a="art-lookup">Buscar</button></div><small class="muted" id="artLkSt"></small></div>'+
+    '<div class="f"><span>Preencher sozinho pelo DOI, PMID ou link do artigo</span><div class="frow" style="flex-wrap:nowrap"><input name="lookup" placeholder="10.1000/xyz123, 12345678 ou https://…" autocomplete="off" style="flex:1"><button type="button" class="btn sm" data-a="art-lookup">Buscar</button></div><small class="muted" id="artLkSt"></small></div>'+
     artF('title','Título',p.title,'req')+artF('authors','Autores (um por linha ou separados por ponto e vírgula)',p.authors,'ta',3,'Silva, João A.; Souza, Maria B.')+
     '<div class="fgrid"><div>'+artF('journal','Revista',p.journal,'in')+'</div><div>'+artF('year','Ano',p.year,'in')+'</div></div>'+
     '<div class="fgrid3">'+artF('vol','Volume',p.vol,'in')+artF('issue','Número',p.issue,'in')+artF('pages','Páginas',p.pages,'in',0,'123-130')+'</div>'+
@@ -16034,10 +16036,22 @@ function artForm(id){
 }
 const ART_PCOL=['#3E63DD','#12A594','#F76B15','#AB4ABA','#30A46C','#E5484D','#C77D0A','#0091FF'];
 async function artLookup(){
-  const f=$('#fArt');if(!f)return;const st=$('#artLkSt'),q=f.elements.lookup.value.trim();if(!q)return;
+  const f=$('#fArt');if(!f)return;const st=$('#artLkSt');let q=f.elements.lookup.value.trim();if(!q)return;
   const set=(n,v)=>{if(v!=null&&String(v).trim())f.elements[n].value=String(v).trim();};
   st.textContent='Buscando…';
   try{
+    if(/^(https?:\/\/|www\.)/i.test(q)){
+      const url=q,dm=q.match(/10\.\d{4,9}\/[^\s?#]+/);
+      if(!f.elements.link.value.trim())f.elements.link.value=normUrl(url);
+      if(dm)q=dm[0].replace(/[.,;)]+$/,'');
+      else{
+        const i=await linkInfo(url),c=i.cit;
+        if(!i.ok){st.textContent=i.err||'Não encontrei dados nesse link.';return;}
+        if(c){set('title',c.title||i.title);set('authors',(c.authors||[]).join('; '));set('journal',c.journal);set('year',c.year);set('vol',c.volume);set('issue',c.issue);set('pages',c.pages);set('doi',c.doi);}
+        else set('title',i.title);
+        st.textContent='Dados preenchidos'+(c?'':' (só o título: o site não informa autores e revista)')+'. Confira antes de salvar.';return;
+      }
+    }
     if(/^\d{5,9}$/.test(q)){
       const r=await fetch('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id='+q),j=await r.json(),d=j.result&&j.result[q];if(!d)throw new Error('não achei');
       set('title',String(d.title||'').replace(/\.$/,''));set('authors',(d.authors||[]).map(x=>x.name).join('; '));set('journal',d.fulljournalname||d.source);set('year',(d.pubdate||'').slice(0,4));set('vol',d.volume);set('issue',d.issue);set('pages',d.pages);set('pmid',q);
@@ -16295,6 +16309,72 @@ document.addEventListener('input',e=>{
   const t=e.target;if(t&&t.id==='amq2'){UI.amQ2=t.value;renderMain();const i=$('#amq2');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length);}}
 });
 
+/* ===== Dados a partir de um link (YouTube, Spotify, lojas, sites, artigos) ===== */
+const liHost=u=>{try{return new URL(normUrl(u)).hostname.replace(/^www\./,'');}catch(e){return '';}};
+async function linkInfo(url){
+  url=normUrl(url);const h=liHost(url),o={url:url,title:'',author:'',image:'',desc:'',site:'',price:0,durationMin:0,cit:null,ok:false,err:''};
+  // 1) oEmbed: o próprio navegador consegue ler (título, canal ou artista, capa)
+  try{
+    let api='';
+    if(/(^|\.)youtube\.com$|^youtu\.be$/.test(h))api='https://www.youtube.com/oembed?format=json&url='+encodeURIComponent(url);
+    else if(/(^|\.)spotify\.com$/.test(h))api='https://open.spotify.com/oembed?url='+encodeURIComponent(url);
+    if(api){const r=await fetch(api);if(r.ok){const j=await r.json();o.title=j.title||'';o.author=j.author_name||'';o.image=j.thumbnail_url||'';o.site=/spotify/.test(h)?'Spotify':'YouTube';}}
+  }catch(e){}
+  // 2) Worker: lê a página (duração, preço, descrição, dados de artigo)
+  const api=pgApi(),tok=pgTok();
+  if(api&&tok){
+    try{
+      const r=await fetch(api+'/linkinfo?url='+encodeURIComponent(url),{headers:{'X-Pingado-Token':tok}}),j=await r.json().catch(()=>({}));
+      if(r.ok&&j&&(j.title||j.price||j.citation)){['title','author','image','desc','site'].forEach(k=>{if(!o[k]&&j[k])o[k]=j[k];});o.price=j.price||0;o.durationMin=j.durationMin||0;o.cit=j.citation||null;}
+      else if(!r.ok)o.err=(j&&j.error)||('Erro '+r.status);
+    }catch(e){o.err='Não consegui falar com o Worker.';}
+  }else if(!o.title)o.err='Para ler sites em geral, configure o Worker em Ajustes > Pingado (endereço e senha).';
+  o.ok=!!(o.title||o.price||o.cit);
+  if(!o.site)o.site=h;
+  return o;
+}
+function lzGuess(url){
+  const h=liHost(url);
+  if(/youtube|youtu\.be|vimeo/.test(h))return 'video';
+  if(/spotify\.com/.test(h))return /\/(episode|show)\//.test(url)?'podcast':'musica';
+  if(/music\.apple|deezer|soundcloud|bandcamp/.test(h))return 'musica';
+  if(/imdb|letterboxd|themoviedb|adorocinema|netflix|primevideo|disneyplus|hbomax|max\.com/.test(h))return 'filme';
+  if(/goodreads|skoob|estantevirtual/.test(h))return 'livro';
+  if(/steampowered|epicgames|igdb/.test(h))return 'jogo';
+  if(/google\.[a-z.]+\/maps|maps\.app\.goo\.gl|tripadvisor/.test(h))return 'local';
+  return '';
+}
+async function liFetch(kind){
+  const F={lz:'#fLz',ws:'#fWs',art:'#fArt'}[kind],f=$(F);if(!f)return;
+  const st=$('#liSt'),E=f.elements,url=String((kind==='lz'?E.link:kind==='ws'?E.url:E.link).value||'').trim();
+  if(!url){if(st)st.textContent='Cole o link primeiro.';return;}
+  if(st)st.textContent='Buscando dados do link…';
+  const i=await linkInfo(url);if(!$(F)){return;}
+  if(!i.ok){if(st)st.textContent=i.err||'Não encontrei dados nesse link. Preencha à mão.';return;}
+  const set=(n,v,force)=>{const el=E[n];if(el&&v!=null&&String(v).trim()&&(force||!String(el.value||'').trim()))el.value=String(v).trim();};
+  const clip=(s,n)=>String(s||'').replace(/\s+/g,' ').trim().slice(0,n);
+  if(kind==='lz'){
+    set('title',i.title);const g=lzGuess(url);
+    if(g){const r=$('input[name=type][value='+g+']',f);if(r&&!E.title.dataset.userType){r.checked=true;r.dispatchEvent(new Event('change',{bubbles:true}));}}
+    if(i.durationMin&&!Number(E.total.value)){E.total.value=i.durationMin;E.unit.value='min';}
+    set('note',[i.author,clip(i.desc,180)].filter(Boolean).join(' | '));
+    if(E.thumb&&i.image)E.thumb.value=i.image;
+  }else if(kind==='ws'){
+    set('title',clip(i.title,140));if(i.price)set('price',Number(i.price).toFixed(2).replace('.',','));
+    set('store',i.site);set('note',clip(i.desc,160));if(E.img&&i.image)E.img.value=i.image;
+  }else{
+    const c=i.cit;
+    if(c){set('title',c.title||i.title);set('authors',(c.authors||[]).join('; '));set('journal',c.journal);set('year',c.year);set('vol',c.volume);set('issue',c.issue);set('pages',c.pages);set('doi',c.doi);}
+    else set('title',i.title);
+  }
+  if(st)st.textContent='Dados preenchidos'+(i.price&&kind==='ws'?' (confira o preço, pode mudar)':'')+'. Confira antes de salvar.';
+}
+Object.assign(ACT,{'li-fetch'(el){liFetch(el.dataset.k);}});
+document.addEventListener('change',e=>{
+  const t=e.target;if(!t||!t.form)return;const id=t.form.id;
+  if((id==='fLz'&&t.name==='link')||(id==='fWs'&&t.name==='url')){const T=t.form.elements.title;if(!T.value.trim()&&/^https?:\/\//i.test(t.value.trim()))liFetch(id==='fLz'?'lz':'ws');}
+});
+
 /* ----- Calendário externo (.ics): o token e o link ficam em Ajustes > App e Widgets; o Worker serve o arquivo ----- */
 const icsBase=()=>String(S.prefs.pgApi||S.prefs.titleApi||'').trim().split('?')[0].replace(/\/+$/,'');
 const icsUrl=()=>{const b=icsBase(),t=S.prefs.icsToken;return b&&t?b+'/calendar.ics?token='+t:'';};
@@ -16357,7 +16437,7 @@ function wsPass(x){
 }
 function wsCard(x){
   const pr=wsPri(x.priority),bought=x.status==='comprado',tot=wsTotal(x),host=x.store||wsHost(x.url);
-  return '<article class="wscard '+(bought?'done':'')+'" style="--c:'+pr[2]+'"><div class="wsb"><div class="wst"><b>'+esc(x.title)+'</b><span class="wspri" title="Prioridade '+pr[1]+'"><i></i>'+pr[1]+'</span></div>'+
+  return '<article class="wscard '+(bought?'done':'')+'" style="--c:'+pr[2]+'"><div class="wsb">'+(x.img?'<img class="wsimg" alt="" loading="lazy" referrerpolicy="no-referrer" src="'+esc(x.img)+'">':'')+'<div class="wst"><b>'+esc(x.title)+'</b><span class="wspri" title="Prioridade '+pr[1]+'"><i></i>'+pr[1]+'</span></div>'+
     '<div class="wsm">'+(host?'<span>'+ic('cart',13)+esc(host)+'</span>':'')+(x.qty>1?'<span>'+x.qty+' un.</span>':'')+(x.catId?tagHTML(x.catId):'')+(bought&&x.boughtAt?'<span>comprado em '+fmtDM(new Date(x.boughtAt).toISOString().slice(0,10))+'</span>':'')+'</div>'+
     (x.note?'<div class="muted small wsn">'+esc(x.note)+'</div>':'')+'</div>'+
     '<div class="wsp"><b>'+(tot?money(tot):'—')+'</b>'+(x.qty>1&&x.price?'<small class="muted">'+money(x.price)+' cada</small>':'')+(bought&&x.paid&&x.paid!==tot?'<small class="muted">pago '+money(x.paid)+'</small>':'')+'</div>'+
@@ -16387,7 +16467,7 @@ function wsForm(id){
   const x=id?wsById(id):null,p=Object.assign({title:'',url:'',price:'',qty:1,store:'',priority:2,catId:'',note:''},x||{});
   openModal('<form id="fWs" class="form"><div class="fh"><h2>'+(x?'Editar desejo':'Novo desejo')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<label class="f">O que você quer<input name="title" required value="'+esc(p.title)+'" autocomplete="off" placeholder="Ex.: Estetoscópio Littmann"></label>'+
-    '<label class="f">Link do produto<input name="url" inputmode="url" value="'+esc(p.url)+'" autocomplete="off" placeholder="https://"></label>'+
+    '<div class="f"><span>Link do produto</span><div class="frow" style="flex-wrap:nowrap"><input name="url" inputmode="url" value="'+esc(p.url)+'" autocomplete="off" placeholder="https://" style="flex:1"><button type="button" class="btn sm" data-a="li-fetch" data-k="ws" title="Preenche nome, preço, loja e foto a partir do link">Puxar dados</button></div><small class="muted" id="liSt"></small><input type="hidden" name="img" value="'+esc(p.img||'')+'"></div>'+
     '<div class="fgrid3"><label class="f">Preço (R$)<input name="price" inputmode="decimal" value="'+esc(p.price?String(p.price).replace('.',','):'')+'" placeholder="0,00"></label><label class="f">Quantidade<input type="number" name="qty" min="1" step="1" value="'+(p.qty||1)+'"></label><label class="f">Loja<input name="store" value="'+esc(p.store)+'" autocomplete="off" placeholder="(opcional)"></label></div>'+
     '<div class="f"><span>Prioridade</span><div class="frow">'+WS_PRI.map(x2=>'<label class="chip cb"><input type="radio" name="priority" value="'+x2[0]+'" '+(Number(p.priority)===x2[0]?'checked':'')+'><span><i class="lzd" style="background:'+x2[2]+'"></i>'+x2[1]+'</span></label>').join('')+'</div></div>'+
     '<div class="f"><span>Categoria</span>'+catPickHTML('wscat',p.catId)+'</div>'+
@@ -16397,7 +16477,7 @@ function wsForm(id){
   f.elements.url.addEventListener('blur',()=>{if(!f.elements.store.value&&f.elements.url.value)f.elements.store.value=wsHost(f.elements.url.value);});
   f.addEventListener('submit',e=>{
     e.preventDefault();const E=f.elements,now=Date.now();
-    const d={title:E.title.value.trim(),url:E.url.value.trim(),price:Math.max(0,parseFloat(String(E.price.value).replace(/\./g,'').replace(',','.'))||0),qty:Math.max(1,Math.round(Number(E.qty.value)||1)),store:E.store.value.trim(),priority:Number($('input[name=priority]:checked',f).value)||2,catId:($('[data-catpick="wscat"]',f)||{dataset:{}}).dataset.value||'',note:E.note.value.trim(),updated:now};
+    const d={title:E.title.value.trim(),url:E.url.value.trim(),price:Math.max(0,parseFloat(String(E.price.value).replace(/\./g,'').replace(',','.'))||0),qty:Math.max(1,Math.round(Number(E.qty.value)||1)),store:E.store.value.trim(),priority:Number($('input[name=priority]:checked',f).value)||2,catId:($('[data-catpick="wscat"]',f)||{dataset:{}}).dataset.value||'',note:E.note.value.trim(),img:E.img.value||'',updated:now};
     if(!d.title)return;
     if(x)Object.assign(x,d);else{S.wishes=S.wishes||[];S.wishes.push(Object.assign({id:uid(),status:'quero',paid:0,created:now,boughtAt:0},d));}
     save();closeModal();renderMain();toast('Desejo salvo.');
