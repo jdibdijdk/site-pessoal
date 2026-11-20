@@ -216,6 +216,71 @@ async function calendar(request, env, u) {
   } catch (e) { return txt('Não foi possível ler os dados: ' + e.message, 503); }
 }
 
+// ----- Dados de um link (título, imagem, preço, duração, autores): GET /linkinfo?url=… com a senha do Pingado -----
+const LI_BAD_HOST = /^(localhost|.*\.local|.*\.internal)$|^\d{1,3}(\.\d{1,3}){3}$|^\[|^0x/i;
+const LI_ENT = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', ndash: '–', mdash: '—', hellip: '…', rsquo: '’', lsquo: '‘', ldquo: '“', rdquo: '”', ccedil: 'ç', Ccedil: 'Ç', ordm: 'º', ordf: 'ª' };
+'aeiou'.split('').forEach((v) => { [['acute', 'áéíóú'], ['grave', 'àèìòù'], ['circ', 'âêîôû'], ['uml', 'äëïöü']].forEach(([n, set]) => { const c = set['aeiou'.indexOf(v)]; LI_ENT[v + n] = c; LI_ENT[v.toUpperCase() + n] = c.toUpperCase(); }); });
+LI_ENT.atilde = 'ã'; LI_ENT.otilde = 'õ'; LI_ENT.Atilde = 'Ã'; LI_ENT.Otilde = 'Õ'; LI_ENT.ntilde = 'ñ';
+const liDec = (s) => String(s == null ? '' : s).replace(/&(#x?[0-9a-f]+|[a-z]+[0-9]*);/gi, (m, c) => {
+  if (c[0] !== '#') return LI_ENT[c] !== undefined ? LI_ENT[c] : (LI_ENT[c.toLowerCase()] !== undefined ? LI_ENT[c.toLowerCase()] : m);
+  const n = c[1] === 'x' || c[1] === 'X' ? parseInt(c.slice(2), 16) : parseInt(c.slice(1), 10);
+  return Number.isFinite(n) && n > 0 && n < 0x110000 ? String.fromCodePoint(n) : m;
+}).replace(/\s+/g, ' ').trim();
+function liMetas(html) {
+  const m = {}, re = /<meta\b[^>]*>/gi; let x;
+  while ((x = re.exec(html))) {
+    const t = x[0], k = (t.match(/(?:property|name|itemprop)\s*=\s*["']([^"']+)["']/i) || [])[1], v = (t.match(/content\s*=\s*["']([^"']*)["']/i) || [])[1];
+    if (k && v != null) (m[k.toLowerCase()] = m[k.toLowerCase()] || []).push(liDec(v));
+  }
+  return m;
+}
+function liLd(html) {
+  const out = [], re = /<script[^>]+type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi; let x;
+  const walk = (o) => { if (Array.isArray(o)) o.forEach(walk); else if (o && typeof o === 'object') { out.push(o); if (o['@graph']) walk(o['@graph']); } };
+  while ((x = re.exec(html))) { try { walk(JSON.parse(x[1].trim())); } catch (e) { /* JSON-LD inválido: ignora */ } }
+  return out;
+}
+const liType = (o) => [].concat(o['@type'] || []).join(',');
+const liName = (a) => [].concat(a || []).map((p) => (typeof p === 'string' ? p : (p && p.name) || '')).filter(Boolean).join('; ');
+const liMoney = (v) => { let s = String(v == null ? '' : v).replace(/[^\d.,]/g, ''); if (!s) return 0; if (/,\d{1,2}$/.test(s)) s = s.replace(/\./g, '').replace(',', '.'); else s = s.replace(/,/g, ''); const n = parseFloat(s); return Number.isFinite(n) ? n : 0; };
+const liMin = (d) => { const m = String(d || '').match(/^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/i); return m ? Math.round(((+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0)) / 60) : 0; };
+async function linkinfo(request, env, u) {
+  const origins = String(env.ALLOWED_ORIGINS || '').split(',').map((x) => x.trim().replace(/\/$/, '')).filter(Boolean);
+  const origin = request.headers.get('Origin') || '';
+  const okOrigin = !origins.length || origins.includes(origin);
+  const cors = { 'Access-Control-Allow-Origin': okOrigin && origin ? origin : (origins[0] || 'null'), 'Access-Control-Allow-Headers': 'Content-Type, X-Pingado-Token', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Vary': 'Origin', 'Content-Type': 'application/json' };
+  const out = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: cors });
+  if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
+  if (!env.PINGADO_TOKEN) return out({ error: 'O Worker ainda não tem o segredo PINGADO_TOKEN.' }, 503);
+  if (!okOrigin) return out({ error: 'Origem não permitida.' }, 403);
+  if (request.headers.get('X-Pingado-Token') !== env.PINGADO_TOKEN) return out({ error: 'Token do Pingado inválido.' }, 401);
+  let t; try { t = new URL(u.searchParams.get('url') || ''); } catch (e) { return out({ error: 'Endereço inválido.' }, 400); }
+  if (!/^https?:$/.test(t.protocol) || LI_BAD_HOST.test(t.hostname)) return out({ error: 'Endereço não permitido.' }, 400);
+  try {
+    const r = await fetch(t, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; RotinaLink/1.0)', 'Accept-Language': 'pt-BR,pt;q=0.9,en;q=0.7', 'Accept': 'text/html,application/xhtml+xml' }, redirect: 'follow' });
+    const html = (await r.text()).slice(0, 700000);
+    const mt = liMetas(html), g = (...ks) => { for (const k of ks) if (mt[k] && mt[k][0]) return mt[k][0]; return ''; };
+    const ld = liLd(html), pick = (re) => ld.find((o) => re.test(liType(o)));
+    const prod = pick(/Product|Book/i), vid = pick(/VideoObject|Movie|MusicRecording|MusicAlbum|PodcastEpisode|Episode|TVSeries/i), art = pick(/ScholarlyArticle|Article/i);
+    const main = prod || vid || art || {};
+    let off = [].concat((prod && prod.offers) || [])[0] || {};
+    if (off.offers) off = [].concat(off.offers)[0] || off;
+    const price = liMoney(g('product:price:amount', 'og:price:amount') || off.price || (off.priceSpecification && off.priceSpecification.price) || off.lowPrice);
+    let img = g('og:image', 'twitter:image') || (typeof main.image === 'string' ? main.image : liName([].concat(main.image || []).map((i) => (i && i.url) || i)));
+    try { if (img) img = new URL(img, r.url).href; } catch (e) { img = ''; }
+    const yt = (html.match(/"lengthSeconds":"(\d+)"/) || [])[1];
+    const dur = liMin(main.duration) || (g('video:duration', 'og:video:duration') ? Math.round(Number(g('video:duration', 'og:video:duration')) / 60) : 0) || (yt ? Math.round(Number(yt) / 60) : 0);
+    const title = g('og:title', 'twitter:title', 'citation_title') || liDec(main.name) || liDec((html.match(/<title[^>]*>([^<]*)<\/title>/i) || [])[1]);
+    const author = g('music:musician', 'og:audio:artist', 'book:author', 'article:author', 'author') || liName(main.author) || liName(main.director) || liDec((html.match(/<link itemprop="name" content="([^"]*)"/i) || [])[1]);
+    const pages = [g('citation_firstpage'), g('citation_lastpage')].filter(Boolean).join('-');
+    return out({
+      title: liDec(title).slice(0, 300), author: liDec(author).slice(0, 200), image: img, desc: g('og:description', 'description', 'twitter:description').slice(0, 600) || liDec(main.description).slice(0, 600),
+      site: g('og:site_name') || t.hostname.replace(/^www\./, ''), type: g('og:type'), price: price, currency: g('product:price:currency', 'og:price:currency') || off.priceCurrency || '', durationMin: dur, url: r.url,
+      citation: mt.citation_title ? { authors: mt.citation_author || [], journal: g('citation_journal_title'), year: (g('citation_publication_date', 'citation_date', 'citation_online_date').match(/\d{4}/) || [])[0] || '', volume: g('citation_volume'), issue: g('citation_issue'), pages: pages, doi: g('citation_doi') } : null,
+    });
+  } catch (e) { return out({ error: 'Não consegui ler a página: ' + (e && e.message || e) }, 502); }
+}
+
 export default {
   async scheduled(event, env, ctx) { ctx.waitUntil(run(env).then((l) => console.log(l.join('\n') || 'Nada a enviar.'))); },
   async fetch(request, env) {
@@ -234,6 +299,8 @@ export default {
         return new Response(JSON.stringify({ title }), { headers: cors });
       } catch (e) { return new Response(JSON.stringify({ title: '' }), { headers: cors }); }
     }
+    // dados de um link (preço, duração, autores…) para preencher formulários do site
+    if (u.pathname === '/linkinfo') return linkinfo(request, env, u);
     // Pingado (assistente Gemini): a chave fica só aqui, nos segredos do Worker
     if (u.pathname.startsWith('/pingado/')) return pingado(request, env, u);
     return new Response(env.VAPID_PRIVATE ? 'Rotina de Estudos · avisos ativos (verifica a cada 5 minutos).' : 'Falta configurar o segredo VAPID_PRIVATE.', { headers: { 'content-type': 'text/plain; charset=utf-8' } }); },
