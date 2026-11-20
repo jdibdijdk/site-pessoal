@@ -2751,6 +2751,34 @@ button.lzico.lk:hover{transform:scale(1.06);box-shadow:0 0 0 3px color-mix(in sr
 .artsec mark,.artmres mark{background:#FFE58A;color:#222;border-radius:3px;padding:0 2px}
 .lzico{overflow:hidden}.lzth{width:100%;height:100%;object-fit:cover;display:block}
 .wsimg{float:left;width:58px;height:58px;object-fit:cover;border-radius:10px;margin-right:12px;background:var(--soft)}
+/* ===== Revisões: cartões compactos ===== */
+.rvhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:2px 0 10px}
+.rvring{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--tx);background:conic-gradient(var(--acc) calc(var(--p)*1%),var(--line2) 0);position:relative}
+.rvring::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--bg,var(--card))}.rvring span{position:relative;z-index:1}
+.rvhead h2{margin:0;font-size:19px}.rvhead .muted{font-size:13px}
+.rvturbo{background:linear-gradient(135deg,#0E9F8E,#12B5A3);color:#fff;border:0;border-radius:999px;font-weight:600}.rvturbo:hover{filter:brightness(1.06)}
+.rvgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px;margin:6px 0 14px}
+.rvc{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.rvc.done{opacity:.72}.rvc.late{border-color:color-mix(in srgb,#E5484D 45%,var(--line))}
+.rvc-h{display:flex;align-items:center;gap:6px;padding:5px 12px;background:var(--soft);font-size:12px;color:var(--mut);min-height:30px}
+.rvc-h .sp{flex:1}.rvc-sep{opacity:.6}
+.rvbd{border-radius:8px;padding:2px 9px;font-size:11.5px;font-weight:600;background:var(--line2);color:var(--tx);white-space:nowrap}
+.rvbd.late{background:color-mix(in srgb,#E5484D 16%,var(--card));color:#C62A2F}.rvbd.today{background:color-mix(in srgb,#12A594 18%,var(--card));color:#0E7C6F}.rvbd.ok{background:color-mix(in srgb,#30A46C 18%,var(--card));color:#18794E}
+.rvc-b{padding:8px 12px 10px;display:flex;flex-direction:column;gap:6px;flex:1}
+.rvc-last{font-size:12px;color:var(--mut)}
+.rvc-t{display:flex;gap:10px;align-items:center}.rvc-t b{font-size:15px;line-height:1.25;flex:1;min-width:0;overflow-wrap:anywhere}
+.rvc-d{flex:none;min-width:38px;height:38px;border-radius:50%;border:3px solid var(--acc);display:grid;place-items:center;font-size:11.5px;font-weight:700;color:var(--tx)}
+.rvc-chips{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.rvtimes{display:inline-flex;align-items:center;gap:5px;background:color-mix(in srgb,#30A46C 16%,var(--card));color:#17784C;border-radius:8px;padding:2px 9px 2px 4px;font-size:11.5px;font-weight:600}
+.rvtimes i{font-style:normal;background:#17784C;color:#fff;border-radius:50%;min-width:16px;height:16px;padding:0 3px;box-sizing:border-box;display:grid;place-items:center;font-size:10px}
+.rvtimes.zero{background:var(--line2);color:var(--mut)}.rvtimes.zero i{background:var(--mut)}
+.rvtag{font-size:11px;color:var(--mut);border:1px solid var(--line);border-radius:8px;padding:1px 7px}
+.rvc-m{display:flex;align-items:center;gap:6px;color:var(--mut);font-size:12.5px;border-top:1px solid var(--line);padding-top:6px;margin-top:auto}.rvc-m b{color:var(--tx)}.rvc-m .sp{flex:1}.rvc-m .ic{vertical-align:-2px}
+.rvc-f{display:flex;gap:6px;justify-content:flex-end;flex-wrap:nowrap}.rvc-f .btn{white-space:nowrap}
+.rvc-x{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}.rvc-x .rvchk{margin:0}
+.btn.rvpill{border-radius:999px}
+.rvh{display:flex;gap:10px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--line)}.rvh b{min-width:44px}.rvh.ok b{color:#18794E}.rvh.late b{color:#C62A2F}
+@media(max-width:560px){.rvgrid{grid-template-columns:1fr}}
 /* ===== Revisões: checklist ===== */
 .rvchk{margin-top:4px;font-size:13px}.rvchk summary{cursor:pointer;color:var(--acc);font-weight:600}
 .rvchk-b{display:flex;flex-direction:column;gap:6px;padding:6px 0 2px;align-items:flex-start}
@@ -4748,8 +4776,9 @@ function rvItem(r){
     '<span class="rvact">'+(r.kind==='rv'&&!r.done?'<button class="btn sm ghost" data-a="rv-snz" data-k="'+esc(r.key)+'">Adiar</button>':'')+(r.done?'':'<button class="btn sm" data-a="rv-sched" data-k="'+esc(r.key)+'">'+ic('calendar',13)+' Agendar</button>')+'</span></div>';
 }
 function rvDays(list){
-  const m={},ord=[];list.forEach(r=>{if(!m[r.date]){m[r.date]=[];ord.push(r.date);}m[r.date].push(r);});
-  return ord.map(d=>{const dt=parseISO(d),T=todayISO();return '<div class="sechead '+(d<T?'late':'')+'">'+(d===T?'Hoje':d===addISO(T,1)?'Amanhã':WDL[dt.getDay()]+' '+fmtDM(d))+' <span class="count">'+m[d].length+'</span><span class="muted small" style="margin-left:auto">'+m[d].reduce((a,r)=>a+r.min,0)+' min</span></div>'+m[d].map(rvItem).join('');}).join('');
+  if(rvView()==='cards')return '<div class="rvgrid">'+list.map(rvCard).join('')+'</div>';
+  const m={},ord=[],cards=false;list.forEach(r=>{if(!m[r.date]){m[r.date]=[];ord.push(r.date);}m[r.date].push(r);});
+  return ord.map(d=>{const dt=parseISO(d),T=todayISO();return '<div class="sechead '+(d<T?'late':'')+'">'+(d===T?'Hoje':d===addISO(T,1)?'Amanhã':WDL[dt.getDay()]+' '+fmtDM(d))+' <span class="count">'+m[d].length+'</span><span class="muted small" style="margin-left:auto">'+m[d].reduce((a,r)=>a+r.min,0)+' min</span></div>'+(cards?'<div class="rvgrid">'+m[d].map(rvCard).join('')+'</div>':m[d].map(rvItem).join(''));}).join('');
 }
 function rvSettingsHTML(){
   const c=rvCfg(),old=S.acts.filter(a=>!a.rev&&RV_TIPO.test(norm((actParts(a).tipo||'')+' '+(a.kind||'')))).length;
@@ -4768,6 +4797,44 @@ function rvSettingsHTML(){
     '<div class="card sec"><h3>Eventos que geram revisão</h3><p class="muted small">Marque “Gera revisão” ao criar ou editar um evento. '+(old?'Há '+old+' evento(s) de Aula, Tutoria ou Plantão ainda sem a marca.':'Nenhum evento de Aula, Tutoria ou Plantão está sem a marca.')+'</p>'+
     (old?'<button class="btn" data-a="rv-mark-old">Marcar Aula, Tutoria e Plantão como revisáveis</button>':'')+'<div class="muted small" style="margin-top:8px">Hoje '+S.acts.filter(a=>a.rev).length+' evento(s) geram revisão.</div></div>';
 }
+/* ----- Cartões compactos de revisão: última revisão, vezes revisado, histórico ----- */
+const rvAgo=d=>{const n=diffDays(todayISO(),d);return n<=0?'hoje':n===1?'há 1 dia':'há '+n+' dias';};
+function rvSeriesPrefix(r){const p=String(r.key).split('|');return p[0]==='rx'?'rx|'+p[1]+'|':'rv|'+p[1]+'|'+p[2]+'|';}
+function rvSeries(r){
+  const pre=rvSeriesPrefix(r),done=S.prefs.rvDone||{},p=String(r.key).split('|'),dates=[];
+  Object.keys(done).forEach(k=>{if(k.indexOf(pre)===0&&done[k])dates.push(done[k]);});
+  const ch=p[0]==='rx'?null:(S.rvc||{})[p[1]+'|'+p[2]];
+  if(ch&&ch.h)ch.h.slice(1).forEach(x=>dates.push(x.d));
+  dates.sort();return {count:dates.length,last:dates[dates.length-1]||'',dates:dates};
+}
+function rvCard(r){
+  const T=todayISO(),late=!r.done&&r.date<T,sr=rvSeries(r),a=r.act,org=r.kind==='rp';
+  const badge=r.done?'<span class="rvbd ok">Concluída</span>':late?'<span class="rvbd late">Atrasada '+diffDays(T,r.date)+'d</span>':r.date===T?'<span class="rvbd today">Hoje</span>':'<span class="rvbd">'+fmtDM(r.date)+'</span>';
+  const last=sr.last?'Última revisão '+rvAgo(sr.last):(org?'Aula de '+fmtDM(r.src):'Ainda não revisado | aula '+rvAgo(r.src));
+  const nv=sr.count,tags=[];
+  if(r.fs)tags.push('série contínua');if(r.lv)tags.push('reorganizada');else if(r.moved)tags.push('adiada');
+  return '<article class="rvc '+(r.done?'done':'')+(late?' late':'')+'"><div class="rvc-h"><span>'+(org?'Organizar':'Revisão')+'</span><span class="rvc-sep">›</span><span>'+esc(actParts(a).tipo||a.kind||'Evento')+' de '+fmtDM(r.src)+'</span><span class="sp"></span>'+badge+'</div>'+
+    '<div class="rvc-b"><div class="rvc-last">'+esc(last)+'</div>'+
+    '<div class="rvc-t"><b>'+esc(r.theme)+'</b><span class="rvc-d" title="'+(org?'Organizar a revisão':'Intervalo D+'+r.n)+'">'+(org?'Org.':'D+'+r.n)+'</span></div>'+
+    '<div class="rvc-chips">'+(r.catId?tagHTML(r.catId):'')+focoChips(a)+(org?'':'<span class="rvtimes '+(nv?'':'zero')+'"><i>'+nv+'</i>'+(nv===1?'vez':'vezes')+' revisado</span>')+tags.map(t=>'<span class="rvtag">'+t+'</span>').join('')+'</div>'+
+    ((rvLinkHTML(r)||rvChkHTML(r))?'<div class="rvc-x">'+(rvLinkHTML(r)||'')+rvChkHTML(r)+'</div>':'')+
+    '<div class="rvc-m"><span>'+ic('clock',13)+' <b>'+r.min+' min</b> estimado'+(r.spent?' | '+r.spent+' min feitos':'')+'</span><span class="sp"></span><button class="icon-btn sm" data-a="rv-min" data-k="'+esc(r.key)+'" data-d="-5" aria-label="Menos 5 minutos">−</button><button class="icon-btn sm" data-a="rv-min" data-k="'+esc(r.key)+'" data-d="5" aria-label="Mais 5 minutos">+</button></div>'+
+    '<div class="rvc-f"><button class="btn sm rvpill" data-a="rv-hist" data-k="'+esc(r.key)+'">Ver histórico</button>'+(r.kind==='rv'&&!r.done?'<button class="btn sm rvpill" data-a="rv-snz" data-k="'+esc(r.key)+'">Adiar</button>':'')+(r.done?'':'<button class="btn sm rvpill" data-a="rv-sched" data-k="'+esc(r.key)+'" title="Agendar na semana" aria-label="Agendar">'+ic('calendar',14)+'</button>')+
+    '<button class="btn sm rvpill '+(r.done?'':'primary')+'" data-a="rv-done" data-k="'+esc(r.key)+'">'+(r.done?'Desfazer':'Revisar →')+'</button></div></div></article>';
+}
+function rvHistDlg(key){
+  const p=String(key).split('|'),pre=p[0]==='rx'?'rx|'+p[1]+'|':'rv|'+p[1]+'|'+p[2]+'|',done=S.prefs.rvDone||{},T=todayISO();
+  const src=p[0]==='rx'?'':p[2];let items=reviewListRaw(src?addISO(src,-1):addISO(T,-400),addISO(T,420)).filter(x=>x.kind==='rv'&&String(x.key).indexOf(pre)===0);
+  const cur=items.find(x=>x.key===key)||items[0];const title=cur?cur.theme:'Revisões';
+  const gl={h:'Difícil',b:'Bom',f:'Fácil'};
+  const rows=items.map(x=>{const st=(S.rv||{})[x.key]||{},dd=done[x.key]||'',late=!x.done&&x.date<T;
+    return '<div class="rvh '+(x.done?'ok':late?'late':'')+'"><b>D+'+x.n+'</b><span>'+(x.done?'Concluída'+(dd?' em '+fmtDM(dd):''):late?'Atrasada, prevista para '+fmtDM(x.date):'Prevista para '+fmtDM(x.date))+'</span><span class="muted small">'+(st.g?gl[st.g]||'':'')+(st.acc!=null?' | '+st.acc+'% de acerto':'')+(st.spent?' | '+st.spent+' min':'')+'</span></div>';}).join('');
+  const ch=p[0]==='rx'?null:(S.rvc||{})[p[1]+'|'+p[2]],fs=ch&&ch.h&&ch.h.length>1?'<h4 style="margin:12px 0 4px">Série contínua</h4>'+ch.h.slice(1).map((x,i)=>'<div class="rvh ok"><b>#'+(i+1)+'</b><span>Concluída em '+fmtDM(x.d)+'</span><span class="muted small">'+({1:'Errei',2:'Difícil',3:'Bom',4:'Fácil'}[x.g]||'')+'</span></div>').join(''):'';
+  openModal('<div class="form"><div class="fh"><h2>Histórico</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><p style="margin:0 0 8px"><b>'+esc(title)+'</b>'+(src?'<br><span class="muted small">Aula de '+fmtDM(src)+'</span>':'')+'</p>'+(rows||'<p class="muted small">Sem registros.</p>')+fs+'</div>');
+}
+Object.assign(ACT,{'rv-hist'(el){rvHistDlg(el.dataset.k);},'rv-view'(el){S.prefs.rvView=el.dataset.v;save();renderMain();}});
+const rvView=()=>S.prefs.rvView==='list'?'list':'cards';
+
 /* ----- revisão ativa (estilo Anki) para notas e questões: avalia, e a próxima revisão vai para a aba Revisões ----- */
 const ANKI_IV=[1,3,7,14,30,60,120];
 function ankiQueue(){
@@ -4794,9 +4861,9 @@ function renderRevisoes(){
   const all=reviewList(addISO(T,-45),addISO(T,60)).filter(rvPass);
   const dueNow=all.filter(r=>!r.done&&r.date<=T),next=all.filter(r=>!r.done&&r.date>T),dn=all.filter(r=>r.done).reverse();
   const wkEnd=addISO(T,6),sum=a=>a.reduce((x,r)=>x+Math.max(0,r.min-(r.spent||0)),0),wk=all.filter(r=>!r.done&&r.date<=wkEnd);
-  let h='<h2 class="vt" style="margin:0 0 4px">Revisões</h2>'+(c.on?'':'<p class="muted small" style="margin:0 0 12px">As revisões estão desligadas.</p>')+
-    '<div class="rvsum"><div><b>'+dueNow.length+'</b><span>pendentes agora</span></div><div><b>'+sum(dueNow)+' min</b><span>previstos hoje</span></div><div><b>'+sum(wk)+' min</b><span>nos próximos 7 dias</span></div></div>'+
-    '<div class="toolbar"><button class="btn sm" data-a="anki-start">'+ic('cards',14)+' Revisão ativa</button>'+pgBtn('revisoes','Organizar com o Pingado')+'<div class="seg">'+[['hoje','Hoje e atrasadas ('+dueNow.length+')'],['prox','Próximas ('+next.length+')'],['feitas','Concluídas ('+dn.length+')'],['cfg','Ajustes']].map(v=>'<button class="'+(tab===v[0]?'on':'')+'" data-a="rv-tab" data-v="'+v[0]+'">'+v[1]+'</button>').join('')+'</div></div>';
+  const doneToday=all.filter(r=>r.done&&((r.key.split('|')[0]==='rf')?r.date===T:(S.prefs.rvDone||{})[r.key]===T)).length,totalToday=dueNow.length+doneToday,pct=totalToday?Math.round(doneToday/totalToday*100):0;
+  let h='<div class="rvhead"><div class="rvring" style="--p:'+pct+'"><span>'+(totalToday?pct+'%':'-')+'</span></div><div><h2 class="vt">Revisões para fazer</h2><div class="muted"><b>'+doneToday+'</b> de '+totalToday+' itens hoje | '+sum(dueNow)+' min previstos | '+sum(wk)+' min nos próximos 7 dias</div></div><span class="sp" style="flex:1"></span><button class="btn rvturbo" data-a="anki-start">'+ic('zap',15)+' Revisão ativa</button>'+pgBtn('revisoes','Organizar com o Pingado')+'</div>'+(c.on?'':'<p class="muted small" style="margin:0 0 12px">As revisões estão desligadas.</p>')+
+    '<div class="toolbar"><div class="seg">'+[['hoje','Hoje e atrasadas ('+dueNow.length+')'],['prox','Próximas ('+next.length+')'],['feitas','Concluídas ('+dn.length+')'],['cfg','Ajustes']].map(v=>'<button class="'+(tab===v[0]?'on':'')+'" data-a="rv-tab" data-v="'+v[0]+'">'+v[1]+'</button>').join('')+'</div><span class="sp"></span><div class="seg" aria-label="Modo de exibição"><button class="'+(rvView()==='cards'?'on':'')+'" data-a="rv-view" data-v="cards">Cartões</button><button class="'+(rvView()==='list'?'on':'')+'" data-a="rv-view" data-v="list">Lista</button></div></div>';
   if(tab==='cfg')return h+rvSettingsHTML();
   h+='<div class="nfbar tfbar"><label class="nfsel"><span>Categoria</span><select id="rvcatSel"><option value="">Todas</option>'+catTreeOpts(UI.rvCat)+'</select></label>'+
     '<div class="frow">'+RV_FILTERS.map(f=>'<button class="chip '+((UI.rvF||'')===f[0]?'on':'')+'" data-a="rv-f" data-v="'+f[0]+'">'+f[1]+'</button>').join('')+'</div></div>';
