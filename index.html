@@ -2751,6 +2751,8 @@ button.lzico.lk:hover{transform:scale(1.06);box-shadow:0 0 0 3px color-mix(in sr
 .artsec mark,.artmres mark{background:#FFE58A;color:#222;border-radius:3px;padding:0 2px}
 .lzico{overflow:hidden}.lzth{width:100%;height:100%;object-fit:cover;display:block}
 .wsimg{float:left;width:58px;height:58px;object-fit:cover;border-radius:10px;margin-right:12px;background:var(--soft)}
+.mfpg{padding:6px 8px 2px;list-style:none}.mfpg button{border:0;background:none;padding:0;font:inherit;font-size:11.5px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.03em;cursor:pointer}.mfpg button:hover{color:var(--acc)}
+.mfpp ul{max-height:320px}.mfpp{width:min(400px,92vw)}
 /* ===== Revisões: cartões compactos ===== */
 .rvhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:2px 0 10px}
 .rvring{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--tx);background:conic-gradient(var(--acc) calc(var(--p)*1%),var(--line2) 0);position:relative}
@@ -8796,7 +8798,7 @@ Object.assign(ACT,{
   'rv-mfq'(el){
     const a=rvActOf(el.dataset.k);if(!a){toast('Evento não encontrado.');return;}
     const f=focoIdsOf(a).map(focoById).filter(Boolean)[0],nome=f?f.name:(actParts(a).theme||'');
-    const m=MFF();m.areas=[];m.provas=[];m.ano='';m.sub='';m.foco=nome;m.nao=m.err=m.cer=m.fav=m.rev=false;m.anul=false;
+    const m=MFF();m.areas=[];m.provas=[];m.anos=[];m.subs=[];m.focos=[nome];m.nao=m.err=m.cer=m.fav=m.rev=false;m.anul=false;
     UI.tab='questoes';renderTabs();renderMain();toast('Filtro: '+nome+'.');
   },
   'rv-opt'(el){const c=rvCfg();c[el.dataset.k]=!!el.checked;S.prefs.rv=c;save();renderMain();},
@@ -13757,7 +13759,7 @@ async function mfLoad(force){
       const tb=d.id.split('__')[0],T=MFD.T[tb],rows=(d.data()||{}).rows||{};if(!T)return;
       Object.keys(rows).forEach(ch=>{const js=rows[ch];if(typeof js!=='string')return;const v=mfJ(js,null);if(!Array.isArray(v))return;T.set(ch,{bloco:d.id,v:v});MFD.size[d.id]=(MFD.size[d.id]||0)+js.length;});
     }));
-    mfBuild();MFD.st='ok';
+    mfBuild();MFD.st='ok';try{mfFocosAuto();}catch(e){}
   }catch(e){
     MFD.st='err';MFD.err=/permission|insufficient/i.test(String((e&&e.code)||e&&e.message))?'O banco recusou o acesso deste site (regras ou domínios autorizados do projeto do MedFisher).':String((e&&e.message)||e);
   }
@@ -13809,17 +13811,17 @@ async function mfImg(fid){
   try{const k=MFD.sdk,s=await k.getDoc(k.doc(MFD.db,'imagens',fid));const d=s.exists()?s.data().d:null;if(d)MFD.imgs[fid]=d;return d;}catch(e){return null;}
 }
 // ----- filtros -----
-const MFF=()=>UI.mff||(UI.mff={areas:[],provas:[],ano:'',sub:'',foco:'',nao:false,err:false,cer:false,fav:false,rev:false,anul:false});
+const MFF=()=>{const f=UI.mff||(UI.mff={areas:[],provas:[],anos:[],subs:[],focos:[],nao:false,err:false,cer:false,fav:false,rev:false,anul:false});['areas','provas','anos','subs','focos'].forEach(k=>{if(!Array.isArray(f[k]))f[k]=[];});return f;};
 function mfFiltered(){
   const f=MFF(),e=MFD.est;
   return MFD.idx.filter(q=>{
     if(q.anul&&!f.anul)return false;
     if(f.areas.length&&f.areas.indexOf(q.area)<0)return false;
     if(f.provas.length&&f.provas.indexOf(q.prova)<0)return false;
-    if(f.ano&&String(q.ano)!==f.ano)return false;
+    if(f.anos.length&&f.anos.indexOf(String(q.ano))<0)return false;
     if(f.cause){const cz=(S.mfCause||{})[q.id],rr=e.r[q.id];if(!cz||cz.c!==f.cause||!rr||rr[1]!==0)return false;}
-    if(f.sub&&q.sub!==f.sub)return false;
-    if(f.foco&&q.foco!==f.foco)return false;
+    if(f.subs.length&&f.subs.indexOf(q.sub)<0)return false;
+    if(f.focos.length&&f.focos.indexOf(q.foco)<0)return false;
     if(f.nao||f.err||f.cer||f.fav||f.rev){
       const r=e.r[q.id];let ok=false;
       if(f.nao&&!r)ok=true;if(f.err&&r&&r[1]===0)ok=true;if(f.cer&&r&&r[1]===1)ok=true;if(f.fav&&e.f[q.id])ok=true;if(f.rev&&e.v[q.id])ok=true;
@@ -13830,31 +13832,23 @@ function mfFiltered(){
 }
 const MF_AREAS=['Clínica Médica','Cirurgia Geral','Ginecologia e Obstetrícia','Pediatria','Preventiva','Radiologia'];
 const mfNome=()=>(MFD.nomes&&MFD.nomes[MFD.user])||'';
-function mfTaxBH(ar,sb){ // subáreas das áreas marcadas e focos da subárea escolhida, como no MedFisher
-  const t=MFD.tax;if(!t)return {subareas:[],focos:[]};const n=new Set(),f=new Set();
-  t.areas.filter(a=>!ar.length||ar.indexOf(a.nome)>=0).forEach(a=>(a.subareas||[]).forEach(o=>{n.add(o.nome);if(!sb.length||sb.indexOf(o.nome)>=0)(o.focos||[]).forEach(x=>f.add(x));}));
-  const c=(x,y)=>x.localeCompare(y,'pt-BR');return {subareas:[...n].filter(Boolean).sort(c),focos:[...f].filter(Boolean).sort(c)};
-}
 const mfAreaStyle=nm=>{const a=(S.areas||[]).find(x=>norm(nm).indexOf(norm(x.name).slice(0,9))===0||norm(x.name).indexOf(norm(nm))===0||(/preventiv/i.test(nm)&&x.id==='ar_mp'))||{icon:'tag',color:'#5B6B85'};return a;};
 const mfAreaPill=nm=>{const a=mfAreaStyle(nm);return '<span class="fpill" style="--fc:'+esc(a.color)+'">'+ic(a.icon,13)+'<span>'+esc(nm)+'</span></span>';};
 const mfStatus=id=>{const r=MFD.est.r[id];return r?(r[1]===1?'certa':r[1]===0?'errada':'anulada'):'nova';};
 function renderQuestoes(){
   const nNotas=S.notes.filter(x=>x.mfId).length,head='<div class="qhead"><h2 class="vt">Questões</h2>'+pgBtn('questoes','Analisar meus erros')+'<img class="mflogo" src="'+MF_LOGO+'" alt=""><span class="muted small">MedFisher | '+(mfNome()?esc(mfNome())+' (usuário '+mfUser()+')':'usuário '+mfUser())+(nNotas?' | '+nNotas+(nNotas===1?' enviada para Notas':' enviadas para Notas'):'')+'</span><span class="sp"></span>'+
-    '<button class="btn sm ghost" data-a="mf-user">'+ic('user',14)+' '+mfUser()+'</button><button class="btn sm ghost" data-a="mf-reload">'+ic('repeat',14)+' Recarregar</button></div>';
+    '<button class="btn sm ghost" data-a="mf-focodlg" title="Comparar e alinhar os seus focos com os do MedFisher">'+ic('tag',14)+' Focos</button><button class="btn sm ghost" data-a="mf-user">'+ic('user',14)+' '+mfUser()+'</button><button class="btn sm ghost" data-a="mf-reload">'+ic('repeat',14)+' Recarregar</button></div>';
   if(MFD.st==='idle'||MFD.user!==mfUser()&&MFD.st!=='loading'){setTimeout(()=>mfLoad(),0);}
   if(MFD.st==='loading'||MFD.st==='idle')return head+'<div class="empty">Carregando o banco de questões…</div>';
   if(MFD.st==='err')return head+'<div class="warn">'+esc(MFD.err)+'</div><div class="addrow"><button class="btn" data-a="mf-reload">Tentar de novo</button></div>';
-  const f=MFF(),list=mfFiltered(),areas=MF_AREAS.concat(Array.from(new Set(MFD.idx.map(q=>q.area))).filter(a=>MF_AREAS.indexOf(a)<0&&a).sort());
-  const anos=Array.from(new Set(MFD.idx.map(q=>q.ano))).sort((a,b)=>b-a);
-  const subs=mfTaxBH(f.areas,[]).subareas;if(f.sub&&subs.indexOf(f.sub)<0)f.sub='';
-  const focos=mfTaxBH(f.areas,f.sub?[f.sub]:[]).focos;if(f.foco&&focos.indexOf(f.foco)<0)f.foco='';
+  const f=mfPrune(MFF()),list=mfFiltered(),areas=MF_AREAS.concat(Array.from(new Set(MFD.idx.map(q=>q.area))).filter(a=>MF_AREAS.indexOf(a)<0&&a).sort());
   const sel=(id,lab,opts,cur)=>'<label class="nfsel"><span>'+lab+'</span><select id="'+id+'"><option value="">Todos</option>'+opts.map(o=>'<option value="'+esc(o[0])+'" '+(String(cur)===String(o[0])?'selected':'')+'>'+esc(o[1])+'</option>').join('')+'</select></label>';
   const cb=(k,l)=>'<label class="chip cb"><input type="checkbox" data-mf="'+k+'" '+(f[k]?'checked':'')+'><span>'+l+'</span></label>';
   const shown=list.slice(0,UI.mfn||50);
   return head+'<div class="qsub"><b>'+list.length+'</b> questões encontradas</div>'+
     '<div class="toolbar" style="margin-bottom:4px"><span class="sp"></span><button class="btn sm" data-a="mf-imprimir">'+ic('printer',14)+' Imprimir</button><button class="btn sm" data-a="mf-trilha">'+ic('list',14)+' Salvar como trilha</button><button class="btn primary sm" data-a="mf-treinar">'+ic('play',14)+' Treinar com estes filtros</button><button class="btn sm" data-a="mf-simulado">'+ic('clock',14)+' Simulado cronometrado</button>'+(f.cause?'<button class="btn sm" data-a="mf-cards">'+ic('cards',14)+' Gerar flashcards dos erros</button>':'')+'</div>'+
     '<div class="mfareas">'+areas.map(a=>'<button class="mfarea '+(f.areas.indexOf(a)>=0?'on':'')+'" data-a="mf-area" data-v="'+esc(a)+'">'+mfAreaPill(a)+'</button>').join('')+'</div>'+
-    '<div class="nfbar">'+mfProvaHTML()+sel('mfAno','Ano',anos.map(a=>[a,a]),f.ano)+sel('mfSub','Subárea',subs.map(a=>[a,a]),f.sub)+sel('mfFoco','Foco',focos.map(a=>[a,a]),f.foco)+sel('mfCause','Causa do erro',MF_CAUSAS,f.cause||'')+'</div>'+
+    '<div class="nfbar">'+mfMultiHTML('provas','Provas','Todas')+mfMultiHTML('anos','Anos','Todos')+mfMultiHTML('subs','Subáreas','Todas')+mfMultiHTML('focos','Focos','Todos')+sel('mfCause','Causa do erro',MF_CAUSAS,f.cause||'')+'</div>'+
     '<div class="frow" style="margin:6px 0 10px">'+cb('nao','Não respondidas')+cb('err','Erradas')+cb('cer','Certas')+cb('fav','Favoritas')+cb('rev','Revisar depois')+cb('anul','Incluir anuladas')+'<button class="btn sm ghost" data-a="mf-limpar">Limpar filtros</button></div>'+
     (shown.length?'<div class="llist mfl">'+shown.map(q=>{const st=mfStatus(q.id);return '<button class="mfrow" data-a="mf-open" data-id="'+esc(q.id)+'"><span class="mfst '+st+'">'+ic(st==='certa'?'check':st==='errada'?'x':'minus',13)+'</span><span class="mft"><b>'+esc(q.inst)+' '+q.ano+'</b> | Questão '+q.num+'</span>'+mfAreaPill(q.area)+'<span class="muted small mfsub">'+esc([q.sub,q.foco].filter(Boolean).join(' › '))+'</span>'+(MFD.est.f[q.id]?'<span class="mfmk">'+ic('star',13)+'</span>':'')+(MFD.est.v[q.id]?'<span class="mfmk">'+ic('bell',13)+'</span>':'')+'</button>';}).join('')+'</div>'+(list.length>shown.length?'<div style="text-align:center;margin:10px"><button class="btn" data-a="mf-mais">Mostrar mais ('+(list.length-shown.length)+')</button></div>':''):'<div class="empty">Nenhuma questão com estes filtros.</div>')+
     '<p class="muted small" style="margin-top:12px">Simulados, trilhas salvas, flashcards e importação continuam no MedFisher.</p>';
@@ -13959,19 +13953,94 @@ function mfProvaList(){
   if(!MFD._pv||MFD._pvN!==MFD.idx.length){const m=new Map();MFD.idx.forEach(q=>{const o=m.get(q.prova)||{id:q.prova,label:q.inst+' '+q.ano,n:0};o.n++;m.set(q.prova,o);});MFD._pv=[...m.values()].sort((a,b)=>a.label<b.label?-1:a.label>b.label?1:0);MFD._pvN=MFD.idx.length;}
   return MFD._pv;
 }
-function mfProvaTxt(){const s=MFF().provas;if(!s.length)return 'Todas';if(s.length===1){const p=mfProvaList().find(x=>x.id===s[0]);return p?p.label:s[0];}return s.length+' provas selecionadas';}
-function mfProvaItems(){
-  const sel=new Set(MFF().provas),q=norm(UI.mfPq||''),it=mfProvaList().filter(p=>!q||norm(p.label).indexOf(q)>=0);
-  return it.length?it.map(p=>'<li><label class="mfpi"><input type="checkbox" data-pv="'+esc(p.id)+'" '+(sel.has(p.id)?'checked':'')+'><span>'+esc(p.label)+'</span><em>'+p.n+'</em></label></li>').join(''):'<li class="muted small" style="padding:10px;text-align:center">Nenhuma prova encontrada.</li>';
+/* ----- seleção múltipla (provas, anos, subáreas e focos), como no MedFisher ----- */
+const mfPrune=f=>{['areas','provas','anos','subs','focos'].forEach(k=>{if(!Array.isArray(f[k]))f[k]=[];});
+  if(MFD.tax){const sa=new Set(mfPopItems('subs').map(x=>x.v));f.subs=f.subs.filter(x=>sa.has(x));const fa=new Set(mfPopItems('focos').map(x=>x.v));f.focos=f.focos.filter(x=>fa.has(x));}
+  return f;};
+function mfPopItems(k){
+  const f=MFF();
+  if(k==='provas')return mfProvaList().map(p=>({v:p.id,t:p.label,n:p.n}));
+  if(k==='anos'){const m={};MFD.idx.forEach(q=>{m[q.ano]=(m[q.ano]||0)+1;});return Object.keys(m).sort((a,b)=>b-a).map(a=>({v:a,t:a,n:m[a]}));}
+  const ar=f.areas,cs={},cf={};
+  MFD.idx.forEach(q=>{if(ar.length&&ar.indexOf(q.area)<0)return;cs[q.sub]=(cs[q.sub]||0)+1;const kk=q.sub+'\u0001'+q.foco;cf[kk]=(cf[kk]||0)+1;});
+  const out=[],seen=new Set();
+  ((MFD.tax&&MFD.tax.areas)||[]).filter(a=>!ar.length||ar.indexOf(a.nome)>=0).forEach(a=>(a.subareas||[]).forEach(s=>{
+    if(k==='subs'){if(s.nome)out.push({v:s.nome,t:s.nome,g:a.nome,n:cs[s.nome]||0});return;}
+    if(f.subs.length&&f.subs.indexOf(s.nome)<0)return;
+    (s.focos||[]).forEach(fc=>{if(!fc)return;const id=s.nome+'\u0001'+fc;if(seen.has(id))return;seen.add(id);out.push({v:fc,t:fc,g:s.nome,n:cf[id]||0});});
+  }));
+  return out;
 }
-function mfProvaHTML(){
-  const n=MFF().provas.length;
-  return '<div class="nfsel mfpw" id="mfPwrap"><span>Provas</span><button type="button" class="mfpb" data-a="mf-pop" aria-haspopup="true" aria-expanded="'+(UI.mfPop?'true':'false')+'"><b id="mfPtxt">'+esc(mfProvaTxt())+'</b>'+ic('chevD',14)+'</button>'+
-    '<div class="mfpp" id="mfPpop" '+(UI.mfPop?'':'hidden')+'><input type="search" id="mfPq" placeholder="Buscar prova…" autocomplete="off" aria-label="Buscar prova" value="'+esc(UI.mfPq||'')+'">'+
-    '<div class="mfph"><span class="muted small">'+(n?n+(n===1?' selecionada':' selecionadas'):'Nenhuma selecionada (todas as provas)')+'</span><button type="button" class="btn sm ghost" data-a="mf-pclear">Limpar</button></div>'+
-    '<ul id="mfPlist">'+mfProvaItems()+'</ul><div style="text-align:right"><button type="button" class="btn sm primary" data-a="mf-pok">Pronto</button></div></div></div>';
+function mfMultiItems(k){
+  const sel=new Set(MFF()[k]),q=norm((UI.mfPq||{})[k]||''),it=mfPopItems(k).filter(x=>!q||norm(x.t+' '+(x.g||'')).indexOf(q)>=0);
+  if(!it.length)return '<li class="muted small" style="padding:10px;text-align:center">Nada encontrado.</li>';
+  let h='',g=null;
+  it.forEach(x=>{
+    if(x.g!==undefined&&x.g!==g){g=x.g;h+='<li class="mfpg"><button type="button" data-a="mf-pgrp" data-k="'+k+'" data-g="'+esc(g)+'" title="Marcar ou desmarcar o grupo">'+esc(g)+'</button></li>';}
+    h+='<li><label class="mfpi"><input type="checkbox" data-mfv="'+k+'" value="'+esc(x.v)+'" '+(sel.has(x.v)?'checked':'')+'><span>'+esc(x.t)+'</span><em>'+x.n+'</em></label></li>';
+  });
+  return h;
 }
-function mfKeepPop(){const l=$('#mfPlist'),top=l?l.scrollTop:0;UI.mfn=50;renderMain();const n=$('#mfPlist');if(n)n.scrollTop=top;}
+function mfMultiHTML(k,lab,all){
+  const sel=MFF()[k],n=sel.length,it=n===1?mfPopItems(k).find(x=>x.v===sel[0]):null,txt=!n?all:n===1?(it?it.t:sel[0]):n+' selecionados',open=UI.mfPop===k;
+  return '<div class="nfsel mfpw" data-mfw="'+k+'"><span>'+lab+'</span><button type="button" class="mfpb" data-a="mf-pop" data-k="'+k+'" aria-haspopup="true" aria-expanded="'+open+'"><b>'+esc(txt)+'</b>'+ic('chevD',14)+'</button>'+
+    '<div class="mfpp" '+(open?'':'hidden')+'><input type="search" data-mfq="'+k+'" placeholder="Buscar…" autocomplete="off" aria-label="Buscar" value="'+esc((UI.mfPq||{})[k]||'')+'">'+
+    '<div class="mfph"><span class="muted small">'+(n?n+(n===1?' selecionado':' selecionados'):'Nenhum (todos)')+'</span><span><button type="button" class="btn sm ghost" data-a="mf-pall" data-k="'+k+'">Marcar visíveis</button><button type="button" class="btn sm ghost" data-a="mf-pclear" data-k="'+k+'">Limpar</button></span></div>'+
+    '<ul data-mfl="'+k+'">'+mfMultiItems(k)+'</ul><div style="text-align:right"><button type="button" class="btn sm primary" data-a="mf-pok">Pronto</button></div></div></div>';
+}
+function mfKeepPop(k){const sc=()=>{const l=$('[data-mfl="'+k+'"]');return l?l.scrollTop:0;},top=sc();UI.mfn=50;renderMain();const n=$('[data-mfl="'+k+'"]');if(n)n.scrollTop=top;}
+function mfToggle(k,v,on){const a=MFF()[k],i=a.indexOf(v);if(on&&i<0)a.push(v);else if(!on&&i>=0)a.splice(i,1);mfKeepPop(k);}
+function mfClosePop(){UI.mfPop='';$$('.mfpw').forEach(w=>{const p=$('.mfpp',w);if(p)p.hidden=true;const b=$('.mfpb',w);if(b)b.setAttribute('aria-expanded','false');});}
+/* ----- Focos iguais aos do MedFisher: a taxonomia (área > subárea > foco) manda ----- */
+const mfAreaOf=nm=>(S.areas||[]).find(x=>norm(x.name)===norm(nm))||(S.areas||[]).find(x=>/preventiv/i.test(nm)&&/preventiv/i.test(x.name))||(S.areas||[]).find(x=>norm(nm).indexOf(norm(x.name).slice(0,9))===0);
+const mfModOrder=a=>{const t=MFD.tax,ar=t&&(t.areas||[]).find(x=>norm(x.nome)===norm(a.name)||(/preventiv/i.test(x.nome)&&/preventiv/i.test(a.name)));return ar?(ar.subareas||[]).map(s=>norm(s.nome)===norm(ar.nome)?'Princípios':s.nome):[];};
+function mfFocoDiff(){
+  const t=MFD.tax;if(!t||!(t.areas||[]).length)return null;
+  const want=[];t.areas.forEach(a=>(a.subareas||[]).forEach(s=>(s.focos||[]).forEach(fc=>{if(fc)want.push({area:a.nome,mod:norm(s.nome)===norm(a.nome)?'Princípios':s.nome,name:fc});})));
+  const used=new Set(),F=S.focos||[],create=[],move=[],fix=[];
+  want.forEach(w=>{const ar=mfAreaOf(w.area);w.ar=ar;const hit=ar&&F.find(f=>!used.has(f.id)&&f.area===ar.id&&norm(f.mod)===norm(w.mod)&&norm(f.name)===norm(w.name));if(hit){used.add(hit.id);w.hit=hit;if(hit.mod!==w.mod||hit.name!==w.name)fix.push(w);}});
+  want.forEach(w=>{if(w.hit)return;const hit=w.ar&&F.find(f=>!used.has(f.id)&&f.area===w.ar.id&&norm(f.name)===norm(w.name));if(hit){used.add(hit.id);w.hit=hit;move.push(w);}else create.push(w);});
+  const extra=F.filter(f=>!used.has(f.id));
+  return {want:want,create:create,move:move,fix:fix,extra:extra};
+}
+function mfFocosSync(removeExtra){
+  const d=mfFocoDiff();if(!d)return null;S.focos=S.focos||[];
+  d.fix.concat(d.move).forEach(w=>{w.hit.mod=w.mod;w.hit.name=w.name;});
+  d.create.forEach(w=>{let ar=w.ar;if(!ar){ar={id:'ar_'+uid(),name:w.area,icon:'tag',color:'#5B6B85'};S.areas=S.areas||[];S.areas.push(ar);w.ar=ar;}S.focos.push({id:'fc_'+uid(),area:ar.id,mod:w.mod,name:w.name});});
+  let removed=0;
+  if(removeExtra&&d.extra.length){const ids=new Set(d.extra.map(f=>f.id));removed=ids.size;S.focos=S.focos.filter(f=>!ids.has(f.id));
+    [].concat(S.tasks,S.acts,S.notes,S.docs,S.pdfs,S.slides||[],S.inks||[],S.decks||[]).forEach(o=>{if(o&&Array.isArray(o.focoIds))o.focoIds=o.focoIds.filter(i=>!ids.has(i));});}
+  const n=d.create.length+d.move.length+d.fix.length+removed;if(n)save();
+  return {created:d.create.length,moved:d.move.length,fixed:d.fix.length,removed:removed,extra:d.extra.length};
+}
+function mfFocosAuto(){
+  if(!MFD.idx.length)return;const r=mfFocosSync(false);
+  if(r&&(r.created+r.moved+r.fixed)>0){toast('Focos alinhados ao MedFisher: '+(r.created?r.created+' novo(s)':'')+(r.created&&(r.moved+r.fixed)?', ':'')+((r.moved+r.fixed)?(r.moved+r.fixed)+' ajustado(s)':'')+'.');if(UI.tab==='assuntos')renderMain();}
+}
+function mfFocoDlg(){
+  if(MFD.st!=='ok'||!MFD.tax){toast('Abra a aba Questões para carregar o banco do MedFisher primeiro.');return;}
+  const d=mfFocoDiff(),F=S.focos||[],used=f=>[].concat(S.tasks,S.acts,S.notes,S.docs,S.pdfs,S.slides||[],S.inks||[]).filter(o=>o&&focoIdsOf(o).indexOf(f.id)>=0).length;
+  const ar=id=>(areaById(id)||{}).name||'';
+  openModal('<div class="form"><div class="fh"><h2>Focos do MedFisher</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
+    '<p class="muted small" style="margin:0 0 8px">O MedFisher tem <b>'+d.want.length+'</b> focos. Os seus são <b>'+F.length+'</b>. Os que faltam são criados e os que mudaram de subárea ou de nome são ajustados sozinhos a cada vez que o banco carrega.</p>'+
+    '<div class="rvh '+(d.create.length+d.move.length+d.fix.length?'late':'ok')+'"><b>'+(d.create.length+d.move.length+d.fix.length)+'</b><span>a criar ou ajustar agora</span></div>'+
+    '<div class="rvh '+(d.extra.length?'late':'ok')+'"><b>'+d.extra.length+'</b><span>no seu site e fora do MedFisher</span></div>'+
+    (d.extra.length?'<div style="max-height:200px;overflow:auto;margin:6px 0">'+d.extra.map(f=>'<div class="small" style="padding:3px 0">'+esc([ar(f.area),f.mod,f.name].filter(Boolean).join(' › '))+(used(f)?' <span class="muted">('+used(f)+' vínculo(s))</span>':'')+'</div>').join('')+'</div><p class="muted small">Remover tira esses focos e os vínculos deles com tarefas, eventos, notas e documentos.</p>':'')+
+    '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Fechar</button><button type="button" class="btn" data-a="mf-focosync" data-rm="">Alinhar agora</button>'+(d.extra.length?'<button type="button" class="btn danger" data-a="mf-focosync" data-rm="1">Alinhar e remover os '+d.extra.length+' extras</button>':'')+'</div></div>');
+}
+Object.assign(ACT,{
+  'mf-focodlg'(){mfFocoDlg();},
+  'mf-focosync'(el){const r=mfFocosSync(!!el.dataset.rm);closeModal();if(r)toast('Focos alinhados: '+r.created+' criado(s), '+(r.moved+r.fixed)+' ajustado(s)'+(r.removed?', '+r.removed+' removido(s)':'')+'.');renderMain();},
+  'mf-pop'(el){const k=el.dataset.k,was=UI.mfPop===k;mfClosePop();if(!was){UI.mfPop=k;const w=$('.mfpw[data-mfw="'+k+'"]');if(w){$('.mfpp',w).hidden=false;$('.mfpb',w).setAttribute('aria-expanded','true');const i=$('[data-mfq]',w);if(i)i.focus();}}},
+  'mf-pclear'(el){MFF()[el.dataset.k]=[];mfKeepPop(el.dataset.k);},
+  'mf-pall'(el){const k=el.dataset.k,a=MFF()[k];$$('[data-mfl="'+k+'"] input[data-mfv]').forEach(i=>{if(a.indexOf(i.value)<0)a.push(i.value);});mfKeepPop(k);},
+  'mf-pgrp'(el){const k=el.dataset.k,g=el.dataset.g,a=MFF()[k],q=norm((UI.mfPq||{})[k]||''),its=mfPopItems(k).filter(x=>x.g===g&&(!q||norm(x.t+' '+(x.g||'')).indexOf(q)>=0)),all=its.every(x=>a.indexOf(x.v)>=0);its.forEach(x=>{const i=a.indexOf(x.v);if(all&&i>=0)a.splice(i,1);else if(!all&&i<0)a.push(x.v);});mfKeepPop(k);},
+  'mf-pok'(){mfClosePop();}
+});
+document.addEventListener('click',e=>{if(UI.mfPop&&!e.target.closest('.mfpw'))mfClosePop();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.mfPop)mfClosePop();});
+document.addEventListener('input',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.mfq){UI.mfPq=UI.mfPq||{};UI.mfPq[t.dataset.mfq]=t.value;const l=$('[data-mfl="'+t.dataset.mfq+'"]');if(l)l.innerHTML=mfMultiItems(t.dataset.mfq);}});
+
 /* ----- discursivas ----- */
 const mfRascGet=id=>{try{return localStorage.getItem('bq_rasc_'+MFD.user+'_'+id)||'';}catch(e){return '';}};
 const mfRascSet=(id,t)=>{try{if(t)localStorage.setItem('bq_rasc_'+MFD.user+'_'+id,t);else localStorage.removeItem('bq_rasc_'+MFD.user+'_'+id);}catch(e){}};
@@ -14041,7 +14110,7 @@ async function mfImgsLoad(raiz){
 }
 function mfTituloFiltro(){
   const f=MFF(),pv=mfProvaList(),p=f.provas.map(id=>{const x=pv.find(y=>y.id===id);return x?x.label:id;}),pt=[];
-  if(p.length)pt.push(p.join(' + '));if(f.ano)pt.push(f.ano);if(f.areas.length)pt.push(f.areas.join(' + '));if(f.sub)pt.push(f.sub);if(f.foco)pt.push('Foco: '+f.foco);
+  if(p.length)pt.push(p.join(' + '));if(f.anos.length)pt.push(f.anos.join(', '));if(f.areas.length)pt.push(f.areas.join(' + '));if(f.subs.length)pt.push(f.subs.join(' + '));if(f.focos.length)pt.push('Foco: '+f.focos.join(' + '));
   return pt.join(' | ')||'Questões';
 }
 async function mfImprimir(o){
@@ -14102,17 +14171,11 @@ function mfPrintDlg(){
   f.addEventListener('submit',ev=>{ev.preventDefault();const E=f.elements,qtd=Math.min(500,Math.max(0,Math.floor(Number(E.qtd.value)||0)))||(n>500?500:0);
     closeModal();setTimeout(()=>mfImprimir({qtd:qtd,cols:Number(E.cols.value)||2,ordem:E.ordem.value,conteudo:E.conteudo.value,paginar:E.pagina.checked}).catch(e=>toast(String((e&&e.message)||e))),180);});
 }
-document.addEventListener('click',e=>{if(UI.mfPop&&!e.target.closest('#mfPwrap')){UI.mfPop=false;const p=$('#mfPpop');if(p)p.hidden=true;}});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.mfPop){UI.mfPop=false;const p=$('#mfPpop');if(p)p.hidden=true;}});
 document.addEventListener('input',e=>{
   const t=e.target;if(!t)return;
-  if(t.id==='mfPq'){UI.mfPq=t.value;const l=$('#mfPlist');if(l)l.innerHTML=mfProvaItems();}
-  else if(t.id==='mfTxt'&&UI.mfq)mfRascSet(UI.mfq.ids[UI.mfq.i],t.value);
+  if(t.id==='mfTxt'&&UI.mfq)mfRascSet(UI.mfq.ids[UI.mfq.i],t.value);
 });
 Object.assign(ACT,{
-  'mf-pop'(){UI.mfPop=!UI.mfPop;const p=$('#mfPpop');if(p)p.hidden=!UI.mfPop;if(UI.mfPop){const i=$('#mfPq');if(i)i.focus();}},
-  'mf-pclear'(){MFF().provas=[];mfKeepPop();},
-  'mf-pok'(){UI.mfPop=false;const p=$('#mfPpop');if(p)p.hidden=true;},
   'mf-imprimir'(){mfPrintDlg();},
   'mf-disc-resp'(){const m=UI.mfq;if(!m)return;const t=String(($('#mfTxt')||{}).value||'').trim();if(!t){toast('Escreva a sua resposta.');return;}m.txt=t.slice(0,8000);mfRascSet(m.ids[m.i],m.txt);m.rev=true;mfShowQ();},
   'mf-disc-edit'(){const m=UI.mfq;if(!m)return;m.rev=false;mfShowQ();},
@@ -14121,15 +14184,15 @@ Object.assign(ACT,{
 });
 document.addEventListener('change',e=>{
   const t=e.target;if(!t||UI.tab!=='questoes')return;const f=MFF();
-  if(t.dataset&&t.dataset.pv){const k=f.provas.indexOf(t.dataset.pv);if(t.checked&&k<0)f.provas.push(t.dataset.pv);else if(!t.checked&&k>=0)f.provas.splice(k,1);mfKeepPop();}else if(t.id==='mfAno'){f.ano=t.value;UI.mfn=50;renderMain();}
-  else if(t.id==='mfSub'){f.sub=t.value;f.foco='';UI.mfn=50;renderMain();}else if(t.id==='mfFoco'){f.foco=t.value;UI.mfn=50;renderMain();}else if(t.id==='mfCause'){f.cause=t.value;UI.mfn=50;renderMain();}
+  if(t.dataset&&t.dataset.mfv){mfToggle(t.dataset.mfv,t.value,t.checked);}
+  else if(t.id==='mfCause'){f.cause=t.value;UI.mfn=50;renderMain();}
   else if(t.dataset&&t.dataset.mf){f[t.dataset.mf]=t.checked;UI.mfn=50;renderMain();}
 });
 Object.assign(ACT,{
   'mf-reload'(){mfLoad(true);},
   'mf-mais'(){UI.mfn=(UI.mfn||50)+50;renderMain();},
   'mf-limpar'(){UI.mff=null;UI.mfn=50;renderMain();},
-  'mf-area'(el){const f=MFF(),a=el.dataset.v,i=f.areas.indexOf(a);if(i>=0)f.areas.splice(i,1);else f.areas.push(a);f.sub='';f.foco='';UI.mfn=50;renderMain();},
+  'mf-area'(el){const f=MFF(),a=el.dataset.v,i=f.areas.indexOf(a);if(i>=0)f.areas.splice(i,1);else f.areas.push(a);UI.mfn=50;renderMain();},
   'mf-open'(el){const ids=mfFiltered().map(q=>q.id);UI.mfq={ids:ids,i:Math.max(0,ids.indexOf(el.dataset.id)),show:false};mfShowQ();},
   'mf-treinar'(){const ids=mfFiltered().map(q=>q.id).slice(0,500);if(!ids.length){toast('Nenhuma questão com estes filtros.');return;}UI.mfq={ids:ids,i:0,show:false,train:true,res:[]};mfShowQ();},
   'mf-nav'(el){const m=UI.mfq;if(!m)return;const j=m.i+Number(el.dataset.d);if(j>=m.ids.length){closeModal();UI.mfq=null;if(m.train&&m.res.length)toast('Treino concluído: '+m.res.filter(x=>x).length+' certas de '+m.res.length+'.');renderMain();return;}if(j<0)return;m.i=j;m.show=false;m.rev=false;m.redo=false;m.txt=null;mfShowQ();},
@@ -14141,7 +14204,7 @@ Object.assign(ACT,{
   'mf-report'(){const m=UI.mfq;if(!m)return;const id=m.ids[m.i];askText('Descreva o problema','',v=>{mfPut('Reportes',mfBloco('Reportes'),mfChave(),[MFD.user,id,String(v).trim().slice(0,2000),new Date().toISOString()]);toast('Problema registrado.');setTimeout(mfShowQ,0);});},
   'mf-trilha'(){
     const f=MFF(),ids=mfFiltered().length;askText('Nome da trilha','',nome=>{
-      const filtro={area:f.areas,provaId:f.provas.slice(),ano:f.ano?[Number(f.ano)]:[],subarea:f.sub?[f.sub]:[],foco:f.foco?[f.foco]:[],status:[f.nao&&'nao_respondidas',f.err&&'erradas',f.cer&&'certas',f.fav&&'favoritas',f.rev&&'revisar'].filter(Boolean),incluirAnuladas:f.anul};
+      const filtro={area:f.areas,provaId:f.provas.slice(),ano:f.anos.map(Number),subarea:f.subs.slice(),foco:f.focos.slice(),status:[f.nao&&'nao_respondidas',f.err&&'erradas',f.cer&&'certas',f.fav&&'favoritas',f.rev&&'revisar'].filter(Boolean),incluirAnuladas:f.anul};
       mfPut('Trilhas',mfBloco('Trilhas'),mfChave(),[mfChave().slice(0,12),MFD.user,nome.slice(0,80),JSON.stringify(filtro),Math.min(ids,500),'prova',new Date().toISOString()]);toast('Trilha salva (visível no MedFisher).');});
   },
   'mf-user'(){askText('Usuário do MedFisher (01 a 20)',mfUser(),v=>{v=String(v).trim().padStart(2,'0');if(!/^(0[1-9]|1\d|20)$/.test(v)){toast('Use um código entre 01 e 20.');return;}S.prefs.mfUser=v;save();MFD.st='idle';renderMain();});}
@@ -15583,7 +15646,7 @@ function lzCard(x){
   const note=x.noteId&&noteById(x.noteId);
   const meta=[T.label,total?total+(unit?' '+unit:''):'',x.plannedMin?'previsto '+hm(x.plannedMin):'',done&&x.doneAt?'em '+fmtDM(new Date(x.doneAt).toISOString().slice(0,10)):''].filter(Boolean).join(' | ');
   return '<article class="lzcard '+(done?'done':'')+'" style="--c:'+T.color+'">'+
-    (x.link?'<button class="lzico lk" data-a="lz-link" data-id="'+x.id+'" title="Abrir '+esc(x.title)+'" aria-label="Abrir '+esc(x.title)+'">'+(x.thumb?'<img class="lzth" alt="" loading="lazy" referrerpolicy="no-referrer" src="'+esc(x.thumb)+'">':ic(T.icon,22))+'</button>':'<div class="lzico" aria-hidden="true">'+(x.thumb?'<img class="lzth" alt="" loading="lazy" referrerpolicy="no-referrer" src="'+esc(x.thumb)+'">':ic(T.icon,22))+'</div>')+
+    (x.link?'<button class="lzico lk" data-a="lz-link" data-id="'+x.id+'" title="Abrir '+esc(x.title)+'" aria-label="Abrir '+esc(x.title)+'">'+(x.thumb&&!S.prefs.lzNoThumb?'<img class="lzth" alt="" loading="lazy" referrerpolicy="no-referrer" src="'+esc(x.thumb)+'">':ic(T.icon,22))+'</button>':'<div class="lzico" aria-hidden="true">'+(x.thumb&&!S.prefs.lzNoThumb?'<img class="lzth" alt="" loading="lazy" referrerpolicy="no-referrer" src="'+esc(x.thumb)+'">':ic(T.icon,22))+'</div>')+
     '<div class="lzb"><div class="lzt"><b>'+esc(x.title)+'</b><span class="lzdot" style="--d:'+sc[2]+'" title="'+sc[1]+'"><i></i>'+sc[1]+'</span></div>'+
     '<div class="lzm">'+esc(meta)+(x.catId?' '+tagHTML(x.catId):'')+'</div>'+
     (total||done?'<div class="lzp"><div class="lzbar"><i style="width:'+pct+'%"></i></div><span class="muted small">'+(done?'Concluído':(total?'Parei em '+prog+' de '+total+(unit?' '+unit:'')+' ('+pct+'%)':''))+'</span></div>':'')+
@@ -15592,7 +15655,7 @@ function lzCard(x){
     (x.note&&!done?'<div class="muted small lzobs">'+esc(x.note)+'</div>':'')+
     '</div><div class="lza">'+
     (x.link?'<button class="btn sm" data-a="lz-link" data-id="'+x.id+'" title="Abrir o link">'+ic('external',14)+' Abrir</button>':'')+
-    (!done&&(total||T.unit)?'<button class="btn sm" data-a="lz-prog" data-id="'+x.id+'">'+ic('pulse',14)+' Onde parei</button>':'')+
+    (!done&&(total||T.unit)?'<button class="btn sm" data-a="lz-prog" data-id="'+x.id+'">'+ic('pulse',14)+' Onde parei</button>':'')+(lzCanMin(x)?'<button class="btn sm ghost" data-a="lz-dur" data-id="'+x.id+'" title="Busca a duração no link">'+ic('clock',14)+' Puxar minutos</button>':'')+
     (!done?'<button class="btn sm primary" data-a="lz-done" data-id="'+x.id+'">'+ic('check',14)+' Marcar como '+(x.type==='livro'?'lido':x.type==='local'?'visitado':x.type==='musica'||x.type==='podcast'?'ouvido':x.type==='jogo'?'jogado':'visto')+'</button>':'<button class="btn sm" data-a="lz-done" data-id="'+x.id+'">'+ic('edit',14)+' Avaliação</button><button class="btn sm ghost" data-a="lz-reopen" data-id="'+x.id+'">Voltar à lista</button>')+
     '<button class="btn sm ghost" data-a="lz-sched" data-id="'+x.id+'" title="Agendar na semana usando o tempo previsto">'+ic('calendar',14)+' Agendar</button>'+
     '<button class="btn sm ghost" data-a="lz-note" data-id="'+x.id+'" title="'+(note?'Abrir a nota':'Criar uma nota')+'">'+ic(note?'note':'filePlus',14)+' '+(note?'Nota':'Criar nota')+'</button>'+
@@ -15610,7 +15673,7 @@ function renderLazer(){
   const pool=all.filter(x=>lzPass(x,true)),cnt=k=>pool.filter(x=>!k||x.type===k).length;
   const sub=all.filter(x=>lzPass(x)),nTodo=sub.filter(x=>x.status==='todo').length,nDone=sub.filter(x=>x.status==='done').length;
   const rated=all.filter(x=>x.status==='done'&&x.stars),avg=rated.length?(rated.reduce((a,x)=>a+x.stars,0)/rated.length).toFixed(1).replace('.',','):'';
-  let h='<div class="toolbar"><h2 class="vt" style="margin:0">Lazer</h2><span class="muted small">'+all.filter(x=>x.status==='todo').length+' na fila | '+all.filter(x=>x.status==='done').length+' concluídos'+(avg?' | média '+avg+' ★':'')+'</span><span class="sp"></span><button class="btn primary" data-a="lz-new">'+ic('plus',15)+' Novo item</button></div>';
+  let h='<div class="toolbar"><h2 class="vt" style="margin:0">Lazer</h2><span class="muted small">'+all.filter(x=>x.status==='todo').length+' na fila | '+all.filter(x=>x.status==='done').length+' concluídos'+(avg?' | média '+avg+' ★':'')+'</span><span class="sp"></span>'+(all.some(x=>x.thumb)?'<button class="btn sm ghost" data-a="lz-thumbs" aria-pressed="'+!!S.prefs.lzNoThumb+'">'+ic(S.prefs.lzNoThumb?'eye':'eyeOff',14)+' '+(S.prefs.lzNoThumb?'Mostrar miniaturas':'Esconder miniaturas')+'</button>':'')+(lzNoMin().length?'<button class="btn sm" data-a="lz-durall" title="Busca no link a duração dos itens que ainda não têm tempo">'+ic('clock',14)+' Puxar minutos ('+lzNoMin().length+')</button>':'')+'<button class="btn primary" data-a="lz-new">'+ic('plus',15)+' Novo item</button></div>';
   h+='<div class="lztypes" role="group" aria-label="Tipo de mídia"><button class="lzchip '+(!UI.lzType?'on':'')+'" data-a="lz-type" data-v=""><span>Tudo</span><small>'+cnt('')+'</small></button>'+
     LZ_TYPES.map(t=>'<button class="lzchip '+(UI.lzType===t.k?'on':'')+'" style="--c:'+t.color+'" data-a="lz-type" data-v="'+t.k+'">'+ic(t.icon,15)+'<span>'+t.label+'</span><small>'+cnt(t.k)+'</small></button>').join('')+'</div>';
   h+='<div class="nfbar tfbar"><div class="frow"><span class="fl" style="min-width:auto">Tipo de uso</span><button class="chip '+(!UI.lzScope?'on':'')+'" data-a="lz-scope" data-v="">Todos</button>'+LZ_SCOPES.map(x=>'<button class="chip '+(UI.lzScope===x[0]?'on':'')+'" data-a="lz-scope" data-v="'+x[0]+'"><i class="lzd" style="background:'+x[2]+'"></i>'+x[1]+'</button>').join('')+'</div>'+
@@ -15689,7 +15752,22 @@ function lzNote(id){
   }
   flushNote();UI.tab='notas';UI.nsub='notas';UI.nview={type:'note',id:n.id,edit:false};closeModal();renderTabs();renderMain();window.scrollTo(0,0);
 }
+const LZ_MIN_T=['video','filme','podcast','serie'];
+const lzCanMin=x=>!!x.link&&!(Number(x.total)>0)&&x.status!=='done'&&LZ_MIN_T.indexOf(x.type)>=0;
+const lzNoMin=()=>(S.lazer||[]).filter(lzCanMin);
+async function lzDur(x,quiet){
+  const i=await linkInfo(x.link);
+  if(i.durationMin){x.total=i.durationMin;x.unit='min';if(!x.thumb&&i.image)x.thumb=i.image;x.updated=Date.now();return true;}
+  if(!quiet)toast(i.err||((pgApi()&&pgTok())?'O site do link não informou a duração.':'Para puxar os minutos, configure o Worker em Ajustes > Pingado.'));
+  return false;
+}
 Object.assign(ACT,{
+  'lz-thumbs'(){S.prefs.lzNoThumb=!S.prefs.lzNoThumb;save();renderMain();},
+  'lz-dur'(el){const x=lzById(el.dataset.id);if(!x)return;toast('Buscando a duração…');lzDur(x).then(ok=>{if(ok){save();renderMain();toast('Duração: '+x.total+' min.');}});},
+  'lz-durall'(){
+    const list=lzNoMin().slice(0,40);if(!list.length)return;toast('Buscando a duração de '+list.length+' item(ns)…');
+    let n=0;(async()=>{for(const x of list){if(await lzDur(x,true))n++;}save();renderMain();toast(n?'Minutos preenchidos em '+n+' de '+list.length+' item(ns).':((pgApi()&&pgTok())?'Nenhum link informou a duração.':'Configure o Worker em Ajustes > Pingado para puxar os minutos.'));})();
+  },
   'lz-new'(){lzForm('');},
   'lz-edit'(el){lzForm(el.dataset.id);},
   'lz-del'(el){const x=lzById(el.dataset.id);if(!x)return;askConfirm('Excluir item?','“'+x.title+'” será removido do Lazer.',()=>{const i=S.lazer.indexOf(x);S.lazer=S.lazer.filter(y=>y!==x);save();closeModal();renderMain();toastUndo('Item excluído.',()=>{S.lazer.splice(Math.min(i,S.lazer.length),0,x);save();renderMain();});},'Excluir');},
@@ -16434,7 +16512,8 @@ async function liFetch(kind){
     if(c){set('title',c.title||i.title);set('authors',(c.authors||[]).join('; '));set('journal',c.journal);set('year',c.year);set('vol',c.volume);set('issue',c.issue);set('pages',c.pages);set('doi',c.doi);}
     else set('title',i.title);
   }
-  if(st)st.textContent='Dados preenchidos'+(i.price&&kind==='ws'?' (confira o preço, pode mudar)':'')+'. Confira antes de salvar.';
+  const noDur=kind==='lz'&&!i.durationMin&&!Number(E.total.value)&&['video','filme','podcast','serie'].indexOf($('input[name=type]:checked',f).value)>=0;
+  if(st)st.textContent='Dados preenchidos'+(i.price&&kind==='ws'?' (confira o preço, pode mudar)':'')+'. Confira antes de salvar.'+(noDur?((pgApi()&&pgTok())?' Não achei a duração nesse link.':' Para puxar os minutos, configure o Worker em Ajustes > Pingado.'):'');
 }
 Object.assign(ACT,{'li-fetch'(el){liFetch(el.dataset.k);}});
 document.addEventListener('change',e=>{
@@ -17233,7 +17312,7 @@ function renderAssuntos(){
   const mast=focoMasteryAll(),stc={};(S.focos||[]).forEach(f=>{stc[mast[f.id].status]=(stc[mast[f.id].status]||0)+1;});
   const list=(S.focos||[]).filter(f=>(!ar||f.area===ar)&&(!q||norm(f.name+' '+f.mod).includes(q))&&(!UI.ftSt||mast[f.id].status===UI.ftSt));
   let h='<div class="toolbar"><div class="sbox" style="max-width:300px">'+ic('search',15)+'<input id="ftq" type="search" placeholder="Buscar foco" value="'+esc(UI.ftq||'')+'"></div><span class="sp"></span>'+
-    '<button class="btn sm ghost" data-a="ar-manage">'+ic('settings',14)+' Áreas</button><button class="btn primary" data-a="ft-new">'+ic('plus',15)+' Novo foco</button></div>'+
+    '<button class="btn sm ghost" data-a="mf-focodlg" title="Comparar e alinhar os focos com os do MedFisher">'+ic('repeat',14)+' Alinhar ao MedFisher</button><button class="btn sm ghost" data-a="ar-manage">'+ic('settings',14)+' Áreas</button><button class="btn primary" data-a="ft-new">'+ic('plus',15)+' Novo foco</button></div>'+
     '<div class="seg" style="margin-bottom:12px">'+[['','Todas']].concat((S.areas||[]).map(a=>[a.id,a.name])).map(v=>'<button class="'+(ar===v[0]?'on':'')+'" data-a="set" data-k="ftArea" data-v="'+esc(v[0])+'">'+esc(v[1])+'</button>').join('')+'</div>';
   h+='<div class="frow" style="margin-bottom:12px"><span class="fl" style="min-width:auto">Domínio</span><button class="chip '+(!UI.ftSt?'on':'')+'" data-a="set" data-k="ftSt" data-v="">Todos</button>'+Object.keys(MAS_ST).map(k=>'<button class="chip '+(UI.ftSt===k?'on':'')+'" data-a="set" data-k="ftSt" data-v="'+k+'"><i class="lzd" style="background:'+MAS_ST[k][1]+'"></i>'+MAS_ST[k][0]+' ('+(stc[k]||0)+')</button>').join('')+'</div>';
   if(!list.length)return h+'<div class="empty">Nenhum foco.<br><button class="btn primary" data-a="ft-new">'+ic('plus',15)+' Novo foco</button></div>';
@@ -17241,7 +17320,7 @@ function renderAssuntos(){
     const fs=list.filter(f=>f.area===a.id);if(!fs.length)return;
     const mods={};fs.forEach(f=>{(mods[f.mod]=mods[f.mod]||[]).push(f);});
     h+='<section class="ftarea"><h3 class="fth" style="--fc:'+esc(a.color)+'"><span class="fpill big">'+ic(a.icon,18)+'<span>'+esc(a.name)+'</span></span><span class="muted small">'+fs.length+'</span>'+(function(){const am=mfStatOf(fs.reduce((x,f)=>x.concat(mfFocoList(f)),[]));return am.pct!=null?'<span class="muted small">acerto '+am.pct+'% no banco</span>':'';})()+'</h3>';
-    Object.keys(mods).sort((x,y)=>x==='Princípios'?-1:y==='Princípios'?1:x.localeCompare(y,'pt-BR')).forEach(m=>{
+    Object.keys(mods).sort((x,y)=>{if(x==='Princípios')return -1;if(y==='Princípios')return 1;const o=mfModOrder(a),i=o.indexOf(x),j=o.indexOf(y);if(i>=0&&j>=0)return i-j;if(i>=0)return -1;if(j>=0)return 1;return x.localeCompare(y,'pt-BR');}).forEach(m=>{
       const ms=MOD_ICO.find(x=>m!=='Princípios'&&x[0].test(m));
       h+='<div class="ftmod">'+(ms?ic(ms[1],14):'')+esc(m)+'</div><div class="ftlist">'+mods[m].sort((x,y)=>x.name.localeCompare(y.name,'pt-BR')).map(f=>{
         const p=focoProg(f);
