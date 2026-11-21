@@ -2772,6 +2772,17 @@ button.lzico.lk:hover{transform:scale(1.06);box-shadow:0 0 0 3px color-mix(in sr
 .skres{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}.skres a{color:var(--acc);overflow-wrap:anywhere}
 .skgrp{margin:6px 0}.skref{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--card);overflow:hidden;font-size:13px}.skref>button,.skref>span{border:0;background:none;padding:3px 10px;font:inherit;color:var(--tx);cursor:pointer;display:inline-flex;align-items:center;gap:5px}.skref>span{cursor:default}.skref>button:hover{color:var(--acc)}.skref .x{padding:3px 8px;color:var(--mut);border-left:1px solid var(--line)}
 @media(max-width:760px){.skcard{grid-template-columns:auto minmax(0,1fr)}.skact{grid-column:1/-1;flex-direction:row;justify-content:flex-start}}
+.skprog{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px;color:var(--mut);font-size:12.5px}.skprog span{display:inline-flex;align-items:center;gap:5px}
+.skmini{display:inline-block;width:46px;height:5px;border-radius:99px;background:var(--soft);overflow:hidden}.skmini b{display:block;height:100%;background:var(--c,var(--acc))}
+.skmod{margin:2px 0 8px}.skmodh{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--mut);padding:8px 0 2px}
+.sklr{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}.sklr.feito .sklt{text-decoration:line-through;color:var(--mut)}
+.skst{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--c);background:transparent;display:grid;place-items:center;cursor:pointer;color:#fff;padding:0;margin-top:1px}.skst i{width:8px;height:8px;border-radius:50%;background:var(--c)}.sklr.feito .skst{background:var(--c)}
+.sklb{flex:1;min-width:0}.sklt{font-weight:500}.sklm{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;margin-top:2px}.sklact{display:flex;gap:0;flex:none}
+.skchip2{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:1px 9px;font-size:12px;color:var(--tx);cursor:pointer;display:inline-flex;align-items:center;gap:4px}.skchip2:hover{color:var(--acc);border-color:var(--acc)}
+.skpj{border:1px solid var(--line);border-left:4px solid var(--c);border-radius:12px;padding:8px 12px;margin:8px 0;background:var(--card)}
+.skpjh{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.skfold{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:0;font:inherit;color:var(--tx);cursor:pointer;text-align:left}.skfold b{font-size:15px}
+.skpjb{padding:4px 0 2px}.lateT{color:#C62A2F}
+.sktimer{display:inline-flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums;font-size:15px;padding:4px 10px;border-radius:999px;background:var(--accs)}
 /* ===== Revisões: cartões compactos ===== */
 .rvhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:2px 0 10px}
 .rvring{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--tx);background:conic-gradient(var(--acc) calc(var(--p)*1%),var(--line2) 0);position:relative}
@@ -14018,7 +14029,7 @@ const mfModOrder=a=>{const t=MFD.tax,ar=t&&(t.areas||[]).find(x=>norm(x.nome)===
 function mfFocoDiff(){
   const t=MFD.tax;if(!t||!(t.areas||[]).length)return null;
   const want=[];t.areas.forEach(a=>(a.subareas||[]).forEach(s=>(s.focos||[]).forEach(fc=>{if(fc)want.push({area:a.nome,mod:norm(s.nome)===norm(a.nome)?'Princípios':s.nome,name:fc});})));
-  const used=new Set(),F=S.focos||[],create=[],move=[],fix=[];
+  const used=new Set(),F=(S.focos||[]).filter(f=>!f.sk),create=[],move=[],fix=[];
   want.forEach(w=>{const ar=mfAreaOf(w.area);w.ar=ar;const hit=ar&&F.find(f=>!used.has(f.id)&&f.area===ar.id&&norm(f.mod)===norm(w.mod)&&norm(f.name)===norm(w.name));if(hit){used.add(hit.id);w.hit=hit;if(hit.mod!==w.mod||hit.name!==w.name)fix.push(w);}});
   want.forEach(w=>{if(w.hit)return;const hit=w.ar&&F.find(f=>!used.has(f.id)&&f.area===w.ar.id&&norm(f.name)===norm(w.name));if(hit){used.add(hit.id);w.hit=hit;move.push(w);}else create.push(w);});
   const extra=F.filter(f=>!used.has(f.id));
@@ -14040,7 +14051,7 @@ function mfFocosAuto(){
 }
 function mfFocoDlg(){
   if(MFD.st!=='ok'||!MFD.tax){toast('Abra a aba Questões para carregar o banco do MedFisher primeiro.');return;}
-  const d=mfFocoDiff(),F=S.focos||[],used=f=>[].concat(S.tasks,S.acts,S.notes,S.docs,S.pdfs,S.slides||[],S.inks||[]).filter(o=>o&&focoIdsOf(o).indexOf(f.id)>=0).length;
+  const d=mfFocoDiff(),F=(S.focos||[]).filter(f=>!f.sk),used=f=>[].concat(S.tasks,S.acts,S.notes,S.docs,S.pdfs,S.slides||[],S.inks||[]).filter(o=>o&&focoIdsOf(o).indexOf(f.id)>=0).length;
   const ar=id=>(areaById(id)||{}).name||'';
   openModal('<div class="form"><div class="fh"><h2>Focos do MedFisher</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<p class="muted small" style="margin:0 0 8px">O MedFisher tem <b>'+d.want.length+'</b> focos. Os seus são <b>'+F.length+'</b>. Os que faltam são criados e os que mudaram de subárea ou de nome são ajustados sozinhos a cada vez que o banco carrega.</p>'+
@@ -16542,58 +16553,96 @@ document.addEventListener('change',e=>{
   if((id==='fLz'&&t.name==='link')||(id==='fWs'&&t.name==='url')){const T=t.form.elements.title;if(!T.value.trim()&&/^https?:\/\//i.test(t.value.trim()))liFetch(id==='fLz'?'lz':'ws');}
 });
 
-/* ===== Habilidades: prática deliberada de habilidades médicas, manuais, técnicas e pessoais ===== */
-const SK_CATS=[['medica','Médica','steth','#3B6FB6'],['manual','Manual e artesanato','hand','#C77D0A'],['tec','Tecnologia e dados','zap','#3E63DD'],['pessoal','Pessoal','heart','#B0215F'],['outra','Outra','star','#6E56CF']];
+/* ===== Habilidades: prática deliberada + curso (teoria), projetos, foco especial ===== */
+Object.assign(ICONS,{
+  sutura:'<path d="M4 20C4 11 10 5 19 4"/><circle cx="18.600" cy="4.400" r=".9"/><path d="M17.500 5.500c2 1.500 3 3.500 2 6.500s-3 3-3 6"/>',
+  croche:'<circle cx="10" cy="14" r="6.500"/><path d="M4.500 12c4 0 8 1.500 10 5M5.500 17c3 0 6 1 8 3M8 8c3 1 6 3 7 6"/><path d="M16 8l5-5M21 3v3"/>',
+  martelo:'<path d="M12 4l7 7-3 3-7-7z"/><path d="M11.500 11.500L4 19l2 2 7.500-7.500"/>',
+  serra:'<path d="M3 17l12-12 4 4L7 21z"/><path d="M6 14l2 2M9 11l2 2M12 8l2 2"/>',
+  chip:'<rect x="6" y="6" width="12" height="12" rx="1.500"/><rect x="9.500" y="9.500" width="5" height="5"/><path d="M9 3v3M12 3v3M15 3v3M9 18v3M12 18v3M15 18v3M3 9h3M3 12h3M3 15h3M18 9h3M18 12h3M18 15h3"/>',
+  codigo:'<path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/>',
+  encadernacao:'<path d="M6 3h11a2 2 0 012 2v14H8a2 2 0 01-2-2z"/><path d="M6 17a2 2 0 012-2h11"/><path d="M10 3v12M10 6H8M10 9H8M10 12H8"/>',
+  tesoura:'<circle cx="6" cy="6" r="2.500"/><circle cx="6" cy="18" r="2.500"/><path d="M8 7.500L20 18M8 16.500L20 6"/>',
+  pincel:'<path d="M18 3l3 3-9 9-3-3z"/><path d="M9 12c-3 0-4 2-4 4s-1 3-2 4c3 1 7 0 8-3 .5-2-.5-4-2-5z"/>',
+  chave:'<path d="M14.500 6.500a4 4 0 105.500 5.500L8 20l-3-3 8-8a4 4 0 011.500-2.500z"/>',
+  grafico:'<path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/>'
+});
+ICON_SETS.splice(1,0,['Habilidades',[['sutura','sutura agulha fio'],['igScalpel','bisturi cirurgia'],['steth','estetoscópio'],['croche','crochê tricô lã'],['tesoura','tesoura costura'],['martelo','martelo marcenaria'],['serra','serra madeira'],['chave','chave ferramenta'],['chip','arduino chip eletrônica'],['codigo','código programação r'],['grafico','gráfico estatística'],['encadernacao','encadernação livro caderno'],['pincel','pincel pintura'],['igPencil','lápis desenho'],['book','livro'],['microscope','microscópio'],['flask','química'],['puzzle','quebra-cabeça'],['hand','mão artesanato'],['zap','energia'],['music','música'],['chef','culinária'],['dumbbell','treino'],['sprout','plantas']]]);
+const SK_CATS=[['medica','Médica','steth','#3B6FB6'],['manual','Manual e artesanato','hand','#C77D0A'],['tec','Tecnologia e dados','chip','#3E63DD'],['pessoal','Pessoal','heart','#B0215F'],['outra','Outra','star','#6E56CF']];
 const SK_LV=['Iniciante','Básico','Intermediário','Avançado','Expert'];
 const SK_ST=[['pratica','Praticando','#2F9E6A'],['aprender','Quero aprender','#6E56CF'],['pausada','Pausada','#8E8C99'],['dominada','Dominada','#E9A100']];
 const SK_PST=[['plano','Planejado'],['andamento','Em andamento'],['feito','Concluído']];
+const SK_LST=[['aprender','A aprender','#6E56CF'],['estudando','Estudando','#E9A100'],['feito','Finalizada','#2F9E6A']];
 const SK_RK=[['curso','Curso'],['video','Vídeo'],['livro','Livro'],['tutorial','Tutorial'],['ferramenta','Ferramenta ou material'],['outro','Outro']];
 const SK_TPL=[
-  {n:'Sutura',c:'medica',m:['Instrumentos e pega correta','Nó de sapateiro com as mãos','Nó instrumental','Ponto simples interrompido','Sutura contínua simples','Ponto em U horizontal (colchoeiro)','Ponto em U vertical','Sutura intradérmica','Sutura de fáscia e planos profundos','Sutura em simulador ou pele de porco com tempo']},
-  {n:'Crochê',c:'manual',m:['Correntinha e ponto baixo','Ponto alto e meio ponto alto','Argola mágica','Aumentos e diminuições','Ler uma receita e um gráfico','Amigurumi simples','Quadrado de vó (granny square)','Peça de roupa ou acessório']},
-  {n:'Marcenaria',c:'manual',m:['Medir, marcar e esquadrejar','Serrar reto','Plaina e lixamento','Junta de topo com parafuso','Encaixes (cavilha, meia-esquadria)','Acabamento (óleo, verniz)','Projeto: caixa','Projeto: banco ou estante']},
-  {n:'Arduino',c:'tec',m:['Blink e estrutura do código','Entradas digitais (botão)','Entradas analógicas (sensores)','PWM e servo','Display LCD ou OLED','Comunicação serial','I2C e módulos','Projeto: estação de sensores']},
-  {n:'R',c:'tec',m:['RStudio, projetos e pacotes','Importar e limpar dados (readr, readxl)','Manipulação com dplyr e tidyr','Gráficos com ggplot2','Estatística descritiva e testes (t, qui-quadrado)','Regressão linear e logística','Relatórios com Quarto ou R Markdown','Análise de sobrevivência']},
-  {n:'Encadernação artesanal',c:'manual',m:['Cortar papel e achar o sentido da fibra','Dobrar e montar cadernos','Costura copta','Costura japonesa','Capa dura','Lombada e cola','Acabamento com tecido','Projeto: caderno de campo']},
-  {n:'',c:'outra',m:[]}
+  {n:'Sutura',c:'medica',i:'sutura',m:['Instrumentos e pega correta','Nó de sapateiro com as mãos','Nó instrumental','Ponto simples interrompido','Sutura contínua simples','Ponto em U horizontal (colchoeiro)','Ponto em U vertical','Sutura intradérmica','Sutura de fáscia e planos profundos','Sutura em simulador ou pele de porco com tempo'],l:['# Fundamentos','Anatomia da pele e planos cirúrgicos','Fios de sutura: tipos, calibres e agulhas','Assepsia, antissepsia e campo estéril','# Técnica','Nós cirúrgicos','Pontos básicos','Pontos especiais','# Aplicação','Fechamento por planos','Cuidados com a ferida e retirada de pontos']},
+  {n:'Crochê',c:'manual',i:'croche',m:['Correntinha e ponto baixo','Ponto alto e meio ponto alto','Argola mágica','Aumentos e diminuições','Ler uma receita e um gráfico','Amigurumi simples','Quadrado de vó (granny square)','Peça de roupa ou acessório'],l:['# Materiais','Fios, agulhas e numeração','Tensão e pegada','# Pontos','Pontos básicos','Pontos em relevo','# Leitura','Ler receitas e abreviações','Ler gráficos']},
+  {n:'Marcenaria',c:'manual',i:'martelo',m:['Medir, marcar e esquadrejar','Serrar reto','Plaina e lixamento','Junta de topo com parafuso','Encaixes (cavilha, meia-esquadria)','Acabamento (óleo, verniz)','Projeto: caixa','Projeto: banco ou estante'],l:['# Base','Tipos de madeira e onde comprar','Ferramentas manuais e elétricas','Segurança na oficina','# Técnicas','Corte e medição','Encaixes e junções','Acabamentos']},
+  {n:'Arduino',c:'tec',i:'chip',m:['Blink e estrutura do código','Entradas digitais (botão)','Entradas analógicas (sensores)','PWM e servo','Display LCD ou OLED','Comunicação serial','I2C e módulos','Projeto: estação de sensores'],l:['# Eletrônica básica','Tensão, corrente e resistência','Protoboard e componentes','# Programação','Estrutura do sketch (setup e loop)','Variáveis, funções e bibliotecas','# Sensores e atuadores','Sensores analógicos e digitais','Motores e servos']},
+  {n:'R',c:'tec',i:'codigo',m:['RStudio, projetos e pacotes','Importar e limpar dados (readr, readxl)','Manipulação com dplyr e tidyr','Gráficos com ggplot2','Estatística descritiva e testes (t, qui-quadrado)','Regressão linear e logística','Relatórios com Quarto ou R Markdown','Análise de sobrevivência'],l:['# Base','Instalação e RStudio','Objetos, vetores e data frames','# Dados','Importação e limpeza','Tidyverse','# Análise','Estatística descritiva','Testes de hipótese','Modelos de regressão','# Comunicação','Gráficos','Relatórios reprodutíveis']},
+  {n:'Encadernação artesanal',c:'manual',i:'encadernacao',m:['Cortar papel e achar o sentido da fibra','Dobrar e montar cadernos','Costura copta','Costura japonesa','Capa dura','Lombada e cola','Acabamento com tecido','Projeto: caderno de campo'],l:['# Materiais','Papéis, gramatura e fibra','Colas, linhas e ferramentas','# Estruturas','Costura copta','Costura japonesa','Capa dura','# Acabamento','Cantos, lombada e guardas']},
+  {n:'',c:'outra',i:'',m:[],l:[]}
 ];
 const skById=id=>(S.skills||[]).find(x=>x.id===id);
 const skCat=k=>SK_CATS.find(c=>c[0]===k)||SK_CATS[SK_CATS.length-1];
 const skSt=k=>SK_ST.find(c=>c[0]===k)||SK_ST[0];
 const skColor=s=>s.color||skCat(s.cat)[3];
+const skGuess=n=>{n=norm(n||'');return /sutur|bisturi|cirurg/.test(n)?'sutura':/croch|trico|amigurumi/.test(n)?'croche':/marcen|madeira|carpint/.test(n)?'martelo':/arduino|eletron|esp32/.test(n)?'chip':/(^|\s)r(\s|$)|estatist|python|programa/.test(n)?'codigo':/encadern|caderno|papel/.test(n)?'encadernacao':/costur|bordad/.test(n)?'tesoura':/pintur|desenh|aquarel/.test(n)?'pincel':'';};
+const skIcon=s=>s.icon||skGuess(s.name)||skCat(s.cat)[2];
 const skImg=id=>{const x=(S.skimg||[]).find(i=>i.id===id);return x?x.src:'';};
 function normSk(o){
-  const d=Object.assign({name:'',cat:'outra',color:'',status:'pratica',level:1,target:3,why:'',weekMin:0,fav:false,created:Date.now(),updated:Date.now()},o||{});
-  ['practices','miles','projs','res','photos','noteIds','actIds','taskIds','docIds','goalIds','focoIds','lvHist'].forEach(k=>{if(!Array.isArray(d[k]))d[k]=[];});
+  const d=Object.assign({name:'',icon:'',cat:'outra',color:'',status:'pratica',level:1,target:3,why:'',weekMin:0,fav:false,focoId:'',created:Date.now(),updated:Date.now()},o||{});
+  ['practices','miles','projs','lessons','res','photos','noteIds','actIds','taskIds','docIds','goalIds','focoIds','lvHist'].forEach(k=>{if(!Array.isArray(d[k]))d[k]=[];});
+  d.projs=d.projs.map(p=>{const q=Object.assign({id:uid(),t:'',st:'plano',note:'',link:'',due:'',doneAt:0,steps:[],noteIds:[],actId:''},p||{});if(!Array.isArray(q.steps))q.steps=[];if(!Array.isArray(q.noteIds))q.noteIds=[];return q;});
+  d.lessons=d.lessons.map(l=>Object.assign({id:uid(),t:'',mod:'',st:'aprender',noteIds:[],link:'',min:30,actId:'',doneAt:0},l||{}));
   d.level=Math.max(1,Math.min(5,Math.round(Number(d.level))||1));d.target=Math.max(1,Math.min(5,Math.round(Number(d.target))||3));
   return d;
 }
+/* foco especial: cada habilidade vira um Foco, para marcar tarefas, eventos e notas com ela em qualquer aba */
+const SK_AREA='ar_hab';
+function skSyncFocos(){
+  const sk=S.skills||[];let ch=false;S.focos=S.focos||[];S.areas=S.areas||[];
+  if(!sk.length&&!S.focos.some(f=>f.sk))return;
+  if(sk.length&&!S.areas.some(a=>a.id===SK_AREA)){S.areas.push({id:SK_AREA,name:'Habilidades',icon:'hand',color:'#C77D0A'});ch=true;}
+  sk.forEach(s=>{
+    let f=(s.focoId&&S.focos.find(x=>x.id===s.focoId))||S.focos.find(x=>x.sk===s.id);
+    const mod=skCat(s.cat)[1],ico=s.icon||skGuess(s.name)||'';
+    if(!f){f={id:'fc_'+uid(),area:SK_AREA,mod:mod,name:s.name,sk:s.id,icon:ico};S.focos.push(f);ch=true;}
+    else if(f.name!==s.name||f.mod!==mod||(f.icon||'')!==ico||f.sk!==s.id||f.area!==SK_AREA){f.name=s.name;f.mod=mod;f.icon=ico;f.sk=s.id;f.area=SK_AREA;ch=true;}
+    if(s.focoId!==f.id){s.focoId=f.id;ch=true;}
+  });
+  const ids=new Set(sk.map(s=>s.id)),orph=S.focos.filter(f=>f.sk&&!ids.has(f.sk));
+  if(orph.length){const oi=new Set(orph.map(f=>f.id));S.focos=S.focos.filter(f=>!oi.has(f.id));[].concat(S.tasks,S.acts,S.notes,S.docs,S.pdfs,S.slides||[],S.inks||[],S.decks||[]).forEach(o=>{if(o&&Array.isArray(o.focoIds))o.focoIds=o.focoIds.filter(i=>!oi.has(i));});ch=true;}
+  if(ch)save();
+}
+const skFocoOf=s=>s.focoId&&focoById(s.focoId);
 const skTotal=s=>s.practices.reduce((a,p)=>a+(Number(p.min)||0),0);
 const skWeek=(s,off)=>{const ws=addISO(mondayOf(todayISO()),-7*(off||0)),we=addISO(ws,6);return s.practices.filter(p=>p.date>=ws&&p.date<=we).reduce((a,p)=>a+(Number(p.min)||0),0);};
 const skLast=s=>s.practices.reduce((m,p)=>p.date>m?p.date:m,'');
-function skStreak(s){
-  const days=new Set(s.practices.map(p=>p.date));let d=todayISO(),n=0;if(!days.has(d))d=addISO(d,-1);
-  while(days.has(d)){n++;d=addISO(d,-1);}return n;
-}
+function skStreak(s){const days=new Set(s.practices.map(p=>p.date));let d=todayISO(),n=0;if(!days.has(d))d=addISO(d,-1);while(days.has(d)){n++;d=addISO(d,-1);}return n;}
 const skHM=m=>{m=Math.round(m||0);return m<60?m+' min':Math.floor(m/60)+'h'+(m%60?String(m%60).padStart(2,'0'):'');};
 const skAgo=d=>{if(!d)return 'nunca praticou';const n=diffDays(todayISO(),d);return n<=0?'praticou hoje':n===1?'praticou ontem':'praticou há '+n+' dias';};
 const skMiles=s=>({done:s.miles.filter(m=>m.done).length,tot:s.miles.length});
+const skLes=s=>({done:s.lessons.filter(l=>l.st==='feito').length,tot:s.lessons.length,ing:s.lessons.filter(l=>l.st==='estudando').length});
+const skPPct=p=>p.steps.length?Math.round(p.steps.filter(x=>x.done).length/p.steps.length*100):p.st==='feito'?100:p.st==='andamento'?50:0;
+const skProj=s=>({tot:s.projs.length,done:s.projs.filter(p=>p.st==='feito').length,pct:s.projs.length?Math.round(s.projs.reduce((a,p)=>a+skPPct(p),0)/s.projs.length):0});
 const skDots=(lv,tg)=>{let h='';for(let i=1;i<=5;i++)h+='<i class="skd '+(i<=lv?'on':'')+(i===tg&&tg>lv?' tg':'')+'"></i>';return '<span class="skdots" title="Nível '+SK_LV[lv-1]+' | meta '+SK_LV[tg-1]+'">'+h+'</span>';};
 function skPass(s){
   if(UI.skCat&&s.cat!==UI.skCat)return false;
   if(UI.skSt&&s.status!==UI.skSt)return false;
-  if(UI.skQ&&norm([s.name,s.why,s.miles.map(m=>m.t).join(' '),s.projs.map(p=>p.t).join(' ')].join(' ')).indexOf(norm(UI.skQ))<0)return false;
+  if(UI.skQ&&norm([s.name,s.why,s.miles.map(m=>m.t).join(' '),s.projs.map(p=>p.t).join(' '),s.lessons.map(l=>l.t+' '+l.mod).join(' ')].join(' ')).indexOf(norm(UI.skQ))<0)return false;
   return true;
 }
 function skCard(s){
-  const c=skColor(s),ct=skCat(s.cat),st=skSt(s.status),wk=skWeek(s),mm=skMiles(s),last=skLast(s);
+  const c=skColor(s),ct=skCat(s.cat),st=skSt(s.status),wk=skWeek(s),mm=skMiles(s),ls=skLes(s),pj=skProj(s),last=skLast(s);
   const nl=s.noteIds.length+s.actIds.length+s.taskIds.length+s.docIds.length+s.goalIds.length;
-  const nxt=s.miles.find(m=>!m.done);
-  return '<article class="skcard" style="--c:'+esc(c)+'"><div class="skico">'+ic(ct[2],22)+'</div><div class="skb"><div class="skt"><b data-a="sk-open" data-id="'+s.id+'" role="button" tabindex="0">'+esc(s.name||'Sem nome')+'</b><span class="lzdot" style="--d:'+st[2]+'"><i></i>'+st[1]+'</span><span class="lzdot" style="--d:'+ct[3]+'"><i></i>'+ct[1]+'</span></div>'+
+  const nxt=s.lessons.find(l=>l.st==='estudando')||s.lessons.find(l=>l.st==='aprender');
+  return '<article class="skcard" style="--c:'+esc(c)+'"><div class="skico">'+icoHTML(skIcon(s),24)+'</div><div class="skb"><div class="skt"><b data-a="sk-open" data-id="'+s.id+'" role="button" tabindex="0">'+esc(s.name||'Sem nome')+'</b><span class="lzdot" style="--d:'+st[2]+'"><i></i>'+st[1]+'</span><span class="lzdot" style="--d:'+ct[3]+'"><i></i>'+ct[1]+'</span></div>'+
     '<div class="skm">'+skDots(s.level,s.target)+'<span>'+SK_LV[s.level-1]+(s.target>s.level?' › meta '+SK_LV[s.target-1]:'')+'</span><span>'+ic('clock',13)+' '+skHM(skTotal(s))+' no total</span><span>'+esc(skAgo(last))+'</span></div>'+
     (s.weekMin>0?'<div class="skbar" title="Esta semana"><i style="width:'+Math.min(100,Math.round(wk/s.weekMin*100))+'%"></i></div><div class="muted small">Esta semana: '+skHM(wk)+' de '+skHM(s.weekMin)+'</div>':(wk?'<div class="muted small">Esta semana: '+skHM(wk)+'</div>':''))+
-    (mm.tot?'<div class="muted small" style="margin-top:2px">'+ic('check',12)+' '+mm.done+'/'+mm.tot+' etapas'+(nxt?' | próxima: '+esc(nxt.t):'')+'</div>':'')+
-    ((nl||s.projs.length||s.photos.length)?'<div class="skmeta">'+(nl?'<span>'+ic('layers',13)+nl+' vinculado(s)</span>':'')+(s.projs.length?'<span>'+ic('puzzle',13)+s.projs.length+' projeto(s)</span>':'')+(s.photos.length?'<span>'+ic('image',13)+s.photos.length+' foto(s)</span>':'')+'</div>':'')+'</div>'+
+    '<div class="skprog">'+(ls.tot?'<span title="Teoria">'+ic('book',13)+' Teoria '+ls.done+'/'+ls.tot+'<i class="skmini"><b style="width:'+Math.round(ls.done/ls.tot*100)+'%"></b></i></span>':'')+(pj.tot?'<span title="Projetos">'+ic('puzzle',13)+' Projetos '+pj.done+'/'+pj.tot+'<i class="skmini"><b style="width:'+pj.pct+'%"></b></i></span>':'')+(mm.tot?'<span title="Técnicas">'+ic('check',13)+' Técnicas '+mm.done+'/'+mm.tot+'</span>':'')+'</div>'+
+    (nxt?'<div class="muted small" style="margin-top:2px">Próxima aula: '+esc(nxt.t)+'</div>':'')+
+    ((nl||s.photos.length)?'<div class="skmeta">'+(nl?'<span>'+ic('layers',13)+nl+' vinculado(s)</span>':'')+(s.photos.length?'<span>'+ic('image',13)+s.photos.length+' foto(s)</span>':'')+'</div>':'')+'</div>'+
     '<div class="skact"><button class="btn sm primary" data-a="sk-log" data-id="'+s.id+'">'+ic('plus',14)+' Praticar</button><button class="btn sm" data-a="sk-open" data-id="'+s.id+'">Abrir</button></div></article>';
 }
 function skListHTML(){
@@ -16603,19 +16652,62 @@ function skListHTML(){
   return base.map(skCard).join('');
 }
 function renderHabilidades(){
+  skSyncFocos();
   const s=UI.skView&&skById(UI.skView);if(s)return skDetail(s);UI.skView='';
   const all=S.skills||[],wk=all.reduce((a,x)=>a+skWeek(x),0),act=all.filter(x=>x.status==='pratica');
   const todo=act.filter(x=>x.weekMin>0?skWeek(x)<x.weekMin:diffDays(todayISO(),skLast(x)||addISO(todayISO(),-99))>=7).slice(0,4);
   let h='<div class="toolbar"><h2 class="vt" style="margin:0">Habilidades</h2><span class="muted small">'+all.length+' habilidades | '+act.length+' praticando | '+skHM(wk)+' esta semana | '+skHM(all.reduce((a,x)=>a+skTotal(x),0))+' no total</span><span class="sp"></span><button class="btn primary" data-a="sk-new">'+ic('plus',15)+' Nova habilidade</button></div>';
-  if(todo.length)h+='<div class="skhint"><b>Para praticar:</b> '+todo.map(x=>'<button class="chip" data-a="sk-log" data-id="'+x.id+'">'+esc(x.name)+(x.weekMin?' <small class="muted">faltam '+skHM(x.weekMin-skWeek(x))+'</small>':' <small class="muted">'+esc(skAgo(skLast(x)))+'</small>')+'</button>').join('')+'</div>';
+  if(todo.length)h+='<div class="skhint"><b>Para praticar:</b> '+todo.map(x=>'<button class="chip" data-a="sk-log" data-id="'+x.id+'">'+icoHTML(skIcon(x),14)+' '+esc(x.name)+(x.weekMin?' <small class="muted">faltam '+skHM(x.weekMin-skWeek(x))+'</small>':' <small class="muted">'+esc(skAgo(skLast(x)))+'</small>')+'</button>').join('')+'</div>';
   h+='<div class="lztypes" role="group" aria-label="Categoria"><button class="lzchip '+(!UI.skCat?'on':'')+'" data-a="sk-cat" data-v=""><span>Todas</span><small>'+all.length+'</small></button>'+SK_CATS.map(c=>'<button class="lzchip '+(UI.skCat===c[0]?'on':'')+'" style="--c:'+c[3]+'" data-a="sk-cat" data-v="'+c[0]+'">'+ic(c[2],15)+'<span>'+c[1]+'</span><small>'+all.filter(x=>x.cat===c[0]).length+'</small></button>').join('')+'</div>';
   h+='<div class="nfbar tfbar"><div class="frow"><span class="fl" style="min-width:auto">Situação</span><button class="chip '+(!UI.skSt?'on':'')+'" data-a="sk-st" data-v="">Todas</button>'+SK_ST.map(x=>'<button class="chip '+(UI.skSt===x[0]?'on':'')+'" data-a="sk-st" data-v="'+x[0]+'"><i class="lzd" style="background:'+x[2]+'"></i>'+x[1]+'</button>').join('')+'</div>'+
     '<div class="sbox" style="max-width:240px">'+ic('search',15)+'<input id="skq" type="search" placeholder="Buscar" value="'+esc(UI.skQ||'')+'" autocomplete="off"></div>'+
     '<label class="nfsel"><span>Ordenar</span><select id="sksort">'+[['recent','Praticadas há pouco'],['stale','Há mais tempo sem praticar'],['hours','Mais horas'],['level','Nível'],['name','Nome']].map(o=>'<option value="'+o[0]+'" '+((UI.skSort||'recent')===o[0]?'selected':'')+'>'+o[1]+'</option>').join('')+'</select></label></div>';
   return h+'<div id="skList" class="lzlist">'+skListHTML()+'</div>';
 }
+/* ----- cronômetro de prática (fica só neste aparelho) ----- */
+const skTimer=()=>{try{return JSON.parse(LS.get('sk_timer')||'null');}catch(e){return null;}};
+const skTfmt=ms=>{const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60);return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(s%60).padStart(2,'0');};
+setInterval(()=>{const el=$('#skTim');if(!el)return;const t=skTimer();if(t)el.textContent=skTfmt(Date.now()-t.t);},1000);
 /* ----- detalhe ----- */
-const skBox=(title,count,btns,body)=>'<section class="card sec artsec"><div class="arth"><h3>'+title+(count!=null?' <small class="muted">'+count+'</small>':'')+'</h3><span class="sp"></span>'+(btns||'')+'</div>'+body+'</section>';
+const skBox=(k,title,count,btns,body)=>'<section class="card sec artsec" id="skb_'+k+'"><div class="arth"><h3>'+title+(count!=null?' <small class="muted">'+count+'</small>':'')+'</h3><span class="sp"></span>'+(btns||'')+'</div>'+body+'</section>';
+const skActChip=(id)=>{const a=id&&actById(id);if(!a)return '';const o=nextOccOf(a);return '<button class="skchip2" data-a="sk-ref" data-r="act:'+id+'" title="Abrir o evento">'+ic('calendar',12)+' '+(o?fmtDM(o.date):'agendado')+'</button>';};
+const skNoteChips=(ids,pk)=>ids.map(i=>{const n=noteById(i);return n?'<button class="skchip2" data-a="sk-ref" data-r="note:'+i+'">'+ic('note',12)+' '+esc(pgClipS(n.title||'Nota',28))+'</button>':'';}).join('');
+const pgClipS=(s,n)=>{s=String(s||'');return s.length>n?s.slice(0,n)+'…':s;};
+function skLessonRow(s,l){
+  const st=SK_LST.find(x=>x[0]===l.st)||SK_LST[0];
+  return '<div class="sklr '+l.st+'"><button class="skst" style="--c:'+st[2]+'" data-a="sk-lst" data-id="'+s.id+'" data-l="'+l.id+'" title="'+st[1]+' (clique para avançar)" aria-label="'+st[1]+'">'+(l.st==='feito'?ic('check',13):l.st==='estudando'?'<i></i>':'')+'</button>'+
+    '<div class="sklb"><div class="sklt">'+esc(l.t)+(l.link?' <a href="'+esc(normUrl(l.link))+'" target="_blank" rel="noopener" class="muted small">'+ic('external',12)+'</a>':'')+'</div><div class="sklm"><span class="muted small">'+st[1]+(l.min?' | '+skHM(l.min):'')+(l.st==='feito'&&l.doneAt?' | '+fmtDM(new Date(l.doneAt).toISOString().slice(0,10)):'')+'</span>'+skActChip(l.actId)+skNoteChips(l.noteIds)+'</div></div>'+
+    '<div class="sklact">'+(l.st==='feito'?'':'<button class="icon-btn sm" data-a="sk-lsched" data-id="'+s.id+'" data-l="'+l.id+'" title="Agendar na semana" aria-label="Agendar">'+ic('calendar',15)+'</button>')+'<button class="icon-btn sm" data-a="sk-lnote" data-id="'+s.id+'" data-l="'+l.id+'" title="'+(l.noteIds.length?'Abrir a nota':'Criar nota da aula')+'" aria-label="Nota">'+ic(l.noteIds.length?'note':'filePlus',15)+'</button><button class="icon-btn sm" data-a="sk-ledit" data-id="'+s.id+'" data-l="'+l.id+'" aria-label="Editar">'+ic('edit',15)+'</button><button class="icon-btn sm" data-a="sk-ldel" data-id="'+s.id+'" data-l="'+l.id+'" aria-label="Excluir">'+ic('x',14)+'</button></div></div>';
+}
+function skTheoryHTML(s){
+  const ls=skLes(s),tab=UI.skLt||'aprender',list=s.lessons.filter(l=>tab==='todas'||(tab==='aprender'?l.st==='aprender'||l.st==='estudando':l.st===tab));
+  const cnt={aprender:s.lessons.filter(l=>l.st==='aprender'||l.st==='estudando').length,feito:ls.done,todas:ls.tot};
+  const mods=[];list.forEach(l=>{const m=l.mod||'';if(mods.indexOf(m)<0)mods.push(m);});
+  const mn=[...new Set(s.lessons.map(l=>l.mod).filter(Boolean))];
+  return (ls.tot?'<div class="skbar big"><i style="width:'+Math.round(ls.done/ls.tot*100)+'%"></i></div><div class="muted small" style="margin:-4px 0 6px">'+ls.done+' de '+ls.tot+' aulas finalizadas'+(ls.ing?' | '+ls.ing+' em estudo':'')+' | faltam '+skHM(s.lessons.filter(l=>l.st!=='feito').reduce((a,l)=>a+(Number(l.min)||0),0))+'</div>':'')+
+    '<div class="seg" style="margin:4px 0 8px">'+[['aprender','O que falta aprender ('+cnt.aprender+')'],['feito','Finalizadas ('+cnt.feito+')'],['todas','Todas ('+cnt.todas+')']].map(v=>'<button class="'+(tab===v[0]?'on':'')+'" data-a="sk-lt" data-v="'+v[0]+'">'+v[1]+'</button>').join('')+'</div>'+
+    (list.length?mods.map(m=>'<div class="skmod">'+(m?'<div class="skmodh">'+esc(m)+'</div>':'')+list.filter(l=>(l.mod||'')===m).map(l=>skLessonRow(s,l)).join('')+'</div>').join(''):'<p class="muted small" style="margin:6px 0">'+(ls.tot?(tab==='feito'?'Nenhuma aula finalizada ainda.':'Nada pendente. Tudo finalizado!'):'Monte a ementa do seu “curso”: módulos e aulas ou tópicos que você precisa aprender. Cada aula pode ter notas, link e horário na semana.')+'</p>')+
+    '<div class="artqa" data-skles="'+s.id+'"><input data-q="t" placeholder="Nova aula ou tópico (Enter)" autocomplete="off" style="flex:1;min-width:200px"><input data-q="mod" list="skmods" placeholder="Módulo" value="'+esc(UI.skMod||'')+'" autocomplete="off" style="width:150px"><input data-q="min" type="number" min="5" step="5" placeholder="min" value="30" style="width:70px"><datalist id="skmods">'+mn.map(m=>'<option value="'+esc(m)+'">').join('')+'</datalist><button class="btn sm primary" data-a="sk-ladd" data-id="'+s.id+'" aria-label="Adicionar">'+ic('plus',14)+'</button></div>';
+}
+function skProjCard(s,p){
+  const pct=skPPct(p),open=!!(UI.skPO||{})[p.id],sd=p.steps.filter(x=>x.done).length,stl=(SK_PST.find(x=>x[0]===p.st)||SK_PST[0])[1],col={plano:'#8E8C99',andamento:'#E9A100',feito:'#2F9E6A'}[p.st]||'#8E8C99';
+  const late=p.due&&p.st!=='feito'&&p.due<todayISO();
+  return '<div class="skpj" style="--c:'+col+'"><div class="skpjh"><button class="skfold" data-a="sk-ptoggle" data-p="'+p.id+'" aria-expanded="'+open+'">'+ic(open?'chevD':'chevR',14)+'<b>'+esc(p.t)+'</b></button><span class="artkind">'+stl+'</span>'+(p.due?'<span class="muted small'+(late?' lateT':'')+'">'+(late?'atrasado: ':'prazo ')+fmtDM(p.due)+'</span>':'')+'<span class="sp" style="flex:1"></span><span class="muted small">'+(p.steps.length?sd+'/'+p.steps.length+' etapas | ':'')+pct+'%</span></div><div class="skbar big" style="margin:4px 0"><i style="width:'+pct+'%;background:'+col+'"></i></div>'+
+    (open?'<div class="skpjb">'+(p.note?'<div class="artpt" style="margin-bottom:6px">'+esc(p.note)+'</div>':'')+(p.link?'<a href="'+esc(normUrl(p.link))+'" target="_blank" rel="noopener" class="small">'+ic('external',12)+' '+esc(liHost(p.link)||p.link)+'</a>':'')+
+      p.steps.map(x=>'<div class="skml '+(x.done?'done':'')+'"><button class="chk sm '+(x.done?'on':'')+'" data-a="sk-pstep" data-id="'+s.id+'" data-p="'+p.id+'" data-x="'+x.id+'" aria-label="Concluir etapa">'+ic('check',12)+'</button><span class="skmt">'+esc(x.t)+'</span><button class="icon-btn sm" data-a="sk-pstepdel" data-id="'+s.id+'" data-p="'+p.id+'" data-x="'+x.id+'" aria-label="Remover">'+ic('x',12)+'</button></div>').join('')+
+      '<input class="artql" data-skps="'+p.id+'" data-id="'+s.id+'" placeholder="Nova etapa deste projeto (Enter)" autocomplete="off"><div class="artchips">'+skActChip(p.actId)+skNoteChips(p.noteIds)+'</div>'+
+      '<div class="artitact"><button class="btn sm" data-a="sk-psched" data-id="'+s.id+'" data-p="'+p.id+'">'+ic('calendar',13)+' Agendar sessão</button><button class="btn sm ghost" data-a="sk-pnote" data-id="'+s.id+'" data-p="'+p.id+'">'+ic('filePlus',13)+' Nota do projeto</button><button class="btn sm ghost" data-a="sk-proj" data-id="'+s.id+'" data-p="'+p.id+'">'+ic('edit',13)+' Editar</button><button class="btn sm ghost" data-a="sk-pdel" data-id="'+s.id+'" data-p="'+p.id+'">'+ic('trash',13)+' Excluir</button></div></div>':'')+'</div>';
+}
+function skLinkedAuto(s){
+  const f=skFocoOf(s);if(!f)return '';const L=focoLinked(f),items=[];
+  L.tasks.forEach(t=>items.push({g:'Tarefas',r:'task:'+t.id,ic:'tasks',t:t.title,d:t.done}));
+  L.acts.forEach(a=>items.push({g:'Eventos',r:'act:'+a.id,ic:'calendar',t:aT(a)}));
+  L.notes.forEach(n=>items.push({g:'Notas',r:'note:'+n.id,ic:'note',t:n.title||'Nota'}));
+  L.files.forEach(x=>items.push({g:'Arquivos',r:(x.k==='doc'||x.k==='pdf'?x.k+':'+x.o.id:x.k==='deck'?'deck:'+x.o.id:''),ic:'file',t:x.o.title||x.o.name||'Arquivo'}));
+  if(!items.length)return '';
+  const grp={};items.forEach(i=>(grp[i.g]=grp[i.g]||[]).push(i));
+  return '<div class="skgrp"><span class="muted small">Marcados com o foco “'+esc(f.name)+'” em outras abas</span>'+Object.keys(grp).map(g=>'<div class="artchips"><span class="muted small" style="min-width:64px">'+g+'</span>'+grp[g].map(r=>'<span class="skref"><button data-a="sk-ref" data-r="'+esc(r.r)+'" '+(r.d?'style="text-decoration:line-through"':'')+'>'+ic(r.ic,13)+' '+esc(pgClipS(r.t,40))+'</button></span>').join('')+'</div>').join('')+'</div>';
+}
 function skRefItems(s){
   const out=[];
   s.noteIds.forEach(i=>{const n=noteById(i);if(n)out.push({k:'noteIds',id:i,r:'note:'+i,ic:'note',t:n.title||'Nota',g:'Notas'});});
@@ -16627,76 +16719,78 @@ function skRefItems(s){
   return out;
 }
 function skDetail(s){
-  const c=skColor(s),ct=skCat(s.cat),st=skSt(s.status),tot=skTotal(s),mm=skMiles(s);
+  const c=skColor(s),ct=skCat(s.cat),st=skSt(s.status),tot=skTotal(s),mm=skMiles(s),pj=skProj(s),tm=skTimer(),mine=tm&&tm.id===s.id;
   let h='<div class="toolbar"><button class="btn sm" data-a="sk-back">'+ic('chevL',14)+' Habilidades</button><span class="sp"></span><button class="btn sm" data-a="sk-edit" data-id="'+s.id+'">'+ic('edit',14)+' Editar</button><button class="btn sm danger" data-a="sk-del" data-id="'+s.id+'">'+ic('trash',14)+' Excluir</button></div>';
-  // topo
   const wks=[];for(let i=7;i>=0;i--)wks.push(skWeek(s,i));const mx=Math.max(60,...wks);
-  h+='<div class="card sec artsec arthero" style="--c:'+esc(c)+'"><div class="arth"><div class="skico big">'+ic(ct[2],26)+'</div><div style="flex:1;min-width:0"><h2 class="vt" style="margin:0">'+esc(s.name||'Sem nome')+'</h2><div class="artchips"><span class="lzdot" style="--d:'+ct[3]+'"><i></i>'+ct[1]+'</span><span class="lzdot" style="--d:'+st[2]+'"><i></i>'+st[1]+'</span></div></div><button class="artfav '+(s.fav?'on':'')+'" data-a="sk-fav" data-id="'+s.id+'" title="Favorita">'+(s.fav?'★':'☆')+'</button></div>'+
+  h+='<div class="card sec artsec arthero" style="--c:'+esc(c)+'"><div class="arth"><div class="skico big">'+icoHTML(skIcon(s),30)+'</div><div style="flex:1;min-width:0"><h2 class="vt" style="margin:0">'+esc(s.name||'Sem nome')+'</h2><div class="artchips"><span class="lzdot" style="--d:'+ct[3]+'"><i></i>'+ct[1]+'</span><span class="lzdot" style="--d:'+st[2]+'"><i></i>'+st[1]+'</span></div></div><button class="artfav '+(s.fav?'on':'')+'" data-a="sk-fav" data-id="'+s.id+'" title="Favorita">'+(s.fav?'★':'☆')+'</button></div>'+
     (s.why?'<div class="artlead"><span>Por que quero melhorar</span>'+esc(s.why)+'</div>':'')+
     '<div class="skstats"><div><b>'+skHM(tot)+'</b><span>no total</span></div><div><b>'+skHM(skWeek(s))+(s.weekMin?' <small>/ '+skHM(s.weekMin)+'</small>':'')+'</b><span>esta semana</span></div><div><b>'+skStreak(s)+(skStreak(s)===1?' dia':' dias')+'</b><span>de sequência</span></div><div><b>'+s.practices.length+'</b><span>práticas</span></div><div><b>'+(s.practices.length?skHM(tot/s.practices.length):'-')+'</b><span>por prática</span></div></div>'+
     '<div class="sklv"><span class="muted small">Nível atual</span><button class="icon-btn sm" data-a="sk-lv" data-id="'+s.id+'" data-f="level" data-d="-1" aria-label="Diminuir">−</button><b>'+SK_LV[s.level-1]+'</b><button class="icon-btn sm" data-a="sk-lv" data-id="'+s.id+'" data-f="level" data-d="1" aria-label="Aumentar">+</button>'+skDots(s.level,s.target)+'<span class="muted small" style="margin-left:10px">Meta</span><button class="icon-btn sm" data-a="sk-lv" data-id="'+s.id+'" data-f="target" data-d="-1" aria-label="Diminuir meta">−</button><b>'+SK_LV[s.target-1]+'</b><button class="icon-btn sm" data-a="sk-lv" data-id="'+s.id+'" data-f="target" data-d="1" aria-label="Aumentar meta">+</button></div>'+
     '<div class="skweeks" title="Minutos por semana, últimas 8">'+wks.map((m,i)=>'<div class="skw"><i style="height:'+Math.round(m/mx*100)+'%" title="'+skHM(m)+'"></i><span>'+(i===7?'esta':'-'+(7-i))+'</span></div>').join('')+'</div>'+
-    '<div class="artbar"><button class="btn sm primary" data-a="sk-log" data-id="'+s.id+'">'+ic('plus',14)+' Registrar prática</button><button class="btn sm" data-a="sk-sched" data-id="'+s.id+'">'+ic('calendar',14)+' Agendar prática</button><button class="btn sm" data-a="sk-note" data-id="'+s.id+'">'+ic('filePlus',14)+' Nova nota desta habilidade</button><button class="btn sm" data-a="sk-link" data-id="'+s.id+'">'+ic('link',14)+' Vincular itens</button>'+
+    '<div class="artbar">'+(mine?'<span class="sktimer">'+ic('clock',14)+' <b id="skTim">'+skTfmt(Date.now()-tm.t)+'</b></span><button class="btn sm primary" data-a="sk-tstop" data-id="'+s.id+'">Parar e registrar</button><button class="btn sm ghost" data-a="sk-tcancel">Descartar</button>':'<button class="btn sm primary" data-a="sk-tstart" data-id="'+s.id+'" '+(tm?'title="Há outro cronômetro em andamento; ele será trocado"':'')+'>'+ic('play',14)+' Iniciar cronômetro</button>')+
+    '<button class="btn sm" data-a="sk-log" data-id="'+s.id+'">'+ic('plus',14)+' Registrar prática</button><button class="btn sm" data-a="sk-sched" data-id="'+s.id+'">'+ic('calendar',14)+' Agendar prática</button><button class="btn sm" data-a="sk-note" data-id="'+s.id+'">'+ic('filePlus',14)+' Nova nota</button><button class="btn sm" data-a="sk-link" data-id="'+s.id+'">'+ic('link',14)+' Vincular itens</button>'+
     '<div class="seg">'+SK_ST.map(x=>'<button class="'+(s.status===x[0]?'on':'')+'" data-a="sk-setst" data-id="'+s.id+'" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div></div></div>';
-  // etapas
-  h+=skBox('Etapas do aprendizado',mm.tot?mm.done+'/'+mm.tot:null,'',
+  const ls=skLes(s);
+  h+=skBox('teoria','Teoria: curso e ementa',ls.tot?ls.done+'/'+ls.tot:null,'<button class="btn sm" data-a="sk-lbatch" data-id="'+s.id+'" title="Cole a ementa inteira de uma vez">'+ic('list',14)+' Colar ementa</button>',skTheoryHTML(s));
+  h+=skBox('proj','Projetos',pj.tot?pj.done+'/'+pj.tot+' | '+pj.pct+'%':null,'<button class="btn sm" data-a="sk-proj" data-id="'+s.id+'">'+ic('plus',14)+' Novo projeto</button>',
+    s.projs.length?s.projs.slice().sort((a,b)=>(a.st==='feito')-(b.st==='feito')).map(p=>skProjCard(s,p)).join(''):'<p class="muted small" style="margin:6px 0">Coisas que você faz ou quer fazer com esta habilidade: uma peça, uma caixa, um script, uma sutura em simulador. Cada projeto tem etapas, prazo, progresso, notas e horário na semana.</p>');
+  h+=skBox('miles','Técnicas e marcos de prática',mm.tot?mm.done+'/'+mm.tot:null,'',
     (mm.tot?'<div class="skbar big"><i style="width:'+Math.round(mm.done/mm.tot*100)+'%"></i></div>':'')+
-    s.miles.map(m=>'<div class="skml '+(m.done?'done':'')+'"><button class="chk sm '+(m.done?'on':'')+'" data-a="sk-mdone" data-id="'+s.id+'" data-m="'+m.id+'" aria-label="Concluir etapa">'+ic('check',12)+'</button><span class="skmt">'+esc(m.t)+'</span>'+(m.done&&m.doneAt?'<span class="muted small">'+fmtDM(new Date(m.doneAt).toISOString().slice(0,10))+'</span>':'')+'<button class="icon-btn sm" data-a="sk-mdel" data-id="'+s.id+'" data-m="'+m.id+'" aria-label="Remover">'+ic('x',12)+'</button></div>').join('')+
-    '<input class="artql" data-skl="miles" data-id="'+s.id+'" placeholder="Nova etapa (Enter)" autocomplete="off">');
-  // projetos
-  h+=skBox('Projetos e peças',s.projs.length||null,'<button class="btn sm" data-a="sk-proj" data-id="'+s.id+'">'+ic('plus',14)+' Adicionar</button>',
-    s.projs.length?s.projs.map(p=>'<div class="artit" style="--c:'+({plano:'#8E8C99',andamento:'#E9A100',feito:'#2F9E6A'}[p.st]||'#8E8C99')+'"><div class="artith"><span class="artkind">'+esc((SK_PST.find(x=>x[0]===p.st)||SK_PST[0])[1])+'</span><b>'+esc(p.t)+'</b>'+(p.link?'<a href="'+esc(normUrl(p.link))+'" target="_blank" rel="noopener" class="muted small">link</a>':'')+'</div>'+(p.note?'<div class="artpt">'+esc(p.note)+'</div>':'')+'<div class="artitact"><button class="icon-btn" data-a="sk-proj" data-id="'+s.id+'" data-p="'+p.id+'" aria-label="Editar">'+ic('edit',16)+'</button><button class="icon-btn" data-a="sk-pdel" data-id="'+s.id+'" data-p="'+p.id+'" aria-label="Excluir">'+ic('trash',16)+'</button></div></div>').join(''):'<p class="muted small" style="margin:6px 0">Coisas que você fez ou quer fazer: uma peça de crochê, uma caixa, um script em R, uma sutura em simulador…</p>');
-  // práticas
+    s.miles.map(m=>'<div class="skml '+(m.done?'done':'')+'"><button class="chk sm '+(m.done?'on':'')+'" data-a="sk-mdone" data-id="'+s.id+'" data-m="'+m.id+'" aria-label="Concluir">'+ic('check',12)+'</button><span class="skmt">'+esc(m.t)+'</span>'+(m.done&&m.doneAt?'<span class="muted small">'+fmtDM(new Date(m.doneAt).toISOString().slice(0,10))+'</span>':'')+'<button class="icon-btn sm" data-a="sk-mdel" data-id="'+s.id+'" data-m="'+m.id+'" aria-label="Remover">'+ic('x',12)+'</button></div>').join('')+
+    '<input class="artql" data-skl="miles" data-id="'+s.id+'" placeholder="Nova técnica ou marco prático (Enter)" autocomplete="off">');
   const pr=s.practices.slice().sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:(b.at||0)-(a.at||0));
-  h+=skBox('Registro de prática',s.practices.length||null,'<button class="btn sm" data-a="sk-log" data-id="'+s.id+'">'+ic('plus',14)+' Registrar</button>',
-    pr.length?pr.slice(0,UI.skPn||10).map(p=>'<div class="skpr"><b>'+fmtDM(p.date)+'</b><span>'+skHM(p.min)+'</span><span class="skprn">'+esc(p.note||'')+'</span><button class="icon-btn sm" data-a="sk-prdel" data-id="'+s.id+'" data-p="'+p.id+'" aria-label="Excluir">'+ic('x',12)+'</button></div>').join('')+(pr.length>(UI.skPn||10)?'<button class="btn sm ghost" data-a="sk-prmore">Mostrar mais ('+(pr.length-(UI.skPn||10))+')</button>':''):'<p class="muted small" style="margin:6px 0">Registre cada prática, mesmo curta: minutos e o que treinou. O total e a sequência se calculam sozinhos.</p>');
-  // materiais
-  h+=skBox('Materiais e referências',s.res.length||null,'',
+  h+=skBox('prat','Registro de prática',s.practices.length||null,'<button class="btn sm" data-a="sk-log" data-id="'+s.id+'">'+ic('plus',14)+' Registrar</button>',
+    pr.length?pr.slice(0,UI.skPn||10).map(p=>'<div class="skpr"><b>'+fmtDM(p.date)+'</b><span>'+skHM(p.min)+'</span><span class="skprn">'+esc(p.note||'')+'</span><button class="icon-btn sm" data-a="sk-prdel" data-id="'+s.id+'" data-p="'+p.id+'" aria-label="Excluir">'+ic('x',12)+'</button></div>').join('')+(pr.length>(UI.skPn||10)?'<button class="btn sm ghost" data-a="sk-prmore">Mostrar mais ('+(pr.length-(UI.skPn||10))+')</button>':''):'<p class="muted small" style="margin:6px 0">Registre cada prática, mesmo curta. O total e a sequência se calculam sozinhos.</p>');
+  h+=skBox('res','Materiais e referências',s.res.length||null,'',
     s.res.map(r=>'<div class="skres"><span class="artkind">'+esc((SK_RK.find(x=>x[0]===r.k)||SK_RK[5])[1])+'</span>'+(r.url?'<a href="'+esc(normUrl(r.url))+'" target="_blank" rel="noopener">'+esc(r.t||r.url)+'</a>':'<span>'+esc(r.t)+'</span>')+'<span class="sp" style="flex:1"></span><button class="icon-btn sm" data-a="sk-rdel" data-id="'+s.id+'" data-r="'+r.id+'" aria-label="Remover">'+ic('x',12)+'</button></div>').join('')+
     '<div class="artqa" data-skres="'+s.id+'"><input data-r="url" placeholder="Cole um link (YouTube, curso, site) ou escreva o nome" autocomplete="off" style="flex:1;min-width:220px"><select data-r="k">'+SK_RK.map(x=>'<option value="'+x[0]+'">'+x[1]+'</option>').join('')+'</select><button class="btn sm primary" data-a="sk-radd" data-id="'+s.id+'">'+ic('plus',14)+'</button></div>');
-  // vínculos
   const refs=skRefItems(s),grp={};refs.forEach(r=>{(grp[r.g]=grp[r.g]||[]).push(r);});
-  h+=skBox('Notas, eventos e outros itens vinculados',refs.length||null,'<button class="btn sm" data-a="sk-link" data-id="'+s.id+'">'+ic('link',14)+' Vincular</button>',
-    refs.length?Object.keys(grp).map(g=>'<div class="skgrp"><span class="muted small">'+g+'</span><div class="artchips">'+grp[g].map(r=>'<span class="skref">'+(r.r?'<button data-a="sk-ref" data-r="'+esc(r.r)+'">'+ic(r.ic,13)+' '+esc(r.t)+'</button>':'<span>'+ic(r.ic,13)+' '+esc(r.t)+'</span>')+'<button class="x" data-a="sk-unlink" data-id="'+s.id+'" data-k="'+r.k+'" data-i="'+r.id+'" aria-label="Desvincular">×</button></span>').join('')+'</div></div>').join(''):'<p class="muted small" style="margin:6px 0">Anexe aqui as notas de estudo, os eventos de prática, tarefas, documentos, objetivos e focos desta habilidade.</p>');
-  // galeria
-  h+=skBox('Galeria de progresso',s.photos.length||null,'<button class="btn sm" data-a="sk-photo" data-id="'+s.id+'">'+ic('plus',14)+' Adicionar foto</button>',
-    s.photos.length?'<div class="artgrid">'+s.photos.slice().sort((a,b)=>a.date<b.date?1:-1).map(p=>{const src=skImg(p.id);return '<figure class="artfig"><button class="artimg" data-a="sk-zoom" data-p="'+p.id+'" aria-label="Ampliar">'+(src?'<img alt="" src="'+src+'" loading="lazy">':'<span class="muted small">imagem indisponível</span>')+'</button><figcaption><b>'+fmtDM(p.date)+'</b><div>'+esc(p.cap||'')+'</div><div class="artitact"><button class="icon-btn" data-a="sk-photo" data-id="'+s.id+'" data-p="'+p.id+'" aria-label="Editar">'+ic('edit',16)+'</button><button class="icon-btn" data-a="sk-phdel" data-id="'+s.id+'" data-p="'+p.id+'" aria-label="Excluir">'+ic('trash',16)+'</button></div></figcaption></figure>';}).join('')+'</div>':'<p class="muted small" style="margin:6px 0">Fotos do antes e depois: a peça de crochê, a encadernação, a montagem do Arduino, o gráfico do R…</p>');
+  h+=skBox('vinc','Notas, eventos e itens ligados',refs.length||null,'<button class="btn sm" data-a="sk-link" data-id="'+s.id+'">'+ic('link',14)+' Vincular</button>',
+    skLinkedAuto(s)+(refs.length?Object.keys(grp).map(g=>'<div class="skgrp"><span class="muted small">'+g+'</span><div class="artchips">'+grp[g].map(r=>'<span class="skref">'+(r.r?'<button data-a="sk-ref" data-r="'+esc(r.r)+'">'+ic(r.ic,13)+' '+esc(r.t)+'</button>':'<span>'+ic(r.ic,13)+' '+esc(r.t)+'</span>')+'<button class="x" data-a="sk-unlink" data-id="'+s.id+'" data-k="'+r.k+'" data-i="'+r.id+'" aria-label="Desvincular">×</button></span>').join('')+'</div></div>').join(''):'')+
+    '<p class="muted small" style="margin:6px 0">Dica: em qualquer tarefa, evento ou nota, escolha o foco “'+esc(s.name)+'” (área Habilidades) e ele aparece aqui sozinho. Também dá para vincular à mão pelo botão acima.</p>');
+  h+=skBox('gal','Galeria de progresso',s.photos.length||null,'<button class="btn sm" data-a="sk-photo" data-id="'+s.id+'">'+ic('plus',14)+' Adicionar foto</button>',
+    s.photos.length?'<div class="artgrid">'+s.photos.slice().sort((a,b)=>a.date<b.date?1:-1).map(p=>{const src=skImg(p.id);return '<figure class="artfig"><button class="artimg" data-a="sk-zoom" data-p="'+p.id+'" aria-label="Ampliar">'+(src?'<img alt="" src="'+src+'" loading="lazy">':'<span class="muted small">imagem indisponível</span>')+'</button><figcaption><b>'+fmtDM(p.date)+'</b><div>'+esc(p.cap||'')+'</div><div class="artitact"><button class="icon-btn" data-a="sk-photo" data-id="'+s.id+'" data-p="'+p.id+'" aria-label="Editar">'+ic('edit',16)+'</button><button class="icon-btn" data-a="sk-phdel" data-id="'+s.id+'" data-p="'+p.id+'" aria-label="Excluir">'+ic('trash',16)+'</button></div></figcaption></figure>';}).join('')+'</div>':'<p class="muted small" style="margin:6px 0">Fotos do antes e depois: a peça, a encadernação, a montagem do Arduino, o gráfico do R…</p>');
   return h;
 }
 /* ----- formulários ----- */
 function skForm(id){
-  const x=id?skById(id):null,p=normSk(x||{cat:UI.skCat||'manual'});
+  const x=id?skById(id):null,p=normSk(x||{cat:UI.skCat||'manual'});UI.icoTab='Habilidades';
   openModal('<form id="fSk" class="form"><div class="fh"><h2>'+(x?'Editar habilidade':'Nova habilidade')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
-    (x?'':'<div class="f"><span>Começar por um modelo (traz as etapas)</span><div class="frow">'+SK_TPL.filter(t=>t.n).map((t,i)=>'<button type="button" class="chip" data-a="sk-tpl" data-i="'+i+'">'+esc(t.n)+'</button>').join('')+'</div><input type="hidden" name="tpl" value=""></div>')+
+    (x?'':'<div class="f"><span>Começar por um modelo (traz ementa, técnicas e ícone)</span><div class="frow">'+SK_TPL.filter(t=>t.n).map((t,i)=>'<button type="button" class="chip" data-a="sk-tpl" data-i="'+i+'">'+ic(t.i,14)+' '+esc(t.n)+'</button>').join('')+'</div><input type="hidden" name="tpl" value=""></div>')+
     '<label class="f">Nome<input name="name" required value="'+esc(p.name)+'" autocomplete="off" placeholder="Ex.: Sutura, Crochê, Marcenaria, Arduino, R"></label>'+
     '<div class="f"><span>Categoria</span><div class="frow">'+SK_CATS.map(c=>'<label class="chip cb"><input type="radio" name="cat" value="'+c[0]+'" '+(p.cat===c[0]?'checked':'')+'><span>'+ic(c[2],14)+c[1]+'</span></label>').join('')+'</div></div>'+
+    iconPickHTML(p.icon,skGuess(p.name)||skCat(p.cat)[2])+
     '<div class="f"><span>Situação</span><div class="frow">'+SK_ST.map(c=>'<label class="chip cb"><input type="radio" name="status" value="'+c[0]+'" '+(p.status===c[0]?'checked':'')+'><span><i class="lzd" style="background:'+c[2]+'"></i>'+c[1]+'</span></label>').join('')+'</div></div>'+
     '<div class="fgrid3"><label class="f">Nível atual<select name="level">'+SK_LV.map((l,i)=>'<option value="'+(i+1)+'" '+(p.level===i+1?'selected':'')+'>'+l+'</option>').join('')+'</select></label>'+
     '<label class="f">Meta de nível<select name="target">'+SK_LV.map((l,i)=>'<option value="'+(i+1)+'" '+(p.target===i+1?'selected':'')+'>'+l+'</option>').join('')+'</select></label>'+
     '<label class="f">Meta semanal (min)<input type="number" name="weekMin" min="0" step="1" value="'+(p.weekMin||'')+'" placeholder="Opcional"></label></div>'+
     '<label class="f">Por que quero melhorar<textarea name="why" rows="2" placeholder="Objetivo, prazo, para que vai servir…">'+esc(p.why)+'</textarea></label>'+
     '<label class="f">Cor <small>opcional</small><input type="color" name="color" value="'+esc(p.color||skCat(p.cat)[3])+'"></label>'+
-    '<div class="ff">'+(x?'<button type="button" class="btn danger" data-a="sk-del" data-id="'+x.id+'">Excluir</button>':'')+'<span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
-  const f=$('#fSk');
+    '<div class="ff">'+(x?'<button type="button" class="btn danger" data-a="sk-del" data-id="'+x.id+'">Excluir</button>':'')+'<span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>',true);
+  const f=$('#fSk');iconPickBind(f);
   f.addEventListener('submit',e=>{
     e.preventDefault();const E=f.elements,now=Date.now(),cat=$('input[name=cat]:checked',f).value;
-    const d={name:E.name.value.trim(),cat:cat,status:$('input[name=status]:checked',f).value,level:Number(E.level.value),target:Number(E.target.value),weekMin:Math.max(0,Number(E.weekMin.value)||0),why:E.why.value.trim(),color:E.color.value===skCat(cat)[3]?'':E.color.value,updated:now};
+    const d={name:E.name.value.trim(),icon:E.icon.value||'',cat:cat,status:$('input[name=status]:checked',f).value,level:Number(E.level.value),target:Number(E.target.value),weekMin:Math.max(0,Number(E.weekMin.value)||0),why:E.why.value.trim(),color:E.color.value===skCat(cat)[3]?'':E.color.value,updated:now};
     if(!d.name)return;
     if(x){if(x.level!==d.level)x.lvHist.push({d:todayISO(),lv:d.level});Object.assign(x,d);}
-    else{const t=E.tpl&&E.tpl.value!==''?SK_TPL.filter(z=>z.n)[Number(E.tpl.value)]:null;const n=normSk(Object.assign({id:uid(),created:now,lvHist:[{d:todayISO(),lv:d.level}],miles:(t?t.m:[]).map(m=>({id:uid(),t:m,done:false,doneAt:0}))},d));S.skills=S.skills||[];S.skills.push(n);UI.skView=n.id;}
-    save();closeModal();renderMain();toast('Habilidade salva.');
+    else{
+      const t=E.tpl&&E.tpl.value!==''?SK_TPL.filter(z=>z.n)[Number(E.tpl.value)]:null;
+      let mod='';const lessons=[];(t?t.l:[]).forEach(l=>{if(l[0]==='#')mod=l.slice(1).trim();else lessons.push({id:uid(),t:l,mod:mod,st:'aprender',noteIds:[],link:'',min:30,actId:'',doneAt:0});});
+      const n=normSk(Object.assign({id:uid(),created:now,lvHist:[{d:todayISO(),lv:d.level}],miles:(t?t.m:[]).map(m=>({id:uid(),t:m,done:false,doneAt:0})),lessons:lessons},d));S.skills=S.skills||[];S.skills.push(n);UI.skView=n.id;
+    }
+    skSyncFocos();save();closeModal();renderMain();toast('Habilidade salva.');
   });
 }
-function skLogDlg(id){
+function skLogDlg(id,min0){
   const s=skById(id);if(!s)return;const open=s.miles.filter(m=>!m.done);
   openModal('<form id="fSkL" class="form"><div class="fh"><h2>Registrar prática</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><p class="muted" style="margin:0 0 8px"><b>'+esc(s.name)+'</b></p>'+
-    '<div class="fgrid"><label class="f">Data<input type="date" name="date" value="'+todayISO()+'" max="'+todayISO()+'"></label><label class="f">Minutos<input type="number" name="min" min="1" step="1" value="30" required></label></div>'+
+    '<div class="fgrid"><label class="f">Data<input type="date" name="date" value="'+todayISO()+'" max="'+todayISO()+'"></label><label class="f">Minutos<input type="number" name="min" min="1" step="1" value="'+(min0||30)+'" required></label></div>'+
     '<div class="frow" style="margin:0 0 8px">'+[10,15,30,45,60,90,120].map(n=>'<button type="button" class="chip" data-a="sk-qmin" data-n="'+n+'">'+n+' min</button>').join('')+'</div>'+
     '<label class="f">O que treinei<textarea name="note" rows="2" placeholder="Ex.: 20 pontos em U no simulador, 1 amigurumi, script de regressão…"></textarea></label>'+
-    (open.length?'<label class="f">Etapa concluída nesta prática <small>opcional</small><select name="m"><option value="">Nenhuma</option>'+open.map(m=>'<option value="'+m.id+'">'+esc(m.t)+'</option>').join('')+'</select></label>':'')+
+    (open.length?'<label class="f">Técnica concluída nesta prática <small>opcional</small><select name="m"><option value="">Nenhuma</option>'+open.map(m=>'<option value="'+m.id+'">'+esc(m.t)+'</option>').join('')+'</select></label>':'')+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
   $('#fSkL').addEventListener('submit',e=>{
-    e.preventDefault();const E=e.target.elements,min=Math.max(1,Math.round(Number(E.min.value)||0));if(!min)return;
+    e.preventDefault();const E=e.target.elements,min=Math.max(1,Math.round(Number(E.min.value)||0));
     s.practices.push({id:uid(),date:E.date.value||todayISO(),min:min,note:E.note.value.trim(),at:Date.now()});
     if(E.m&&E.m.value){const m=s.miles.find(z=>z.id===E.m.value);if(m){m.done=true;m.doneAt=Date.now();}}
     if(s.status==='aprender')s.status='pratica';
@@ -16704,13 +16798,42 @@ function skLogDlg(id){
   });
 }
 function skProjDlg(id,pid){
-  const s=skById(id);if(!s)return;const x=pid?s.projs.find(z=>z.id===pid):null,p=Object.assign({t:'',st:'plano',note:'',link:''},x||{});
+  const s=skById(id);if(!s)return;const x=pid?s.projs.find(z=>z.id===pid):null,p=Object.assign({t:'',st:'plano',note:'',link:'',due:'',noteIds:[]},x||{});
   openModal('<form id="fSkP" class="form"><div class="fh"><h2>'+(x?'Editar projeto':'Novo projeto')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<label class="f">Projeto ou peça<input name="t" required value="'+esc(p.t)+'" autocomplete="off" placeholder="Ex.: Banco de madeira, amigurumi de polvo"></label>'+
     '<div class="f"><span>Situação</span><div class="frow">'+SK_PST.map(o=>'<label class="chip cb"><input type="radio" name="st" value="'+o[0]+'" '+(p.st===o[0]?'checked':'')+'><span>'+o[1]+'</span></label>').join('')+'</div></div>'+
-    '<label class="f">Link<input name="link" value="'+esc(p.link)+'" placeholder="https://" autocomplete="off"></label><label class="f">Observações<textarea name="note" rows="3">'+esc(p.note)+'</textarea></label>'+
+    '<div class="fgrid"><label class="f">Prazo<input type="date" name="due" value="'+esc(p.due||'')+'"></label><label class="f">Link<input name="link" value="'+esc(p.link)+'" placeholder="https://" autocomplete="off"></label></div>'+
+    '<label class="f">Observações<textarea name="note" rows="3">'+esc(p.note)+'</textarea></label>'+(x?'':'<label class="f">Etapas <small>uma por linha, opcional</small><textarea name="steps" rows="4" placeholder="Desenhar o projeto&#10;Comprar material&#10;Montar&#10;Acabamento"></textarea></label>')+
+    '<div class="f"><span>Notas do projeto</span>'+pickerHTML('skpn',S.notes.filter(n=>n.type!=='questao').map(n=>({id:n.id,label:n.title||'Nota'})),p.noteIds||[],'Notas')+'</div>'+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
-  $('#fSkP').addEventListener('submit',e=>{e.preventDefault();const E=e.target.elements,d={t:E.t.value.trim(),st:$('input[name=st]:checked',e.target).value,link:E.link.value.trim(),note:E.note.value.trim()};if(!d.t)return;if(x)Object.assign(x,d);else s.projs.push(Object.assign({id:uid()},d));s.updated=Date.now();save();closeModal();renderMain();});
+  $('#fSkP').addEventListener('submit',e=>{
+    e.preventDefault();const f=e.target,E=f.elements,d={t:E.t.value.trim(),st:$('input[name=st]:checked',f).value,due:E.due.value,link:E.link.value.trim(),note:E.note.value.trim(),noteIds:pickedValues(f,'skpn')};if(!d.t)return;
+    if(x){if(x.st!=='feito'&&d.st==='feito')d.doneAt=Date.now();Object.assign(x,d);}
+    else{const steps=String(E.steps?E.steps.value:'').split('\n').map(z=>z.trim()).filter(Boolean).map(z=>({id:uid(),t:z,done:false}));const n=Object.assign({id:uid(),doneAt:0,steps:steps,actId:''},d);s.projs.push(n);UI.skPO=Object.assign(UI.skPO||{},{[n.id]:true});}
+    s.updated=Date.now();save();closeModal();renderMain();
+  });
+}
+function skLessonDlg(id,lid){
+  const s=skById(id);if(!s)return;const x=lid?s.lessons.find(z=>z.id===lid):null,p=Object.assign({t:'',mod:'',st:'aprender',min:30,link:'',noteIds:[]},x||{});
+  openModal('<form id="fSkE" class="form"><div class="fh"><h2>'+(x?'Editar aula':'Nova aula')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
+    '<label class="f">Aula ou tópico<input name="t" required value="'+esc(p.t)+'" autocomplete="off"></label><div class="fgrid"><label class="f">Módulo<input name="mod" value="'+esc(p.mod)+'" autocomplete="off" placeholder="Ex.: Técnica"></label><label class="f">Tempo estimado (min)<input type="number" name="min" min="0" step="1" value="'+(p.min||'')+'"></label></div>'+
+    '<div class="f"><span>Situação</span><div class="frow">'+SK_LST.map(o=>'<label class="chip cb"><input type="radio" name="st" value="'+o[0]+'" '+(p.st===o[0]?'checked':'')+'><span><i class="lzd" style="background:'+o[2]+'"></i>'+o[1]+'</span></label>').join('')+'</div></div>'+
+    '<label class="f">Link da aula ou material<input name="link" value="'+esc(p.link)+'" placeholder="https://" autocomplete="off"></label>'+
+    '<div class="f"><span>Notas desta aula</span>'+pickerHTML('skln',S.notes.filter(n=>n.type!=='questao').map(n=>({id:n.id,label:n.title||'Nota'})),p.noteIds||[],'Notas')+'</div>'+
+    '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
+  $('#fSkE').addEventListener('submit',e=>{
+    e.preventDefault();const f=e.target,E=f.elements,d={t:E.t.value.trim(),mod:E.mod.value.trim(),min:Math.max(0,Number(E.min.value)||0),st:$('input[name=st]:checked',f).value,link:E.link.value.trim(),noteIds:pickedValues(f,'skln')};if(!d.t)return;
+    if(x){if(x.st!=='feito'&&d.st==='feito')d.doneAt=Date.now();if(d.st!=='feito')d.doneAt=0;Object.assign(x,d);}else s.lessons.push(Object.assign({id:uid(),actId:'',doneAt:d.st==='feito'?Date.now():0},d));
+    s.updated=Date.now();save();closeModal();renderMain();
+  });
+}
+function skBatchDlg(id){
+  const s=skById(id);if(!s)return;
+  openModal('<form id="fSkB" class="form"><div class="fh"><h2>Colar ementa</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><p class="muted small" style="margin:0 0 6px">Uma aula por linha. Linhas que começam com <b>#</b> viram o módulo das seguintes. Termine com <b>(45 min)</b> para o tempo estimado. Exemplo:<br><i># Fundamentos<br>Fios e agulhas (30 min)<br>Nós cirúrgicos (45 min)</i></p>'+
+    '<label class="f"><textarea name="txt" rows="9" placeholder="# Módulo 1&#10;Aula 1 (30 min)&#10;Aula 2"></textarea></label><div id="skBP" class="muted small"></div><div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Adicionar</button></div></form>',true);
+  const f=$('#fSkB'),parse=()=>{let mod='';const out=[];f.elements.txt.value.split('\n').map(l=>l.trim()).filter(Boolean).forEach(l=>{if(l[0]==='#'){mod=l.replace(/^#+\s*/,'');return;}const m=l.match(/\s*\((\d+)\s*(?:min|m)?\)\s*$/i);out.push({t:(m?l.slice(0,m.index):l).replace(/^[-*•]\s*/,'').trim(),mod:mod,min:m?Number(m[1]):30});});return out.filter(x=>x.t);};
+  f.elements.txt.addEventListener('input',()=>{const p=parse();$('#skBP').textContent=p.length?p.length+' aula(s) em '+new Set(p.map(x=>x.mod)).size+' módulo(s).':'';});
+  f.addEventListener('submit',e=>{e.preventDefault();const p=parse();if(!p.length){toast('Nada para adicionar.');return;}p.forEach(x=>s.lessons.push({id:uid(),t:x.t,mod:x.mod,st:'aprender',noteIds:[],link:'',min:x.min,actId:'',doneAt:0}));s.updated=Date.now();save();closeModal();renderMain();toast(p.length+' aula(s) adicionada(s).');});
 }
 function skLinkDlg(id){
   const s=skById(id);if(!s)return;
@@ -16718,7 +16841,7 @@ function skLinkDlg(id){
     acts=S.acts.map(a=>({id:a.id,label:aT(a)})),tasks=S.tasks.filter(t=>!t.done).map(t=>({id:t.id,label:t.title})),docs=docsRecent().map(d=>({id:d.id,label:d.title})),goals=goalItems();
   openModal('<form id="fSkK" class="form"><div class="fh"><h2>Vincular itens</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><p class="muted small" style="margin:0 0 8px">Marque tudo o que pertence a <b>'+esc(s.name)+'</b>. Pode vincular vários de cada tipo.</p>'+
     '<div class="f"><span>Notas</span>'+pickerHTML('skn',notes,s.noteIds,'Notas')+'</div><div class="f"><span>Eventos</span>'+pickerHTML('ska',acts,s.actIds,'Eventos')+'</div><div class="f"><span>Tarefas pendentes</span>'+pickerHTML('skt',tasks,s.taskIds,'Tarefas')+'</div>'+
-    '<div class="f"><span>Documentos</span>'+pickerHTML('skd',docs,s.docIds,'Documentos')+'</div><div class="f"><span>Objetivos</span>'+pickerHTML('skg',goals,s.goalIds,'Objetivos')+'</div><div class="f"><span>Focos</span>'+focoPickHTML('skf',s.focoIds)+'</div>'+
+    '<div class="f"><span>Documentos</span>'+pickerHTML('skd',docs,s.docIds,'Documentos')+'</div><div class="f"><span>Objetivos</span>'+pickerHTML('skg',goals,s.goalIds,'Objetivos')+'</div><div class="f"><span>Outros focos</span>'+focoPickHTML('skf',s.focoIds.filter(i=>i!==s.focoId))+'</div>'+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>',true);
   $('#fSkK').addEventListener('submit',e=>{
     e.preventDefault();const f=e.target;
@@ -16746,44 +16869,75 @@ function skPhotoDlg(id,pid){
     }catch(err){toast(err&&err.message||'Não consegui salvar a imagem.');}
   });
 }
-function skNote(id){
-  const s=skById(id);if(!s)return;
-  const lv=SK_LV[s.level-1],html='<h2>'+esc(s.name)+'</h2><p><i>Habilidade | '+esc(skCat(s.cat)[1])+' | nível '+esc(lv)+'</i></p><h3>O que aprendi</h3><p><br></p><h3>Dúvidas e dificuldades</h3><p><br></p><h3>Próximo passo</h3><p><br></p>';
-  const n=normNote({id:uid(),type:'nota',title:s.name+' | '+fmtDM(todayISO()),html:html,folderId:'',catId:'',cd:null,focoIds:s.focoIds.slice(),created:Date.now(),updated:Date.now()});
-  S.notes.push(n);s.noteIds.push(n.id);s.updated=Date.now();save();
-  flushNote();UI.tab='notas';UI.nsub='notas';UI.nview={type:'note',id:n.id,edit:true,focusTitle:false};closeModal();renderTabs();renderMain();window.scrollTo(0,0);
+function skMakeNote(s,title,body){
+  const html='<h2>'+esc(title)+'</h2><p><i>Habilidade: '+esc(s.name)+' | '+esc(skCat(s.cat)[1])+'</i></p>'+body;
+  const n=normNote({id:uid(),type:'nota',title:title,html:html,folderId:'',catId:'',cd:null,focoIds:[s.focoId].filter(Boolean),created:Date.now(),updated:Date.now()});
+  S.notes.push(n);return n;
+}
+const skOpenNote=n=>{flushNote();UI.tab='notas';UI.nsub='notas';UI.nview={type:'note',id:n.id,edit:true,focusTitle:false};closeModal();renderTabs();renderMain();window.scrollTo(0,0);};
+function skNote(id){const s=skById(id);if(!s)return;const n=skMakeNote(s,s.name+' | '+fmtDM(todayISO()),'<h3>O que aprendi</h3><p><br></p><h3>Dúvidas e dificuldades</h3><p><br></p><h3>Próximo passo</h3><p><br></p>');s.noteIds.push(n.id);s.updated=Date.now();save();skOpenNote(n);}
+function skSchedule(s,title,mins,prefill,onAct){
+  const before=new Set(S.acts.map(x=>x.id));
+  schedPicker(title,Object.assign({title:title,theme:title,tipoAtv:'Estudo Individual',kind:'Organização',blockType:'livre',focoIds:[s.focoId].filter(Boolean)},prefill||{}),mins,true,()=>{const a=S.acts.find(x=>!before.has(x.id));if(a){if(onAct)onAct(a);if(s.actIds.indexOf(a.id)<0)s.actIds.push(a.id);s.updated=Date.now();save();renderMain();}});
 }
 async function skAddRes(id,box){
   const s=skById(id);if(!s)return;const v=$('[data-r=url]',box).value.trim(),k=$('[data-r=k]',box).value;if(!v)return;
   const isUrl=/^(https?:\/\/|www\.)/i.test(v)||/^[\w-]+(\.[\w-]+)+\/\S*$/.test(v);let r={id:uid(),k:k,t:v,url:''};
-  if(isUrl){r.url=normUrl(v);r.t=liHost(v);if(/(youtu|vimeo)/.test(r.t)&&k==='curso')r.k='video';try{toast('Lendo o título do link…');const i=await linkInfo(v);if(i.title)r.t=i.title.slice(0,140);if(/(youtu|vimeo)/.test(liHost(v))&&k==='curso')r.k='video';}catch(e){}}
+  if(isUrl){r.url=normUrl(v);r.t=liHost(v);if(/(youtu|vimeo)/.test(r.t)&&k==='curso')r.k='video';try{toast('Lendo o título do link…');const i=await linkInfo(v);if(i.title)r.t=i.title.slice(0,140);}catch(e){}}
   s.res.push(r);s.updated=Date.now();save();renderMain();
+}
+function skAddLesson(box){
+  const s=skById(box.dataset.skles);if(!s)return;const v=n=>$('[data-q='+n+']',box).value.trim(),t=v('t');if(!t){toast('Escreva a aula ou o tópico.');return;}
+  UI.skMod=v('mod');s.lessons.push({id:uid(),t:t,mod:v('mod'),st:'aprender',noteIds:[],link:'',min:Math.max(0,Number(v('min'))||0),actId:'',doneAt:0});s.updated=Date.now();save();renderMain();const i=$('[data-skles] [data-q=t]');if(i)i.focus();
 }
 Object.assign(ACT,{
   'sk-new'(){skForm('');},'sk-edit'(el){skForm(el.dataset.id);},
   'sk-open'(el){UI.skView=el.dataset.id;UI.skPn=10;renderMain();window.scrollTo(0,0);},'sk-back'(){UI.skView='';renderMain();window.scrollTo(0,0);},
   'sk-cat'(el){UI.skCat=el.dataset.v;renderMain();},'sk-st'(el){UI.skSt=el.dataset.v;renderMain();},
-  'sk-tpl'(el){const f=$('#fSk');if(!f)return;const t=SK_TPL.filter(z=>z.n)[Number(el.dataset.i)];f.elements.tpl.value=el.dataset.i;f.elements.name.value=t.n;const r=$('input[name=cat][value='+t.c+']',f);if(r)r.checked=true;$$('[data-a=sk-tpl]',f).forEach(b=>b.classList.toggle('on',b===el));},
+  'sk-tpl'(el){const f=$('#fSk');if(!f)return;const t=SK_TPL.filter(z=>z.n)[Number(el.dataset.i)];f.elements.tpl.value=el.dataset.i;f.elements.name.value=t.n;const r=$('input[name=cat][value='+t.c+']',f);if(r)r.checked=true;f.elements.icon.value=t.i;const q=$('.icoq',f);if(q)q.dispatchEvent(new Event('input'));$$('[data-a=sk-tpl]',f).forEach(b=>b.classList.toggle('on',b===el));},
   'sk-fav'(el){const s=skById(el.dataset.id);if(!s)return;s.fav=!s.fav;save();renderMain();},
   'sk-setst'(el){const s=skById(el.dataset.id);if(!s)return;s.status=el.dataset.v;s.updated=Date.now();save();renderMain();},
   'sk-lv'(el){const s=skById(el.dataset.id);if(!s)return;const f=el.dataset.f,v=Math.max(1,Math.min(5,s[f]+Number(el.dataset.d)));if(v===s[f])return;s[f]=v;if(f==='level')s.lvHist.push({d:todayISO(),lv:v});s.updated=Date.now();save();renderMain();},
-  'sk-del'(el){const s=skById(el.dataset.id);if(!s)return;askConfirm('Excluir habilidade?','“'+s.name+'” e todo o registro de prática, etapas e fotos serão removidos. As notas e eventos vinculados continuam.',()=>{s.photos.forEach(p=>{S.skimg=(S.skimg||[]).filter(z=>z.id!==p.id);});S.skills=S.skills.filter(x=>x!==s);UI.skView='';save();closeModal();renderMain();toast('Habilidade excluída.');},'Excluir');},
+  'sk-del'(el){const s=skById(el.dataset.id);if(!s)return;askConfirm('Excluir habilidade?','“'+s.name+'” e todo o registro de prática, aulas, projetos e fotos serão removidos. As notas e eventos vinculados continuam.',()=>{s.photos.forEach(p=>{S.skimg=(S.skimg||[]).filter(z=>z.id!==p.id);});S.skills=S.skills.filter(x=>x!==s);UI.skView='';skSyncFocos();save();closeModal();renderMain();toast('Habilidade excluída.');},'Excluir');},
   'sk-log'(el){skLogDlg(el.dataset.id);},
   'sk-qmin'(el){const i=$('#fSkL [name=min]');if(i)i.value=el.dataset.n;},
+  'sk-tstart'(el){LS.set('sk_timer',JSON.stringify({id:el.dataset.id,t:Date.now()}));renderMain();},
+  'sk-tstop'(el){const t=skTimer();try{localStorage.removeItem('sk_timer');}catch(e){}const m=t?Math.max(1,Math.ceil((Date.now()-t.t)/60000)):30;renderMain();skLogDlg(el.dataset.id,m);},
+  'sk-tcancel'(){try{localStorage.removeItem('sk_timer');}catch(e){}renderMain();},
   'sk-prdel'(el){const s=skById(el.dataset.id);if(!s)return;const i=s.practices.findIndex(p=>p.id===el.dataset.p);if(i<0)return;const p=s.practices[i];s.practices.splice(i,1);save();renderMain();toastUndo('Prática removida.',()=>{s.practices.splice(Math.min(i,s.practices.length),0,p);save();renderMain();});},
   'sk-prmore'(){UI.skPn=(UI.skPn||10)+20;renderMain();},
   'sk-mdone'(el){const s=skById(el.dataset.id),m=s&&s.miles.find(z=>z.id===el.dataset.m);if(!m)return;m.done=!m.done;m.doneAt=m.done?Date.now():0;s.updated=Date.now();save();renderMain();},
   'sk-mdel'(el){const s=skById(el.dataset.id);if(!s)return;s.miles=s.miles.filter(z=>z.id!==el.dataset.m);save();renderMain();},
+  /* teoria */
+  'sk-lt'(el){UI.skLt=el.dataset.v;renderMain();},
+  'sk-ladd'(el){const b=el.closest('[data-skles]');if(b)skAddLesson(b);},
+  'sk-lst'(el){const s=skById(el.dataset.id),l=s&&s.lessons.find(z=>z.id===el.dataset.l);if(!l)return;l.st=l.st==='aprender'?'estudando':l.st==='estudando'?'feito':'aprender';l.doneAt=l.st==='feito'?Date.now():0;s.updated=Date.now();save();renderMain();},
+  'sk-ledit'(el){skLessonDlg(el.dataset.id,el.dataset.l);},'sk-lbatch'(el){skBatchDlg(el.dataset.id);},
+  'sk-ldel'(el){const s=skById(el.dataset.id);if(!s)return;const i=s.lessons.findIndex(z=>z.id===el.dataset.l);if(i<0)return;const l=s.lessons[i];s.lessons.splice(i,1);save();renderMain();toastUndo('Aula removida.',()=>{s.lessons.splice(Math.min(i,s.lessons.length),0,l);save();renderMain();});},
+  'sk-lnote'(el){const s=skById(el.dataset.id),l=s&&s.lessons.find(z=>z.id===el.dataset.l);if(!l)return;
+    const ex=l.noteIds.map(noteById).find(Boolean);if(ex){skOpenNote(ex);return;}
+    const n=skMakeNote(s,s.name+' | '+l.t,(l.mod?'<p><i>Módulo: '+esc(l.mod)+'</i></p>':'')+'<h3>Resumo da aula</h3><p><br></p><h3>Pontos-chave</h3><ul><li><br></li></ul><h3>Dúvidas</h3><p><br></p>');
+    l.noteIds.push(n.id);if(l.st==='aprender')l.st='estudando';s.updated=Date.now();save();skOpenNote(n);},
+  'sk-lsched'(el){const s=skById(el.dataset.id),l=s&&s.lessons.find(z=>z.id===el.dataset.l);if(!l)return;skSchedule(s,'Estudar: '+s.name+' | '+l.t,Math.max(15,Number(l.min)||30),{link:l.link},a=>{l.actId=a.id;if(l.st==='aprender')l.st='estudando';});},
+  /* projetos */
   'sk-proj'(el){skProjDlg(el.dataset.id,el.dataset.p||'');},
-  'sk-pdel'(el){const s=skById(el.dataset.id);if(!s)return;s.projs=s.projs.filter(z=>z.id!==el.dataset.p);save();renderMain();},
+  'sk-ptoggle'(el){UI.skPO=UI.skPO||{};UI.skPO[el.dataset.p]=!UI.skPO[el.dataset.p];renderMain();},
+  'sk-pstep'(el){const s=skById(el.dataset.id),p=s&&s.projs.find(z=>z.id===el.dataset.p),x=p&&p.steps.find(z=>z.id===el.dataset.x);if(!x)return;x.done=!x.done;
+    const all=p.steps.length&&p.steps.every(z=>z.done);if(all&&p.st!=='feito'){p.st='feito';p.doneAt=Date.now();toast('Projeto concluído!');}else if(!all&&p.st==='feito'){p.st='andamento';p.doneAt=0;}else if(p.st==='plano'&&x.done)p.st='andamento';
+    s.updated=Date.now();save();renderMain();},
+  'sk-pstepdel'(el){const s=skById(el.dataset.id),p=s&&s.projs.find(z=>z.id===el.dataset.p);if(!p)return;p.steps=p.steps.filter(z=>z.id!==el.dataset.x);save();renderMain();},
+  'sk-pdel'(el){const s=skById(el.dataset.id);if(!s)return;const p=s.projs.find(z=>z.id===el.dataset.p);if(!p)return;askConfirm('Excluir projeto?','“'+p.t+'” e as etapas dele serão removidos.',()=>{s.projs=s.projs.filter(z=>z!==p);save();closeModal();renderMain();},'Excluir');},
+  'sk-psched'(el){const s=skById(el.dataset.id),p=s&&s.projs.find(z=>z.id===el.dataset.p);if(!p)return;const nx=p.steps.find(x=>!x.done);skSchedule(s,'Projeto: '+p.t+(nx?' | '+nx.t:''),60,{link:p.link},a=>{p.actId=a.id;if(p.st==='plano')p.st='andamento';});},
+  'sk-pnote'(el){const s=skById(el.dataset.id),p=s&&s.projs.find(z=>z.id===el.dataset.p);if(!p)return;const ex=p.noteIds.map(noteById).find(Boolean);if(ex){skOpenNote(ex);return;}
+    const n=skMakeNote(s,s.name+' | Projeto: '+p.t,'<h3>Objetivo</h3><p>'+esc(p.note||'')+'</p><h3>Materiais</h3><ul><li><br></li></ul><h3>Passo a passo</h3><ol>'+(p.steps.map(x=>'<li>'+esc(x.t)+'</li>').join('')||'<li><br></li>')+'</ol><h3>O que deu certo e o que mudar</h3><p><br></p>');
+    p.noteIds.push(n.id);s.updated=Date.now();save();skOpenNote(n);},
   'sk-radd'(el){const b=el.closest('[data-skres]');if(b)skAddRes(el.dataset.id,b);},
   'sk-rdel'(el){const s=skById(el.dataset.id);if(!s)return;s.res=s.res.filter(z=>z.id!==el.dataset.r);save();renderMain();},
   'sk-link'(el){skLinkDlg(el.dataset.id);},
   'sk-unlink'(el){const s=skById(el.dataset.id);if(!s)return;s[el.dataset.k]=s[el.dataset.k].filter(i=>i!==el.dataset.i);save();renderMain();},
-  'sk-ref'(el){openRef(el.dataset.r);},
+  'sk-ref'(el){if(el.dataset.r)openRef(el.dataset.r);},
   'sk-note'(el){skNote(el.dataset.id);},
-  'sk-sched'(el){const s=skById(el.dataset.id);if(!s)return;const t='Praticar: '+s.name,mins=s.weekMin?Math.min(120,Math.max(20,Math.round(s.weekMin/3/5)*5)):45;
-    schedPicker(t,{title:t,theme:t,tipoAtv:'Estudo Individual',kind:'Organização',blockType:'livre',focoIds:s.focoIds.slice()},mins,true,()=>{const a=S.acts[S.acts.length-1];if(a&&a.title===t&&s.actIds.indexOf(a.id)<0){s.actIds.push(a.id);s.updated=Date.now();save();}});},
+  'sk-sched'(el){const s=skById(el.dataset.id);if(!s)return;skSchedule(s,'Praticar: '+s.name,s.weekMin?Math.min(120,Math.max(20,Math.round(s.weekMin/3/5)*5)):45);},
   'sk-photo'(el){skPhotoDlg(el.dataset.id,el.dataset.p||'');},
   'sk-phdel'(el){const s=skById(el.dataset.id);if(!s)return;askConfirm('Excluir a foto?','Ela será removida da galeria.',()=>{s.photos=s.photos.filter(z=>z.id!==el.dataset.p);S.skimg=(S.skimg||[]).filter(z=>z.id!==el.dataset.p);save();closeModal();renderMain();},'Excluir');},
   'sk-zoom'(el){const s=skImg(el.dataset.p);if(s)fxZoomImg(s);}
@@ -16791,6 +16945,8 @@ Object.assign(ACT,{
 document.addEventListener('keydown',e=>{
   const t=e.target;if(!t||e.key!=='Enter'||e.isComposing)return;
   if(t.dataset&&t.dataset.skl){e.preventDefault();const s=skById(t.dataset.id),v=t.value.trim();if(!s||!v)return;s.miles.push({id:uid(),t:v,done:false,doneAt:0});s.updated=Date.now();save();renderMain();const n=$('[data-skl=miles]');if(n)n.focus();return;}
+  if(t.dataset&&t.dataset.skps){e.preventDefault();const s=skById(t.dataset.id),p=s&&s.projs.find(z=>z.id===t.dataset.skps),v=t.value.trim();if(!p||!v)return;p.steps.push({id:uid(),t:v,done:false});if(p.st==='feito'){p.st='andamento';p.doneAt=0;}s.updated=Date.now();save();renderMain();const n=$('[data-skps="'+p.id+'"]');if(n)n.focus();return;}
+  const l=t.closest&&t.closest('[data-skles]');if(l&&t.tagName==='INPUT'){e.preventDefault();skAddLesson(l);return;}
   const b=t.closest&&t.closest('[data-skres]');if(b&&t.tagName==='INPUT'){e.preventDefault();skAddRes(b.dataset.skres,b);}
 });
 document.addEventListener('input',e=>{const t=e.target;if(t&&t.id==='skq'){UI.skQ=t.value;const l=$('#skList');if(l)l.innerHTML=skListHTML();}});
@@ -17567,6 +17723,7 @@ function focoPill(f,short){
 }
 const focoChips=o=>focoIdsOf(o).map(focoById).filter(Boolean).map(f=>focoPill(f)).join('');
 function focoItems(){
+  try{skSyncFocos();}catch(e){}
   return (S.focos||[]).slice().sort((a,b)=>{const x=areaById(a.area),y=areaById(b.area);return ((x?S.areas.indexOf(x):9)-(y?S.areas.indexOf(y):9))||a.mod.localeCompare(b.mod,'pt-BR')||a.name.localeCompare(b.name,'pt-BR');})
     .map(f=>({id:f.id,label:f.name,sub:((areaById(f.area)||{}).name||'')+' › '+f.mod}));
 }
