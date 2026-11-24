@@ -17459,7 +17459,7 @@ document.addEventListener('keydown',e=>{const t=e.target;if(!t||e.key!=='Enter'|
 /* ----- Foco da questão no estilo do MedFisher e Caderno de erros por foco ----- */
 const mfProvaLbl=q=>String((mfJ(q.v[15],{})||{}).prova_nome||(q.inst+' '+q.ano));
 function mfFocoPill(q){const a=mfAreaStyle(q.area||''),txt=[q.area,q.sub,q.foco].filter(Boolean).join(' > ');return '<span class="fpill mffp" style="--fc:'+esc(a.color)+'" title="'+esc(txt)+'">'+ic(a.icon,13)+'<span>'+esc(txt)+'</span></span>';}
-const mfChipsHTML=q=>'<span class="mfchip">'+ic('cap',13)+'<span>'+esc(mfProvaLbl(q))+'</span></span>'+(S.prefs.mfHideFoco?'':mfFocoPill(q));
+const mfChipsHTML=q=>'<span class="mfchip">'+ic('cap',13)+'<span>'+esc(mfProvaLbl(q))+'</span></span>'+(S.prefs.mfHideFoco?(q.area?mfAreaPill(q.area):''):mfFocoPill(q));
 const cadByQ=qid=>(S.cad||[]).find(e=>e.qid===qid);
 const cadOf=f=>(S.cad||[]).filter(e=>norm(e.foco)===norm(f.name)).sort((a,b)=>(b.created||0)-(a.created||0));
 function cadSend(){
