@@ -2769,6 +2769,7 @@ button.lzico.lk:hover{transform:scale(1.06);box-shadow:0 0 0 3px color-mix(in sr
 .sklv{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin:6px 0}
 .skweeks{display:flex;gap:6px;align-items:flex-end;height:78px;margin:8px 0}.skw{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px}.skw i{display:block;width:100%;max-width:34px;background:var(--c,var(--acc));border-radius:4px 4px 0 0;min-height:2px;opacity:.85}.skw span{font-size:10.5px;color:var(--mut)}
 .skml{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--line)}.skml .skmt{flex:1;min-width:0}.skml.done .skmt{text-decoration:line-through;color:var(--mut)}
+.skph{padding:0}.skphc{display:flex;flex-direction:column;gap:4px}.skphd{border:0;background:none;font:inherit;font-size:12.5px;font-weight:600;color:var(--pfg);cursor:pointer;padding:2px;text-align:center}.skphd:hover{text-decoration:underline}.skpr.hi{background:var(--pbg);border-radius:8px}
 .skpr{display:flex;align-items:baseline;gap:10px;padding:5px 0;border-bottom:1px solid var(--line)}.skpr b{min-width:56px}.skprn{flex:1;color:var(--mut);font-size:13px;min-width:0}
 .skres{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}.skres a{color:var(--acc);overflow-wrap:anywhere}
 .skgrp{margin:6px 0}.skref{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--card);overflow:hidden;font-size:13px}.skref>button,.skref>span{border:0;background:none;padding:3px 10px;font:inherit;color:var(--tx);cursor:pointer;display:inline-flex;align-items:center;gap:5px}.skref>span{cursor:default}.skref>button:hover{color:var(--acc)}.skref .x{padding:3px 8px;color:var(--mut);border-left:1px solid var(--line)}
@@ -5257,7 +5258,7 @@ function dfolderCount(id){
 function dfolderTreeHTML(pid,depth){
   return S.dfolders.filter(f=>(f.parentId||'')===pid).sort(byName).map(f=>{const hk=S.dfolders.some(x=>x.parentId===f.id),cl=!!UI.fclosed['d'+f.id];return (
     '<div class="fo '+(UI.df===f.id?'on':'')+'" style="--d:'+depth+'" data-a="df-folder" data-id="'+f.id+'" role="button" tabindex="0">'+foFx(hk,'d'+f.id,cl)+'<span class="fnm">'+folderIcon(f,16)+esc(f.name)+'</span><span class="count">'+dfolderCount(f.id)+'</span>'+
-    '<span class="gact"><button class="icon-btn sm" data-a="folder-look" data-k="d" data-id="'+f.id+'" title="Ícone e cor" aria-label="Ícone e cor da pasta">'+ic('palette',14)+'</button><button class="icon-btn sm" data-a="df-sub" data-id="'+f.id+'" title="Nova subpasta" aria-label="Nova subpasta">'+ic('folderPlus',15)+'</button><button class="icon-btn sm" data-a="df-ren" data-id="'+f.id+'" title="Renomear" aria-label="Renomear">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="df-del" data-id="'+f.id+'" title="Excluir pasta" aria-label="Excluir pasta">'+ic('trash',14)+'</button></span></div>'+(cl?'':dfolderTreeHTML(f.id,depth+1)));}).join('');
+    '<span class="gact"><button class="icon-btn sm" data-a="folder-look" data-k="d" data-id="'+f.id+'" title="Ícone e cor" aria-label="Ícone e cor da pasta">'+ic('palette',14)+'</button><button class="icon-btn sm" data-a="df-sub" data-id="'+f.id+'" title="Nova subpasta" aria-label="Nova subpasta">'+ic('folderPlus',15)+'</button><button class="icon-btn sm" data-a="df-move" data-id="'+f.id+'" title="Mover para outro lugar" aria-label="Mover a pasta">'+ic('folder',14)+'</button><button class="icon-btn sm" data-a="df-ren" data-id="'+f.id+'" title="Renomear" aria-label="Renomear">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="df-del" data-id="'+f.id+'" title="Excluir pasta" aria-label="Excluir pasta">'+ic('trash',14)+'</button></span></div>'+(cl?'':dfolderTreeHTML(f.id,depth+1)));}).join('');
 }
 
 /* ==========================================================================
@@ -5470,7 +5471,7 @@ Object.assign(ACT,{'folder-look'(el,e){if(e)e.stopPropagation();openFolderLook(e
 function folderTile(f){
   const ns=S.dfolders.filter(x=>x.parentId===f.id).length,tot=dfolderCount(f.id);
   const sub=[tot+(tot===1?' Documento':' Documentos')];if(ns)sub.push(ns+(ns===1?' Subpasta':' Subpastas'));
-  return folderTileHTML(f,'d','df-folder',sub.join(' | '),'<button class="icon-btn sm" data-a="df-sub" data-id="'+f.id+'" title="Nova subpasta" aria-label="Nova subpasta">'+ic('folderPlus',15)+'</button><button class="icon-btn sm" data-a="df-ren" data-id="'+f.id+'" title="Renomear" aria-label="Renomear">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="df-del" data-id="'+f.id+'" title="Excluir pasta" aria-label="Excluir pasta">'+ic('trash',14)+'</button>');
+  return folderTileHTML(f,'d','df-folder',sub.join(' | '),'<button class="icon-btn sm" data-a="df-sub" data-id="'+f.id+'" title="Nova subpasta" aria-label="Nova subpasta">'+ic('folderPlus',15)+'</button><button class="icon-btn sm" data-a="df-move" data-id="'+f.id+'" title="Mover para outro lugar" aria-label="Mover a pasta">'+ic('folder',14)+'</button><button class="icon-btn sm" data-a="df-ren" data-id="'+f.id+'" title="Renomear" aria-label="Renomear">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="df-del" data-id="'+f.id+'" title="Excluir pasta" aria-label="Excluir pasta">'+ic('trash',14)+'</button>');
 }
 const DST=[['iniciar','Iniciar'],['andamento','Em andamento'],['finalizado','Finalizado']];
 const dstLabel=s=>(DST.find(x=>x[0]===s)||['',''])[1];
@@ -5526,7 +5527,8 @@ function renderDocs(){
   const fl=flatOn('docs')&&!UI.filters.q;
   const inF=d=>UI.df==='__none'?docNoFolder(d):fl?(cur?d.folderId===cur.id:docNoFolder(d)):(ids?ids.indexOf(d.folderId)>=0:true);
   const all=S.docs.filter(d=>passDoc(d)&&inF(d)),pend=all.filter(d=>docPending(d)>0),ok=all.filter(d=>docPending(d)===0);
-  const list0=UI.docTab==='todo'?pend:UI.docTab==='ok'?ok:all,list=UI.dstat?list0.filter(d=>d.status===UI.dstat):list0;
+  const inBook=!!(cur&&dfolderChain(cur.id).some(x=>x.book)),tabv=inBook?'all':UI.docTab;
+  const list0=tabv==='todo'?pend:tabv==='ok'?ok:all,list=UI.dstat?list0.filter(d=>d.status===UI.dstat):list0;
   if(cur&&(cur.book||ids&&ids.some(i=>bkOf(i))))list.sort((a,b)=>(a.bookOrder||0)-(b.bookOrder||0));
   const crumbs=cur?'<nav class="crumbs" aria-label="Caminho da pasta"><button class="crumb" data-a="df-folder" data-id="">Todos</button>'+dfolderChain(cur.id).map(f=>'<span class="sep">›</span><button class="crumb '+(f.id===cur.id?'on':'')+'" data-a="df-folder" data-id="'+f.id+'">'+esc(f.name)+'</button>').join('')+
     '<button class="btn sm ghost" data-a="df-sub" data-id="'+cur.id+'">'+ic('folderPlus',14)+' Nova subpasta aqui</button></nav>':'';
@@ -5540,7 +5542,7 @@ function renderDocs(){
     dfolderTreeHTML('',0)+
     '<div class="fo" data-a="doc-sub" data-v="aulas" role="button" tabindex="0" style="margin-top:8px;border-top:1px solid var(--line);padding-top:10px"><span class="fnm">'+ic('pastaMenos',16)+'Cursos e aulas</span><span class="count">'+crsList().length+'</span></div>'+
     '<button class="btn sm ghost" data-a="df-new" style="margin-top:8px;width:100%;justify-content:center">'+ic('folderPlus',15)+' Nova pasta</button></aside>';
-  const main='<div class="toolbar">'+docSubSeg('docs')+'<div class="seg">'+[['todo','A fazer ('+pend.length+')'],['ok','Em dia ('+ok.length+')'],['all','Todos']].map(v=>'<button class="'+(UI.docTab===v[0]?'on':'')+'" data-a="set" data-k="docTab" data-v="'+v[0]+'">'+v[1]+'</button>').join('')+'</div>'+
+  const main='<div class="toolbar">'+docSubSeg('docs')+'<div class="seg">'+[['todo','A fazer ('+pend.length+')'],['ok','Em dia ('+ok.length+')'],['all','Todos']].map(v=>'<button class="'+(tabv===v[0]?'on':'')+'" data-a="set" data-k="docTab" data-v="'+v[0]+'">'+v[1]+'</button>').join('')+'</div>'+
     '<span class="sp"></span>'+flatBtn('docs')+treeBtn('docs')+'<div class="seg vseg" aria-label="Modo de exibição">'+[['grade','Grade'],['cartoes','Cartões'],['lista','Lista']].map(v=>'<button class="'+(dv===v[0]?'on':'')+'" data-a="dview" data-v="'+v[0]+'" title="'+v[1]+'">'+v[1]+'</button>').join('')+'</div>'+
     '<button class="btn" data-a="book-new" title="Um livro dividido em vários PDFs de uma pasta do Drive">'+ic('book',14)+' Adicionar livro</button><button class="btn '+(UI.dsel?'on':'')+'" data-a="dsel-toggle" aria-pressed="'+!!UI.dsel+'">'+ic('check',14)+' Selecionar</button><button class="btn primary" data-a="new-doc">'+ic('plus',15)+' Novo documento</button></div>'+(UI.dsel?dselBar():'')+
     sumWrap('docs',modeCards([['','Todos',S.docs.length,'layers','Todos os documentos']].concat(DST.map(x=>[x[0],x[1],S.docs.filter(d=>d.status===x[0]).length,{iniciar:'play',andamento:'clock',finalizado:'check'}[x[0]]||'file',{iniciar:'Ainda não comecei',andamento:'Em produção',finalizado:'Prontos'}[x[0]]||''])),UI.dstat||'','set','dstat'))+tplBarHTML()+crumbs+(cur&&cur.book?bkHeaderHTML(cur):'')+subRow+
@@ -10841,6 +10843,10 @@ Object.assign(ACT,{
   'df-folder'(el){UI.df=el.dataset.id;renderMain();},
   'df-new'(){askText('Nova pasta','',v=>{const f={id:uid(),name:v,parentId:''};S.dfolders.push(f);UI.df=f.id;save();renderMain();});},
   'df-sub'(el){const pid=el.dataset.id;askText('Nova subpasta','',v=>{const f={id:uid(),name:v,parentId:pid};S.dfolders.push(f);UI.df=f.id;save();renderMain();});},
+  'df-move'(el){const f=dfolderById(el.dataset.id);if(!f)return;const bad=new Set(dfolderDesc(f.id));
+    const out=['<option value="">Início (fora de qualquer pasta)</option>'];const walk=(pid,d)=>S.dfolders.filter(x=>(x.parentId||'')===pid&&!bad.has(x.id)).sort(byName).forEach(x=>{out.push('<option value="'+x.id+'" '+(x.id===f.parentId?'selected':'')+'>'+'\u2003'.repeat(d)+esc(x.name)+'</option>');walk(x.id,d+1);});walk('',0);
+    openModal('<form id="fDfMove" class="form"><div class="fh"><h2>Mover '+(f.book?'o livro':'a pasta')+'</h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div><p class="muted" style="margin:0">'+esc(f.name)+'</p><label class="f">Para dentro de<select name="p">'+out.join('')+'</select></label><div class="ff"><button type="button" class="btn" data-a="close">Cancelar</button><button class="btn primary">Mover</button></div></form>');
+    $('#fDfMove').addEventListener('submit',e=>{e.preventDefault();f.parentId=e.target.elements.p.value;save();closeModal();renderMain();toast('Movido.');});},
   'df-ren'(el){const f=dfolderById(el.dataset.id);if(!f)return;askText('Renomear pasta',f.name,v=>{f.name=v;save();renderMain();});},
   'df-del'(el){
     const f=dfolderById(el.dataset.id);if(!f)return;
@@ -17023,7 +17029,7 @@ function skDetail(s){
     '<input class="artql" data-skl="miles" data-id="'+s.id+'" placeholder="Nova técnica ou marco prático (Enter)" autocomplete="off">');
   const pr=s.practices.slice().sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:(b.at||0)-(a.at||0));
   h+=skBox('prat','Registro de prática',s.practices.length||null,'<button class="btn sm" data-a="sk-log" data-id="'+s.id+'">'+ic('plus',14)+' Registrar</button>',
-    pr.length?pr.slice(0,UI.skPn||10).map(p=>'<div class="skpr"><b>'+fmtDM(p.date)+'</b><span>'+skHM(p.min)+'</span><span class="skprn">'+esc(p.note||'')+'</span>'+(p.auto?'<span class="muted small" title="Registrada ao concluir o evento ou a tarefa. Desmarque a conclusão para remover.">automática</span>':'<button class="icon-btn sm" data-a="sk-prdel" data-id="'+s.id+'" data-p="'+p.id+'" aria-label="Excluir">'+ic('x',12)+'</button>')+'</div>').join('')+(pr.length>(UI.skPn||10)?'<button class="btn sm ghost" data-a="sk-prmore">Mostrar mais ('+(pr.length-(UI.skPn||10))+')</button>':''):'');
+    pr.length?pr.slice(0,UI.skPn||10).map(p=>'<div class="skpr'+(UI.skHi===p.id?' hi':'')+'" id="skpr_'+p.id+'"><b>'+fmtDM(p.date)+'</b><span>'+skHM(p.min)+'</span><span class="skprn">'+esc(p.note||'')+'</span>'+(p.photo?'<a class="icon-btn sm" href="'+esc(normUrl(p.photo))+'" target="_blank" rel="noopener" title="Foto desta prática" aria-label="Foto">'+ic('image',13)+'</a>':'')+(p.auto?'<span class="muted small" title="Registrada ao concluir o evento ou a tarefa. Desmarque a conclusão para remover.">automática</span>':'<button class="icon-btn sm" data-a="sk-prdel" data-id="'+s.id+'" data-p="'+p.id+'" aria-label="Excluir">'+ic('x',12)+'</button>')+'</div>').join('')+(pr.length>(UI.skPn||10)?'<button class="btn sm ghost" data-a="sk-prmore">Mostrar mais ('+(pr.length-(UI.skPn||10))+')</button>':''):'');
   h+=skBox('res','Materiais e referências',s.res.length||null,'',
     s.res.map(r=>'<div class="skres"><span class="artkind">'+esc((SK_RK.find(x=>x[0]===r.k)||SK_RK[5])[1])+'</span>'+(r.url?'<a href="'+esc(normUrl(r.url))+'" target="_blank" rel="noopener">'+esc(r.t||r.url)+'</a>':'<span>'+esc(r.t)+'</span>')+'<span class="sp" style="flex:1"></span><button class="icon-btn sm" data-a="sk-rwish" data-id="'+s.id+'" data-r="'+r.id+'" title="Adicionar à lista de desejos" aria-label="Desejo">'+ic('gift',13)+'</button><button class="icon-btn sm" data-a="sk-rdel" data-id="'+s.id+'" data-r="'+r.id+'" aria-label="Remover">'+ic('x',12)+'</button></div>').join('')+
     qaBox('sr_'+s.id,'Material ou link','<div class="artqa" data-skres="'+s.id+'"><input data-r="url" placeholder="Cole um link (YouTube, curso, site) ou escreva o nome" autocomplete="off" style="flex:1;min-width:220px"><select data-r="k">'+SK_RK.map(x=>'<option value="'+x[0]+'">'+x[1]+'</option>').join('')+'</select><button class="btn sm primary" data-a="sk-radd" data-id="'+s.id+'">'+ic('plus',14)+'</button></div>'));
@@ -17032,7 +17038,8 @@ function skDetail(s){
     skLinkedAuto(s)+(refs.length?Object.keys(grp).map(g=>'<div class="skgrp"><span class="muted small">'+g+'</span><div class="artchips">'+grp[g].map(r=>'<span class="skref">'+(r.r?'<button data-a="sk-ref" data-r="'+esc(r.r)+'">'+ic(r.ic,13)+' '+esc(r.t)+'</button>':'<span>'+ic(r.ic,13)+' '+esc(r.t)+'</span>')+'<button class="x" data-a="sk-unlink" data-id="'+s.id+'" data-k="'+r.k+'" data-i="'+r.id+'" aria-label="Desvincular">×</button></span>').join('')+'</div></div>').join(''):'')+
     '');
   h+=skCrsBox(s);
-  h+=skBox('gal','Galeria de progresso',(s.photos.length+s.albums.length)||null,'<button class="btn sm" data-a="sk-album" data-id="'+s.id+'" title="Cole o link de um álbum do Google Fotos ou de uma pasta do Drive">'+ic('link',14)+' Colar álbum</button><button class="btn sm" data-a="sk-photo" data-id="'+s.id+'">'+ic('plus',14)+' Adicionar foto</button>',
+  h+=skBox('gal','Galeria de progresso',(s.photos.length+s.albums.length+s.practices.filter(p=>p.photo).length)||null,'<button class="btn sm" data-a="sk-log-photo" data-id="'+s.id+'" title="Registra a prática do dia com o link da foto">'+ic('plus',14)+' Adicionar foto</button>',
+    skPhotoTiles(s)+
     s.albums.map(a=>'<div class="skalb"><div class="arth"><b>'+esc(a.t||'Álbum')+'</b><span class="sp"></span><button class="icon-btn sm" data-a="sk-albdel" data-id="'+s.id+'" data-p="'+a.id+'" aria-label="Tirar o álbum">'+ic('trash',14)+'</button></div><div class="crsfr gal">'+galBoxHTML(a.url)+'</div></div>').join('')+(s.photos.length?'<div class="artgrid">'+s.photos.slice().sort((a,b)=>a.date<b.date?1:-1).map(p=>{const src=skImg(p.id);return '<figure class="artfig"><button class="artimg" data-a="sk-zoom" data-p="'+p.id+'" aria-label="Ampliar">'+(src?'<img alt="" src="'+src+'" loading="lazy">':'<span class="muted small">imagem indisponível</span>')+'</button><figcaption><b>'+fmtDM(p.date)+'</b><div>'+esc(p.cap||'')+'</div><div class="artitact"><button class="icon-btn" data-a="sk-photo" data-id="'+s.id+'" data-p="'+p.id+'" aria-label="Editar">'+ic('edit',16)+'</button><button class="icon-btn" data-a="sk-phdel" data-id="'+s.id+'" data-p="'+p.id+'" aria-label="Excluir">'+ic('trash',16)+'</button></div></figcaption></figure>';}).join('')+'</div>':''));
   return h;
 }
@@ -17065,17 +17072,31 @@ function skForm(id){
     skSyncFocos();save();closeModal();renderMain();toast('Habilidade salva.');
   });
 }
-function skLogDlg(id,min0){
+// foto ligada a uma prática: o link vira miniatura (Drive, Google Fotos ou imagem direta)
+function skPhotoTiles(s){
+  const L=s.practices.filter(p=>p.photo).sort((a,b)=>a.date<b.date?1:-1);if(!L.length)return '';
+  setTimeout(skPhHydrate,0);
+  return '<div class="galgrid skph">'+L.map(p=>'<div class="skphc"><a class="galth" href="'+esc(normUrl(p.photo))+'" target="_blank" rel="noopener" title="Abrir a foto"><img data-phu="'+esc(p.photo)+'" alt="" referrerpolicy="no-referrer"><span class="galic">'+ic('image',22)+'</span></a><button class="skphd" data-a="sk-prgo" data-id="'+s.id+'" data-p="'+p.id+'" title="Ver o registro de prática deste dia">'+fmtDM(p.date)+'</button></div>').join('')+'</div>';
+}
+function skPhHydrate(){
+  $$('img[data-phu]:not([data-done])').forEach(im=>{im.dataset.done='1';const u=im.dataset.phu,d=u.match(/drive\.google\.com\/file\/d\/([\w-]{10,})/);
+    if(/\.(png|jpe?g|gif|webp|avif)(\?|#|$)/i.test(u)){im.src=u;return;}
+    if(d){im.src='https://drive.google.com/thumbnail?id='+d[1]+'&sz=w600';return;}
+    if(galKind(u)==='photos')galLoad(u,c=>{if(c.st==='ok'&&c.d.items[0]&&im.isConnected)im.src=c.d.items[0].thumb.replace('=w480','=w600');});});
+}
+function skLogDlg(id,min0,opt){
   const s=skById(id);if(!s)return;const open=s.miles.filter(m=>!m.done);
   openModal('<form id="fSkL" class="form"><div class="fh"><h2>Registrar prática</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><p class="muted" style="margin:0 0 8px"><b>'+esc(s.name)+'</b></p>'+
     '<div class="fgrid"><label class="f">Data<input type="date" name="date" value="'+todayISO()+'" max="'+todayISO()+'"></label><label class="f">Minutos<input type="number" name="min" min="1" step="1" value="'+(min0||30)+'" required></label></div>'+
     '<div class="frow" style="margin:0 0 8px">'+[10,15,30,45,60,90,120].map(n=>'<button type="button" class="chip" data-a="sk-qmin" data-n="'+n+'">'+n+' min</button>').join('')+'</div>'+
     '<label class="f">O que treinei<textarea name="note" rows="2" placeholder=""></textarea></label>'+
+    '<label class="f">Link da foto <small class="muted">(Google Fotos ou Drive; vai para a Galeria de progresso)</small><input name="photo" placeholder="https://photos.app.goo.gl/… ou https://drive.google.com/file/d/…" autocomplete="off"></label>'+
     (open.length?'<label class="f">Técnica concluída nesta prática <small>opcional</small><select name="m"><option value="">Nenhuma</option>'+open.map(m=>'<option value="'+m.id+'">'+esc(m.t)+'</option>').join('')+'</select></label>':'')+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
+  if(opt&&opt.photo)setTimeout(()=>{const i=$('#fSkL [name=photo]');if(i)i.focus();},60);
   $('#fSkL').addEventListener('submit',e=>{
     e.preventDefault();const E=e.target.elements,min=Math.max(1,Math.round(Number(E.min.value)||0));
-    s.practices.push({id:uid(),date:E.date.value||todayISO(),min:min,note:E.note.value.trim(),at:Date.now()});
+    s.practices.push({id:uid(),date:E.date.value||todayISO(),min:min,note:E.note.value.trim(),photo:E.photo.value.trim()?normUrl(E.photo.value.trim()):'',at:Date.now()});
     if(E.m&&E.m.value){const m=s.miles.find(z=>z.id===E.m.value);if(m){m.done=true;m.doneAt=Date.now();}}
     if(s.status==='aprender')s.status='pratica';
     s.updated=Date.now();save();closeModal();renderMain();toast(skHM(min)+' registrados. Total: '+skHM(skTotal(s))+'.');
@@ -17184,6 +17205,8 @@ Object.assign(ACT,{
   'sk-lv'(el){const s=skById(el.dataset.id);if(!s)return;const f=el.dataset.f,v=Math.max(1,Math.min(5,s[f]+Number(el.dataset.d)));if(v===s[f])return;s[f]=v;if(f==='level')s.lvHist.push({d:todayISO(),lv:v});s.updated=Date.now();save();renderMain();},
   'sk-del'(el){const s=skById(el.dataset.id);if(!s)return;askConfirm('Excluir habilidade?','“'+s.name+'” e todo o registro de prática, aulas, projetos e fotos serão removidos. As notas e eventos vinculados continuam.',()=>{s.photos.forEach(p=>{S.skimg=(S.skimg||[]).filter(z=>z.id!==p.id);});S.skills=S.skills.filter(x=>x!==s);UI.skView='';skSyncFocos();save();closeModal();renderMain();toast('Habilidade excluída.');},'Excluir');},
   'sk-log'(el){skLogDlg(el.dataset.id);},
+  'sk-log-photo'(el){skLogDlg(el.dataset.id,0,{photo:true});},
+  'sk-prgo'(el){const s=skById(el.dataset.id);if(!s)return;const i=s.practices.slice().sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:(b.at||0)-(a.at||0)).findIndex(p=>p.id===el.dataset.p);if(i>=(UI.skPn||10))UI.skPn=i+1;UI.skHi=el.dataset.p;renderMain();const r=$('#skpr_'+el.dataset.p);if(r)r.scrollIntoView({block:'center',behavior:'smooth'});setTimeout(()=>{UI.skHi='';const x=$('#skpr_'+el.dataset.p);if(x)x.classList.remove('hi');},2500);},
   'sk-qmin'(el){const i=$('#fSkL [name=min]');if(i)i.value=el.dataset.n;},
   'sk-tstart'(el){LS.set('sk_timer',JSON.stringify({id:el.dataset.id,t:Date.now()}));renderMain();},
   'sk-tstop'(el){const t=skTimer();try{localStorage.removeItem('sk_timer');}catch(e){}const m=t?Math.max(1,Math.ceil((Date.now()-t.t)/60000)):30;renderMain();skLogDlg(el.dataset.id,m);},
