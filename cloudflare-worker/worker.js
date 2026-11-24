@@ -300,6 +300,106 @@ async function linkinfo(request, env, u) {
   } catch (e) { return out({ error: 'Não consegui ler a página: ' + (e && e.message || e) }, 502); }
 }
 
+// ----- Galeria e pastas: GET /gallery?url=… (pasta do Google Drive ou álbum do Google Fotos) com a senha do Pingado -----
+const GL_ENT = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
+const glDec = (s) => String(s == null ? '' : s).replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (m, c) => {
+  if (c[0] !== '#') return GL_ENT[c.toLowerCase()] !== undefined ? GL_ENT[c.toLowerCase()] : m;
+  const n = c[1] === 'x' || c[1] === 'X' ? parseInt(c.slice(2), 16) : parseInt(c.slice(1), 10);
+  return Number.isFinite(n) && n > 0 && n < 0x110000 ? String.fromCodePoint(n) : m;
+}).replace(/\s+/g, ' ').trim();
+const glType = (name, icon, folder) => {
+  if (folder) return 'folder';
+  const t = (String(icon || '') + ' ' + String(name || '')).toLowerCase();
+  if (/pdf/.test(t)) return 'pdf';
+  if (/image|\.(jpe?g|png|gif|webp|heic|heif|bmp|avif)\b/.test(t)) return 'image';
+  if (/video|\.(mp4|mov|m4v|webm|mkv|avi)\b/.test(t)) return 'video';
+  if (/google-apps\.(document|spreadsheet|presentation)|\.(docx?|xlsx?|pptx?)\b/.test(t)) return 'doc';
+  return 'file';
+};
+// pasta do Drive: a página "embeddedfolderview" lista os itens (nome, id, tipo) de uma pasta compartilhada
+function gdParse(html) {
+  html = String(html || '');
+  const title = glDec((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || '').replace(/ - (Google Drive|Google Drive)$/i, '');
+  const starts = [...html.matchAll(/id="entry-([\w-]{10,})"/g)].map((m) => ({ id: m[1], at: m.index }));
+  const items = [], folders = [], seen = new Set();
+  starts.forEach((s, i) => {
+    if (seen.has(s.id)) return; seen.add(s.id);
+    const blk = html.slice(s.at, i + 1 < starts.length ? starts[i + 1].at : s.at + 4000);
+    const href = glDec((blk.match(/href="([^"]*drive\.google\.com\/[^"]+)"/) || [])[1] || '');
+    const name = glDec((blk.match(/flip-entry-title[^>]*>([\s\S]*?)<\/div>/) || [])[1] || '').replace(/<[^>]+>/g, '').trim();
+    const icon = (blk.match(/<img[^>]+src="([^"]+)"/) || [])[1] || '';
+    const isF = /\/drive\/(?:u\/\d+\/)?folders\//.test(href) || /folder/i.test(icon);
+    if (!name) return;
+    if (isF) folders.push({ id: s.id, name: name, url: 'https://drive.google.com/drive/folders/' + s.id });
+    else {
+      const ty = glType(name, icon, false);
+      items.push({ id: s.id, name: name, type: ty, thumb: 'https://drive.google.com/thumbnail?id=' + s.id + '&sz=w480', full: ty === 'image' ? 'https://drive.google.com/thumbnail?id=' + s.id + '&sz=w1600' : '', preview: 'https://drive.google.com/file/d/' + s.id + '/preview', url: 'https://drive.google.com/file/d/' + s.id + '/view' });
+    }
+  });
+  if (!starts.length) { // plano B: procura só os links dos arquivos
+    [...html.matchAll(/href="https:\/\/drive\.google\.com\/(file\/d|drive\/folders)\/([\w-]{10,})[^"]*"[^>]*>([\s\S]{0,400}?)<\/a>/g)].forEach((m) => {
+      const id = m[2]; if (seen.has(id)) return; seen.add(id);
+      const name = glDec(m[3].replace(/<[^>]+>/g, ' '));
+      if (!name) return;
+      if (m[1] === 'drive/folders') folders.push({ id: id, name: name, url: 'https://drive.google.com/drive/folders/' + id });
+      else { const ty = glType(name, '', false); items.push({ id: id, name: name, type: ty, thumb: 'https://drive.google.com/thumbnail?id=' + id + '&sz=w480', full: ty === 'image' ? 'https://drive.google.com/thumbnail?id=' + id + '&sz=w1600' : '', preview: 'https://drive.google.com/file/d/' + id + '/preview', url: 'https://drive.google.com/file/d/' + id + '/view' }); }
+    });
+  }
+  const nat = (a, b) => a.name.localeCompare(b.name, 'pt-BR', { numeric: true, sensitivity: 'base' });
+  items.sort(nat); folders.sort(nat);
+  return { title: title, items: items, folders: folders };
+}
+// álbum do Google Fotos: o endereço de cada foto aparece no HTML da página compartilhada
+function gpParse(html) {
+  html = String(html || '');
+  const meta = (k) => glDec((html.match(new RegExp('<meta[^>]+(?:property|name)="' + k + '"[^>]+content="([^"]*)"', 'i')) || html.match(new RegExp('<meta[^>]+content="([^"]*)"[^>]+(?:property|name)="' + k + '"', 'i')) || [])[1] || '');
+  const title = meta('og:title') || glDec((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || '').replace(/ - Google Fotos$| - Google Photos$/i, '');
+  const seen = new Set(), items = [];
+  [...html.matchAll(/https:\/\/lh3\.googleusercontent\.com\/(pw|lr\/photo|d)\/([\w-]{30,})/g)].forEach((m) => {
+    const id = m[2]; if (seen.has(id)) return; seen.add(id);
+    const base = 'https://lh3.googleusercontent.com/' + m[1] + '/' + id;
+    items.push({ id: id, name: '', type: 'image', thumb: base + '=w480', full: base + '=w2048', preview: '', url: base + '=w2048' });
+  });
+  const cover = (meta('og:image') || '').replace(/=[wsh]\d.*$/, '');
+  // a capa do álbum costuma repetir a primeira foto: tira a duplicata
+  const ci = cover ? items.findIndex((x) => cover.indexOf(x.id) >= 0) : -1;
+  return { title: title.replace(/^[^\wÀ-ɏ]+/, ''), items: items.slice(0, 300), folders: [], cover: ci >= 0 ? '' : cover, coverIdx: ci };
+}
+const GL_BAD_HOST = /^(localhost|.*\.local|.*\.internal)$|^\d{1,3}(\.\d{1,3}){3}$|^\[|^0x/i;
+async function gallery(request, env, u) {
+  const origins = String(env.ALLOWED_ORIGINS || '').split(',').map((x) => x.trim().replace(/\/$/, '')).filter(Boolean);
+  const origin = request.headers.get('Origin') || '';
+  const okOrigin = !origins.length || origins.includes(origin);
+  const cors = { 'Access-Control-Allow-Origin': okOrigin && origin ? origin : (origins[0] || 'null'), 'Access-Control-Allow-Headers': 'Content-Type, X-Pingado-Token', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Vary': 'Origin', 'Content-Type': 'application/json' };
+  const out = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: cors });
+  if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
+  if (!env.PINGADO_TOKEN) return out({ error: 'O Worker ainda não tem o segredo PINGADO_TOKEN.' }, 503);
+  if (!okOrigin) return out({ error: 'Origem não permitida.' }, 403);
+  if (request.headers.get('X-Pingado-Token') !== env.PINGADO_TOKEN) return out({ error: 'Token do Pingado inválido.' }, 401);
+  let t; try { t = new URL(u.searchParams.get('url') || ''); } catch (e) { return out({ error: 'Endereço inválido.' }, 400); }
+  const host = t.hostname.replace(/^www\./, '');
+  if (!/^https?:$/.test(t.protocol) || GL_BAD_HOST.test(t.hostname)) return out({ error: 'Endereço não permitido.' }, 400);
+  const hdr = { 'User-Agent': 'Mozilla/5.0 (compatible; RotinaGaleria/1.0)', 'Accept-Language': 'pt-BR,pt;q=0.9,en;q=0.7', 'Accept': 'text/html', 'Cookie': 'CONSENT=YES+1' };
+  try {
+    if (host === 'drive.google.com') {
+      const id = (t.pathname.match(/\/folders\/([\w-]{10,})/) || [])[1] || t.searchParams.get('id') || '';
+      if (!/^[\w-]{10,}$/.test(id)) return out({ error: 'Este link não é de uma pasta do Drive.' }, 400);
+      const r = await fetch('https://drive.google.com/embeddedfolderview?id=' + id, { headers: hdr, redirect: 'follow' });
+      if (!r.ok) return out({ error: 'O Drive não abriu a pasta (erro ' + r.status + '). Ela precisa estar compartilhada com “qualquer pessoa com o link”.' }, 502);
+      const g = gdParse((await r.text()).slice(0, 1500000));
+      if (!g.items.length && !g.folders.length) return out({ error: 'Não encontrei arquivos nesta pasta. Confira se ela está compartilhada com “qualquer pessoa com o link”.' }, 404);
+      return out({ kind: 'drive', id: id, url: 'https://drive.google.com/drive/folders/' + id, title: g.title, items: g.items.slice(0, 400), folders: g.folders.slice(0, 100) });
+    }
+    if (host === 'photos.app.goo.gl' || host === 'photos.google.com' || host === 'goo.gl') {
+      const r = await fetch(t, { headers: hdr, redirect: 'follow' });
+      const g = gpParse((await r.text()).slice(0, 2500000));
+      if (!g.items.length) return out({ error: 'Não consegui ler as fotos deste álbum. Ele precisa estar compartilhado por link.' }, 404);
+      return out({ kind: 'photos', url: r.url || t.href, title: g.title, items: g.items, folders: [], cover: g.cover });
+    }
+    return out({ error: 'Cole um link de pasta do Google Drive ou de álbum do Google Fotos.' }, 400);
+  } catch (e) { return out({ error: 'Não consegui ler o link: ' + (e && e.message || e) }, 502); }
+}
+
 export default {
   async scheduled(event, env, ctx) { ctx.waitUntil(run(env).then((l) => console.log(l.join('\n') || 'Nada a enviar.'))); },
   async fetch(request, env) {
@@ -320,6 +420,8 @@ export default {
     }
     // dados de um link (preço, duração, autores…) para preencher formulários do site
     if (u.pathname === '/linkinfo') return linkinfo(request, env, u);
+    // fotos de um álbum do Google Fotos ou arquivos de uma pasta do Drive (galeria, livros)
+    if (u.pathname === '/gallery') return gallery(request, env, u);
     // Pingado (assistente Gemini): a chave fica só aqui, nos segredos do Worker
     if (u.pathname.startsWith('/pingado/')) return pingado(request, env, u);
     return new Response(env.VAPID_PRIVATE ? 'Rotina de Estudos · avisos ativos (verifica a cada 5 minutos).' : 'Falta configurar o segredo VAPID_PRIVATE.', { headers: { 'content-type': 'text/plain; charset=utf-8' } }); },

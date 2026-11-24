@@ -2894,6 +2894,25 @@ html[data-contrast="high"] :focus-visible{outline-width:3px}
 .dskp{position:absolute;top:8px;left:8px}.gtile.sel,.lrow.sel,.dcard.sel{outline:2px solid var(--accf);outline-offset:-2px;background:var(--accs)}
 .dcard .dh .dsk{margin-right:8px}
 .qbar{display:flex;height:8px;border-radius:99px;overflow:hidden;background:var(--line2);margin:0 0 4px}.qbar i{display:block;height:100%}
+.crsind{padding-left:14px}.crsmod.sub{color:var(--tx);margin:8px 0 0 12px;padding:8px 10px;border-radius:12px;background:var(--soft)}.crsmod.sub h4{margin:0;font-size:14px}
+.crspl{flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;padding:0 0 4px 52px}.crsmod .crspl{padding-left:34px}
+.crspp{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;background:var(--card);padding:3px 10px;font:inherit;font-size:12.5px;color:var(--tx);cursor:pointer}.crspp:hover{border-color:var(--pbd);background:var(--pbg);color:var(--pfg)}.crspp.done{color:var(--mut);text-decoration:line-through}
+.partrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr) 70px auto;gap:6px;margin-bottom:6px;align-items:center}@media(max-width:600px){.partrow{grid-template-columns:1fr auto}.partrow input[name=pu]{grid-column:1/-1;grid-row:2}}
+.crsfr.gal{background:var(--card);height:auto;min-height:220px;max-height:78vh;overflow:auto;padding:0}.galone{display:block;max-width:100%;margin:0 auto}
+.galhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;border-bottom:1px solid var(--line)}
+.galgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;padding:10px}
+.galth{position:relative;aspect-ratio:1/1;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--soft);padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:inherit;color:var(--mut)}
+.galth img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.galth:hover{border-color:var(--pbd)}
+.galth .galic{position:relative;display:inline-flex}.galth img+.galic{opacity:0}
+.galth .galn{position:absolute;left:0;right:0;bottom:0;padding:4px 6px;font-size:11.5px;line-height:1.25;background:rgba(255,255,255,.88);color:#25283D;text-align:left;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.galth.fol .galn{position:static;background:none;color:var(--tx);text-align:center;padding:0 6px;font-size:12.5px}
+.skalb{margin-bottom:12px}.galfr{width:100%;height:min(70vh,640px);border:0;display:block}.galerr{padding:10px 12px}
+.gallb .galstage{display:flex;justify-content:center;align-items:center;min-height:50vh;max-height:72vh;overflow:auto;background:var(--soft);border-radius:12px}
+.galbig{max-width:100%;max-height:72vh;display:block}.galpv{width:100%;height:70vh;border:0}
+.bkhead{display:flex;gap:14px;align-items:flex-start;margin:0 0 12px;padding:14px}.bkcover{width:84px;height:112px;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:var(--soft);flex:none}
+.bkman{margin:10px 0}.bkman summary{cursor:pointer;color:var(--mut);font-size:13px}.bksec{margin-bottom:6px}
+.bkrow{display:flex;align-items:center;gap:8px;padding:3px 0}.bkrow .bkt{flex:1;min-width:0}.bkrow small{width:34px;text-align:right}
+.docread .crsfr.tall{height:min(72vh,820px)}
 /* ===== Revisões: cartões compactos ===== */
 .rvhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:2px 0 10px}
 .rvring{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--tx);background:conic-gradient(var(--acc) calc(var(--p)*1%),var(--line2) 0);position:relative}
@@ -5255,7 +5274,7 @@ function docRow(d){
   const col=catColor(d.catId),ext=docExt(d),pend=docPending(d),fp=dfolderPath(d.folderId).join(' › ');
   return '<div class="lrow '+(UI.dsel&&UI.dsel[d.id]?'sel':'')+'" style="--c:'+col+'" data-a="'+docAct(d)+'" data-id="'+d.id+'" role="'+(UI.dsel?'checkbox':'button')+'"'+(UI.dsel?' aria-checked="'+!!UI.dsel[d.id]+'"':'')+' tabindex="0" title="'+esc(d.title)+'"><span class="lic">'+(UI.dsel?dselCk(d):fileIcon(ext,22))+'</span><span class="lt">'+esc(d.title)+'</span>'+
     '<span class="lmeta">'+docStatusPill(d)+(d.catId?tagHTML(d.catId):'')+(fp?'<span class="lpath">'+ic('folder',12)+esc(fp)+'</span>':'')+(pend?'<span class="lpend" title="'+pend+' ação(ões) pendente(s)">'+pend+' a fazer</span>':'')+'</span>'+
-    '<span class="lact">'+(d.link?linkHTML(d.link,'Abrir'):'')+'<button class="icon-btn sm" data-a="doc-move" data-id="'+d.id+'" title="Mover para uma pasta" aria-label="Mover para uma pasta">'+ic('folder',14)+'</button><button class="icon-btn sm" data-a="edit-doc" data-id="'+d.id+'" title="Editar" aria-label="Editar">'+ic('edit',14)+'</button></span></div>';
+    '<span class="lact">'+(d.link?linkHTML(d.link,'Abrir'):'')+docReadBtn(d)+'<button class="icon-btn sm" data-a="doc-move"data-id="'+d.id+'" title="Mover para uma pasta" aria-label="Mover para uma pasta">'+ic('folder',14)+'</button><button class="icon-btn sm" data-a="edit-doc" data-id="'+d.id+'" title="Editar" aria-label="Editar">'+ic('edit',14)+'</button></span></div>';
 }
 /* ----- aparência das pastas: ícone e cor pastel (estilo MedWay), à escolha ou seguindo um eixo (categoria) ----- */
 const FOLDER_ICONS=['folder','book','heart','pulse','steth','lungs','thyroid','uterus','pregnant','pill','clinic','microscope','flask','cap','star','users','home','briefcase','sun','dumbbell','cards','note','file','target'];
@@ -5470,6 +5489,7 @@ function docSetStatus(d,st){
 }
 const dselCk=d=>'<span class="dsk '+((UI.dsel||{})[d.id]?'on':'')+'" aria-hidden="true">'+((UI.dsel||{})[d.id]?ic('check',12):'')+'</span>';
 const docAct=d=>UI.dsel?'dsel-pick':'view-doc';
+const docReadBtn=(d,sz)=>{const k=crsEmbed(d.link).k;return (k==='drive'||k==='gdoc'||k==='pdf')?'<button class="icon-btn sm" data-a="doc-read" data-id="'+d.id+'" title="Ler aqui, sem sair do site" aria-label="Ler aqui">'+ic('book',sz||14)+'</button>':'';};
 function dselIds(){return Object.keys(UI.dsel||{}).filter(id=>UI.dsel[id]&&docById(id));}
 function dselBar(){
   const n=dselIds().length,off=n?'':' disabled';
@@ -5479,7 +5499,7 @@ function dselBar(){
 function docTile(d,showPath){
   const col=catColor(d.catId),ext=docExt(d),pend=docPending(d),fp=showPath?dfolderPath(d.folderId).join(' › '):'';
   return '<div class="gtile '+(UI.dsel&&UI.dsel[d.id]?'sel':'')+'" style="--c:'+col+'" data-a="'+docAct(d)+'" data-id="'+d.id+'" role="'+(UI.dsel?'checkbox':'button')+'"'+(UI.dsel?' aria-checked="'+!!UI.dsel[d.id]+'"':'')+' tabindex="0" title="'+esc(d.title)+'">'+(UI.dsel?'<span class="dskp">'+dselCk(d)+'</span>':'')+
-    '<span class="gtact"><button class="icon-btn sm" data-a="doc-move" data-id="'+d.id+'" title="Mover para uma pasta" aria-label="Mover para uma pasta">'+ic('folder',14)+'</button><button class="icon-btn sm" data-a="edit-doc" data-id="'+d.id+'" title="Editar" aria-label="Editar">'+ic('edit',14)+'</button></span>'+
+    '<span class="gtact">'+docReadBtn(d)+'<button class="icon-btn sm" data-a="doc-move" data-id="'+d.id+'"title="Mover para uma pasta" aria-label="Mover para uma pasta">'+ic('folder',14)+'</button><button class="icon-btn sm" data-a="edit-doc" data-id="'+d.id+'" title="Editar" aria-label="Editar">'+ic('edit',14)+'</button></span>'+
     (pend?'<span class="gbadge" title="'+pend+' pendente(s)">'+pend+'</span>':'')+
     '<span class="gic">'+fileIcon(ext,58)+(docThumb(d)?'<img class="gthumb" src="'+esc(docThumb(d))+'" alt="" loading="lazy" onerror="this.remove()">':'')+'</span><span class="gtt">'+esc(d.title)+'</span>'+
     '<span class="gmeta">'+fxTag(ext)+docStatusPill(d)+(d.link?linkHTML(d.link,'Abrir'):'')+'</span>'+(fp?'<span class="gpath">'+esc(fp)+'</span>':'')+'</div>';
@@ -5487,7 +5507,7 @@ function docTile(d,showPath){
 function docCard(d){
   const col=catColor(d.catId),gs=S.goals.filter(g=>d.goalIds.includes(g.id)),acts=S.acts.filter(a=>a.docIds.includes(d.id)),tasks=S.tasks.filter(t=>t.docId===d.id&&!t.done),ext=docExt(d),fp=dfolderPath(d.folderId).join(' › ');
   return '<article class="card dcard '+(UI.dsel&&UI.dsel[d.id]?'sel':'')+'" style="--c:'+col+'"'+(UI.dsel?' data-a="dsel-pick" data-id="'+d.id+'" role="checkbox" aria-checked="'+!!UI.dsel[d.id]+'" tabindex="0"':'')+'><div class="dh">'+(UI.dsel?dselCk(d):'')+(tagHTML(d.catId)||'<span class="muted small">Sem categoria</span>')+
-    '<span><button class="icon-btn sm" data-a="doc-move" data-id="'+d.id+'" title="Mover para uma pasta" aria-label="Mover para uma pasta">'+ic('folder',15)+'</button><button class="icon-btn sm" data-a="edit-doc" data-id="'+d.id+'" title="Editar" aria-label="Editar">'+ic('edit',15)+'</button><button class="icon-btn sm" data-a="del-doc" data-id="'+d.id+'" title="Excluir" aria-label="Excluir">'+ic('trash',15)+'</button></span></div>'+
+    '<span>'+docReadBtn(d,15)+'<button class="icon-btn sm" data-a="doc-move" data-id="'+d.id+'" title="Mover para uma pasta" aria-label="Mover para uma pasta">'+ic('folder',15)+'</button><button class="icon-btn sm" data-a="edit-doc" data-id="'+d.id+'" title="Editar" aria-label="Editar">'+ic('edit',15)+'</button><button class="icon-btn sm" data-a="del-doc" data-id="'+d.id+'" title="Excluir" aria-label="Excluir">'+ic('trash',15)+'</button></span></div>'+
     '<h3 class="dtt">'+fileIcon(ext,30)+'<span>'+esc(d.title)+'</span></h3>'+docStatusLine(d)+docStatusBtns(d)+
     (d.todo.length?'<div class="dtodo">'+d.todo.map(x=>'<button class="pill '+(x.done?'ok':'')+'" data-a="toggle-dtodo" data-id="'+d.id+'" data-tid="'+x.id+'">'+ic('check',12)+esc(x.label)+'</button>').join('')+'</div>':'<div class="muted small">Sem ações pendentes.</div>')+
     '<div class="tmeta">'+focoChips(d)+fxTag(ext)+(d.link?linkHTML(d.link,'Abrir documento'):'')+(fp?'<span class="mi">'+ic('folder',13)+esc(fp)+'</span>':'')+savedLinksHTML(d.linkIds)+gs.map(g=>'<span class="mi">'+ic('target',13)+esc(g.title)+'</span>').join('')+
@@ -5504,6 +5524,7 @@ function renderDocs(){
   const inF=d=>UI.df==='__none'?docNoFolder(d):fl?(cur?d.folderId===cur.id:docNoFolder(d)):(ids?ids.indexOf(d.folderId)>=0:true);
   const all=S.docs.filter(d=>passDoc(d)&&inF(d)),pend=all.filter(d=>docPending(d)>0),ok=all.filter(d=>docPending(d)===0);
   const list0=UI.docTab==='todo'?pend:UI.docTab==='ok'?ok:all,list=UI.dstat?list0.filter(d=>d.status===UI.dstat):list0;
+  if(cur&&(cur.book||ids&&ids.some(i=>bkOf(i))))list.sort((a,b)=>(a.bookOrder||0)-(b.bookOrder||0));
   const crumbs=cur?'<nav class="crumbs" aria-label="Caminho da pasta"><button class="crumb" data-a="df-folder" data-id="">Todos</button>'+dfolderChain(cur.id).map(f=>'<span class="sep">›</span><button class="crumb '+(f.id===cur.id?'on':'')+'" data-a="df-folder" data-id="'+f.id+'">'+esc(f.name)+'</button>').join('')+
     '<button class="btn sm ghost" data-a="df-sub" data-id="'+cur.id+'">'+ic('folderPlus',14)+' Nova subpasta aqui</button></nav>':'';
   const subs=UI.df==='__none'?[]:S.dfolders.filter(f=>(f.parentId||'')===(cur?cur.id:'')).sort(byName);
@@ -5518,8 +5539,8 @@ function renderDocs(){
     '<button class="btn sm ghost" data-a="df-new" style="margin-top:8px;width:100%;justify-content:center">'+ic('folderPlus',15)+' Nova pasta</button></aside>';
   const main='<div class="toolbar">'+docSubSeg('docs')+'<div class="seg">'+[['todo','A fazer ('+pend.length+')'],['ok','Em dia ('+ok.length+')'],['all','Todos']].map(v=>'<button class="'+(UI.docTab===v[0]?'on':'')+'" data-a="set" data-k="docTab" data-v="'+v[0]+'">'+v[1]+'</button>').join('')+'</div>'+
     '<span class="sp"></span>'+flatBtn('docs')+treeBtn('docs')+'<div class="seg vseg" aria-label="Modo de exibição">'+[['grade','Grade'],['cartoes','Cartões'],['lista','Lista']].map(v=>'<button class="'+(dv===v[0]?'on':'')+'" data-a="dview" data-v="'+v[0]+'" title="'+v[1]+'">'+v[1]+'</button>').join('')+'</div>'+
-    '<button class="btn '+(UI.dsel?'on':'')+'" data-a="dsel-toggle" aria-pressed="'+!!UI.dsel+'">'+ic('check',14)+' Selecionar</button><button class="btn primary" data-a="new-doc">'+ic('plus',15)+' Novo documento</button></div>'+(UI.dsel?dselBar():'')+
-    sumWrap('docs',modeCards([['','Todos',S.docs.length,'layers','Todos os documentos']].concat(DST.map(x=>[x[0],x[1],S.docs.filter(d=>d.status===x[0]).length,{iniciar:'play',andamento:'clock',finalizado:'check'}[x[0]]||'file',{iniciar:'Ainda não comecei',andamento:'Em produção',finalizado:'Prontos'}[x[0]]||''])),UI.dstat||'','set','dstat'))+tplBarHTML()+crumbs+subRow+
+    '<button class="btn" data-a="book-new" title="Um livro dividido em vários PDFs de uma pasta do Drive">'+ic('book',14)+' Adicionar livro</button><button class="btn '+(UI.dsel?'on':'')+'" data-a="dsel-toggle" aria-pressed="'+!!UI.dsel+'">'+ic('check',14)+' Selecionar</button><button class="btn primary" data-a="new-doc">'+ic('plus',15)+' Novo documento</button></div>'+(UI.dsel?dselBar():'')+
+    sumWrap('docs',modeCards([['','Todos',S.docs.length,'layers','Todos os documentos']].concat(DST.map(x=>[x[0],x[1],S.docs.filter(d=>d.status===x[0]).length,{iniciar:'play',andamento:'clock',finalizado:'check'}[x[0]]||'file',{iniciar:'Ainda não comecei',andamento:'Em produção',finalizado:'Prontos'}[x[0]]||''])),UI.dstat||'','set','dstat'))+tplBarHTML()+crumbs+(cur&&cur.book?bkHeaderHTML(cur):'')+subRow+
     (list.length?(dv==='grade'?'<div class="gtiles'+(UI.dsel?' dselmode':'')+'">'+list.map(d=>docTile(d,showPath)).join('')+'</div>':dv==='lista'?'<div class="llist'+(UI.dsel?' dselmode':'')+'">'+list.map(docRow).join('')+'</div>':'<div class="dgrid'+(UI.dsel?' dselmode':'')+'">'+list.map(docCard).join('')+'</div>'):'<div class="empty">'+(cur?'Nenhum documento nesta pasta.':'Nenhum documento aqui.')+'<br><button class="btn primary" data-a="new-doc">'+ic('plus',15)+' Adicionar documento</button></div>');
   return '<div class="nlay'+(UI.ftoff.docs?' nofo':'')+'">'+tree+'<section>'+main+'</section></div>';
 }
@@ -8226,7 +8247,7 @@ function gsBuild(){
   S.tasks.forEach(t=>P('task',t.id,'Tarefas','tasks',t.title,[t.notes,t.obs,t.where,t.link].join(' '),t.done?'concluída':(tDue(t)?fmtDM(tDue(t)):'')));
   (S.wishes||[]).forEach(x=>P('wish',x.id,'Desejos','gift',x.title,[x.note,x.store,x.url].join(' '),''));
   (S.arts||[]).forEach(a=>P('art',a.id,'Artigos','flask',a.title,[a.authors,a.journal,a.year,a.question,a.topics.join(' '),a.conclusion,a.results,a.notes,a.doi,a.intro.concat(a.disc).map(i=>i.author+' '+i.point).join(' ')].join(' '),a.journal||''));
-  crsList().forEach(c=>{P('curso',c.id,'Aulas','pastaMenos',c.title,c.desc,'Curso');crsLessons(c).forEach(x=>P('aula',c.id+'|'+x.m.id+'|'+x.l.id,'Aulas','play',x.l.t,x.l.url,c.title));});
+  crsList().forEach(c=>{P('curso',c.id,'Aulas','pastaMenos',c.title,c.desc,'Curso');crsLessons(c).forEach(x=>P('aula',c.id+'|'+x.m.id+'|'+x.l.id,'Aulas','play',x.l.t,[x.l.url].concat(x.l.parts.map(q=>q.t+' '+q.url)).join(' '),c.title));});
   (S.skills||[]).forEach(x=>P('skill',x.id,'Habilidades','hand',x.name,[x.why,x.miles.map(m=>m.t).join(' '),x.projs.map(p=>p.t+' '+p.note).join(' '),x.practices.map(p=>p.note).join(' '),x.res.map(r=>r.t).join(' ')].join(' '),skCat(x.cat)[1]));
   (S.lazer||[]).forEach(x=>P('lazer',x.id,'Lazer','film',x.title,[x.note,x.review,x.link,lzType(x.type).label,x.scope].join(' '),''));
   S.docs.forEach(d=>P('doc',d.id,'Documentos','file',d.title,[d.notes,d.link,d.source,d.srcLink,dstLabel(d.status),gsFlat(d.todo,SK).join(' ')].join(' '),dfolderPath(d.folderId).join(' › ')));
@@ -16850,7 +16871,7 @@ const skIcon=s=>s.icon||skGuess(s.name)||skCat(s.cat)[2];
 const skImg=id=>{const x=(S.skimg||[]).find(i=>i.id===id);return x?x.src:'';};
 function normSk(o){
   const d=Object.assign({name:'',icon:'',cat:'outra',color:'',status:'pratica',level:1,target:3,why:'',weekMin:0,fav:false,focoId:'',created:Date.now(),updated:Date.now()},o||{});
-  ['practices','miles','projs','lessons','mats','res','photos','noteIds','actIds','taskIds','docIds','goalIds','focoIds','lvHist'].forEach(k=>{if(!Array.isArray(d[k]))d[k]=[];});
+  ['practices','miles','projs','lessons','mats','res','photos','albums','noteIds','actIds','taskIds','docIds','goalIds','focoIds','lvHist'].forEach(k=>{if(!Array.isArray(d[k]))d[k]=[];});
   d.projs=d.projs.map(p=>{const q=Object.assign({id:uid(),t:'',st:'plano',note:'',link:'',due:'',doneAt:0,steps:[],noteIds:[],actId:''},p||{});if(!Array.isArray(q.steps))q.steps=[];if(!Array.isArray(q.noteIds))q.noteIds=[];return q;});
   d.lessons=d.lessons.map(l=>Object.assign({id:uid(),t:'',mod:'',st:'aprender',noteIds:[],link:'',min:30,actId:'',doneAt:0},l||{}));
   d.level=Math.max(1,Math.min(5,Math.round(Number(d.level))||1));d.target=Math.max(1,Math.min(5,Math.round(Number(d.target))||3));
@@ -17008,8 +17029,8 @@ function skDetail(s){
     skLinkedAuto(s)+(refs.length?Object.keys(grp).map(g=>'<div class="skgrp"><span class="muted small">'+g+'</span><div class="artchips">'+grp[g].map(r=>'<span class="skref">'+(r.r?'<button data-a="sk-ref" data-r="'+esc(r.r)+'">'+ic(r.ic,13)+' '+esc(r.t)+'</button>':'<span>'+ic(r.ic,13)+' '+esc(r.t)+'</span>')+'<button class="x" data-a="sk-unlink" data-id="'+s.id+'" data-k="'+r.k+'" data-i="'+r.id+'" aria-label="Desvincular">×</button></span>').join('')+'</div></div>').join(''):'')+
     '');
   h+=skCrsBox(s);
-  h+=skBox('gal','Galeria de progresso',s.photos.length||null,'<button class="btn sm" data-a="sk-photo" data-id="'+s.id+'">'+ic('plus',14)+' Adicionar foto</button>',
-    s.photos.length?'<div class="artgrid">'+s.photos.slice().sort((a,b)=>a.date<b.date?1:-1).map(p=>{const src=skImg(p.id);return '<figure class="artfig"><button class="artimg" data-a="sk-zoom" data-p="'+p.id+'" aria-label="Ampliar">'+(src?'<img alt="" src="'+src+'" loading="lazy">':'<span class="muted small">imagem indisponível</span>')+'</button><figcaption><b>'+fmtDM(p.date)+'</b><div>'+esc(p.cap||'')+'</div><div class="artitact"><button class="icon-btn" data-a="sk-photo" data-id="'+s.id+'" data-p="'+p.id+'" aria-label="Editar">'+ic('edit',16)+'</button><button class="icon-btn" data-a="sk-phdel" data-id="'+s.id+'" data-p="'+p.id+'" aria-label="Excluir">'+ic('trash',16)+'</button></div></figcaption></figure>';}).join('')+'</div>':'');
+  h+=skBox('gal','Galeria de progresso',(s.photos.length+s.albums.length)||null,'<button class="btn sm" data-a="sk-album" data-id="'+s.id+'" title="Cole o link de um álbum do Google Fotos ou de uma pasta do Drive">'+ic('link',14)+' Colar álbum</button><button class="btn sm" data-a="sk-photo" data-id="'+s.id+'">'+ic('plus',14)+' Adicionar foto</button>',
+    s.albums.map(a=>'<div class="skalb"><div class="arth"><b>'+esc(a.t||'Álbum')+'</b><span class="sp"></span><button class="icon-btn sm" data-a="sk-albdel" data-id="'+s.id+'" data-p="'+a.id+'" aria-label="Tirar o álbum">'+ic('trash',14)+'</button></div><div class="crsfr gal">'+galBoxHTML(a.url)+'</div></div>').join('')+(s.photos.length?'<div class="artgrid">'+s.photos.slice().sort((a,b)=>a.date<b.date?1:-1).map(p=>{const src=skImg(p.id);return '<figure class="artfig"><button class="artimg" data-a="sk-zoom" data-p="'+p.id+'" aria-label="Ampliar">'+(src?'<img alt="" src="'+src+'" loading="lazy">':'<span class="muted small">imagem indisponível</span>')+'</button><figcaption><b>'+fmtDM(p.date)+'</b><div>'+esc(p.cap||'')+'</div><div class="artitact"><button class="icon-btn" data-a="sk-photo" data-id="'+s.id+'" data-p="'+p.id+'" aria-label="Editar">'+ic('edit',16)+'</button><button class="icon-btn" data-a="sk-phdel" data-id="'+s.id+'" data-p="'+p.id+'" aria-label="Excluir">'+ic('trash',16)+'</button></div></figcaption></figure>';}).join('')+'</div>':''));
   return h;
 }
 /* ----- formulários ----- */
@@ -17200,6 +17221,10 @@ Object.assign(ACT,{
   'sk-sched'(el){const s=skById(el.dataset.id);if(!s)return;skSchedule(s,'Praticar: '+s.name,s.weekMin?Math.min(120,Math.max(20,Math.round(s.weekMin/3/5)*5)):45);},
   'sk-photo'(el){skPhotoDlg(el.dataset.id,el.dataset.p||'');},
   'sk-phdel'(el){const s=skById(el.dataset.id);if(!s)return;askConfirm('Excluir a foto?','Ela será removida da galeria.',()=>{s.photos=s.photos.filter(z=>z.id!==el.dataset.p);S.skimg=(S.skimg||[]).filter(z=>z.id!==el.dataset.p);save();closeModal();renderMain();},'Excluir');},
+  'sk-album'(el){const s=skById(el.dataset.id);if(!s)return;
+    openModal('<form id="fAlb" class="form"><div class="fh"><h2>Colar álbum de fotos</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><p class="muted small" style="margin:0">Envie as fotos ao Google Fotos ou ao Drive, compartilhe por link e cole aqui. Elas abrem dentro do site.</p><label class="f">Link do álbum ou da pasta<input name="url" required placeholder="https://photos.app.goo.gl/… ou https://drive.google.com/drive/folders/…" autocomplete="off"></label><label class="f">Nome <small class="muted">(opcional)</small><input name="t" autocomplete="off"></label><div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Adicionar</button></div></form>');
+    $('#fAlb').addEventListener('submit',e=>{e.preventDefault();const E=e.target.elements,u=normUrl(E.url.value.trim());if(!galKind(u)){toast('Cole um link de álbum do Google Fotos ou de pasta do Drive.');return;}s.albums.push({id:uid(),t:E.t.value.trim(),url:u});s.updated=Date.now();save();closeModal();renderMain();});},
+  'sk-albdel'(el){const s=skById(el.dataset.id);if(!s)return;s.albums=s.albums.filter(a=>a.id!==el.dataset.p);s.updated=Date.now();save();renderMain();},
   'sk-zoom'(el){const s=skImg(el.dataset.p);if(s)fxZoomImg(s);}
 });
 document.addEventListener('keydown',e=>{
@@ -17432,23 +17457,34 @@ Object.assign(ACT,{
 document.addEventListener('change',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.cad){const x=(S.cad||[]).find(z=>z.id===t.dataset.cad);if(x){x.text=t.value.trim();x.updated=Date.now();save();}}});
 
 /* ===== Aulas e cursos (dentro de Documentos): player no site, notas ao lado, sessões de estudo ===== */
-const CRS_KINDS=[['video','Vídeo'],['pdf','PDF'],['doc','Documento'],['link','Link']];
-const crsKindIc=k=>({video:'play',pdf:'file',doc:'note',link:'link'})[k]||'link';
-function normLesson(l){const o=Object.assign({id:uid(),t:'',url:'',kind:'video',min:0,done:false,doneAt:0,noteId:'',focoIds:[],skillIds:[],actId:''},l||{});if(!Array.isArray(o.focoIds))o.focoIds=[];if(!Array.isArray(o.skillIds))o.skillIds=[];return o;}
-function normMod(m){const o=Object.assign({id:uid(),t:'',focoIds:[],skillIds:[],lessons:[]},m||{});if(!Array.isArray(o.focoIds))o.focoIds=[];if(!Array.isArray(o.skillIds))o.skillIds=[];o.lessons=(Array.isArray(o.lessons)?o.lessons:[]).map(normLesson);return o;}
+const CRS_KINDS=[['video','Vídeo'],['pdf','PDF'],['doc','Documento'],['galeria','Galeria de fotos'],['link','Link']];
+const crsKindIc=k=>({video:'play',pdf:'file',doc:'note',galeria:'image',link:'link'})[k]||'link';
+function normPart(p){return Object.assign({id:uid(),t:'',url:'',kind:'video',min:0,done:false},p||{});}
+function normLesson(l){const o=Object.assign({id:uid(),t:'',url:'',kind:'video',min:0,done:false,doneAt:0,noteId:'',focoIds:[],skillIds:[],actId:'',parts:[]},l||{});if(!Array.isArray(o.focoIds))o.focoIds=[];if(!Array.isArray(o.skillIds))o.skillIds=[];o.parts=(Array.isArray(o.parts)?o.parts:[]).map(normPart);return o;}
+function normMod(m){const o=Object.assign({id:uid(),t:'',focoIds:[],skillIds:[],lessons:[],subs:[]},m||{});if(!Array.isArray(o.focoIds))o.focoIds=[];if(!Array.isArray(o.skillIds))o.skillIds=[];o.lessons=(Array.isArray(o.lessons)?o.lessons:[]).map(normLesson);o.subs=(Array.isArray(o.subs)?o.subs:[]).map(normMod);return o;}
 function normCrs(c){const o=Object.assign({id:uid(),title:'',desc:'',color:'',focoIds:[],skillIds:[],mods:[],created:Date.now(),updated:Date.now()},c||{});if(!Array.isArray(o.focoIds))o.focoIds=[];if(!Array.isArray(o.skillIds))o.skillIds=[];o.mods=(Array.isArray(o.mods)?o.mods:[]).map(normMod);return o;}
 function normSess(s){const o=Object.assign({id:uid(),title:'',items:[],created:Date.now()},s||{});o.items=(Array.isArray(o.items)?o.items:[]).map(i=>Object.assign({id:uid(),t:'',url:'',kind:'link',ref:'',noteId:'',done:false,focoIds:[]},i));return o;}
-const crsLoose=()=>({id:'__avulsas',title:'Aulas avulsas',desc:'',color:'',focoIds:[],skillIds:[],loose:true,mods:[{id:'__m',t:'',focoIds:[],skillIds:[],lessons:(S.aulas=S.aulas||[])}]});
+const crsLoose=()=>({id:'__avulsas',title:'Aulas avulsas',desc:'',color:'',focoIds:[],skillIds:[],loose:true,mods:[{id:'__m',t:'',focoIds:[],skillIds:[],subs:[],lessons:(S.aulas=S.aulas||[])}]});
 const crsById=id=>id==='__avulsas'?crsLoose():(S.courses||[]).find(c=>c.id===id);
 const crsList=()=>(S.courses||[]).concat((S.aulas||[]).length?[crsLoose()]:[]);
 const sessById=id=>(S.sessions||[]).find(s=>s.id===id);
-const crsLessons=c=>c.mods.reduce((a,m)=>a.concat(m.lessons.map(l=>({c:c,m:m,l:l}))),[]);
+function crsMods(c){const out=[];const w=(ms,d,ch)=>(ms||[]).forEach(m=>{const cc=ch.concat(m);out.push({m:m,d:d,chain:cc,parent:ch.length?ch[ch.length-1]:null});w(m.subs,d+1,cc);});w(c.mods,0,[]);return out;}
+const crsFindM=(c,mid)=>crsMods(c).find(z=>z.m.id===mid)||null;
+const crsModLessons=m=>(m.lessons||[]).concat((m.subs||[]).reduce((a,x)=>a.concat(crsModLessons(x)),[]));
+function crsLessons(c){const out=[];const w=ms=>(ms||[]).forEach(m=>{m.lessons.forEach(l=>out.push({c:c,m:m,l:l}));w(m.subs);});w(c.mods);return out;}
+function crsSteps(c){const o=[];crsLessons(c).forEach(x=>{if(x.l.parts.length)x.l.parts.forEach(p=>o.push({m:x.m,l:x.l,p:p}));else o.push({m:x.m,l:x.l,p:null});});return o;}
+const crsMin=l=>l.parts&&l.parts.length?l.parts.reduce((a,p)=>a+(Number(p.min)||0),0):(Number(l.min)||0);
+const crsPartT=(l,p)=>p.t||'Parte '+(l.parts.indexOf(p)+1);
+const crsLDone=l=>l.parts&&l.parts.length?l.parts.every(p=>p.done):!!l.done;
 const crsProg=c=>{const L=crsLessons(c);return {done:L.filter(x=>x.l.done).length,tot:L.length};};
-function crsFindL(cid,mid,lid){const c=crsById(cid);if(!c)return null;const m=c.mods.find(x=>x.id===mid),l=m&&m.lessons.find(x=>x.id===lid);return l?{c:c,m:m,l:l}:null;}
-const crsFocos=(c,m,l)=>[...new Set([].concat((c&&c.focoIds)||[],(m&&m.focoIds)||[],(l&&l.focoIds)||[]))];
+function crsFindL(cid,mid,lid){const c=crsById(cid);if(!c)return null;const x=crsFindM(c,mid),l=x&&x.m.lessons.find(z=>z.id===lid);return l?{c:c,m:x.m,l:l}:null;}
+const crsUni=(c,m,l,k)=>{const s=[].concat(c[k]||[]);if(m){const x=crsFindM(c,m.id);(x?x.chain:[m]).forEach(z=>s.push.apply(s,z[k]||[]));}s.push.apply(s,(l&&l[k])||[]);return [...new Set(s)];};
+const crsFocos=(c,m,l)=>crsUni(c,m,l,'focoIds');
+const crsSkills=(c,m,l)=>crsUni(c,m,l,'skillIds');
 const crsAttr=(c,m,l)=>'data-c="'+c+'" data-m="'+m+'" data-l="'+l+'"';
 function crsGuessKind(url,title){
   const u=String(url||''),t=String(title||'');
+  if(galKind(u))return 'galeria';
   if(/docs\.google\.com\/(document|spreadsheets|presentation|forms)/.test(u))return 'doc';
   if(/youtube\.com|youtu\.be|vimeo\.com/.test(u))return 'video';
   if(/\.pdf(\?|#|$)/i.test(u)||/\.pdf\s*$/i.test(t))return 'pdf';
@@ -17459,7 +17495,7 @@ function crsGuessKind(url,title){
 function crsEmbed(url){
   const u=String(url||'').trim();if(!u)return {k:'none',src:''};let m;
   if((m=u.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=\w+&)?id=)([\w-]{10,})/)))return {k:'drive',src:'https://drive.google.com/file/d/'+m[1]+'/preview'};
-  if((m=u.match(/drive\.google\.com\/drive\/folders\/([\w-]+)/)))return {k:'folder',src:'https://drive.google.com/embeddedfolderview?id='+m[1]+'#list'};
+  if((m=u.match(/drive\.google\.com\/drive\/(?:u\/\d+\/)?folders\/([\w-]+)/)))return {k:'folder',src:'https://drive.google.com/embeddedfolderview?id='+m[1]+'#list'};
   if((m=u.match(/docs\.google\.com\/(document|spreadsheets|presentation|forms)\/d\/([\w-]+)/)))return {k:'gdoc',src:'https://docs.google.com/'+m[1]+'/d/'+m[2]+(m[1]==='presentation'?'/embed?start=false&loop=false':m[1]==='forms'?'/viewform?embedded=true':'/preview')};
   if((m=u.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([\w-]{11})/)))return {k:'yt',src:'https://www.youtube.com/embed/'+m[1]};
   if((m=u.match(/vimeo\.com\/(\d+)/)))return {k:'vimeo',src:'https://player.vimeo.com/video/'+m[1]};
@@ -17468,14 +17504,158 @@ function crsEmbed(url){
   return {k:'ext',src:u};
 }
 const docSubSeg=cur=>'<div class="seg" aria-label="Seção de Documentos"><button class="'+(cur==='docs'?'on':'')+'" data-a="doc-sub" data-v="docs">Documentos</button><button class="'+(cur==='aulas'?'on':'')+'" data-a="doc-sub" data-v="aulas">Aulas</button></div>';
+/* ===== Livros: um livro dividido em vários PDFs de uma mesma pasta do Drive ===== */
+const bkClean=n=>String(n||'').replace(/\.(pdf|docx?|pptx?|xlsx?|epub)$/i,'').replace(/_+/g,' ').replace(/\s+/g,' ').trim();
+const bkDriveId=u=>{const m=String(u||'').match(/\/file\/d\/([\w-]{10,})|[?&]id=([\w-]{10,})/);return m?(m[1]||m[2]):'';};
+const bkOf=id=>S.dfolders.find(f=>f.id===id&&f.book);
+const bkChapters=b=>S.docs.filter(d=>d.bookId===b.id).sort((x,y)=>(x.bookOrder||0)-(y.bookOrder||0));
+function bkDoc(it,b,folderId,order){return {id:uid(),title:bkClean(it.name)||'Capítulo',catId:'',link:it.url,notes:'',todo:[],goalIds:[],linkIds:[],noteIds:[],folderId:folderId,ext:it.type==='pdf'?'pdf':'',status:'iniciar',source:b.name,srcLink:b.book.url||b.name,starnote:false,driveId:it.id||bkDriveId(it.url),driveMod:0,bookId:b.id,bookOrder:order};}
+function bkManual(txt){return String(txt||'').split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{const sp=splitLink(l);if(!sp.link)return null;return {id:bkDriveId(sp.link),name:sp.t||liHost(sp.link),type:/\.(pdf)(\?|#|$)/i.test(sp.link)||/pdf/i.test(sp.t)||/drive\.google\.com\/file\/d\//.test(sp.link)?'pdf':'file',url:sp.link,thumb:'',preview:''};}).filter(Boolean);}
+// lê a pasta do Drive e as subpastas de primeiro nível (seções do livro)
+function bkRead(url,cb){
+  galLoad(url,c=>{
+    if(c.st!=='ok'){cb(null,c.err);return;}
+    const d=c.d,subs=(d.folders||[]).slice(0,12);let n=subs.length;const sec=[{name:'',url:url,items:d.items}];
+    if(!n){cb({title:d.title,url:d.url||url,secs:sec});return;}
+    const got=[];subs.forEach((f,i)=>galLoad(f.url,cc=>{got[i]={name:f.name,url:f.url,items:cc.st==='ok'?cc.d.items:[]};if(--n===0){got.forEach(g=>{if(g.items.length)sec.push(g);});cb({title:d.title,url:d.url||url,secs:sec});}}));
+  });
+}
+function bookDlg(parentId){
+  UI.bk={parent:parentId||'',data:null};
+  openModal('<form id="fBook" class="form"><div class="fh"><h2>Adicionar livro</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
+    '<p class="muted small" style="margin:0">Um livro dividido em vários PDFs: cole o link da pasta do Drive e o site lê o nome e os arquivos sozinho. Cada PDF vira um documento dentro de uma pasta do livro.</p>'+
+    '<div class="f"><span>Link da pasta do Drive</span><div class="frow" style="flex-wrap:nowrap"><input id="bkUrl" placeholder="https://drive.google.com/drive/folders/…" autocomplete="off" style="flex:1"><button type="button" class="btn" data-a="bk-read">Ler pasta</button></div></div>'+
+    '<div id="bkBody"></div>'+
+    '<details id="bkMan" class="bkman"><summary>Colar os links dos PDFs à mão</summary><label class="f"><textarea id="bkTxt" rows="5" placeholder="Capítulo 1 https://drive.google.com/file/d/…&#10;Capítulo 2 https://drive.google.com/file/d/…"></textarea></label><button type="button" class="btn sm" data-a="bk-manual">Usar estes links</button></details>'+
+    '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary" id="bkGo" disabled>Criar livro</button></div></form>',true);
+  $('#fBook').addEventListener('submit',e=>{e.preventDefault();bkCreate();});
+  $('#fBook').addEventListener('input',bkSync);$('#fBook').addEventListener('change',bkSync);
+  setTimeout(()=>{const i=$('#bkUrl');if(i)i.focus();},40);
+}
+function bkPreview(d){
+  UI.bk.data=d;
+  const multi=d.secs.length>1;
+  $('#bkBody').innerHTML='<label class="f">Nome do livro<input id="bkName" required value="'+esc(bkClean(d.title)||'Livro')+'" autocomplete="off"></label>'+
+    '<label class="f">Guardar em<select id="bkPar">'+dfolderOptions(UI.bk.parent)+'</select></label>'+
+    d.secs.map((sc,si)=>'<div class="bksec" data-si="'+si+'">'+(multi?'<div class="frow" style="margin:8px 0 2px"><label class="chip cb"><input type="checkbox" data-bkall="'+si+'" checked><span>'+esc(sc.name||'Capítulos')+'</span></label><span class="muted small">'+sc.items.length+'</span></div>':'<div class="muted small" style="margin:8px 0 2px">'+sc.items.length+' arquivo(s) <button type="button" class="btn sm ghost" data-a="bk-all" data-v="1">Marcar todos</button><button type="button" class="btn sm ghost" data-a="bk-all" data-v="0">Desmarcar</button></div>')+
+      sc.items.map((it,ii)=>'<label class="bkrow"><input type="checkbox" data-bk="'+si+'|'+ii+'" '+(['pdf','doc','file'].indexOf(it.type)>=0?'checked':'')+'><input class="bkt" data-bkt="'+si+'|'+ii+'" value="'+esc(bkClean(it.name))+'" aria-label="Título"><small class="muted">'+esc(it.type)+'</small></label>').join('')+'</div>').join('');
+  bkSync();
+}
+function bkSync(){
+  const f=$('#fBook');if(!f||!UI.bk)return;
+  $$('[data-bkall]',f).forEach(a=>{if(a._t)return;});
+  const n=$$('[data-bk]:checked',f).length,b=$('#bkGo');if(b){b.disabled=!UI.bk.data||!n;b.textContent='Criar livro'+(n?' ('+n+' capítulo'+(n===1?'':'s')+')':'');}
+}
+function bkCreate(){
+  const bk=UI.bk,d=bk&&bk.data;if(!d)return;const f=$('#fBook'),name=($('#bkName').value||'').trim()||'Livro',par=$('#bkPar').value;
+  const pick=[];d.secs.forEach((sc,si)=>sc.items.forEach((it,ii)=>{const c=$('[data-bk="'+si+'|'+ii+'"]',f);if(c&&c.checked){const t=($('[data-bkt="'+si+'|'+ii+'"]',f).value||'').trim();pick.push({si:si,it:Object.assign({},it,{name:t||it.name})});}}));
+  if(!pick.length){toast('Marque ao menos um arquivo.');return;}
+  const b={id:uid(),name:name,parentId:par,icon:'book',color:'#C7D2FE',book:{url:d.url,at:Date.now()}};S.dfolders.push(b);
+  const fold={};let ord=0;
+  pick.forEach(x=>{
+    const sc=d.secs[x.si];let fid=b.id;
+    if(sc.name){if(!fold[x.si]){const sf={id:uid(),name:sc.name,parentId:b.id,icon:'book',color:'#C7D2FE'};S.dfolders.push(sf);fold[x.si]=sf.id;}fid=fold[x.si];}
+    S.docs.push(bkDoc(x.it,b,fid,ord++));
+  });
+  save();UI.df=b.id;UI.docSub='docs';UI.dsel=null;closeModal();renderMain();toast('Livro criado com '+pick.length+' capítulo(s).');
+}
+function bkSync2(b,cb){ // acrescenta os PDFs novos da pasta do Drive ao livro
+  const u=b.book.url;delete (UI.gal||{})[u];
+  bkRead(u,(d,err)=>{
+    if(!d){cb(0,err);return;}
+    const have=new Set(S.docs.filter(x=>x.bookId===b.id).map(x=>x.driveId)),all=bkChapters(b);let ord=all.length?Math.max.apply(null,all.map(x=>x.bookOrder||0))+1:0,n=0;
+    d.secs.forEach(sc=>{
+      let fid=b.id;
+      if(sc.name){let sf=S.dfolders.find(x=>x.parentId===b.id&&x.name===sc.name);if(!sf&&sc.items.some(it=>!have.has(it.id))){sf={id:uid(),name:sc.name,parentId:b.id,icon:'book',color:'#C7D2FE'};S.dfolders.push(sf);}fid=sf?sf.id:b.id;}
+      sc.items.forEach(it=>{if(have.has(it.id)||['pdf','doc','file'].indexOf(it.type)<0)return;S.docs.push(bkDoc(it,b,fid,ord++));have.add(it.id);n++;});
+    });
+    if(n){b.book.at=Date.now();save();}cb(n);
+  });
+}
+function bkHeaderHTML(b){
+  const ch=bkChapters(b),dn=ch.filter(x=>x.status==='finalizado').length,first=ch.find(x=>x.status!=='finalizado')||ch[0],cv=ch[0]&&ch[0].driveId;
+  return '<div class="card bkhead">'+(cv?'<img class="bkcover" alt="" src="https://drive.google.com/thumbnail?id='+esc(cv)+'&sz=w240" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">':'')+
+    '<div style="flex:1;min-width:0"><div class="muted small">Livro</div><h3 style="margin:0">'+esc(b.name)+'</h3><div class="muted small">'+ch.length+' capítulo'+(ch.length===1?'':'s')+(ch.length?' | '+dn+' finalizado'+(dn===1?'':'s'):'')+'</div>'+(ch.length?'<div class="skbar" style="margin:6px 0"><i style="width:'+Math.round(dn/ch.length*100)+'%"></i></div>':'')+
+    '<div class="frow">'+(first?'<button class="btn sm primary" data-a="doc-read" data-id="'+first.id+'">'+ic('book',14)+' '+(dn?'Continuar a leitura':'Começar a ler')+'</button>':'')+'<button class="btn sm" data-a="bk-sync" data-id="'+b.id+'">'+ic('repeat',14)+' Atualizar capítulos do Drive</button>'+(b.book.url?'<a class="btn sm ghost" href="'+esc(normUrl(b.book.url))+'" target="_blank" rel="noopener">'+ic('external',14)+' Pasta no Drive</a>':'')+'</div></div></div>';
+}
+function docReadDlg(id){
+  const d=docById(id);if(!d)return;const e=crsEmbed(d.link),b=d.bookId?bkOf(d.bookId):null,sib=b?bkChapters(b):[d],i=sib.indexOf(d),pv=sib[i-1],nx=sib[i+1];
+  const body=e.k==='none'?'<div class="crsfr crsmsg"><p class="muted">Este documento não tem link.</p></div>':(e.k==='ext'?'<div class="crsfr crsmsg"><p class="muted">Este endereço não abre dentro do site.</p></div>':'<div class="crsfr tall"><iframe src="'+esc(e.src)+'" title="'+esc(d.title)+'" allow="autoplay; fullscreen" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>');
+  openModal('<div class="form docread"><div class="fh"><div style="min-width:0"><div class="muted small">'+(b?esc(b.name)+' | capítulo '+(i+1)+' de '+sib.length:'Documento')+'</div><h2 style="margin:0;font-size:16px">'+esc(d.title)+'</h2></div><span class="sp"></span><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div>'+body+
+    '<div class="ff"><button class="btn sm" data-a="doc-read" data-id="'+(pv?pv.id:'')+'" '+(pv?'':'disabled')+'>'+ic('chevL',14)+' Anterior</button><span class="sp"></span>'+(d.link?'<a class="btn sm ghost" href="'+esc(normUrl(d.link))+'" target="_blank" rel="noopener">'+ic('external',14)+' Outra aba</a>':'')+
+    '<button class="btn sm '+(d.status==='finalizado'?'':'primary')+'" data-a="doc-read-st" data-id="'+d.id+'">'+ic('check',14)+' '+(d.status==='finalizado'?'Finalizado':'Marcar como finalizado')+'</button><span class="sp"></span><button class="btn sm" data-a="doc-read" data-id="'+(nx?nx.id:'')+'" '+(nx?'':'disabled')+'>Próximo '+ic('chevR',14)+'</button></div></div>',true);
+}
+Object.assign(ACT,{
+  'book-new'(){bookDlg(UI.df&&UI.df!=='__none'&&dfolderById(UI.df)?UI.df:'');},
+  'bk-read'(){const u=normUrl(($('#bkUrl')||{}).value||'');if(galKind(u)!=='drive'){toast('Cole o link de uma pasta do Google Drive.');return;}
+    $('#bkBody').innerHTML='<div class="muted small" style="padding:8px 0">Lendo a pasta…</div>';
+    delete (UI.gal||{})[u];bkRead(u,(d,err)=>{if(!$('#fBook'))return;if(!d){$('#bkBody').innerHTML='<div class="warn">'+esc(err||'Não consegui ler a pasta.')+'</div>';const m=$('#bkMan');if(m)m.open=true;return;}bkPreview(d);});},
+  'bk-manual'(){const it=bkManual(($('#bkTxt')||{}).value);if(!it.length){toast('Cole ao menos um link, um por linha.');return;}bkPreview({title:'Livro',url:'',secs:[{name:'',url:'',items:it}]});},
+  'bk-all'(el){$$('#fBook [data-bk]').forEach(c=>{c.checked=el.dataset.v==='1';});bkSync();},
+  'bk-sync'(el){const b=bkOf(el.dataset.id);if(!b)return;toast('Procurando capítulos novos…');bkSync2(b,(n,err)=>{if(err){toast(err);return;}renderMain();toast(n?n+' capítulo(s) novo(s) adicionado(s).':'Nenhum capítulo novo.');});},
+  'doc-read'(el){if(el.dataset.id)docReadDlg(el.dataset.id);},
+  'doc-read-st'(el){const d=docById(el.dataset.id);if(!d)return;d.status=d.status==='finalizado'?'andamento':'finalizado';save();renderMain();docReadDlg(d.id);}
+});
+/* ----- galeria: álbum do Google Fotos ou pasta do Drive, aberta dentro do site ----- */
+function galKind(u){u=String(u||'');if(/photos\.app\.goo\.gl|photos\.google\.com\/(?:u\/\d+\/)?(?:share|album)/.test(u))return 'photos';if(/drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?folders\/|folderview)/.test(u))return 'drive';return '';}
+const galFolderId=u=>{const m=String(u||'').match(/\/folders\/([\w-]{10,})|[?&]id=([\w-]{10,})/);return m?(m[1]||m[2]):'';};
+function galLoad(url,cb){
+  const C=UI.gal=UI.gal||{},c=C[url];
+  if(c&&c.st==='ok'){cb(c);return;}
+  if(c&&c.st==='load'){c.w.push(cb);return;}
+  if(c&&c.st==='err'&&Date.now()-c.t<15000){cb(c);return;}
+  const api=pgApi(),tok=pgTok();
+  if(!api||!tok){C[url]={st:'err',t:Date.now(),nw:true,err:'Para listar as fotos configure o Worker em Ajustes > Pingado (endereço e senha).'};cb(C[url]);return;}
+  const e=C[url]={st:'load',w:[cb]};
+  fetch(api+'/gallery?url='+encodeURIComponent(url),{headers:{'X-Pingado-Token':tok}}).then(async r=>{const j=await r.json().catch(()=>({}));if(r.ok&&j&&Array.isArray(j.items)){e.st='ok';e.d=j;}else{e.st='err';e.err=(j&&j.error)||('Erro '+r.status);}}).catch(()=>{e.st='err';e.err='Não consegui falar com o Worker.';}).then(()=>{e.t=Date.now();const w=e.w;e.w=[];w.forEach(f=>f(e));});
+}
+function galBoxHTML(url,opt){
+  setTimeout(galHydrate,0);
+  return '<div class="galbox" data-galurl="'+esc(url)+'" data-galroot="'+esc(url)+'"><div class="muted small" style="padding:10px">Carregando as fotos…</div></div>';
+}
+function galHydrate(){
+  $$('.galbox:not([data-done])').forEach(b=>{b.dataset.done='1';galLoad(b.dataset.galurl,c=>{if(b.isConnected)galFill(b,c);});});
+}
+const galIc=t=>({pdf:'file',video:'play',doc:'note',folder:'folder',image:'image'})[t]||'file';
+function galFill(box,c){
+  const url=box.dataset.galurl,root=box.dataset.galroot;
+  if(c.st!=='ok'){
+    const k=galKind(url),id=galFolderId(url);
+    box.innerHTML=(k==='drive'&&id?'<iframe class="galfr" src="https://drive.google.com/embeddedfolderview?id='+esc(id)+'#grid" title="Pasta do Drive" loading="lazy"></iframe>':'')+
+      '<div class="galerr muted small">'+esc(c.err||'Não consegui abrir.')+'</div><div class="frow" style="padding:0 10px 10px"><a class="btn sm" href="'+esc(normUrl(url))+'" target="_blank" rel="noopener">'+ic('external',14)+' Abrir '+(k==='photos'?'o álbum':'a pasta')+' em outra aba</a></div>';
+    return;
+  }
+  const d=c.d,st=((UI.galStack=UI.galStack||{})[root]||[]);
+  box.innerHTML='<div class="galhead">'+(st.length?'<button class="btn sm ghost" data-a="gal-back" data-r="'+esc(root)+'">'+ic('chevL',14)+' Voltar</button>':'')+'<b>'+esc(d.title||'Galeria')+'</b><span class="muted small">'+d.items.length+(d.items.length===1?' item':' itens')+'</span><span class="sp" style="flex:1"></span><a class="btn sm ghost" href="'+esc(normUrl(d.url||url))+'" target="_blank" rel="noopener">'+ic('external',14)+' '+(d.kind==='photos'?'Abrir no Google Fotos':'Abrir no Drive')+'</a></div>'+
+    '<div class="galgrid">'+(d.folders||[]).map(f=>'<button class="galth fol" data-a="gal-go" data-u="'+esc(f.url)+'" data-r="'+esc(root)+'" title="'+esc(f.name)+'"><span class="galic">'+ic('folder',26)+'</span><span class="galn">'+esc(f.name)+'</span></button>').join('')+
+    d.items.map((it,i)=>'<button class="galth" data-a="gal-open" data-u="'+esc(url)+'" data-i="'+i+'" title="'+esc(it.name||'Foto '+(i+1))+'">'+(it.thumb?'<img src="'+esc(it.thumb)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">':'')+'<span class="galic">'+ic(galIc(it.type),22)+'</span>'+(it.name?'<span class="galn">'+esc(it.name)+'</span>':'')+'</button>').join('')+'</div>';
+}
+function galLB(url,i){
+  const c=(UI.gal||{})[url],d=c&&c.d;if(!d)return;const n=d.items.length;i=((i%n)+n)%n;const it=d.items[i];UI.galLB={u:url,i:i};
+  const body=it.type==='image'?'<img class="galbig" alt="'+esc(it.name||'')+'" src="'+esc(it.full||it.thumb)+'" referrerpolicy="no-referrer">':'<iframe class="galpv" src="'+esc(it.preview||it.url)+'" title="'+esc(it.name)+'" allowfullscreen></iframe>';
+  openModal('<div class="form gallb"><div class="fh"><h2 style="font-size:15px">'+esc(it.name||d.title||'Foto')+' <small class="muted">'+(i+1)+'/'+n+'</small></h2><button type="button" class="icon-btn" data-a="close" aria-label="Fechar">'+ic('x')+'</button></div><div class="galstage">'+body+'</div>'+
+    '<div class="ff"><button class="btn sm" data-a="gal-nav" data-d="-1">'+ic('chevL',14)+' Anterior</button><span class="sp"></span><a class="btn sm ghost" href="'+esc(normUrl(it.url||it.full))+'" target="_blank" rel="noopener">'+ic('external',14)+' Abrir original</a><span class="sp"></span><button class="btn sm" data-a="gal-nav" data-d="1">Próxima '+ic('chevR',14)+'</button></div></div>',true);
+}
+document.addEventListener('keydown',e=>{if(!UI.galLB||!$('#sheet .gallb')||$('#modal').hidden)return;if(e.key==='ArrowRight'){e.preventDefault();galLB(UI.galLB.u,UI.galLB.i+1);}else if(e.key==='ArrowLeft'){e.preventDefault();galLB(UI.galLB.u,UI.galLB.i-1);}});
+Object.assign(ACT,{
+  'gal-open'(el){galLB(el.dataset.u,Number(el.dataset.i)||0);},
+  'gal-nav'(el){const l=UI.galLB;if(l)galLB(l.u,l.i+Number(el.dataset.d));},
+  'gal-go'(el){const r=el.dataset.r,box=$$('.galbox').find(b=>b.dataset.galroot===r);if(!box)return;const st=(UI.galStack=UI.galStack||{});(st[r]=st[r]||[]).push(box.dataset.galurl);box.dataset.galurl=el.dataset.u;box.innerHTML='<div class="muted small" style="padding:10px">Carregando…</div>';galLoad(el.dataset.u,c=>{if(box.isConnected)galFill(box,c);});},
+  'gal-back'(el){const r=el.dataset.r,box=$$('.galbox').find(b=>b.dataset.galroot===r),st=(UI.galStack||{})[r];if(!box||!st||!st.length)return;box.dataset.galurl=st.pop();galLoad(box.dataset.galurl,c=>{if(box.isConnected)galFill(box,c);});}
+});
 /* ----- início de Aulas ----- */
+function crsTreeMod(c,m,fold){
+  const mk=c.id+'|'+m.id,mo=!fold[mk],L=crsModLessons(m),dn=L.filter(l=>l.done).length;
+  return (m.t?'<div class="crsmh"><button class="crsfo" data-a="crs-fold" data-k="'+mk+'" aria-expanded="'+mo+'">'+ic(mo?'chevD':'chevR',13)+'<span>'+esc(m.t)+'</span></button><span class="muted small">'+dn+'/'+L.length+'</span></div>':'')+
+    ((mo||!m.t)?'<div class="crsind">'+m.lessons.map(l=>crsLessonRow(c,m,l,true)).join('')+(m.subs||[]).map(x=>crsTreeMod(c,x,fold)).join('')+'</div>':'');
+}
 function crsTreeHTML(){
   const fold=UI.crsFold||{};
   const cs=crsList();if(!cs.length)return '';
   return '<div class="crstree">'+cs.map(c=>{
     const pg=crsProg(c),op=!fold[c.id];
     return '<div class="crsc"><div class="crsch"><button class="crsfo" data-a="crs-fold" data-k="'+c.id+'" aria-expanded="'+op+'">'+ic(op?'chevD':'chevR',14)+'<b>'+esc(c.title)+'</b></button><span class="muted small">'+pg.done+'/'+pg.tot+'</span><span class="sp" style="flex:1"></span><button class="icon-btn sm" data-a="crs-open" data-id="'+c.id+'" title="Abrir o curso" aria-label="Abrir o curso">'+ic('external',14)+'</button></div>'+
-      (op?c.mods.map(m=>{const mk=c.id+'|'+m.id,mo=!fold[mk];return (m.t?'<div class="crsmh"><button class="crsfo" data-a="crs-fold" data-k="'+mk+'" aria-expanded="'+mo+'">'+ic(mo?'chevD':'chevR',13)+'<span>'+esc(m.t)+'</span></button><span class="muted small">'+m.lessons.filter(l=>l.done).length+'/'+m.lessons.length+'</span></div>':'')+((mo||!m.t)?m.lessons.map(l=>crsLessonRow(c,m,l,true)).join(''):'');}).join(''):'')+'</div>';}).join('')+'</div>';
+      (op?c.mods.map(m=>crsTreeMod(c,m,fold)).join(''):'')+'</div>';}).join('')+'</div>';
 }
 function renderAulas(){
   const A=UI.aul=UI.aul||{v:'home'};
@@ -17493,11 +17673,19 @@ function renderAulas(){
   return h;
 }
 function crsLessonRow(c,m,l,showC){
-  const ex=l.actId&&actById(l.actId),o=ex&&nextOccOf(ex),n=l.noteId&&noteById(l.noteId);
-  return '<div class="crsl '+(l.done?'done':'')+'"><button class="chk sm '+(l.done?'on':'')+'" data-a="les-done" '+crsAttr(c.id,m.id,l.id)+' aria-label="Marcar como assistida">'+ic('check',12)+'</button><span class="crsk">'+ic(crsKindIc(l.kind),15)+'</span>'+
-    '<span class="crst" data-a="les-play" '+crsAttr(c.id,m.id,l.id)+' role="button" tabindex="0">'+esc(l.t||'Sem título')+'</span>'+(showC&&c.id!=='__avulsas'&&UI.crsTree?'':'')+
-    (l.min?'<span class="muted small">'+skHM(l.min)+'</span>':'')+(o?'<span class="skchip2" title="Agendada">'+ic('calendar',12)+' '+fmtDM(o.date)+'</span>':'')+(n?'<span class="muted" title="Tem anotações">'+ic('note',13)+'</span>':'')+
-    '<span class="crsa"><button class="icon-btn sm" data-a="les-sched" '+crsAttr(c.id,m.id,l.id)+' title="Agendar" aria-label="Agendar">'+ic('calendar',14)+'</button><button class="icon-btn sm" data-a="les-rev" '+crsAttr(c.id,m.id,l.id)+' title="Colocar na revisão (D+1)" aria-label="Revisão">'+ic('repeat',14)+'</button><button class="icon-btn sm" data-a="les-edit" '+crsAttr(c.id,m.id,l.id)+' aria-label="Editar">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="les-del" '+crsAttr(c.id,m.id,l.id)+' aria-label="Excluir">'+ic('x',13)+'</button></span></div>';
+  const ex=l.actId&&actById(l.actId),o=ex&&nextOccOf(ex),n=l.noteId&&noteById(l.noteId),hp=l.parts.length,mn=crsMin(l),dn=crsLDone(l);
+  const A=crsAttr(c.id,m.id,l.id);
+  return '<div class="crsl '+(dn?'done':'')+'"><button class="chk sm '+(dn?'on':'')+'" data-a="les-done" '+A+' aria-label="Marcar como assistida">'+ic('check',12)+'</button><span class="crsk">'+ic(crsKindIc(hp?l.parts[0].kind:l.kind),15)+'</span>'+
+    '<span class="crst" data-a="les-play" '+A+' role="button" tabindex="0">'+esc(l.t||'Sem título')+'</span>'+
+    (hp?'<span class="muted small" title="Partes desta aula">'+l.parts.filter(p=>p.done).length+'/'+hp+' partes</span>':'')+(mn?'<span class="muted small">'+skHM(mn)+'</span>':'')+(o?'<span class="skchip2" title="Agendada">'+ic('calendar',12)+' '+fmtDM(o.date)+'</span>':'')+(n?'<span class="muted" title="Tem anotações">'+ic('note',13)+'</span>':'')+
+    '<span class="crsa"><button class="icon-btn sm" data-a="les-part-add" '+A+' title="Adicionar parte a esta aula" aria-label="Adicionar parte">'+ic('layers',14)+'</button><button class="icon-btn sm" data-a="les-sched" '+A+' title="Agendar" aria-label="Agendar">'+ic('calendar',14)+'</button><button class="icon-btn sm" data-a="les-rev" '+A+' title="Colocar na revisão (D+1)" aria-label="Revisão">'+ic('repeat',14)+'</button><button class="icon-btn sm" data-a="les-edit" '+A+' aria-label="Editar">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="les-del" '+A+' aria-label="Excluir">'+ic('x',13)+'</button></span>'+
+    (hp?'<div class="crspl">'+l.parts.map(p=>'<button class="crspp '+(p.done?'done':'')+'" data-a="les-play" '+A+' data-p="'+p.id+'">'+ic(p.done?'check':crsKindIc(p.kind),12)+' '+esc(crsPartT(l,p))+'</button>').join('')+'</div>':'')+'</div>';
+}
+function crsModHTML(c,m,d,fold){
+  const k=c.id+'|'+m.id,op=!fold[k],mf=(m.focoIds||[]).map(focoById).filter(Boolean),L=crsModLessons(m);
+  return '<section class="'+(d?'crsmod sub':'card sec crsmod')+'"><div class="arth"><button class="crsfo" data-a="crs-fold" data-k="'+k+'" aria-expanded="'+op+'">'+ic(op?'chevD':'chevR',15)+(d?'<h4>':'<h3>')+esc(m.t||'Aulas')+' <small class="muted">'+L.filter(l=>l.done).length+'/'+L.length+'</small>'+(d?'</h4>':'</h3>')+'</button><span class="sp"></span>'+
+    '<button class="btn sm" data-a="les-new" data-c="'+c.id+'" data-m="'+m.id+'">'+ic('plus',14)+' Aula</button><button class="btn sm" data-a="mod-new" data-c="'+c.id+'" data-p="'+m.id+'">'+ic('plus',14)+' Submódulo</button><button class="icon-btn sm" data-a="mod-edit" data-c="'+c.id+'" data-m="'+m.id+'" aria-label="Editar módulo">'+ic('edit',14)+'</button></div>'+
+    (op?(mf.length?'<div class="artchips" style="margin-bottom:4px">'+mf.map(f=>focoPill(f,true)).join('')+'</div>':'')+m.lessons.map(l=>crsLessonRow(c,m,l)).join('')+(m.subs||[]).map(x=>crsModHTML(c,x,d+1,fold)).join(''):'')+'</section>';
 }
 function crsCourseView(c){
   const pg=crsProg(c),fold=UI.crsFold||{},fo=(c.focoIds||[]).map(focoById).filter(Boolean),sk=(c.skillIds||[]).map(skById).filter(Boolean);
@@ -17506,27 +17694,29 @@ function crsCourseView(c){
     (pg.tot?'<div class="skbar big"><i style="width:'+Math.round(pg.done/pg.tot*100)+'%"></i></div><div class="muted small">'+pg.done+' de '+pg.tot+' aulas assistidas</div>':'')+
     ((fo.length||sk.length)?'<div class="artchips" style="margin-top:6px">'+fo.map(f=>focoPill(f)).join('')+sk.map(s=>'<span class="lzdot" style="--d:'+esc(skColor(s))+'"><i></i>'+esc(s.name)+'</span>').join('')+'</div>':'')+'</div>';
   if(!c.mods.length)return h+'<div class="empty">Sem módulos. <button class="btn" data-a="mod-new" data-c="'+c.id+'">Novo módulo</button> <button class="btn" data-a="crs-batch" data-id="'+c.id+'">Colar aulas</button></div>';
-  h+=c.mods.map(m=>{const k=c.id+'|'+m.id,op=!fold[k],mf=(m.focoIds||[]).map(focoById).filter(Boolean);
-    return '<section class="card sec crsmod"><div class="arth"><button class="crsfo" data-a="crs-fold" data-k="'+k+'" aria-expanded="'+op+'">'+ic(op?'chevD':'chevR',15)+'<h3>'+esc(m.t||'Aulas')+' <small class="muted">'+m.lessons.filter(l=>l.done).length+'/'+m.lessons.length+'</small></h3></button><span class="sp"></span>'+
-      '<button class="btn sm" data-a="les-new" data-c="'+c.id+'" data-m="'+m.id+'">'+ic('plus',14)+' Aula</button><button class="icon-btn sm" data-a="mod-edit" data-c="'+c.id+'" data-m="'+m.id+'" aria-label="Editar módulo">'+ic('edit',14)+'</button></div>'+
-      (op?(mf.length?'<div class="artchips" style="margin-bottom:4px">'+mf.map(f=>focoPill(f,true)).join('')+'</div>':'')+m.lessons.map(l=>crsLessonRow(c,m,l)).join(''):'')+'</section>';}).join('');
-  return h;
+  return h+c.mods.map(m=>crsModHTML(c,m,0,fold)).join('');
 }
 /* ----- player e anotações ----- */
+function crsTgOf(f,pid,extra){
+  const l=f.l,p=l.parts.length?(l.parts.find(x=>x.id===pid)||l.parts.find(x=>!x.done)||l.parts[0]):null;
+  return Object.assign({c:f.c,m:f.m,l:l,obj:l,part:p,ntitle:l.t,title:l.t+(p?' | '+crsPartT(l,p):''),url:p?p.url:l.url,kind:p?p.kind:l.kind,foc:crsFocos(f.c,f.m,l),ctx:f.c.title},extra||{});
+}
 function crsTarget(){
   const A=UI.aul||{};
-  if(A.v==='play'){const f=crsFindL(A.cid,A.mid,A.lid);return f?{c:f.c,m:f.m,l:f.l,obj:f.l,title:f.l.t,url:f.l.url,kind:f.l.kind,foc:crsFocos(f.c,f.m,f.l),ctx:f.c.title}:null;}
+  if(A.v==='play'){const f=crsFindL(A.cid,A.mid,A.lid);return f?crsTgOf(f,A.pid):null;}
   if(A.v==='session'){const s=sessById(A.sid),it=s&&s.items.find(x=>x.id===A.iid);if(!it)return null;
-    if(it.ref){const p=it.ref.split('|'),f=crsFindL(p[0],p[1],p[2]);if(f)return {c:f.c,m:f.m,l:f.l,obj:f.l,title:f.l.t,url:f.l.url,kind:f.l.kind,foc:crsFocos(f.c,f.m,f.l),ctx:f.c.title,sess:s,it:it};}
+    if(it.ref){const p=it.ref.split('|'),f=crsFindL(p[0],p[1],p[2]);if(f)return crsTgOf(f,A.pid,{sess:s,it:it});}
     return {obj:it,title:it.t,url:it.url,kind:it.kind,foc:it.focoIds||[],ctx:s.title,sess:s,it:it};}
   return null;
 }
 function crsNote(tg,create){
   let n=tg.obj.noteId&&noteById(tg.obj.noteId);
-  if(!n&&create){n=normNote({id:uid(),type:'nota',title:tg.title+(tg.ctx?' | '+tg.ctx:''),html:'',folderId:'',catId:'',cd:null,focoIds:tg.foc.slice(),created:Date.now(),updated:Date.now()});S.notes.push(n);tg.obj.noteId=n.id;save();}
+  if(!n&&create){n=normNote({id:uid(),type:'nota',title:(tg.ntitle||tg.title)+(tg.ctx?' | '+tg.ctx:''),html:'',folderId:'',catId:'',cd:null,focoIds:tg.foc.slice(),created:Date.now(),updated:Date.now()});S.notes.push(n);tg.obj.noteId=n.id;save();}
   return n;
 }
 function crsPlayerHTML(tg){
+  if(galKind(tg.url))return '<div class="crsfr gal">'+galBoxHTML(tg.url)+'</div>';
+  if(tg.kind==='galeria'&&/\.(png|jpe?g|gif|webp|avif)(\?|#|$)/i.test(tg.url||''))return '<div class="crsfr gal"><img class="galone" alt="'+esc(tg.title)+'" src="'+esc(normUrl(tg.url))+'" referrerpolicy="no-referrer"></div>';
   const e=crsEmbed(tg.url),k=tg.kind;
   if(e.k==='none')return '<div class="crsfr crsmsg"><p class="muted">Esta aula ainda não tem link. Edite para colar o link do Google Drive, YouTube ou site.</p></div>';
   if(e.k==='ext')return '<div class="crsfr crsmsg"><p class="muted">Este endereço não permite abrir dentro do site.</p><a class="btn primary" href="'+esc(normUrl(tg.url))+'" target="_blank" rel="noopener">Abrir em outra aba</a></div>';
@@ -17540,14 +17730,20 @@ function crsPlayBody(tg){
     '<button class="icon-btn sm" data-a="crs-fmt" data-f="bold" title="Negrito" aria-label="Negrito">'+ic('bold',14)+'</button><button class="icon-btn sm" data-a="crs-fmt" data-f="italic" title="Itálico" aria-label="Itálico">'+ic('italic',14)+'</button><button class="icon-btn sm" data-a="crs-fmt" data-f="insertUnorderedList" title="Lista" aria-label="Lista">'+ic('list',14)+'</button>'+(n?'<button class="icon-btn sm" data-a="crs-note-open" title="Abrir a nota completa" aria-label="Abrir a nota">'+ic('external',14)+'</button>':'')+'</div>'+
     '<div class="crsne ned" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Anotações da aula" data-ph="Escreva suas anotações aqui">'+(n?cleanHTML(n.html):'')+'</div></aside>':'')+'</div>';
 }
+function crsPartTabs(tg){
+  if(!tg||!tg.l||!tg.l.parts.length)return '';
+  const A=crsAttr(tg.c.id,tg.m.id,tg.l.id);
+  return '<div class="sesstabs" role="tablist" aria-label="Partes da aula">'+tg.l.parts.map(p=>'<span class="sesstab '+(p===tg.part?'on':'')+'" role="tab"><button data-a="les-part" data-p="'+p.id+'">'+ic(p.done?'check':crsKindIc(p.kind),13)+' '+esc(crsPartT(tg.l,p))+'</button></span>').join('')+'<button class="btn sm ghost" data-a="les-part-add" '+A+'>'+ic('plus',13)+' Parte</button></div>';
+}
 function crsPlayView(){
   const A=UI.aul,tg=crsTarget();if(!tg){UI.aul={v:'home'};return renderAulas();}
-  const L=crsLessons(tg.c),i=L.findIndex(x=>x.l.id===tg.l.id),prev=L[i-1],next=L[i+1],d=tg.l.done;
-  return '<div class="toolbar"><nav class="crumbs" style="margin:0"><button class="crumb" data-a="aul-home">Aulas</button>'+(tg.c.id!=='__avulsas'?'<span class="sep">›</span><button class="crumb" data-a="crs-open" data-id="'+tg.c.id+'">'+esc(tg.c.title)+'</button>':'')+(tg.m.t?'<span class="sep">›</span><span class="crumb">'+esc(tg.m.t)+'</span>':'')+'</nav><span class="sp"></span>'+
+  const St=crsSteps(tg.c),si=St.findIndex(x=>x.l.id===tg.l.id&&(!tg.part||x.p===tg.part)),prev=St[si-1],next=St[si+1],hp=!!tg.part,d=hp?tg.part.done:tg.l.done,AT=crsAttr(tg.c.id,tg.m.id,tg.l.id);
+  const chain=crsFindM(tg.c,tg.m.id);
+  return '<div class="toolbar"><nav class="crumbs" style="margin:0"><button class="crumb" data-a="aul-home">Aulas</button>'+(tg.c.id!=='__avulsas'?'<span class="sep">›</span><button class="crumb" data-a="crs-open" data-id="'+tg.c.id+'">'+esc(tg.c.title)+'</button>':'')+((chain?chain.chain:[tg.m]).filter(x=>x.t).map(x=>'<span class="sep">›</span><span class="crumb">'+esc(x.t)+'</span>').join(''))+'</nav><span class="sp"></span>'+
     '<button class="btn sm" data-a="les-go" data-d="-1" '+(prev?'':'disabled')+'>'+ic('chevL',14)+' Anterior</button><button class="btn sm" data-a="les-go" data-d="1" '+(next?'':'disabled')+'>Próxima '+ic('chevR',14)+'</button></div>'+
-    '<div class="crsttl"><h2 class="vt" style="margin:0">'+esc(tg.l.t)+'</h2><div class="artbar" style="margin:6px 0 10px"><button class="btn sm '+(d?'':'primary')+'" data-a="les-done" '+crsAttr(tg.c.id,tg.m.id,tg.l.id)+'>'+ic('check',14)+' '+(d?'Assistida':'Marcar como assistida')+'</button>'+
-    '<button class="btn sm" data-a="les-sched" '+crsAttr(tg.c.id,tg.m.id,tg.l.id)+'>'+ic('calendar',14)+' Agendar</button><button class="btn sm" data-a="les-rev" '+crsAttr(tg.c.id,tg.m.id,tg.l.id)+'>'+ic('repeat',14)+' Revisão</button>'+
-    '<button class="btn sm" data-a="les-edit" '+crsAttr(tg.c.id,tg.m.id,tg.l.id)+'>'+ic('link',14)+' Editar e vincular</button>'+(tg.url?'<a class="btn sm" href="'+esc(normUrl(tg.url))+'" target="_blank" rel="noopener">'+ic('external',14)+' Abrir em outra aba</a>':'')+
+    '<div class="crsttl"><h2 class="vt" style="margin:0">'+esc(tg.l.t)+'</h2>'+crsPartTabs(tg)+'<div class="artbar" style="margin:6px 0 10px"><button class="btn sm '+(d?'':'primary')+'" data-a="'+(hp?'les-pdone':'les-done')+'" '+AT+(hp?' data-p="'+tg.part.id+'"':'')+'>'+ic('check',14)+' '+(hp?(d?'Parte assistida':'Marcar parte como assistida'):(d?'Assistida':'Marcar como assistida'))+'</button>'+(hp?'<button class="btn sm" data-a="les-done" '+AT+'>'+ic('check',14)+' '+(tg.l.done?'Aula toda assistida':'Marcar aula toda')+'</button>':'')+
+    '<button class="btn sm" data-a="les-sched" '+AT+'>'+ic('calendar',14)+' Agendar</button><button class="btn sm" data-a="les-rev" '+AT+'>'+ic('repeat',14)+' Revisão</button>'+
+    '<button class="btn sm" data-a="les-edit" '+AT+'>'+ic('link',14)+' Editar e vincular</button>'+(tg.url?'<a class="btn sm" href="'+esc(normUrl(tg.url))+'" target="_blank" rel="noopener">'+ic('external',14)+' Abrir em outra aba</a>':'')+
     '<button class="btn sm ghost" data-a="crs-notes-toggle">'+(UI.crsNotes===false?'Mostrar anotações':'Ocultar anotações')+'</button></div></div>'+crsPlayBody(tg);
 }
 /* ----- sessões de estudo (abas temporárias com aulas de cursos diferentes) ----- */
@@ -17562,7 +17758,7 @@ function crsSessionView(s){
   let h='<div class="toolbar"><nav class="crumbs" style="margin:0"><button class="crumb" data-a="aul-home">Aulas</button><span class="sep">›</span><button class="crumb" data-a="sess-list">Sessões</button><span class="sep">›</span><button class="crumb on">'+esc(s.title)+'</button></nav><span class="sp"></span><button class="btn sm" data-a="sess-add" data-id="'+s.id+'">'+ic('plus',14)+' Adicionar</button><button class="btn sm ghost" data-a="sess-ren" data-id="'+s.id+'">Renomear</button><button class="btn sm danger" data-a="sess-end" data-id="'+s.id+'">Encerrar sessão</button></div>';
   h+='<div class="sesstabs" role="tablist">'+s.items.map(it=>{const ref=it.ref?crsFindL.apply(null,it.ref.split('|')):null,t=ref?ref.l.t:it.t;return '<span class="sesstab '+(it.id===A.iid?'on':'')+'" role="tab"><button data-a="sess-item" data-id="'+s.id+'" data-i="'+it.id+'">'+ic(crsKindIc(ref?ref.l.kind:it.kind),13)+' '+esc(pgClipS(t,34))+'</button><button class="x" data-a="sess-itemdel" data-id="'+s.id+'" data-i="'+it.id+'" aria-label="Tirar da sessão">×</button></span>';}).join('')+'</div>';
   if(!tg)return h+'<div class="empty">Sessão vazia.<br><button class="btn primary" data-a="sess-add" data-id="'+s.id+'">'+ic('plus',15)+' Adicionar aulas ou links</button></div>';
-  return h+'<div class="crsttl"><h2 class="vt" style="margin:0">'+esc(tg.title)+'</h2><div class="artbar" style="margin:6px 0 10px">'+(tg.url?'<a class="btn sm" href="'+esc(normUrl(tg.url))+'" target="_blank" rel="noopener">'+ic('external',14)+' Abrir em outra aba</a>':'')+'<button class="btn sm ghost" data-a="crs-notes-toggle">'+(UI.crsNotes===false?'Mostrar anotações':'Ocultar anotações')+'</button></div></div>'+crsPlayBody(tg);
+  return h+'<div class="crsttl"><h2 class="vt" style="margin:0">'+esc(tg.ntitle||tg.title)+'</h2>'+crsPartTabs(tg)+'<div class="artbar" style="margin:6px 0 10px">'+(tg.url?'<a class="btn sm" href="'+esc(normUrl(tg.url))+'" target="_blank" rel="noopener">'+ic('external',14)+' Abrir em outra aba</a>':'')+'<button class="btn sm ghost" data-a="crs-notes-toggle">'+(UI.crsNotes===false?'Mostrar anotações':'Ocultar anotações')+'</button></div></div>'+crsPlayBody(tg);
 }
 /* ----- diálogos ----- */
 const crsSkItems=()=>(S.skills||[]).map(s=>({id:s.id,label:s.name,sub:skCat(s.cat)[1]}));
@@ -17571,7 +17767,7 @@ function crsCourseDlg(cid){
   openModal('<form id="fCrs" class="form"><div class="fh"><h2>'+(x?'Editar curso':'Novo curso')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<label class="f">Curso<input name="title" required value="'+esc(p.title)+'" autocomplete="off"></label><label class="f">Descrição<input name="desc" value="'+esc(p.desc)+'" autocomplete="off"></label>'+swatchHTML('color',p.color,'#B8BCC8')+
     '<div class="f"><span>Focos</span>'+focoPickHTML('cfoco',p.focoIds)+'</div><div class="f"><span>Habilidades</span>'+pickerHTML('csk',crsSkItems(),p.skillIds,'Habilidades')+'</div>'+
-    (x?'':'<label class="f">Aulas <small>opcional: uma por linha; “# Módulo” cria módulos; cole o link no fim da linha</small><textarea name="batch" rows="5" placeholder="# Módulo 1&#10;Aula 1 https://drive.google.com/file/d/…&#10;Aula 2 (45 min) https://…"></textarea></label>')+
+    (x?'':'<label class="f">Aulas <small>opcional: uma por linha; “# Módulo” e “## Submódulo”; linha recuada vira parte da aula acima; cole o link no fim</small><textarea name="batch" rows="5" placeholder="# Módulo 1&#10;Aula 1 https://drive.google.com/file/d/…&#10;Aula 2 (45 min) https://…"></textarea></label>')+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>',true);
   $('#fCrs').addEventListener('submit',e=>{
     e.preventDefault();const f=e.target,E=f.elements,d={title:E.title.value.trim(),desc:E.desc.value.trim(),color:E.color.value||'',focoIds:pickedValues(f,'cfoco'),skillIds:pickedValues(f,'csk'),updated:Date.now()};if(!d.title)return;
@@ -17580,50 +17776,90 @@ function crsCourseDlg(cid){
   });
 }
 function crsParse(txt){
-  let mod='';const out=[];
-  String(txt||'').split('\n').map(l=>l.trim()).filter(Boolean).forEach(l=>{
-    if(l[0]==='#'){mod=l.replace(/^#+\s*/,'');return;}
+  let path=[];const out=[];
+  String(txt||'').split('\n').forEach(raw=>{
+    const l=raw.trim();if(!l)return;
+    const h=l.match(/^(#+)\s*(.*)$/);
+    if(h){const d=h[1].length;path=path.slice(0,d-1);while(path.length<d-1)path.push('');path[d-1]=h[2].trim();return;}
     const sp=splitLink(l.replace(/^[-*•]\s*/,'')),mm=sp.t.match(/\s*\((\d+)\s*(?:min|m)?\)\s*$/i),t=(mm?sp.t.slice(0,mm.index):sp.t).trim();
-    if(!t&&!sp.link)return;out.push({mod:mod,t:t||sp.link,url:sp.link,min:mm?Number(mm[1]):0});
+    if(!t&&!sp.link)return;
+    const it={t:t||sp.link,url:sp.link,min:mm?Number(mm[1]):0};
+    if(/^(\s{2,}|\t)/.test(raw)&&out.length&&out[out.length-1].path.join('|')===path.join('|')){out[out.length-1].parts.push(it);return;}
+    out.push({path:path.slice(),t:it.t,url:it.url,min:it.min,parts:[]});
   });
   return out;
 }
 function crsBatchApply(c,txt){
-  const items=crsParse(txt);items.forEach(x=>{
-    let m=c.mods.find(z=>z.t===x.mod)||(x.mod===''?c.mods.find(z=>!z.t):null);
-    if(!m){m=normMod({t:x.mod});c.mods.push(m);}
-    m.lessons.push(normLesson({t:x.t,url:x.url,kind:crsGuessKind(x.url,x.t),min:x.min}));
+  const items=crsParse(txt);
+  const get=(list,name)=>{let m=list.find(z=>(z.t||'')===name);if(!m){m=normMod({t:name});list.push(m);}return m;};
+  items.forEach(x=>{
+    let list=c.mods,m=null;
+    if(!x.path.length||x.path.every(n=>!n)){m=c.mods.find(z=>!z.t)||get(c.mods,'');}
+    else x.path.forEach(n=>{m=get(list,n);list=m.subs;});
+    const parts=x.parts.map(q=>normPart({t:q.t,url:q.url,min:q.min,kind:crsGuessKind(q.url,q.t)}));
+    if(parts.length&&x.url)parts.unshift(normPart({t:'Parte 1',url:x.url,min:x.min,kind:crsGuessKind(x.url,x.t)}));
+    m.lessons.push(normLesson({t:x.t,url:parts.length?'':x.url,kind:crsGuessKind(x.url||(x.parts[0]||{}).url,x.t),min:parts.length?0:x.min,parts:parts}));
   });
   return items.length;
 }
 function crsBatchDlg(cid){
   const c=crsById(cid);if(!c)return;
-  openModal('<form id="fCrsB" class="form"><div class="fh"><h2>Colar aulas em '+esc(c.title)+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><label class="f"><textarea name="txt" rows="10" placeholder="# Módulo&#10;Aula 1 https://drive.google.com/file/d/…&#10;Aula 2 (45 min) https://…"></textarea></label><div id="crsBP" class="muted small"></div><div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Adicionar</button></div></form>',true);
-  const f=$('#fCrsB');f.elements.txt.addEventListener('input',()=>{const p=crsParse(f.elements.txt.value);$('#crsBP').textContent=p.length?p.length+' aula(s) em '+new Set(p.map(x=>x.mod)).size+' módulo(s).':'';});
+  openModal('<form id="fCrsB" class="form"><div class="fh"><h2>Colar aulas em '+esc(c.title)+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><label class="f"><textarea name="txt" rows="10" placeholder="# Módulo&#10;## Submódulo&#10;Aula 1 https://drive.google.com/file/d/…&#10;  Parte 2 da aula 1 (recuada) https://…&#10;Aula 2 (45 min) https://…"></textarea></label><div id="crsBP" class="muted small"></div><div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Adicionar</button></div></form>',true);
+  const f=$('#fCrsB');f.elements.txt.addEventListener('input',()=>{const p=crsParse(f.elements.txt.value),np=p.reduce((a,x)=>a+x.parts.length,0);$('#crsBP').textContent=p.length?p.length+' aula(s) em '+new Set(p.map(x=>x.path.join(' › '))).size+' módulo(s)'+(np?', com '+np+' parte(s) extra':'')+'.':'';});
   f.addEventListener('submit',e=>{e.preventDefault();const n=crsBatchApply(c,f.elements.txt.value);if(!n){toast('Nada para adicionar.');return;}c.updated=Date.now();save();closeModal();renderMain();toast(n+' aula(s) adicionada(s).');});
 }
-function crsModDlg(cid,mid){
-  const c=crsById(cid);if(!c)return;const x=mid?c.mods.find(z=>z.id===mid):null,p=Object.assign({t:'',focoIds:[],skillIds:[]},x||{});
-  openModal('<form id="fMod" class="form"><div class="fh"><h2>'+(x?'Editar módulo':'Novo módulo')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><label class="f">Módulo<input name="t" required value="'+esc(p.t)+'" autocomplete="off"></label>'+
+function crsModOpts(c,sel,skipId){
+  const skip=new Set();if(skipId){const x=crsFindM(c,skipId);if(x){skip.add(skipId);const w=m=>(m.subs||[]).forEach(z=>{skip.add(z.id);w(z);});w(x.m);}}
+  return '<option value="">Módulo principal (sem pai)</option>'+crsMods(c).filter(z=>!skip.has(z.m.id)).map(z=>'<option value="'+z.m.id+'" '+(z.m.id===sel?'selected':'')+'>'+' '.repeat(z.d)+esc(z.m.t||'Aulas')+'</option>').join('');
+}
+function crsModDlg(cid,mid,parentId){
+  const c=crsById(cid);if(!c)return;const fx=mid?crsFindM(c,mid):null,x=fx&&fx.m,p=Object.assign({t:'',focoIds:[],skillIds:[]},x||{}),par=x?(fx.parent?fx.parent.id:''):(parentId||'');
+  openModal('<form id="fMod" class="form"><div class="fh"><h2>'+(x?'Editar módulo':par?'Novo submódulo':'Novo módulo')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><label class="f">Nome<input name="t" required value="'+esc(p.t)+'" autocomplete="off"></label>'+
+    '<label class="f">Dentro de<select name="par">'+crsModOpts(c,par,mid)+'</select></label>'+
     '<div class="f"><span>Focos</span>'+focoPickHTML('mfoco',p.focoIds)+'</div><div class="f"><span>Habilidades</span>'+pickerHTML('msk',crsSkItems(),p.skillIds,'Habilidades')+'</div>'+
     '<div class="ff">'+(x?'<button type="button" class="btn danger" data-a="mod-del" data-c="'+c.id+'" data-m="'+x.id+'">Excluir</button>':'')+'<span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
-  $('#fMod').addEventListener('submit',e=>{e.preventDefault();const f=e.target,d={t:f.elements.t.value.trim(),focoIds:pickedValues(f,'mfoco'),skillIds:pickedValues(f,'msk')};if(!d.t)return;if(x)Object.assign(x,d);else c.mods.push(normMod(d));c.updated=Date.now();save();closeModal();renderMain();});
+  $('#fMod').addEventListener('submit',e=>{
+    e.preventDefault();const f=e.target,d={t:f.elements.t.value.trim(),focoIds:pickedValues(f,'mfoco'),skillIds:pickedValues(f,'msk')},np=f.elements.par.value;if(!d.t)return;
+    const dest=np?(crsFindM(c,np)||{m:null}).m:null,list=dest?dest.subs:c.mods;
+    if(x){Object.assign(x,d);const cur=fx.parent?fx.parent.subs:c.mods;if(cur!==list){cur.splice(cur.indexOf(x),1);list.push(x);}}else list.push(normMod(d));
+    if(np){UI.crsFold=UI.crsFold||{};delete UI.crsFold[c.id+'|'+np];}
+    c.updated=Date.now();save();closeModal();renderMain();
+  });
 }
-function crsLessonDlg(cid,mid,lid){
-  const c=crsById(cid);if(!c)return;const f0=lid?crsFindL(cid,mid,lid):null,x=f0&&f0.l,p=Object.assign({t:'',url:'',kind:'video',min:'',focoIds:[],skillIds:[]},x||{});
+const crsPartRow=p=>'<div class="partrow" data-pid="'+esc(p.id||'')+'"><input name="pt" placeholder="Nome da parte" value="'+esc(p.t||'')+'" autocomplete="off"><input name="pu" placeholder="https://" value="'+esc(p.url||'')+'" autocomplete="off"><input name="pm" type="number" min="0" step="1" placeholder="min" value="'+(p.min||'')+'" aria-label="Minutos da parte"><button type="button" class="icon-btn sm" data-a="part-del" aria-label="Tirar a parte">'+ic('x',13)+'</button></div>';
+function crsLessonDlg(cid,mid,lid,opt){
+  opt=opt||{};
+  const c=crsById(cid);if(!c)return;const f0=lid?crsFindL(cid,mid,lid):null,x=f0&&f0.l,p=Object.assign({t:'',url:'',kind:'video',min:'',focoIds:[],skillIds:[],parts:[]},x||{});
+  const others=[];if(x)crsLessons(c).forEach(z=>{if(z.l!==x)others.push({id:z.m.id+'|'+z.l.id,label:z.l.t,sub:z.m.t||'Aulas'});});
   openModal('<form id="fLes" class="form"><div class="fh"><h2>'+(x?'Editar aula':'Nova aula')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
-    '<label class="f">Aula<input name="t" required value="'+esc(p.t)+'" autocomplete="off"></label>'+
-    '<div class="f"><span>Link (Google Drive, YouTube, documento…)</span><div class="frow" style="flex-wrap:nowrap"><input name="url" value="'+esc(p.url)+'" placeholder="https://" autocomplete="off" style="flex:1"><button type="button" class="btn sm" data-a="les-title">Puxar título</button></div></div>'+
+    '<label class="f">Aula ou tema<input name="t" required value="'+esc(p.t)+'" autocomplete="off"></label>'+
+    '<div class="f"><span>Link (Google Drive, Google Fotos, YouTube, documento…)</span><div class="frow" style="flex-wrap:nowrap"><input name="url" value="'+esc(p.url)+'" placeholder="https://" autocomplete="off" style="flex:1"><button type="button" class="btn sm" data-a="les-title">Puxar título</button></div></div>'+
     '<div class="fgrid"><label class="f">Tipo<select name="kind">'+CRS_KINDS.map(k=>'<option value="'+k[0]+'" '+(p.kind===k[0]?'selected':'')+'>'+k[1]+'</option>').join('')+'</select></label><label class="f">Duração (min)<input type="number" name="min" min="0" step="1" value="'+(p.min||'')+'"></label></div>'+
-    (c.id==='__avulsas'?'':'<label class="f">Módulo<select name="mod">'+c.mods.map(m=>'<option value="'+m.id+'" '+((mid||c.mods[0].id)===m.id?'selected':'')+'>'+esc(m.t||'Aulas')+'</option>').join('')+'</select></label>')+
+    '<div class="f"><span>Partes desta aula <small class="muted">(opcional: várias partes do mesmo tema; o link acima passa a ser só de referência)</small></span><div id="lesParts">'+p.parts.map(crsPartRow).join('')+'</div><div class="frow"><button type="button" class="btn sm ghost" data-a="part-add">'+ic('plus',13)+' Parte</button></div></div>'+
+    (x&&others.length?'<div class="f"><span>Juntar outras aulas como partes desta</span>'+pickerHTML('lmerge',others,[],'Escolher aulas')+'</div>':'')+
+    (c.id==='__avulsas'?'':'<label class="f">Módulo<select name="mod">'+crsMods(c).map(z=>'<option value="'+z.m.id+'" '+((mid||c.mods[0].id)===z.m.id?'selected':'')+'>'+' '.repeat(z.d)+esc(z.m.t||'Aulas')+'</option>').join('')+'</select></label>')+
     '<div class="f"><span>Focos desta aula</span>'+focoPickHTML('lfoco',p.focoIds)+'</div><div class="f"><span>Habilidades</span>'+pickerHTML('lsk',crsSkItems(),p.skillIds,'Habilidades')+'</div>'+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>',true);
   const f=$('#fLes');let touched=!!x;f.elements.kind.addEventListener('change',()=>{touched=true;});
   f.elements.url.addEventListener('change',()=>{if(!touched)f.elements.kind.value=crsGuessKind(f.elements.url.value,f.elements.t.value);});
+  if(opt.addPart){const w=$('#lesParts');w.insertAdjacentHTML('beforeend',crsPartRow({}));const i=w.querySelector('.partrow:last-child input');if(i)i.focus();}
   f.addEventListener('submit',e=>{
     e.preventDefault();const E=f.elements,d={t:E.t.value.trim(),url:E.url.value.trim()?normUrl(E.url.value.trim()):'',kind:E.kind.value,min:Math.max(0,Number(E.min.value)||0),focoIds:pickedValues(f,'lfoco'),skillIds:pickedValues(f,'lsk')};if(!d.t)return;
-    const tm=c.id==='__avulsas'?c.mods[0]:c.mods.find(m=>m.id===E.mod.value)||c.mods[0];
-    if(x){Object.assign(x,d);if(f0.m!==tm){f0.m.lessons=f0.m.lessons.filter(l=>l!==x);tm.lessons.push(x);}}else tm.lessons.push(normLesson(d));
+    const old=x?x.parts:[],parts=$$('#lesParts .partrow',f).map(r=>{const t=r.querySelector('[name=pt]').value.trim(),u=r.querySelector('[name=pu]').value.trim(),o=old.find(z=>z.id===r.dataset.pid),url=u?normUrl(u):'';
+      return o?Object.assign(o,{t:t,url:url,min:Math.max(0,Number(r.querySelector('[name=pm]').value)||0),kind:o.url===url?o.kind:crsGuessKind(url,t)}):normPart({t:t,url:url,min:Math.max(0,Number(r.querySelector('[name=pm]').value)||0),kind:crsGuessKind(url,t)});}).filter(z=>z.t||z.url);
+    const tm=c.id==='__avulsas'?c.mods[0]:(crsFindM(c,E.mod.value)||{m:c.mods[0]}).m;
+    let L=x;
+    if(x){Object.assign(x,d,{parts:parts});if(f0.m!==tm){f0.m.lessons=f0.m.lessons.filter(l=>l!==x);tm.lessons.push(x);}}else{L=normLesson(Object.assign(d,{parts:parts}));tm.lessons.push(L);}
+    if(x){ // junta outras aulas como partes desta
+      const ids=pickedValues(f,'lmerge');
+      if(ids.length){
+        if(!L.parts.length&&L.url)L.parts.push(normPart({t:'Parte 1',url:L.url,kind:L.kind,min:L.min,done:L.done}));
+        ids.forEach(id=>{const q=id.split('|'),m2=(crsFindM(c,q[0])||{}).m,l2=m2&&m2.lessons.find(z=>z.id===q[1]);if(!l2)return;
+          if(l2.parts.length)l2.parts.forEach(z=>L.parts.push(z));else L.parts.push(normPart({t:l2.t,url:l2.url,kind:l2.kind,min:l2.min,done:l2.done}));
+          m2.lessons=m2.lessons.filter(z=>z!==l2);});
+      }
+    }
+    if(L.parts.length){L.done=L.parts.every(z=>z.done);L.min=0;}
     c.updated=Date.now();save();closeModal();renderMain();
   });
 }
@@ -17653,18 +17889,23 @@ Object.assign(ACT,{
   'crs-del'(el){const c=crsById(el.dataset.id);if(!c||c.loose)return;askConfirm('Excluir o curso?','“'+c.title+'” e as aulas dele serão removidos. As notas das aulas continuam em Notas.',()=>{S.courses=S.courses.filter(x=>x!==c);UI.aul={v:'home'};save();closeModal();renderMain();},'Excluir');},
   'crs-tree'(){UI.crsTree=!UI.crsTree;renderMain();},
   'crs-fold'(el){UI.crsFold=UI.crsFold||{};UI.crsFold[el.dataset.k]=!UI.crsFold[el.dataset.k];renderMain();},
-  'crs-foldall'(el){const f={};const fold=el.dataset.v==='1',A=UI.aul||{};(A.v==='course'?[crsById(A.cid)]:crsList()).filter(Boolean).forEach(c=>{if(A.v!=='course'&&fold)f[c.id]=true;c.mods.forEach(m=>{if(fold)f[c.id+'|'+m.id]=true;});});UI.crsFold=f;renderMain();},
+  'crs-foldall'(el){const f={};const fold=el.dataset.v==='1',A=UI.aul||{};(A.v==='course'?[crsById(A.cid)]:crsList()).filter(Boolean).forEach(c=>{if(A.v!=='course'&&fold)f[c.id]=true;crsMods(c).forEach(z=>{if(fold)f[c.id+'|'+z.m.id]=true;});});UI.crsFold=f;renderMain();},
   'crs-batch'(el){crsBatchDlg(el.dataset.id);},
-  'mod-new'(el){crsModDlg(el.dataset.c,'');},'mod-edit'(el){crsModDlg(el.dataset.c,el.dataset.m);},
-  'mod-del'(el){const c=crsById(el.dataset.c),m=c&&c.mods.find(x=>x.id===el.dataset.m);if(!m)return;askConfirm('Excluir o módulo?','As '+m.lessons.length+' aula(s) dele serão removidas.',()=>{c.mods=c.mods.filter(x=>x!==m);save();closeModal();renderMain();},'Excluir');},
+  'mod-new'(el){crsModDlg(el.dataset.c,'',el.dataset.p||'');},'mod-edit'(el){crsModDlg(el.dataset.c,el.dataset.m);},
+  'mod-del'(el){const c=crsById(el.dataset.c),fx=c&&crsFindM(c,el.dataset.m);if(!fx)return;const m=fx.m,n=crsModLessons(m).length,ns=crsMods({mods:m.subs||[]}).length;askConfirm('Excluir o módulo?','As '+n+' aula(s) dele'+(ns?' e os '+ns+' submódulo(s)':'')+' serão removidas.',()=>{const list=fx.parent?fx.parent.subs:c.mods;list.splice(list.indexOf(m),1);save();closeModal();renderMain();},'Excluir');},
   'les-new'(el){const c=crsById(el.dataset.c);if(!c){return;}if(c.id==='__avulsas'||c.mods.length){crsLessonDlg(c.id,el.dataset.m||(c.mods[0]||{}).id,'');}},
   'les-edit'(el){crsLessonDlg(el.dataset.c,el.dataset.m,el.dataset.l);},
   'les-del'(el){const f=crsFindL(el.dataset.c,el.dataset.m,el.dataset.l);if(!f)return;const i=f.m.lessons.indexOf(f.l);f.m.lessons.splice(i,1);save();if(UI.aul&&UI.aul.v==='play')UI.aul={v:'course',cid:f.c.id};renderMain();toastUndo('Aula removida.',()=>{f.m.lessons.splice(Math.min(i,f.m.lessons.length),0,f.l);save();renderMain();});},
-  'les-done'(el){const f=crsFindL(el.dataset.c,el.dataset.m,el.dataset.l);if(!f)return;f.l.done=!f.l.done;f.l.doneAt=f.l.done?Date.now():0;save();renderMain();},
-  'les-play'(el){UI.aul={v:'play',cid:el.dataset.c,mid:el.dataset.m,lid:el.dataset.l};closeModal();UI.tab='docs';UI.docSub='aulas';renderTabs();renderMain();window.scrollTo(0,0);},
-  'les-go'(el){const A=UI.aul,f=crsFindL(A.cid,A.mid,A.lid);if(!f)return;const L=crsLessons(f.c),i=L.findIndex(x=>x.l.id===f.l.id)+Number(el.dataset.d),t=L[i];if(t){UI.aul={v:'play',cid:f.c.id,mid:t.m.id,lid:t.l.id};renderMain();window.scrollTo(0,0);}},
+  'les-done'(el){const f=crsFindL(el.dataset.c,el.dataset.m,el.dataset.l);if(!f)return;const nv=!crsLDone(f.l);f.l.done=nv;f.l.doneAt=nv?Date.now():0;f.l.parts.forEach(p=>{p.done=nv;});save();renderMain();},
+  'les-pdone'(el){const f=crsFindL(el.dataset.c,el.dataset.m,el.dataset.l);if(!f)return;const p=f.l.parts.find(z=>z.id===el.dataset.p);if(!p)return;p.done=!p.done;f.l.done=f.l.parts.every(z=>z.done);f.l.doneAt=f.l.done?Date.now():0;save();renderMain();},
+  'les-part'(el){UI.aul=Object.assign({},UI.aul,{pid:el.dataset.p});renderMain();},
+  'les-part-add'(el){crsLessonDlg(el.dataset.c,el.dataset.m,el.dataset.l,{addPart:true});},
+  'part-add'(){const w=$('#lesParts');if(!w)return;w.insertAdjacentHTML('beforeend',crsPartRow({}));const i=w.querySelector('.partrow:last-child input');if(i)i.focus();},
+  'part-del'(el){const r=el.closest('.partrow');if(r)r.remove();},
+  'les-play'(el){UI.aul={v:'play',cid:el.dataset.c,mid:el.dataset.m,lid:el.dataset.l,pid:el.dataset.p||''};closeModal();UI.tab='docs';UI.docSub='aulas';renderTabs();renderMain();window.scrollTo(0,0);},
+  'les-go'(el){const A=UI.aul,f=crsFindL(A.cid,A.mid,A.lid);if(!f)return;const tg=crsTgOf(f,A.pid),St=crsSteps(f.c),i=St.findIndex(x=>x.l.id===f.l.id&&(!tg.part||x.p===tg.part))+Number(el.dataset.d),t=St[i];if(t){UI.aul=Object.assign({},A,{v:'play',cid:f.c.id,mid:t.m.id,lid:t.l.id,pid:t.p?t.p.id:''});renderMain();window.scrollTo(0,0);}},
   'les-title'(){const f=$('#fLes');if(!f)return;const u=f.elements.url.value.trim();if(!u){toast('Cole o link primeiro.');return;}linkInfo(u).then(i=>{if(i.title&&!f.elements.t.value.trim())f.elements.t.value=i.title.slice(0,140);else if(!i.title)toast('Não consegui ler o título desse link.');});},
-  'les-sched'(el){const f=crsFindL(el.dataset.c,el.dataset.m,el.dataset.l);if(!f)return;crsSchedule('Assistir: '+f.l.t,Math.max(15,Number(f.l.min)||45),{link:f.l.url,focoIds:crsFocos(f.c,f.m,f.l)},a=>{f.l.actId=a.id;});},
+  'les-sched'(el){const f=crsFindL(el.dataset.c,el.dataset.m,el.dataset.l);if(!f)return;crsSchedule('Assistir: '+f.l.t,Math.max(15,crsMin(f.l)||45),{link:(f.l.parts[0]||f.l).url,focoIds:crsFocos(f.c,f.m,f.l)},a=>{f.l.actId=a.id;});},
   'les-rev'(el){const f=crsFindL(el.dataset.c,el.dataset.m,el.dataset.l);if(!f)return;const n=crsNote({obj:f.l,title:f.l.t,ctx:f.c.title,foc:crsFocos(f.c,f.m,f.l)},true);skToRevision(n);renderMain();},
   'crs-notes-toggle'(){UI.crsNotes=UI.crsNotes===false;renderMain();},
   'crs-note-open'(){const tg=crsTarget();if(!tg)return;const n=crsNote(tg,false);if(n)openRef('note:'+n.id);},
@@ -17674,7 +17915,7 @@ Object.assign(ACT,{
   'sess-open'(el){UI.aul={v:'session',sid:el.dataset.id,iid:''};renderMain();window.scrollTo(0,0);},
   'sess-add'(el){crsSessAddDlg(el.dataset.id);},
   'sess-ren'(el){const s=sessById(el.dataset.id);if(!s)return;askText('Nome da sessão',s.title,v=>{s.title=v;save();renderMain();});},
-  'sess-item'(el){UI.aul=Object.assign({},UI.aul,{v:'session',sid:el.dataset.id,iid:el.dataset.i});renderMain();},
+  'sess-item'(el){UI.aul=Object.assign({},UI.aul,{v:'session',sid:el.dataset.id,iid:el.dataset.i,pid:''});renderMain();},
   'sess-itemdel'(el){const s=sessById(el.dataset.id);if(!s)return;s.items=s.items.filter(i=>i.id!==el.dataset.i);if(UI.aul&&UI.aul.iid===el.dataset.i)UI.aul.iid='';save();renderMain();},
   'sess-end'(el){const s=sessById(el.dataset.id);if(!s)return;askConfirm('Encerrar a sessão?','“'+s.title+'” será fechada. As aulas e as notas continuam onde estão.',()=>{S.sessions=S.sessions.filter(x=>x!==s);UI.aul={v:'sessions'};save();closeModal();renderMain();},'Encerrar');},
   'crs-sk-open'(el){ACT['crs-open'](el);}
@@ -17686,14 +17927,14 @@ document.addEventListener('input',e=>{
 });
 document.addEventListener('mousedown',e=>{if(e.target.closest&&e.target.closest('[data-a=crs-fmt]'))e.preventDefault();});
 
-function crsFocoLessons(f){const out=[];crsList().forEach(c=>c.mods.forEach(m=>m.lessons.forEach(l=>{if(crsFocos(c,m,l).indexOf(f.id)>=0)out.push({c:c,m:m,l:l});})));return out;}
+function crsFocoLessons(f){const out=[];crsList().forEach(c=>crsLessons(c).forEach(x=>{if(crsFocos(c,x.m,x.l).indexOf(f.id)>=0)out.push(x);}));return out;}
 function crsFocoHTML(f){
   const L=crsFocoLessons(f);if(!L.length)return '<div class="muted small" style="padding:6px 0">Nenhuma aula ligada a este foco. Em Documentos > Aulas, escolha o foco no curso, no módulo ou na aula.</div>';
   const g={};L.forEach(x=>(g[x.c.id]=g[x.c.id]||[]).push(x));
-  return Object.keys(g).map(k=>'<div class="relbox"><div class="relh">'+esc(g[k][0].c.title)+'</div>'+g[k].map(x=>'<div class="ftit"><button class="chk sm '+(x.l.done?'on':'')+'" data-a="les-done" '+crsAttr(x.c.id,x.m.id,x.l.id)+' aria-label="Assistida">'+ic('check',12)+'</button><span class="'+(x.l.done?'done':'')+'" data-a="les-play" '+crsAttr(x.c.id,x.m.id,x.l.id)+'>'+esc(x.l.t)+'</span><small>'+esc((x.m.t?x.m.t+' | ':'')+(CRS_KINDS.find(z=>z[0]===x.l.kind)||CRS_KINDS[3])[1])+'</small></div>').join('')+'</div>').join('');
+  return Object.keys(g).map(k=>'<div class="relbox"><div class="relh">'+esc(g[k][0].c.title)+'</div>'+g[k].map(x=>'<div class="ftit"><button class="chk sm '+(x.l.done?'on':'')+'" data-a="les-done" '+crsAttr(x.c.id,x.m.id,x.l.id)+' aria-label="Assistida">'+ic('check',12)+'</button><span class="'+(x.l.done?'done':'')+'" data-a="les-play" '+crsAttr(x.c.id,x.m.id,x.l.id)+'>'+esc(x.l.t)+'</span><small>'+esc((x.m.t?x.m.t+' | ':'')+(CRS_KINDS.find(z=>z[0]===x.l.kind)||CRS_KINDS[CRS_KINDS.length-1])[1])+'</small></div>').join('')+'</div>').join('');
 }
 function skCrsBox(s){
-  const L=[];crsList().forEach(c=>c.mods.forEach(m=>m.lessons.forEach(l=>{if((c.skillIds||[]).indexOf(s.id)>=0||(m.skillIds||[]).indexOf(s.id)>=0||(l.skillIds||[]).indexOf(s.id)>=0)L.push({c:c,m:m,l:l});})));
+  const L=[];crsList().forEach(c=>crsLessons(c).forEach(x=>{if(crsSkills(c,x.m,x.l).indexOf(s.id)>=0)L.push(x);}));
   if(!L.length)return '';
   const g={};L.forEach(x=>(g[x.c.id]=g[x.c.id]||[]).push(x));
   return skBox('crs','Cursos e aulas',L.filter(x=>x.l.done).length+'/'+L.length,'',Object.keys(g).map(k=>'<div class="skgrp"><span class="muted small">'+esc(g[k][0].c.title)+'</span>'+g[k].map(x=>'<div class="crsl" style="padding-left:0"><button class="chk sm '+(x.l.done?'on':'')+'" data-a="les-done" '+crsAttr(x.c.id,x.m.id,x.l.id)+' aria-label="Assistida">'+ic('check',12)+'</button><span class="crsk">'+ic(crsKindIc(x.l.kind),15)+'</span><span class="crst" data-a="les-play" '+crsAttr(x.c.id,x.m.id,x.l.id)+'>'+esc(x.l.t)+'</span></div>').join('')+'</div>').join(''));
