@@ -2894,6 +2894,9 @@ html[data-contrast="high"] :focus-visible{outline-width:3px}
 .dskp{position:absolute;top:8px;left:8px}.gtile.sel,.lrow.sel,.dcard.sel{outline:2px solid var(--accf);outline-offset:-2px;background:var(--accs)}
 .dcard .dh .dsk{margin-right:8px}
 .qbar{display:flex;height:8px;border-radius:99px;overflow:hidden;background:var(--line2);margin:0 0 4px}.qbar i{display:block;height:100%}
+.crsfoc{display:inline-flex;gap:4px;flex-wrap:wrap}.crsfrac{font-size:12px;font-weight:600;color:var(--pfg);background:var(--pbg);border-radius:999px;padding:1px 8px}
+.crsflash{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:600;color:#9A5B00;background:#FFF0C7;border-radius:999px;padding:1px 8px}
+.crsfbox{border:1px solid #F3D88A;background:#FFF8E1;border-radius:12px;padding:8px 12px;margin:10px 0;color:#4A3A10}.crsfbox .crst:hover{color:#9A5B00}
 .crsind{padding-left:14px}.crsmod.sub{color:var(--tx);margin:8px 0 0 12px;padding:8px 10px;border-radius:12px;background:var(--soft)}.crsmod.sub h4{margin:0;font-size:14px}
 .crspl{flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;padding:0 0 4px 52px}.crsmod .crspl{padding-left:34px}
 .crspp{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;background:var(--card);padding:3px 10px;font:inherit;font-size:12.5px;color:var(--tx);cursor:pointer}.crspp:hover{border-color:var(--pbd);background:var(--pbg);color:var(--pfg)}.crspp.done{color:var(--mut);text-decoration:line-through}
@@ -4938,7 +4941,7 @@ function rvQHTML(){
     '<p class="muted small" style="margin:0 0 8px">'+esc(a?actParts(a).theme||aT(a):'')+'. A quantidade e os Focos já vêm da revisão; ajuste se precisar.</p>'+
     '<div class="f"><span>Focos</span><div class="frow">'+(rows||'<span class="muted small">Esta revisão não tem Foco.</span>')+'</div></div>'+
     '<div class="fgrid"><label class="f">Quantidade<input type="number" id="rvqN" min="1" max="200" step="1" value="'+u.qty+'"></label><label class="f">Quais<select id="rvqP"><option value="mix" '+(u.pri==='mix'?'selected':'')+'>Erradas, depois novas, depois certas</option><option value="err" '+(u.pri==='err'?'selected':'')+'>Só as que errei</option><option value="nao" '+(u.pri==='nao'?'selected':'')+'>Só não respondidas</option></select></label></div>'+
-    '<div id="rvqInfo" class="muted small"></div>'+
+    '<div id="rvqInfo" class="muted small"></div>'+crsFlashForNames(u.names)+
     '<div class="ff"><button type="button" class="btn sm ghost" data-a="rv-q-bank">Ver no banco</button><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button type="button" class="btn primary" id="rvqGo" data-a="rv-q-go">Começar</button></div></div>';
 }
 function rvQRead(){
@@ -4970,7 +4973,7 @@ function rvQEnd(m){
   openModal('<div class="form"><div class="fh"><h2>Questões da revisão concluídas</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<div class="fstat">'+(n?'<b>'+ok+'</b> certas de '+n+' respondidas agora ('+pct+'%).':'Nenhuma questão nova foi respondida desta vez.')+'</div>'+
     (R.round===1?'<p class="muted small" style="margin:0 0 10px">O item de questões do checklist desta revisão foi marcado.'+(pct!=null?' O acerto de '+pct+'% já aparece ao concluir a revisão.':'')+'</p>':'')+
-    '<div class="frow"><button type="button" class="btn" data-a="rv-q-more" '+(left?'':'disabled')+'>'+ic('play',14)+' Continuar prática de questões'+(left?' <small class="muted">('+left+' restantes)</small>':'')+'</button></div>'+
+    ((pct!=null&&pct<60)?crsFlashForNames(R.names).replace('Você está errando bastante este foco','Você acertou pouco agora'):crsFlashForNames(R.names))+'<div class="frow"><button type="button" class="btn" data-a="rv-q-more" '+(left?'':'disabled')+'>'+ic('play',14)+' Continuar prática de questões'+(left?' <small class="muted">('+left+' restantes)</small>':'')+'</button></div>'+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn primary" data-a="cancel">Fechar</button></div></div>');
   renderMain();
 }
@@ -17457,10 +17460,10 @@ Object.assign(ACT,{
 document.addEventListener('change',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.cad){const x=(S.cad||[]).find(z=>z.id===t.dataset.cad);if(x){x.text=t.value.trim();x.updated=Date.now();save();}}});
 
 /* ===== Aulas e cursos (dentro de Documentos): player no site, notas ao lado, sessões de estudo ===== */
-const CRS_KINDS=[['video','Vídeo'],['pdf','PDF'],['doc','Documento'],['galeria','Galeria de fotos'],['link','Link']];
+const CRS_KINDS=[['video','Vídeo'],['pdf','PDF'],['doc','Documento'],['link','Link']];
 const crsKindIc=k=>({video:'play',pdf:'file',doc:'note',galeria:'image',link:'link'})[k]||'link';
 function normPart(p){return Object.assign({id:uid(),t:'',url:'',kind:'video',min:0,done:false},p||{});}
-function normLesson(l){const o=Object.assign({id:uid(),t:'',url:'',kind:'video',min:0,done:false,doneAt:0,noteId:'',focoIds:[],skillIds:[],actId:'',parts:[]},l||{});if(!Array.isArray(o.focoIds))o.focoIds=[];if(!Array.isArray(o.skillIds))o.skillIds=[];o.parts=(Array.isArray(o.parts)?o.parts:[]).map(normPart);return o;}
+function normLesson(l){const o=Object.assign({id:uid(),t:'',url:'',kind:'video',min:0,done:false,doneAt:0,noteId:'',focoIds:[],skillIds:[],actId:'',parts:[],flash:false},l||{});if(o.kind==='galeria')o.kind='link';if(!Array.isArray(o.focoIds))o.focoIds=[];if(!Array.isArray(o.skillIds))o.skillIds=[];o.parts=(Array.isArray(o.parts)?o.parts:[]).map(normPart);return o;}
 function normMod(m){const o=Object.assign({id:uid(),t:'',focoIds:[],skillIds:[],lessons:[],subs:[]},m||{});if(!Array.isArray(o.focoIds))o.focoIds=[];if(!Array.isArray(o.skillIds))o.skillIds=[];o.lessons=(Array.isArray(o.lessons)?o.lessons:[]).map(normLesson);o.subs=(Array.isArray(o.subs)?o.subs:[]).map(normMod);return o;}
 function normCrs(c){const o=Object.assign({id:uid(),title:'',desc:'',color:'',focoIds:[],skillIds:[],mods:[],created:Date.now(),updated:Date.now()},c||{});if(!Array.isArray(o.focoIds))o.focoIds=[];if(!Array.isArray(o.skillIds))o.skillIds=[];o.mods=(Array.isArray(o.mods)?o.mods:[]).map(normMod);return o;}
 function normSess(s){const o=Object.assign({id:uid(),title:'',items:[],created:Date.now()},s||{});o.items=(Array.isArray(o.items)?o.items:[]).map(i=>Object.assign({id:uid(),t:'',url:'',kind:'link',ref:'',noteId:'',done:false,focoIds:[]},i));return o;}
@@ -17484,7 +17487,6 @@ const crsSkills=(c,m,l)=>crsUni(c,m,l,'skillIds');
 const crsAttr=(c,m,l)=>'data-c="'+c+'" data-m="'+m+'" data-l="'+l+'"';
 function crsGuessKind(url,title){
   const u=String(url||''),t=String(title||'');
-  if(galKind(u))return 'galeria';
   if(/docs\.google\.com\/(document|spreadsheets|presentation|forms)/.test(u))return 'doc';
   if(/youtube\.com|youtu\.be|vimeo\.com/.test(u))return 'video';
   if(/\.pdf(\?|#|$)/i.test(u)||/\.pdf\s*$/i.test(t))return 'pdf';
@@ -17673,12 +17675,12 @@ function renderAulas(){
   return h;
 }
 function crsLessonRow(c,m,l,showC){
-  const ex=l.actId&&actById(l.actId),o=ex&&nextOccOf(ex),n=l.noteId&&noteById(l.noteId),hp=l.parts.length,mn=crsMin(l),dn=crsLDone(l);
+  const ex=l.actId&&actById(l.actId),o=ex&&nextOccOf(ex),n=l.noteId&&noteById(l.noteId),hp=l.parts.length,mn=crsMin(l),dn=crsLDone(l),fcs=crsFocos(c,m,l).map(focoById).filter(Boolean);
   const A=crsAttr(c.id,m.id,l.id);
   return '<div class="crsl '+(dn?'done':'')+'"><button class="chk sm '+(dn?'on':'')+'" data-a="les-done" '+A+' aria-label="Marcar como assistida">'+ic('check',12)+'</button><span class="crsk">'+ic(crsKindIc(hp?l.parts[0].kind:l.kind),15)+'</span>'+
-    '<span class="crst" data-a="les-play" '+A+' role="button" tabindex="0">'+esc(l.t||'Sem título')+'</span>'+
-    (hp?'<span class="muted small" title="Partes desta aula">'+l.parts.filter(p=>p.done).length+'/'+hp+' partes</span>':'')+(mn?'<span class="muted small">'+skHM(mn)+'</span>':'')+(o?'<span class="skchip2" title="Agendada">'+ic('calendar',12)+' '+fmtDM(o.date)+'</span>':'')+(n?'<span class="muted" title="Tem anotações">'+ic('note',13)+'</span>':'')+
-    '<span class="crsa"><button class="icon-btn sm" data-a="les-part-add" '+A+' title="Adicionar parte a esta aula" aria-label="Adicionar parte">'+ic('layers',14)+'</button><button class="icon-btn sm" data-a="les-sched" '+A+' title="Agendar" aria-label="Agendar">'+ic('calendar',14)+'</button><button class="icon-btn sm" data-a="les-rev" '+A+' title="Colocar na revisão (D+1)" aria-label="Revisão">'+ic('repeat',14)+'</button><button class="icon-btn sm" data-a="les-edit" '+A+' aria-label="Editar">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="les-del" '+A+' aria-label="Excluir">'+ic('x',13)+'</button></span>'+
+    '<span class="crst" data-a="les-play" '+A+' role="button" tabindex="0">'+esc(l.t||'Sem título')+'</span>'+(fcs.length?'<span class="crsfoc">'+fcs.map(f=>focoPill(f,true)).join('')+'</span>':'')+
+    (hp?'<span class="crsfrac" title="Partes assistidas">'+l.parts.filter(p=>p.done).length+'/'+hp+'</span>':'')+(l.flash?'<span class="crsflash" title="Aula Flash: aparece quando você erra muito este foco">'+ic('zap',12)+' Flash</span>':'')+(mn?'<span class="muted small">'+skHM(mn)+'</span>':'')+(o?'<span class="skchip2" title="Agendada">'+ic('calendar',12)+' '+fmtDM(o.date)+'</span>':'')+(n?'<span class="muted" title="Tem anotações">'+ic('note',13)+'</span>':'')+
+    '<span class="crsa"><button class="icon-btn sm" data-a="les-flash" '+A+' title="'+(l.flash?'Tirar de Flash':'Marcar como Flash')+'" aria-label="Flash">'+ic('zap',14)+'</button><button class="icon-btn sm" data-a="les-part-add" '+A+' title="Adicionar parte a esta aula" aria-label="Adicionar parte">'+ic('layers',14)+'</button><button class="icon-btn sm" data-a="les-sched" '+A+' title="Agendar" aria-label="Agendar">'+ic('calendar',14)+'</button><button class="icon-btn sm" data-a="les-rev" '+A+' title="Colocar na revisão (D+1)" aria-label="Revisão">'+ic('repeat',14)+'</button><button class="icon-btn sm" data-a="les-edit" '+A+' aria-label="Editar">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="les-del" '+A+' aria-label="Excluir">'+ic('x',13)+'</button></span>'+
     (hp?'<div class="crspl">'+l.parts.map(p=>'<button class="crspp '+(p.done?'done':'')+'" data-a="les-play" '+A+' data-p="'+p.id+'">'+ic(p.done?'check':crsKindIc(p.kind),12)+' '+esc(crsPartT(l,p))+'</button>').join('')+'</div>':'')+'</div>';
 }
 function crsModHTML(c,m,d,fold){
@@ -17689,7 +17691,7 @@ function crsModHTML(c,m,d,fold){
 }
 function crsCourseView(c){
   const pg=crsProg(c),fold=UI.crsFold||{},fo=(c.focoIds||[]).map(focoById).filter(Boolean),sk=(c.skillIds||[]).map(skById).filter(Boolean);
-  let h='<div class="toolbar"><nav class="crumbs" style="margin:0"><button class="crumb" data-a="aul-home">Aulas</button><span class="sep">›</span><button class="crumb on">'+esc(c.title)+'</button></nav><span class="sp"></span><button class="btn sm ghost" data-a="crs-foldall" data-v="0">Expandir tudo</button><button class="btn sm ghost" data-a="crs-foldall" data-v="1">Recolher tudo</button><button class="btn sm" data-a="crs-batch" data-id="'+c.id+'">'+ic('list',14)+' Colar aulas</button><button class="btn sm" data-a="mod-new" data-c="'+c.id+'">'+ic('plus',14)+' Módulo</button><button class="btn sm" data-a="crs-edit" data-id="'+c.id+'">'+ic('edit',14)+' Editar</button><button class="btn sm danger" data-a="crs-del" data-id="'+c.id+'">'+ic('trash',14)+'</button></div>';
+  let h='<div class="toolbar"><nav class="crumbs" style="margin:0"><button class="crumb" data-a="aul-home">Aulas</button><span class="sep">›</span><button class="crumb on">'+esc(c.title)+'</button></nav><span class="sp"></span><button class="btn sm ghost" data-a="crs-foldall" data-v="0">Expandir tudo</button><button class="btn sm ghost" data-a="crs-foldall" data-v="1">Recolher tudo</button><button class="btn sm" data-a="crs-batch" data-id="'+c.id+'">'+ic('list',14)+' Colar aulas</button><button class="btn sm" data-a="crs-pg" data-id="'+c.id+'" title="O Pingado sugere foco, módulos e partes">'+pgMascot('idle',14)+' Organizar com o Pingado</button><button class="btn sm" data-a="mod-new" data-c="'+c.id+'">'+ic('plus',14)+' Módulo</button><button class="btn sm" data-a="crs-edit" data-id="'+c.id+'">'+ic('edit',14)+' Editar</button><button class="btn sm danger" data-a="crs-del" data-id="'+c.id+'">'+ic('trash',14)+'</button></div>';
   h+='<div class="card sec"><div class="arth"><h2 class="vt" style="margin:0;flex:1">'+esc(c.title)+'</h2></div>'+(c.desc?'<p class="muted" style="margin:4px 0">'+esc(c.desc)+'</p>':'')+
     (pg.tot?'<div class="skbar big"><i style="width:'+Math.round(pg.done/pg.tot*100)+'%"></i></div><div class="muted small">'+pg.done+' de '+pg.tot+' aulas assistidas</div>':'')+
     ((fo.length||sk.length)?'<div class="artchips" style="margin-top:6px">'+fo.map(f=>focoPill(f)).join('')+sk.map(s=>'<span class="lzdot" style="--d:'+esc(skColor(s))+'"><i></i>'+esc(s.name)+'</span>').join('')+'</div>':'')+'</div>';
@@ -17715,8 +17717,6 @@ function crsNote(tg,create){
   return n;
 }
 function crsPlayerHTML(tg){
-  if(galKind(tg.url))return '<div class="crsfr gal">'+galBoxHTML(tg.url)+'</div>';
-  if(tg.kind==='galeria'&&/\.(png|jpe?g|gif|webp|avif)(\?|#|$)/i.test(tg.url||''))return '<div class="crsfr gal"><img class="galone" alt="'+esc(tg.title)+'" src="'+esc(normUrl(tg.url))+'" referrerpolicy="no-referrer"></div>';
   const e=crsEmbed(tg.url),k=tg.kind;
   if(e.k==='none')return '<div class="crsfr crsmsg"><p class="muted">Esta aula ainda não tem link. Edite para colar o link do Google Drive, YouTube ou site.</p></div>';
   if(e.k==='ext')return '<div class="crsfr crsmsg"><p class="muted">Este endereço não permite abrir dentro do site.</p><a class="btn primary" href="'+esc(normUrl(tg.url))+'" target="_blank" rel="noopener">Abrir em outra aba</a></div>';
@@ -17727,7 +17727,7 @@ function crsPlayerHTML(tg){
 function crsPlayBody(tg){
   const n=crsNote(tg,false),on=UI.crsNotes!==false;
   return '<div class="crsplay '+(on?'':'solo')+'"><div class="crsp">'+crsPlayerHTML(tg)+'</div>'+(on?'<aside class="crsn"><div class="crsnh"><b>Anotações</b><span class="sp" style="flex:1"></span>'+
-    '<button class="icon-btn sm" data-a="crs-fmt" data-f="bold" title="Negrito" aria-label="Negrito">'+ic('bold',14)+'</button><button class="icon-btn sm" data-a="crs-fmt" data-f="italic" title="Itálico" aria-label="Itálico">'+ic('italic',14)+'</button><button class="icon-btn sm" data-a="crs-fmt" data-f="insertUnorderedList" title="Lista" aria-label="Lista">'+ic('list',14)+'</button>'+(n?'<button class="icon-btn sm" data-a="crs-note-open" title="Abrir a nota completa" aria-label="Abrir a nota">'+ic('external',14)+'</button>':'')+'</div>'+
+    '<button class="icon-btn sm" data-a="crs-fmt" data-f="bold" title="Negrito" aria-label="Negrito">'+ic('bold',14)+'</button><button class="icon-btn sm" data-a="crs-fmt" data-f="italic" title="Itálico" aria-label="Itálico">'+ic('italic',14)+'</button><button class="icon-btn sm" data-a="crs-fmt" data-f="insertUnorderedList" title="Lista" aria-label="Lista">'+ic('list',14)+'</button>'+'<button class="btn sm" data-a="crs-note-send" title="Cria uma nota nova em Notas com estas anotações, já ligada à aula e ao foco">'+ic('note',14)+' Enviar à Notas</button>'+(n?'<button class="icon-btn sm" data-a="crs-note-open" title="Abrir a nota completa" aria-label="Abrir a nota">'+ic('external',14)+'</button>':'')+'</div>'+
     '<div class="crsne ned" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Anotações da aula" data-ph="Escreva suas anotações aqui">'+(n?cleanHTML(n.html):'')+'</div></aside>':'')+'</div>';
 }
 function crsPartTabs(tg){
@@ -17766,11 +17766,12 @@ function crsCourseDlg(cid){
   const x=cid?crsById(cid):null,p=Object.assign({title:'',desc:'',color:'',focoIds:[],skillIds:[]},x||{});
   openModal('<form id="fCrs" class="form"><div class="fh"><h2>'+(x?'Editar curso':'Novo curso')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<label class="f">Curso<input name="title" required value="'+esc(p.title)+'" autocomplete="off"></label><label class="f">Descrição<input name="desc" value="'+esc(p.desc)+'" autocomplete="off"></label>'+swatchHTML('color',p.color,'#B8BCC8')+
-    '<div class="f"><span>Focos</span>'+focoPickHTML('cfoco',p.focoIds)+'</div><div class="f"><span>Habilidades</span>'+pickerHTML('csk',crsSkItems(),p.skillIds,'Habilidades')+'</div>'+
+    '<div class="f"><span>Focos</span>'+focoPickHTML('cfoco',p.focoIds)+'</div><label class="f">Novo subfoco <small class="muted">(opcional: nasce dentro do primeiro foco escolhido)</small><input name="subfoco" placeholder="Ex.: AVC isquêmico" autocomplete="off"></label><div class="f"><span>Habilidades</span>'+pickerHTML('csk',crsSkItems(),p.skillIds,'Habilidades')+'</div>'+
     (x?'':'<label class="f">Aulas <small>opcional: uma por linha; “# Módulo” e “## Submódulo”; linha recuada vira parte da aula acima; cole o link no fim</small><textarea name="batch" rows="5" placeholder="# Módulo 1&#10;Aula 1 https://drive.google.com/file/d/…&#10;Aula 2 (45 min) https://…"></textarea></label>')+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>',true);
   $('#fCrs').addEventListener('submit',e=>{
     e.preventDefault();const f=e.target,E=f.elements,d={title:E.title.value.trim(),desc:E.desc.value.trim(),color:E.color.value||'',focoIds:pickedValues(f,'cfoco'),skillIds:pickedValues(f,'csk'),updated:Date.now()};if(!d.title)return;
+    const sf=(E.subfoco.value||'').trim();if(sf){const par=focoById(d.focoIds[0]);if(!par){toast('Escolha o foco principal para criar o subfoco dentro dele.');return;}let nf=(S.focos||[]).find(z=>z.area===par.area&&norm(z.name)===norm(sf));if(!nf){nf={id:'fc_'+uid(),area:par.area,mod:par.mod,name:sf,parent:par.id};S.focos.push(nf);}if(d.focoIds.indexOf(nf.id)<0)d.focoIds.push(nf.id);}
     let c=x;if(x)Object.assign(x,d);else{c=normCrs(d);S.courses=S.courses||[];S.courses.push(c);if(E.batch&&E.batch.value.trim())crsBatchApply(c,E.batch.value);UI.aul={v:'course',cid:c.id};}
     save();closeModal();renderMain();
   });
@@ -17826,25 +17827,30 @@ function crsModDlg(cid,mid,parentId){
     c.updated=Date.now();save();closeModal();renderMain();
   });
 }
+function crsAutoFill(url,tEl,mEl){
+  url=String(url||'').trim();if(!url||!tEl||tEl.value.trim())return;
+  linkInfo(url).then(i=>{if(!tEl.isConnected)return;if(i.title&&!tEl.value.trim()){tEl.value=i.title.replace(/\.(pdf|mp4|mov|mkv)$/i,'').slice(0,140);tEl.classList.add('pgfilled');setTimeout(()=>tEl.classList.remove('pgfilled'),4000);}if(mEl&&!mEl.value&&i.durationMin)mEl.value=i.durationMin;});
+}
 const crsPartRow=p=>'<div class="partrow" data-pid="'+esc(p.id||'')+'"><input name="pt" placeholder="Nome da parte" value="'+esc(p.t||'')+'" autocomplete="off"><input name="pu" placeholder="https://" value="'+esc(p.url||'')+'" autocomplete="off"><input name="pm" type="number" min="0" step="1" placeholder="min" value="'+(p.min||'')+'" aria-label="Minutos da parte"><button type="button" class="icon-btn sm" data-a="part-del" aria-label="Tirar a parte">'+ic('x',13)+'</button></div>';
 function crsLessonDlg(cid,mid,lid,opt){
   opt=opt||{};
-  const c=crsById(cid);if(!c)return;const f0=lid?crsFindL(cid,mid,lid):null,x=f0&&f0.l,p=Object.assign({t:'',url:'',kind:'video',min:'',focoIds:[],skillIds:[],parts:[]},x||{});
+  const c=crsById(cid);if(!c)return;const f0=lid?crsFindL(cid,mid,lid):null,x=f0&&f0.l,p=Object.assign({t:'',url:'',kind:'video',min:'',focoIds:[],skillIds:[],parts:[],flash:false},x||{});
   const others=[];if(x)crsLessons(c).forEach(z=>{if(z.l!==x)others.push({id:z.m.id+'|'+z.l.id,label:z.l.t,sub:z.m.t||'Aulas'});});
   openModal('<form id="fLes" class="form"><div class="fh"><h2>'+(x?'Editar aula':'Nova aula')+'</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
     '<label class="f">Aula ou tema<input name="t" required value="'+esc(p.t)+'" autocomplete="off"></label>'+
-    '<div class="f"><span>Link (Google Drive, Google Fotos, YouTube, documento…)</span><div class="frow" style="flex-wrap:nowrap"><input name="url" value="'+esc(p.url)+'" placeholder="https://" autocomplete="off" style="flex:1"><button type="button" class="btn sm" data-a="les-title">Puxar título</button></div></div>'+
+    '<div class="f"><span>Link (Google Drive, YouTube, documento… o título é puxado sozinho)</span><div class="frow" style="flex-wrap:nowrap"><input name="url" value="'+esc(p.url)+'" placeholder="https://" autocomplete="off" style="flex:1"><button type="button" class="btn sm" data-a="les-title">Puxar título</button></div></div>'+
     '<div class="fgrid"><label class="f">Tipo<select name="kind">'+CRS_KINDS.map(k=>'<option value="'+k[0]+'" '+(p.kind===k[0]?'selected':'')+'>'+k[1]+'</option>').join('')+'</select></label><label class="f">Duração (min)<input type="number" name="min" min="0" step="1" value="'+(p.min||'')+'"></label></div>'+
     '<div class="f"><span>Partes desta aula <small class="muted">(opcional: várias partes do mesmo tema; o link acima passa a ser só de referência)</small></span><div id="lesParts">'+p.parts.map(crsPartRow).join('')+'</div><div class="frow"><button type="button" class="btn sm ghost" data-a="part-add">'+ic('plus',13)+' Parte</button></div></div>'+
-    (x&&others.length?'<div class="f"><span>Juntar outras aulas como partes desta</span>'+pickerHTML('lmerge',others,[],'Escolher aulas')+'</div>':'')+
+    '<label class="chip cb" style="margin:4px 0"><input type="checkbox" name="flash" '+(p.flash?'checked':'')+'><span>Aula Flash: revisão rápida quando eu errar muitas questões do foco</span></label>'+(x&&others.length?'<div class="f"><span>Juntar outras aulas como partes desta</span>'+pickerHTML('lmerge',others,[],'Escolher aulas')+'</div>':'')+
     (c.id==='__avulsas'?'':'<label class="f">Módulo<select name="mod">'+crsMods(c).map(z=>'<option value="'+z.m.id+'" '+((mid||c.mods[0].id)===z.m.id?'selected':'')+'>'+' '.repeat(z.d)+esc(z.m.t||'Aulas')+'</option>').join('')+'</select></label>')+
     '<div class="f"><span>Focos desta aula</span>'+focoPickHTML('lfoco',p.focoIds)+'</div><div class="f"><span>Habilidades</span>'+pickerHTML('lsk',crsSkItems(),p.skillIds,'Habilidades')+'</div>'+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>',true);
   const f=$('#fLes');let touched=!!x;f.elements.kind.addEventListener('change',()=>{touched=true;});
-  f.elements.url.addEventListener('change',()=>{if(!touched)f.elements.kind.value=crsGuessKind(f.elements.url.value,f.elements.t.value);});
+  f.elements.url.addEventListener('change',()=>{if(!touched)f.elements.kind.value=crsGuessKind(f.elements.url.value,f.elements.t.value);crsAutoFill(f.elements.url.value,f.elements.t,f.elements.min);});
+  f.addEventListener('change',e=>{if(e.target.name==='pu'){const r=e.target.closest('.partrow');crsAutoFill(e.target.value,r.querySelector('[name=pt]'),r.querySelector('[name=pm]'));}});
   if(opt.addPart){const w=$('#lesParts');w.insertAdjacentHTML('beforeend',crsPartRow({}));const i=w.querySelector('.partrow:last-child input');if(i)i.focus();}
   f.addEventListener('submit',e=>{
-    e.preventDefault();const E=f.elements,d={t:E.t.value.trim(),url:E.url.value.trim()?normUrl(E.url.value.trim()):'',kind:E.kind.value,min:Math.max(0,Number(E.min.value)||0),focoIds:pickedValues(f,'lfoco'),skillIds:pickedValues(f,'lsk')};if(!d.t)return;
+    e.preventDefault();const E=f.elements,d={t:E.t.value.trim(),url:E.url.value.trim()?normUrl(E.url.value.trim()):'',kind:E.kind.value,min:Math.max(0,Number(E.min.value)||0),focoIds:pickedValues(f,'lfoco'),skillIds:pickedValues(f,'lsk'),flash:!!E.flash.checked};if(!d.t)return;
     const old=x?x.parts:[],parts=$$('#lesParts .partrow',f).map(r=>{const t=r.querySelector('[name=pt]').value.trim(),u=r.querySelector('[name=pu]').value.trim(),o=old.find(z=>z.id===r.dataset.pid),url=u?normUrl(u):'';
       return o?Object.assign(o,{t:t,url:url,min:Math.max(0,Number(r.querySelector('[name=pm]').value)||0),kind:o.url===url?o.kind:crsGuessKind(url,t)}):normPart({t:t,url:url,min:Math.max(0,Number(r.querySelector('[name=pm]').value)||0),kind:crsGuessKind(url,t)});}).filter(z=>z.t||z.url);
     const tm=c.id==='__avulsas'?c.mods[0]:(crsFindM(c,E.mod.value)||{m:c.mods[0]}).m;
@@ -17897,6 +17903,9 @@ Object.assign(ACT,{
   'les-edit'(el){crsLessonDlg(el.dataset.c,el.dataset.m,el.dataset.l);},
   'les-del'(el){const f=crsFindL(el.dataset.c,el.dataset.m,el.dataset.l);if(!f)return;const i=f.m.lessons.indexOf(f.l);f.m.lessons.splice(i,1);save();if(UI.aul&&UI.aul.v==='play')UI.aul={v:'course',cid:f.c.id};renderMain();toastUndo('Aula removida.',()=>{f.m.lessons.splice(Math.min(i,f.m.lessons.length),0,f.l);save();renderMain();});},
   'les-done'(el){const f=crsFindL(el.dataset.c,el.dataset.m,el.dataset.l);if(!f)return;const nv=!crsLDone(f.l);f.l.done=nv;f.l.doneAt=nv?Date.now():0;f.l.parts.forEach(p=>{p.done=nv;});save();renderMain();},
+  'crs-pg'(el){crsPingado(el.dataset.id);},
+  'crs-pg-apply'(){crsPgApply();},
+  'les-flash'(el){const f=crsFindL(el.dataset.c,el.dataset.m,el.dataset.l);if(!f)return;f.l.flash=!f.l.flash;save();renderMain();toast(f.l.flash?'Aula Flash: aparece quando você errar muito o foco.':'Aula tirada de Flash.');},
   'les-pdone'(el){const f=crsFindL(el.dataset.c,el.dataset.m,el.dataset.l);if(!f)return;const p=f.l.parts.find(z=>z.id===el.dataset.p);if(!p)return;p.done=!p.done;f.l.done=f.l.parts.every(z=>z.done);f.l.doneAt=f.l.done?Date.now():0;save();renderMain();},
   'les-part'(el){UI.aul=Object.assign({},UI.aul,{pid:el.dataset.p});renderMain();},
   'les-part-add'(el){crsLessonDlg(el.dataset.c,el.dataset.m,el.dataset.l,{addPart:true});},
@@ -17908,6 +17917,11 @@ Object.assign(ACT,{
   'les-sched'(el){const f=crsFindL(el.dataset.c,el.dataset.m,el.dataset.l);if(!f)return;crsSchedule('Assistir: '+f.l.t,Math.max(15,crsMin(f.l)||45),{link:(f.l.parts[0]||f.l).url,focoIds:crsFocos(f.c,f.m,f.l)},a=>{f.l.actId=a.id;});},
   'les-rev'(el){const f=crsFindL(el.dataset.c,el.dataset.m,el.dataset.l);if(!f)return;const n=crsNote({obj:f.l,title:f.l.t,ctx:f.c.title,foc:crsFocos(f.c,f.m,f.l)},true);skToRevision(n);renderMain();},
   'crs-notes-toggle'(){UI.crsNotes=UI.crsNotes===false;renderMain();},
+  'crs-note-send'(){const tg=crsTarget();if(!tg)return;const ed=$('.crsne'),h=cleanHTML(ed?ed.innerHTML:''),src=crsNote(tg,false);
+    if(!h.replace(/<[^>]*>/g,'').trim()&&!(src&&src.html)){toast('Escreva as anotações primeiro.');return;}
+    const l=tg.l,ref=l?'aula:'+tg.c.id+'|'+tg.m.id+'|'+l.id:'',head='<p><b>Aula:</b> '+esc(tg.title)+(tg.ctx?' ('+esc(tg.ctx)+')':'')+(tg.url?' <a href="'+esc(normUrl(tg.url))+'" target="_blank" rel="noopener">link</a>':'')+'</p>';
+    const n=normNote({id:uid(),type:'nota',title:'Anotações: '+(tg.ntitle||tg.title),html:head+(h||(src&&src.html)||''),folderId:'',catId:'',cd:null,focoIds:tg.foc.slice(),lesRef:ref,created:Date.now(),updated:Date.now()});
+    S.notes.push(n);save();toast('Nota criada em Notas, com o foco da aula.');toastUndo&&0;openRef('note:'+n.id);},
   'crs-note-open'(){const tg=crsTarget();if(!tg)return;const n=crsNote(tg,false);if(n)openRef('note:'+n.id);},
   'crs-fmt'(el){const ed=$('.crsne');if(!ed)return;ed.focus();document.execCommand(el.dataset.f,false,null);ed.dispatchEvent(new Event('input',{bubbles:true}));},
   'sess-list'(){UI.aul={v:'sessions'};renderMain();window.scrollTo(0,0);},
@@ -17927,6 +17941,47 @@ document.addEventListener('input',e=>{
 });
 document.addEventListener('mousedown',e=>{if(e.target.closest&&e.target.closest('[data-a=crs-fmt]'))e.preventDefault();});
 
+function crsJson(t){const m=String(t||'').match(/\{[\s\S]*\}/);if(!m)return null;try{return JSON.parse(m[0]);}catch(e){return null;}}
+async function crsPingado(cid){
+  const c=crsById(cid);if(!c)return;
+  if(!pgReady()){ACT['pg-setup']();toast('Configure o Pingado primeiro.');return;}
+  const L=crsLessons(c);if(!L.length){toast('O curso ainda não tem aulas.');return;}
+  const fl=(S.focos||[]).map(f=>f.id+' | '+f.name+' | '+f.mod+' | '+((areaById(f.area)||{}).name||'')).join('\n'),ls=L.map((x,i)=>i+' | '+x.l.t+' | módulo atual: '+(x.m.t||'-')+(x.l.parts.length?' | partes: '+x.l.parts.length:'')).join('\n');
+  toast('O Pingado está organizando…');
+  const prompt='Organize o curso "'+c.title+'". Focos disponíveis (id | nome | módulo | área):\n'+fl+'\n\nAulas (índice | título | módulo atual):\n'+ls+'\n\nResponda SOMENTE um JSON: {"focoCurso":"id do foco mais próximo do curso ou vazio","aulas":[{"i":índice,"foco":"id do foco mais próximo ou vazio"}],"modulos":[{"nome":"nome","aulas":[índices]}],"partes":[[índices de aulas que são partes do mesmo tema, em ordem]]}. Use só ids e índices que existem. Agrupe em módulos coerentes e junte em partes só aulas claramente do mesmo tema.';
+  try{
+    const j=await pgCall({contents:[{role:'user',parts:[{text:prompt}]}],tools:[],system:'Você organiza cursos de estudo. Responda apenas JSON válido.'});
+    const txt=((j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts)||[]).map(p=>p.text||'').join('');
+    const r=crsJson(txt);if(!r){toast('O Pingado não devolveu uma sugestão válida.');return;}
+    UI.crsPg={cid:cid,r:r,L:L};
+    const nm=(r.modulos||[]).length,np=(r.partes||[]).length,nf=(r.aulas||[]).filter(a=>a.foco&&focoById(a.foco)).length;
+    openModal('<div class="form"><div class="fh"><h2>Sugestão do Pingado</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div><div class="fstat">'+(r.focoCurso&&focoById(r.focoCurso)?'Foco do curso: <b>'+esc(focoById(r.focoCurso).name)+'</b><br>':'')+'Foco em '+nf+' aula(s)<br>'+nm+' módulo(s) sugerido(s)'+(np?'<br>'+np+' grupo(s) de partes':'')+'</div><p class="muted small">Ao aplicar, as aulas são reorganizadas nesses módulos e partes. Os focos só são acrescentados, nada é removido.</p><div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button type="button" class="btn primary" data-a="crs-pg-apply">Aplicar</button></div></div>');
+  }catch(e){toast('Erro do Pingado: '+(e.message||e));}
+}
+function crsPgApply(){
+  const u=UI.crsPg;if(!u)return;const c=crsById(u.cid);if(!c)return;const r=u.r,L=u.L,add=(arr,id)=>{if(id&&focoById(id)&&arr.indexOf(id)<0)arr.push(id);};
+  add(c.focoIds,r.focoCurso);(r.aulas||[]).forEach(a=>{const x=L[a.i];if(x)add(x.l.focoIds,a.foco);});
+  // partes: junta as aulas do grupo na primeira
+  (r.partes||[]).forEach(g=>{const xs=(g||[]).map(i=>L[i]).filter(Boolean);if(xs.length<2)return;const t=xs[0].l;
+    if(!t.parts.length&&t.url)t.parts.push(normPart({t:'Parte 1',url:t.url,kind:t.kind,min:t.min,done:t.done}));
+    xs.slice(1).forEach(y=>{if(y.l.parts.length)y.l.parts.forEach(z=>t.parts.push(z));else t.parts.push(normPart({t:y.l.t,url:y.l.url,kind:y.l.kind,min:y.l.min,done:y.l.done}));y.m.lessons=y.m.lessons.filter(z=>z!==y.l);y.gone=true;});
+    t.min=0;t.done=t.parts.every(z=>z.done);});
+  const live=new Set(crsLessons(c).map(x=>x.l));
+  if((r.modulos||[]).length){
+    const mods=[];r.modulos.forEach(m=>{const ls=(m.aulas||[]).map(i=>L[i]).filter(x=>x&&live.has(x.l)).map(x=>x.l);if(ls.length){const nm=normMod({t:String(m.nome||'').slice(0,80)});nm.lessons=ls;mods.push(nm);}});
+    const placed=new Set();mods.forEach(m=>m.lessons.forEach(l=>placed.add(l)));
+    const rest=[...live].filter(l=>!placed.has(l));if(rest.length){const nm=normMod({t:'Outras aulas'});nm.lessons=rest;mods.push(nm);}
+    c.mods=mods;
+  }
+  c.updated=Date.now();UI.crsPg=null;save();closeModal();renderMain();toast('Curso organizado pelo Pingado.');
+}
+function crsFlashFor(ids){const out=[];crsList().forEach(c=>crsLessons(c).forEach(x=>{if(x.l.flash&&crsFocos(c,x.m,x.l).some(i=>ids.indexOf(i)>=0))out.push(x);}));return out;}
+function crsFlashBox(ids,why){
+  const L=crsFlashFor(ids);if(!L.length)return '';
+  return '<div class="crsfbox"><b>'+ic('zap',14)+' Aulas Flash para este foco</b>'+(why?'<div class="muted small">'+esc(why)+'</div>':'')+L.map(x=>'<div class="crsl" style="padding-left:0"><span class="crsk">'+ic(crsKindIc(x.l.kind),15)+'</span><span class="crst" data-a="les-play" '+crsAttr(x.c.id,x.m.id,x.l.id)+'>'+esc(x.l.t)+'</span><span class="muted small">'+esc(x.c.title)+'</span></div>').join('')+'</div>';
+}
+function focoWeakNames(names){const E=mfR();let ok=0,er=0;const nn=names.map(norm);(MFD.idx||[]).forEach(q=>{if(nn.indexOf(norm(q.foco))<0)return;const r=E[q.id];if(r&&r[1]===1)ok++;else if(r&&r[1]===0)er++;});const t=ok+er;return {ok:ok,er:er,weak:(er>=3&&er/t>=.4)||(t>=5&&ok/t<.6)};}
+function crsFlashForNames(names){const ids=(S.focos||[]).filter(f=>names.some(n=>norm(n)===norm(f.name))).map(f=>f.id),w=focoWeakNames(names);return w.weak?crsFlashBox(ids,'Você está errando bastante este foco ('+w.er+' erradas). Veja estas aulas rápidas.'):'';}
 function crsFocoLessons(f){const out=[];crsList().forEach(c=>crsLessons(c).forEach(x=>{if(crsFocos(c,x.m,x.l).indexOf(f.id)>=0)out.push(x);}));return out;}
 function crsFocoHTML(f){
   const L=crsFocoLessons(f);if(!L.length)return '<div class="muted small" style="padding:6px 0">Nenhuma aula ligada a este foco. Em Documentos > Aulas, escolha o foco no curso, no módulo ou na aula.</div>';
@@ -18786,7 +18841,7 @@ function focoModalHTML(f,tab){
           '<button class="btn sm" data-a="foco-q-train" data-f="'+f.id+'" data-m="err" '+(m.err?'':'disabled')+'>Erradas ('+m.err+')</button>'+
           '<button class="btn sm" data-a="foco-q-trilha" data-f="'+f.id+'" '+(m.tot?'':'disabled')+'>'+ic('list',14)+' Salvar como lista</button>'+
           '<button class="btn sm ghost" data-a="foco-q-bank" data-f="'+f.id+'">Ver no banco</button></div>'+
-        '<h4 class="fsub">Questões deste Foco ('+m.tot+')</h4>'+
+        crsFlashForNames([f.name])+'<h4 class="fsub">Questões deste Foco ('+m.tot+')</h4>'+
         (shown.map((q,i)=>{const st=mfStatus(q.id);return '<div class="ftit"><span class="mfst '+st+'">'+ic(st==='certa'?'check':st==='errada'?'x':'minus',12)+'</span><span data-a="foco-q-open" data-f="'+f.id+'" data-i="'+i+'">Q'+q.num+' | '+esc(q.inst)+' '+q.ano+'</span><small>'+esc(q.sub)+'</small></div>';}).join('')||'<div class="muted small">Nenhuma questão do banco com este Foco.</div>')+
         (all.length>shown.length?'<button class="btn sm ghost" data-a="foco-q-more" data-f="'+f.id+'">Mostrar mais ('+(all.length-shown.length)+')</button>':'')+notes;
     }
