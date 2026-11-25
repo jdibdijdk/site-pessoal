@@ -2917,6 +2917,15 @@ html[data-contrast="high"] :focus-visible{outline-width:3px}
 .bkman{margin:10px 0}.bkman summary{cursor:pointer;color:var(--mut);font-size:13px}.bksec{margin-bottom:6px}
 .bkrow{display:flex;align-items:center;gap:8px;padding:3px 0}.bkrow .bkt{flex:1;min-width:0}.bkrow small{width:34px;text-align:right}
 .docread .crsfr.tall{height:min(72vh,820px)}
+/* cursos compactos, modo leitura e partes ao lado do nome */
+.crsl{padding:3px 0 3px 4px;gap:4px 8px;border-top-color:transparent}.crsmod.card.sec{padding:10px 14px;margin-bottom:8px}.crsmod .arth{margin:0 0 2px;gap:8px}.crsmod.sub{margin-top:4px;padding:6px 10px}
+.crst{flex:0 1 auto;min-width:0;font-size:15.5px;font-weight:500}.crspl{display:inline-flex;flex-wrap:wrap;gap:4px;flex-basis:auto;padding:0}.crspp{padding:2px 8px;font-size:11.5px}.crspp.fl{border-color:#F3D88A;background:#FFF8E1;color:#7A5A00}
+.crsa{margin-left:auto}.crsmod .crspl{padding-left:0}.crsfoc{display:inline-flex}.crsmh2{display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap}
+.crsro .crsed{display:none!important}
+.partrow{grid-template-columns:minmax(0,1.1fr) minmax(0,1.6fr) 64px 130px auto auto}
+@media(max-width:600px){.crsl .crsfoc{flex-basis:100%;order:5}.partrow{grid-template-columns:minmax(0,1fr) 64px auto}.partrow input[name=pt]{grid-column:1;grid-row:1}.partrow input[name=pm]{grid-column:2;grid-row:1}.partrow .pmv{grid-column:3;grid-row:1}.partrow input[name=pu]{grid-column:1/-1;grid-row:2}.partrow select{grid-column:1;grid-row:3}.partrow .pfl{grid-column:2/-1;grid-row:3}}
+@media(max-width:600px){.crsl .crst{flex:1 1 0;min-width:45%}.crsl .crspl,.crsl .crsfoc{flex-basis:100%;padding-left:46px}.crsl .crsfoc{order:5}.crsl .crsfrac{order:4}.crsmod .arth .crsfoc{flex-basis:100%;order:9}}
+@media(max-width:600px){.crsl .crsa{display:none;flex-basis:100%;padding-left:46px;opacity:1}.crsl.open .crsa{display:flex;flex-wrap:wrap}.crsk{cursor:pointer}}
 /* auditoria de layout */
 .mfchips .mffp{display:flex;align-items:flex-start;width:auto;max-width:100%;border-radius:14px;white-space:normal;line-height:1.35}.mfchips .mffp>span{min-width:0;overflow-wrap:anywhere}.mfchips .mfchip{max-width:100%;white-space:normal}
 @media(max-width:600px){.mfqh{flex-wrap:wrap;align-items:center;gap:2px}.mfqh .mfqn{margin-right:2px;font-size:16px}.mfqh .btn.sm{padding:6px 8px;gap:4px}.mfqt{display:contents}.mfqt .mfchips{flex:1 1 100%;order:5}.mfqh>.sp{flex:1}.mfchips{flex-direction:column;align-items:stretch}.mfchips .mffp,.mfchips .mfchip{width:100%;box-sizing:border-box}}
@@ -14317,34 +14326,62 @@ function mfFocoDiff(){
   const extra=F.filter(f=>!used.has(f.id));
   return {want:want,create:create,move:move,fix:fix,extra:extra};
 }
+// questões guardadas (caderno de erros e notas de questão) seguem o foco que o MedFisher usa hoje
+function mfQAlign(){
+  const pairs={};let n=0;
+  (S.cad||[]).forEach(e=>{const q=MFD.byId[e.qid];if(!q)return;const nf=q.foco||'Sem foco';if(norm(e.foco)!==norm(nf)){pairs[norm(e.foco)]=nf;e.foco=nf;n++;}if(q.sub)e.sub=q.sub;if(q.area)e.area=q.area;});
+  (S.notes||[]).forEach(nn=>{
+    if(nn.type!=='questao'||!nn.mfId)return;const q=MFD.byId[nn.mfId];if(!q||!q.foco)return;
+    const nf=q.foco,old=nn.qgroup&&norm(nn.qgroup)!==norm(nf)?nn.qgroup:'';
+    if(old){pairs[norm(old)]=nf;nn.qgroup=nf;n++;}
+    const ar=mfAreaOf(q.area),fo=(S.focos||[]).find(f=>!f.sk&&norm(f.name)===norm(nf)&&(!ar||f.area===ar.id));
+    if(fo){const ids=focoIdsOf(nn).filter(i=>{const f=focoById(i);return !(f&&old&&norm(f.name)===norm(old));});if(ids.indexOf(fo.id)<0)ids.push(fo.id);if(JSON.stringify(ids)!==JSON.stringify(nn.focoIds||[])){nn.focoIds=ids;n++;}}
+  });
+  return {n:n,pairs:pairs};
+}
+// foco do site que o MedFisher não tem mais: para onde vão os vínculos dele
+function mfRemapTarget(f,pairs,keep){
+  const viaQ=pairs[norm(f.name)];let t=viaQ&&keep.find(x=>norm(x.name)===norm(viaQ));
+  if(t)return t;
+  const tok=x=>new Set(norm(x).split(/[^a-z0-9]+/).filter(w=>w.length>2)),a=tok(f.name);let best=null,bs=0;
+  keep.filter(x=>x.area===f.area).forEach(x=>{const b=tok(x.name);let i=0;a.forEach(w=>{if(b.has(w))i++;});const sc=i/Math.max(1,a.size+b.size-i);if(sc>bs){bs=sc;best=x;}});
+  return bs>=.5?best:null;
+}
 function mfFocosSync(removeExtra){
   const d=mfFocoDiff();if(!d)return null;S.focos=S.focos||[];
   d.fix.concat(d.move).forEach(w=>{w.hit.mod=w.mod;w.hit.name=w.name;});
   d.create.forEach(w=>{let ar=w.ar;if(!ar){ar={id:'ar_'+uid(),name:w.area,icon:'tag',color:'#5B6B85'};S.areas=S.areas||[];S.areas.push(ar);w.ar=ar;}S.focos.push({id:'fc_'+uid(),area:ar.id,mod:w.mod,name:w.name});});
-  let removed=0;
-  if(removeExtra&&d.extra.length){const ids=new Set(d.extra.map(f=>f.id));removed=ids.size;S.focos=S.focos.filter(f=>!ids.has(f.id));
-    [].concat(S.tasks,S.acts,S.notes,S.docs,S.pdfs,S.slides||[],S.inks||[],S.decks||[]).forEach(o=>{if(o&&Array.isArray(o.focoIds))o.focoIds=o.focoIds.filter(i=>!ids.has(i));});}
-  const n=d.create.length+d.move.length+d.fix.length+removed;if(n)save();
-  return {created:d.create.length,moved:d.move.length,fixed:d.fix.length,removed:removed,extra:d.extra.length};
+  const qa=mfQAlign();
+  let removed=0,remapped=0;
+  if(removeExtra&&d.extra.length){
+    const ids=new Set(d.extra.map(f=>f.id)),keep=S.focos.filter(f=>!ids.has(f.id)&&!f.sk),map={};
+    d.extra.forEach(f=>{const t=mfRemapTarget(f,qa.pairs,keep);if(t)map[f.id]=t.id;});
+    removed=ids.size;S.focos=S.focos.filter(f=>!ids.has(f.id));
+    const fix=o=>{if(!o||!Array.isArray(o.focoIds))return;const out=[];o.focoIds.forEach(i=>{if(!ids.has(i)){if(out.indexOf(i)<0)out.push(i);}else if(map[i]){remapped++;if(out.indexOf(map[i])<0)out.push(map[i]);}});o.focoIds=out;};
+    [].concat(S.tasks,S.acts,S.notes,S.docs,S.pdfs,S.slides||[],S.inks||[],S.decks||[],S.courses||[],S.aulas||[]).forEach(fix);
+    (S.courses||[]).forEach(c=>crsMods(c).forEach(z=>{fix(z.m);z.m.lessons.forEach(fix);}));(S.aulas||[]).forEach(fix);
+  }
+  const n=d.create.length+d.move.length+d.fix.length+removed+qa.n;if(n)save();
+  return {created:d.create.length,moved:d.move.length,fixed:d.fix.length,removed:removed,remapped:remapped,qaligned:qa.n,extra:d.extra.length};
 }
 function mfFocosAuto(){
   if(!MFD.idx.length)return;const r=mfFocosSync(false);
-  if(r&&(r.created+r.moved+r.fixed)>0){toast('Focos alinhados ao MedFisher: '+(r.created?r.created+' novo(s)':'')+(r.created&&(r.moved+r.fixed)?', ':'')+((r.moved+r.fixed)?(r.moved+r.fixed)+' ajustado(s)':'')+'.');if(UI.tab==='assuntos')renderMain();}
+  if(r&&(r.created+r.moved+r.fixed+r.qaligned)>0){toast('Alinhado ao MedFisher: '+(r.created?r.created+' foco(s) novo(s)':'')+(r.created&&(r.moved+r.fixed)?', ':'')+((r.moved+r.fixed)?(r.moved+r.fixed)+' foco(s) ajustado(s)':'')+((r.created+r.moved+r.fixed)&&r.qaligned?', ':'')+(r.qaligned?r.qaligned+' questão(ões) guardada(s) no foco novo':'')+'.');if(UI.tab==='assuntos'||UI.tab==='notas')renderMain();}
 }
 function mfFocoDlg(){
   if(MFD.st!=='ok'||!MFD.tax){toast('Abra a aba Questões para carregar o banco do MedFisher primeiro.');return;}
   const d=mfFocoDiff(),F=(S.focos||[]).filter(f=>!f.sk),used=f=>[].concat(S.tasks,S.acts,S.notes,S.docs,S.pdfs,S.slides||[],S.inks||[]).filter(o=>o&&focoIdsOf(o).indexOf(f.id)>=0).length;
   const ar=id=>(areaById(id)||{}).name||'';
   openModal('<div class="form"><div class="fh"><h2>Focos do MedFisher</h2><button type="button" class="icon-btn" data-a="cancel" aria-label="Fechar">'+ic('x')+'</button></div>'+
-    '<p class="muted small" style="margin:0 0 8px">O MedFisher tem <b>'+d.want.length+'</b> focos. Os seus são <b>'+F.length+'</b>. Os que faltam são criados e os que mudaram de subárea ou de nome são ajustados sozinhos a cada vez que o banco carrega.</p>'+
+    '<p class="muted small" style="margin:0 0 8px">O MedFisher tem <b>'+d.want.length+'</b> focos. Os seus são <b>'+F.length+'</b>. Os que faltam são criados, os que mudaram de subárea ou de nome são ajustados e as questões que você guardou (caderno de erros e notas) acompanham o foco do MedFisher, tudo sozinho a cada vez que o banco carrega.</p>'+
     '<div class="rvh '+(d.create.length+d.move.length+d.fix.length?'late':'ok')+'"><b>'+(d.create.length+d.move.length+d.fix.length)+'</b><span>a criar ou ajustar agora</span></div>'+
     '<div class="rvh '+(d.extra.length?'late':'ok')+'"><b>'+d.extra.length+'</b><span>no seu site e fora do MedFisher</span></div>'+
-    (d.extra.length?'<div style="max-height:200px;overflow:auto;margin:6px 0">'+d.extra.map(f=>'<div class="small" style="padding:3px 0">'+esc([ar(f.area),f.mod,f.name].filter(Boolean).join(' › '))+(used(f)?' <span class="muted">('+used(f)+' vínculo(s))</span>':'')+'</div>').join('')+'</div><p class="muted small">Remover tira esses focos e os vínculos deles com tarefas, eventos, notas e documentos.</p>':'')+
+    (d.extra.length?'<div style="max-height:200px;overflow:auto;margin:6px 0">'+d.extra.map(f=>'<div class="small" style="padding:3px 0">'+esc([ar(f.area),f.mod,f.name].filter(Boolean).join(' › '))+(used(f)?' <span class="muted">('+used(f)+' vínculo(s))</span>':'')+'</div>').join('')+'</div><p class="muted small">Ao remover, os vínculos desses focos (tarefas, eventos, notas, documentos, aulas e questões guardadas) vão para o foco que o MedFisher usa hoje nas mesmas questões, ou para o foco de nome mais parecido na mesma área. Nada fica sem foco quando existe um destino; só se não houver nenhum o vínculo é solto.</p>':'')+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Fechar</button><button type="button" class="btn" data-a="mf-focosync" data-rm="">Alinhar agora</button>'+(d.extra.length?'<button type="button" class="btn danger" data-a="mf-focosync" data-rm="1">Alinhar e remover os '+d.extra.length+' extras</button>':'')+'</div></div>');
 }
 Object.assign(ACT,{
   'mf-focodlg'(){mfFocoDlg();},
-  'mf-focosync'(el){const r=mfFocosSync(!!el.dataset.rm);closeModal();if(r)toast('Focos alinhados: '+r.created+' criado(s), '+(r.moved+r.fixed)+' ajustado(s)'+(r.removed?', '+r.removed+' removido(s)':'')+'.');renderMain();},
+  'mf-focosync'(el){const r=mfFocosSync(!!el.dataset.rm);closeModal();if(r)toast('Focos alinhados: '+r.created+' criado(s), '+(r.moved+r.fixed)+' ajustado(s)'+(r.qaligned?', '+r.qaligned+' questão(ões) realinhada(s)':'')+(r.removed?', '+r.removed+' removido(s), '+r.remapped+' vínculo(s) remanejado(s)':'')+'.');renderMain();},
   'mf-pop'(el){const k=el.dataset.k,was=UI.mfPop===k;mfClosePop();if(!was){UI.mfPop=k;const w=$('.mfpw[data-mfw="'+k+'"]');if(w){$('.mfpp',w).hidden=false;$('.mfpb',w).setAttribute('aria-expanded','true');const i=$('[data-mfq]',w);if(i)i.focus();}}},
   'mf-pclear'(el){MFF()[el.dataset.k]=[];mfKeepPop(el.dataset.k);},
   'mf-pall'(el){const k=el.dataset.k,a=MFF()[k];$$('[data-mfl="'+k+'"] input[data-mfv]').forEach(i=>{if(a.indexOf(i.value)<0)a.push(i.value);});mfKeepPop(k);},
@@ -17494,7 +17531,7 @@ document.addEventListener('change',e=>{const t=e.target;if(t&&t.dataset&&t.datas
 /* ===== Aulas e cursos (dentro de Documentos): player no site, notas ao lado, sessões de estudo ===== */
 const CRS_KINDS=[['video','Vídeo'],['pdf','PDF'],['doc','Documento'],['link','Link']];
 const crsKindIc=k=>({video:'play',pdf:'file',doc:'note',galeria:'image',link:'link'})[k]||'link';
-function normPart(p){return Object.assign({id:uid(),t:'',url:'',kind:'video',min:0,done:false},p||{});}
+function normPart(p){return Object.assign({id:uid(),t:'',url:'',kind:'video',min:0,done:false,flash:false,kindSet:false},p||{});}
 function normLesson(l){const o=Object.assign({id:uid(),t:'',url:'',kind:'video',min:0,done:false,doneAt:0,noteId:'',focoIds:[],skillIds:[],actId:'',parts:[],flash:false},l||{});if(o.kind==='galeria')o.kind='link';if(!Array.isArray(o.focoIds))o.focoIds=[];if(!Array.isArray(o.skillIds))o.skillIds=[];o.parts=(Array.isArray(o.parts)?o.parts:[]).map(normPart);return o;}
 function normMod(m){const o=Object.assign({id:uid(),t:'',focoIds:[],skillIds:[],lessons:[],subs:[]},m||{});if(!Array.isArray(o.focoIds))o.focoIds=[];if(!Array.isArray(o.skillIds))o.skillIds=[];o.lessons=(Array.isArray(o.lessons)?o.lessons:[]).map(normLesson);o.subs=(Array.isArray(o.subs)?o.subs:[]).map(normMod);return o;}
 function normCrs(c){const o=Object.assign({id:uid(),title:'',desc:'',color:'',focoIds:[],skillIds:[],mods:[],created:Date.now(),updated:Date.now()},c||{});if(!Array.isArray(o.focoIds))o.focoIds=[];if(!Array.isArray(o.skillIds))o.skillIds=[];o.mods=(Array.isArray(o.mods)?o.mods:[]).map(normMod);return o;}
@@ -17508,6 +17545,7 @@ const crsFindM=(c,mid)=>crsMods(c).find(z=>z.m.id===mid)||null;
 const crsModLessons=m=>(m.lessons||[]).concat((m.subs||[]).reduce((a,x)=>a.concat(crsModLessons(x)),[]));
 function crsLessons(c){const out=[];const w=ms=>(ms||[]).forEach(m=>{m.lessons.forEach(l=>out.push({c:c,m:m,l:l}));w(m.subs);});w(c.mods);return out;}
 function crsSteps(c){const o=[];crsLessons(c).forEach(x=>{if(x.l.parts.length)x.l.parts.forEach(p=>o.push({m:x.m,l:x.l,p:p}));else o.push({m:x.m,l:x.l,p:null});});return o;}
+const crsEyeBtn=()=>'<button class="btn sm '+(S.prefs.crsRead?'on':'')+'" data-a="crs-eye" aria-pressed="'+!!S.prefs.crsRead+'" title="'+(S.prefs.crsRead?'Voltar ao modo de edição':'Modo leitura: esconde os botões de editar')+'">'+ic(S.prefs.crsRead?'eyeOff':'eye',14)+' '+(S.prefs.crsRead?'Editar':'Leitura')+'</button>';
 const crsMin=l=>l.parts&&l.parts.length?l.parts.reduce((a,p)=>a+(Number(p.min)||0),0):(Number(l.min)||0);
 const crsPartT=(l,p)=>p.t||'Parte '+(l.parts.indexOf(p)+1);
 const crsLDone=l=>l.parts&&l.parts.length?l.parts.every(p=>p.done):!!l.done;
@@ -17680,7 +17718,7 @@ Object.assign(ACT,{
 /* ----- início de Aulas ----- */
 function crsTreeMod(c,m,fold){
   const mk=c.id+'|'+m.id,mo=!fold[mk],L=crsModLessons(m),dn=L.filter(l=>l.done).length;
-  return (m.t?'<div class="crsmh"><button class="crsfo" data-a="crs-fold" data-k="'+mk+'" aria-expanded="'+mo+'">'+ic(mo?'chevD':'chevR',13)+'<span>'+esc(m.t)+'</span></button><span class="muted small">'+dn+'/'+L.length+'</span></div>':'')+
+  return (m.t?'<div class="crsmh"><button class="crsfo" data-a="crs-fold" data-k="'+mk+'" aria-expanded="'+mo+'">'+ic(mo?'chevD':'chevR',13)+'<span>'+esc(m.t)+'</span></button><span class="muted small">'+dn+'/'+L.length+'</span>'+((m.focoIds||[]).length?'<span class="crsfoc">'+m.focoIds.map(focoById).filter(Boolean).map(f=>focoPill(f,true)).join('')+'</span>':'')+'</div>':'')+
     ((mo||!m.t)?'<div class="crsind">'+m.lessons.map(l=>crsLessonRow(c,m,l,true)).join('')+(m.subs||[]).map(x=>crsTreeMod(c,x,fold)).join('')+'</div>':'');
 }
 function crsTreeHTML(){
@@ -17692,6 +17730,7 @@ function crsTreeHTML(){
       (op?c.mods.map(m=>crsTreeMod(c,m,fold)).join(''):'')+'</div>';}).join('')+'</div>';
 }
 function renderAulas(){
+  document.body.classList.toggle('crsro',!!S.prefs.crsRead);
   const A=UI.aul=UI.aul||{v:'home'};
   if(A.v==='course'&&crsById(A.cid))return crsCourseView(crsById(A.cid));
   if(A.v==='play'&&crsFindL(A.cid,A.mid,A.lid))return crsPlayView();
@@ -17699,7 +17738,7 @@ function renderAulas(){
   if(A.v==='session'&&sessById(A.sid))return crsSessionView(sessById(A.sid));
   UI.aul={v:'home'};
   const cs=S.courses||[],loose=S.aulas||[],tile=c=>{const L=folderLook({color:c.color,icon:'pastaMenos'}),pg=crsProg(c);return '<div class="ftile pst" style="'+L.style+'" data-a="crs-open" data-id="'+c.id+'" role="button" tabindex="0" title="'+esc(c.title)+'"><span class="fti">'+ic('pastaMenos',22)+'</span><span class="ftn">'+esc(c.title)+'</span><span class="ftc">'+pg.done+'/'+pg.tot+' aulas</span></div>';};
-  let h='<div class="toolbar">'+docSubSeg('aulas')+'<span class="sp"></span><button class="btn sm '+(UI.crsTree?'on':'')+'" data-a="crs-tree">'+ic('list',14)+' Cursos e módulos</button>'+(UI.crsTree?'<button class="btn sm ghost" data-a="crs-foldall" data-v="0">Expandir tudo</button><button class="btn sm ghost" data-a="crs-foldall" data-v="1">Recolher tudo</button>':'')+'<button class="btn sm" data-a="sess-list">'+ic('layers',14)+' Sessões de estudo'+((S.sessions||[]).length?' ('+S.sessions.length+')':'')+'</button><button class="btn sm" data-a="les-new" data-c="__avulsas">'+ic('plus',14)+' Aula</button><button class="btn primary" data-a="crs-new">'+ic('plus',15)+' Novo curso</button></div>';
+  let h='<div class="toolbar">'+docSubSeg('aulas')+'<span class="sp"></span><button class="btn sm '+(UI.crsTree?'on':'')+'" data-a="crs-tree">'+ic('list',14)+' Cursos e módulos</button>'+(UI.crsTree?'<button class="btn sm ghost" data-a="crs-foldall" data-v="0">Expandir tudo</button><button class="btn sm ghost" data-a="crs-foldall" data-v="1">Recolher tudo</button>':'')+'<button class="btn sm" data-a="sess-list">'+ic('layers',14)+' Sessões de estudo'+((S.sessions||[]).length?' ('+S.sessions.length+')':'')+'</button><button class="btn sm crsed" data-a="les-new" data-c="__avulsas">'+ic('plus',14)+' Aula</button><button class="btn primary crsed" data-a="crs-new">'+ic('plus',15)+' Novo curso</button>'+crsEyeBtn()+'</div>';
   if(!cs.length&&!loose.length)return h+'<div class="empty">Nenhum curso ainda.<br><button class="btn primary" data-a="crs-new">'+ic('plus',15)+' Criar curso</button></div>';
   if(UI.crsTree)return h+crsTreeHTML();
   if(cs.length)h+='<div class="ftiles">'+cs.map(tile).join('')+'</div>';
@@ -17708,22 +17747,24 @@ function renderAulas(){
 }
 function crsLessonRow(c,m,l,showC){
   const ex=l.actId&&actById(l.actId),o=ex&&nextOccOf(ex),n=l.noteId&&noteById(l.noteId),hp=l.parts.length,mn=crsMin(l),dn=crsLDone(l),fcs=crsFocos(c,m,l).map(focoById).filter(Boolean);
-  const A=crsAttr(c.id,m.id,l.id);
-  return '<div class="crsl '+(dn?'done':'')+'"><button class="chk sm '+(dn?'on':'')+'" data-a="les-done" '+A+' aria-label="Marcar como assistida">'+ic('check',12)+'</button><span class="crsk">'+ic(crsKindIc(hp?l.parts[0].kind:l.kind),15)+'</span>'+
-    '<span class="crst" data-a="les-play" '+A+' role="button" tabindex="0">'+esc(l.t||'Sem título')+'</span>'+(fcs.length?'<span class="crsfoc">'+fcs.map(f=>focoPill(f,true)).join('')+'</span>':'')+
-    (hp?'<span class="crsfrac" title="Partes assistidas">'+l.parts.filter(p=>p.done).length+'/'+hp+'</span>':'')+(l.flash?'<span class="crsflash" title="Aula Flash: aparece quando você erra muito este foco">'+ic('zap',12)+' Flash</span>':'')+(mn?'<span class="muted small">'+skHM(mn)+'</span>':'')+(o?'<span class="skchip2" title="Agendada">'+ic('calendar',12)+' '+fmtDM(o.date)+'</span>':'')+(n?'<span class="muted" title="Tem anotações">'+ic('note',13)+'</span>':'')+
-    '<span class="crsa"><button class="icon-btn sm" data-a="les-flash" '+A+' title="'+(l.flash?'Tirar de Flash':'Marcar como Flash')+'" aria-label="Flash">'+ic('zap',14)+'</button><button class="icon-btn sm" data-a="les-part-add" '+A+' title="Adicionar parte a esta aula" aria-label="Adicionar parte">'+ic('layers',14)+'</button><button class="icon-btn sm" data-a="les-sched" '+A+' title="Agendar" aria-label="Agendar">'+ic('calendar',14)+'</button><button class="icon-btn sm" data-a="les-rev" '+A+' title="Colocar na revisão (D+1)" aria-label="Revisão">'+ic('repeat',14)+'</button><button class="icon-btn sm" data-a="les-edit" '+A+' aria-label="Editar">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="les-del" '+A+' aria-label="Excluir">'+ic('x',13)+'</button></span>'+
-    (hp?'<div class="crspl">'+l.parts.map(p=>'<button class="crspp '+(p.done?'done':'')+'" data-a="les-play" '+A+' data-p="'+p.id+'">'+ic(p.done?'check':crsKindIc(p.kind),12)+' '+esc(crsPartT(l,p))+'</button>').join('')+'</div>':'')+'</div>';
+  const A=crsAttr(c.id,m.id,l.id),mv=t=>'<button class="icon-btn sm" data-a="crs-mv" data-t="les" data-d="'+t+'" '+A+' title="'+(t<0?'Subir':'Descer')+'" aria-label="'+(t<0?'Subir':'Descer')+'">'+ic(t<0?'chevU':'chevD',14)+'</button>';
+  return '<div class="crsl '+(dn?'done':'')+'"><button class="chk sm '+(dn?'on':'')+'" data-a="les-done" '+A+' aria-label="Marcar como assistida">'+ic('check',12)+'</button><span class="crsk" data-a="crs-rowopen" title="Mostrar as ações desta aula" role="button" tabindex="0">'+ic(crsKindIc(hp?l.parts[0].kind:l.kind),15)+'</span>'+
+    '<span class="crst" data-a="les-play" '+A+' role="button" tabindex="0">'+esc(l.t||'Sem título')+'</span>'+
+    (hp?'<span class="crspl">'+l.parts.map(p=>'<button class="crspp '+(p.done?'done':'')+(p.flash?' fl':'')+'" data-a="les-play" '+A+' data-p="'+p.id+'" title="'+esc(crsPartT(l,p))+'">'+ic(p.done?'check':p.flash?'zap':crsKindIc(p.kind),12)+' '+esc(crsPartT(l,p))+'</button>').join('')+'</span><span class="crsfrac" title="Partes assistidas">'+l.parts.filter(p=>p.done).length+'/'+hp+'</span>':'')+
+    (l.flash?'<span class="crsflash" title="Aula Flash">'+ic('zap',12)+' Flash</span>':'')+
+    (fcs.length?'<span class="crsfoc">'+fcs.map(f=>focoPill(f,true)).join('')+'</span>':'')+
+    (mn?'<span class="muted small">'+skHM(mn)+'</span>':'')+(o?'<span class="skchip2" title="Agendada">'+ic('calendar',12)+' '+fmtDM(o.date)+'</span>':'')+(n?'<span class="muted" title="Tem anotações">'+ic('note',13)+'</span>':'')+
+    '<span class="crsa crsed">'+mv(-1)+mv(1)+'<button class="icon-btn sm" data-a="les-flash" '+A+' title="'+(l.flash?'Tirar de Flash':'Toda a aula é Flash')+'" aria-label="Flash">'+ic('zap',14)+'</button><button class="icon-btn sm" data-a="les-part-add" '+A+' title="Adicionar parte a esta aula" aria-label="Adicionar parte">'+ic('layers',14)+'</button><button class="icon-btn sm" data-a="les-sched" '+A+' title="Agendar" aria-label="Agendar">'+ic('calendar',14)+'</button><button class="icon-btn sm" data-a="les-rev" '+A+' title="Colocar na revisão (D+1)" aria-label="Revisão">'+ic('repeat',14)+'</button><button class="icon-btn sm" data-a="les-edit" '+A+' aria-label="Editar">'+ic('edit',14)+'</button><button class="icon-btn sm" data-a="les-del" '+A+' aria-label="Excluir">'+ic('x',13)+'</button></span></div>';
 }
 function crsModHTML(c,m,d,fold){
-  const k=c.id+'|'+m.id,op=!fold[k],mf=(m.focoIds||[]).map(focoById).filter(Boolean),L=crsModLessons(m);
-  return '<section class="'+(d?'crsmod sub':'card sec crsmod')+'"><div class="arth"><button class="crsfo" data-a="crs-fold" data-k="'+k+'" aria-expanded="'+op+'">'+ic(op?'chevD':'chevR',15)+(d?'<h4>':'<h3>')+esc(m.t||'Aulas')+' <small class="muted">'+L.filter(l=>l.done).length+'/'+L.length+'</small>'+(d?'</h4>':'</h3>')+'</button><span class="sp"></span>'+
-    '<button class="btn sm" data-a="les-new" data-c="'+c.id+'" data-m="'+m.id+'">'+ic('plus',14)+' Aula</button><button class="btn sm" data-a="mod-new" data-c="'+c.id+'" data-p="'+m.id+'">'+ic('plus',14)+' Submódulo</button><button class="icon-btn sm" data-a="mod-edit" data-c="'+c.id+'" data-m="'+m.id+'" aria-label="Editar módulo">'+ic('edit',14)+'</button></div>'+
-    (op?(mf.length?'<div class="artchips" style="margin-bottom:4px">'+mf.map(f=>focoPill(f,true)).join('')+'</div>':'')+m.lessons.map(l=>crsLessonRow(c,m,l)).join('')+(m.subs||[]).map(x=>crsModHTML(c,x,d+1,fold)).join(''):'')+'</section>';
+  const k=c.id+'|'+m.id,op=!fold[k],mf=(m.focoIds||[]).map(focoById).filter(Boolean),L=crsModLessons(m),mv=t=>'<button class="icon-btn sm" data-a="crs-mv" data-t="mod" data-d="'+t+'" data-c="'+c.id+'" data-m="'+m.id+'" title="'+(t<0?'Subir':'Descer')+'" aria-label="'+(t<0?'Subir':'Descer')+'">'+ic(t<0?'chevU':'chevD',14)+'</button>';
+  return '<section class="'+(d?'crsmod sub':'card sec crsmod')+'"><div class="arth"><button class="crsfo" data-a="crs-fold" data-k="'+k+'" aria-expanded="'+op+'">'+ic(op?'chevD':'chevR',15)+(d?'<h4>':'<h3>')+esc(m.t||'Aulas')+' <small class="muted">'+L.filter(l=>l.done).length+'/'+L.length+'</small>'+(d?'</h4>':'</h3>')+'</button>'+(mf.length?'<span class="crsfoc">'+mf.map(f=>focoPill(f,true)).join('')+'</span>':'')+'<span class="sp"></span>'+
+    '<span class="crsed crsmh2">'+mv(-1)+mv(1)+'<button class="btn sm" data-a="les-new" data-c="'+c.id+'" data-m="'+m.id+'">'+ic('plus',14)+' Aula</button><button class="btn sm" data-a="mod-new" data-c="'+c.id+'" data-p="'+m.id+'">'+ic('plus',14)+' Submódulo</button><button class="icon-btn sm" data-a="mod-edit" data-c="'+c.id+'" data-m="'+m.id+'" aria-label="Editar módulo">'+ic('edit',14)+'</button></span></div>'+
+    (op?m.lessons.map(l=>crsLessonRow(c,m,l)).join('')+(m.subs||[]).map(x=>crsModHTML(c,x,d+1,fold)).join(''):'')+'</section>';
 }
 function crsCourseView(c){
   const pg=crsProg(c),fold=UI.crsFold||{},fo=(c.focoIds||[]).map(focoById).filter(Boolean),sk=(c.skillIds||[]).map(skById).filter(Boolean);
-  let h='<div class="toolbar"><nav class="crumbs" style="margin:0"><button class="crumb" data-a="aul-home">Aulas</button><span class="sep">›</span><button class="crumb on">'+esc(c.title)+'</button></nav><span class="sp"></span><button class="btn sm ghost" data-a="crs-foldall" data-v="0">Expandir tudo</button><button class="btn sm ghost" data-a="crs-foldall" data-v="1">Recolher tudo</button><button class="btn sm" data-a="crs-batch" data-id="'+c.id+'">'+ic('list',14)+' Colar aulas</button><button class="btn sm" data-a="crs-pg" data-id="'+c.id+'" title="O Pingado sugere foco, módulos e partes">'+pgMascot('idle',14)+' Organizar com o Pingado</button><button class="btn sm" data-a="mod-new" data-c="'+c.id+'">'+ic('plus',14)+' Módulo</button><button class="btn sm" data-a="crs-edit" data-id="'+c.id+'">'+ic('edit',14)+' Editar</button><button class="btn sm danger" data-a="crs-del" data-id="'+c.id+'">'+ic('trash',14)+'</button></div>';
+  let h='<div class="toolbar"><nav class="crumbs" style="margin:0"><button class="crumb" data-a="aul-home">Aulas</button><span class="sep">›</span><button class="crumb on">'+esc(c.title)+'</button></nav><span class="sp"></span><button class="btn sm ghost" data-a="crs-foldall" data-v="0">Expandir tudo</button><button class="btn sm ghost" data-a="crs-foldall" data-v="1">Recolher tudo</button><button class="btn sm crsed" data-a="crs-batch" data-id="'+c.id+'">'+ic('list',14)+' Colar aulas</button><button class="btn sm crsed" data-a="crs-pg" data-id="'+c.id+'" title="O Pingado sugere foco, módulos e partes">'+pgMascot('idle',14)+' Organizar com o Pingado</button><button class="btn sm crsed" data-a="mod-new" data-c="'+c.id+'">'+ic('plus',14)+' Módulo</button><span class="crsed"><button class="icon-btn sm" data-a="crs-mv" data-t="crs" data-d="-1" data-c="'+c.id+'" title="Mover o curso para antes" aria-label="Mover o curso para antes">'+ic('chevU',14)+'</button><button class="icon-btn sm" data-a="crs-mv" data-t="crs" data-d="1" data-c="'+c.id+'" title="Mover o curso para depois" aria-label="Mover o curso para depois">'+ic('chevD',14)+'</button></span><button class="btn sm crsed" data-a="crs-edit" data-id="'+c.id+'">'+ic('edit',14)+' Editar</button><button class="btn sm danger crsed" data-a="crs-del" data-id="'+c.id+'">'+ic('trash',14)+'</button>'+crsEyeBtn()+'</div>';
   h+='<div class="card sec"><div class="arth"><h2 class="vt" style="margin:0;flex:1">'+esc(c.title)+'</h2></div>'+(c.desc?'<p class="muted" style="margin:4px 0">'+esc(c.desc)+'</p>':'')+
     (pg.tot?'<div class="skbar big"><i style="width:'+Math.round(pg.done/pg.tot*100)+'%"></i></div><div class="muted small">'+pg.done+' de '+pg.tot+' aulas assistidas</div>':'')+
     ((fo.length||sk.length)?'<div class="artchips" style="margin-top:6px">'+fo.map(f=>focoPill(f)).join('')+sk.map(s=>'<span class="lzdot" style="--d:'+esc(skColor(s))+'"><i></i>'+esc(s.name)+'</span>').join('')+'</div>':'')+'</div>';
@@ -17765,7 +17806,7 @@ function crsPlayBody(tg){
 function crsPartTabs(tg){
   if(!tg||!tg.l||!tg.l.parts.length)return '';
   const A=crsAttr(tg.c.id,tg.m.id,tg.l.id);
-  return '<div class="sesstabs" role="tablist" aria-label="Partes da aula">'+tg.l.parts.map(p=>'<span class="sesstab '+(p===tg.part?'on':'')+'" role="tab"><button data-a="les-part" data-p="'+p.id+'">'+ic(p.done?'check':crsKindIc(p.kind),13)+' '+esc(crsPartT(tg.l,p))+'</button></span>').join('')+'<button class="btn sm ghost" data-a="les-part-add" '+A+'>'+ic('plus',13)+' Parte</button></div>';
+  return '<div class="sesstabs" role="tablist" aria-label="Partes da aula">'+tg.l.parts.map(p=>'<span class="sesstab '+(p===tg.part?'on':'')+'" role="tab"><button data-a="les-part" data-p="'+p.id+'">'+ic(p.done?'check':p.flash?'zap':crsKindIc(p.kind),13)+' '+esc(crsPartT(tg.l,p))+'</button></span>').join('')+'<button class="btn sm ghost" data-a="les-part-add" '+A+'>'+ic('plus',13)+' Parte</button></div>';
 }
 function crsPlayView(){
   const A=UI.aul,tg=crsTarget();if(!tg){UI.aul={v:'home'};return renderAulas();}
@@ -17773,7 +17814,7 @@ function crsPlayView(){
   const chain=crsFindM(tg.c,tg.m.id);
   return '<div class="toolbar"><nav class="crumbs" style="margin:0"><button class="crumb" data-a="aul-home">Aulas</button>'+(tg.c.id!=='__avulsas'?'<span class="sep">›</span><button class="crumb" data-a="crs-open" data-id="'+tg.c.id+'">'+esc(tg.c.title)+'</button>':'')+((chain?chain.chain:[tg.m]).filter(x=>x.t).map(x=>'<span class="sep">›</span><span class="crumb">'+esc(x.t)+'</span>').join(''))+'</nav><span class="sp"></span>'+
     '<button class="btn sm" data-a="les-go" data-d="-1" '+(prev?'':'disabled')+'>'+ic('chevL',14)+' Anterior</button><button class="btn sm" data-a="les-go" data-d="1" '+(next?'':'disabled')+'>Próxima '+ic('chevR',14)+'</button></div>'+
-    '<div class="crsttl"><h2 class="vt" style="margin:0">'+esc(tg.l.t)+'</h2>'+crsPartTabs(tg)+'<div class="artbar" style="margin:6px 0 10px"><button class="btn sm '+(d?'':'primary')+'" data-a="'+(hp?'les-pdone':'les-done')+'" '+AT+(hp?' data-p="'+tg.part.id+'"':'')+'>'+ic('check',14)+' '+(hp?(d?'Parte assistida':'Marcar parte como assistida'):(d?'Assistida':'Marcar como assistida'))+'</button>'+(hp?'<button class="btn sm" data-a="les-done" '+AT+'>'+ic('check',14)+' '+(tg.l.done?'Aula toda assistida':'Marcar aula toda')+'</button>':'')+
+    '<div class="crsttl"><h2 class="vt" style="margin:0">'+esc(tg.l.t)+'</h2>'+crsPartTabs(tg)+'<div class="artbar" style="margin:6px 0 10px"><button class="btn sm '+(d?'':'primary')+'" data-a="'+(hp?'les-pdone':'les-done')+'" '+AT+(hp?' data-p="'+tg.part.id+'"':'')+'>'+ic('check',14)+' '+(hp?(d?'Parte assistida':'Marcar parte como assistida'):(d?'Assistida':'Marcar como assistida'))+'</button>'+(hp?'<button class="btn sm" data-a="les-done" '+AT+'>'+ic('check',14)+' '+(tg.l.done?'Aula toda assistida':'Marcar aula toda')+'</button><button class="btn sm '+(tg.part.flash?'on':'')+'" data-a="les-pflash" '+AT+' data-p="'+tg.part.id+'" title="Marca só esta parte como resumo Flash">'+ic('zap',14)+' '+(tg.part.flash?'Parte Flash':'Parte é Flash?')+'</button>':'')+
     '<button class="btn sm" data-a="les-sched" '+AT+'>'+ic('calendar',14)+' Agendar</button><button class="btn sm" data-a="les-rev" '+AT+'>'+ic('repeat',14)+' Revisão</button>'+
     '<button class="btn sm" data-a="les-edit" '+AT+'>'+ic('link',14)+' Editar e vincular</button>'+(tg.url?'<a class="btn sm" href="'+esc(normUrl(tg.url))+'" target="_blank" rel="noopener">'+ic('external',14)+' Abrir em outra aba</a>':'')+
     '<button class="btn sm ghost" data-a="crs-notes-toggle">'+(UI.crsNotes===false?'Mostrar anotações':'Ocultar anotações')+'</button></div></div>'+crsPlayBody(tg);
@@ -17863,7 +17904,7 @@ function crsAutoFill(url,tEl,mEl){
   url=String(url||'').trim();if(!url||!tEl||tEl.value.trim())return;
   linkInfo(url).then(i=>{if(!tEl.isConnected)return;if(i.title&&!tEl.value.trim()){tEl.value=i.title.replace(/\.(pdf|mp4|mov|mkv)$/i,'').slice(0,140);tEl.classList.add('pgfilled');setTimeout(()=>tEl.classList.remove('pgfilled'),4000);}if(mEl&&!mEl.value&&i.durationMin)mEl.value=i.durationMin;});
 }
-const crsPartRow=p=>'<div class="partrow" data-pid="'+esc(p.id||'')+'"><input name="pt" placeholder="Nome da parte" value="'+esc(p.t||'')+'" autocomplete="off"><input name="pu" placeholder="https://" value="'+esc(p.url||'')+'" autocomplete="off"><input name="pm" type="number" min="0" step="1" placeholder="min" value="'+(p.min||'')+'" aria-label="Minutos da parte"><button type="button" class="icon-btn sm" data-a="part-del" aria-label="Tirar a parte">'+ic('x',13)+'</button></div>';
+const crsPartRow=p=>'<div class="partrow" data-pid="'+esc(p.id||'')+'"><input name="pt" placeholder="Nome da parte" value="'+esc(p.t||'')+'" autocomplete="off"><input name="pu" placeholder="https://" value="'+esc(p.url||'')+'" autocomplete="off"><input name="pm" type="number" min="0" step="1" placeholder="min" value="'+(p.min||'')+'" aria-label="Minutos da parte"><select name="pk" aria-label="Tipo da parte"><option value="">Tipo: automático</option>'+CRS_KINDS.map(k=>'<option value="'+k[0]+'" '+(p.kindSet&&p.kind===k[0]?'selected':'')+'>'+k[1]+'</option>').join('')+'</select><label class="chip cb pfl"><input type="checkbox" name="pf" '+(p.flash?'checked':'')+'><span>Flash</span></label><span class="pmv"><button type="button" class="icon-btn sm" data-a="part-up" aria-label="Subir a parte">'+ic('chevU',13)+'</button><button type="button" class="icon-btn sm" data-a="part-dn" aria-label="Descer a parte">'+ic('chevD',13)+'</button><button type="button" class="icon-btn sm" data-a="part-del" aria-label="Tirar a parte">'+ic('x',13)+'</button></span></div>';
 function crsLessonDlg(cid,mid,lid,opt){
   opt=opt||{};
   const c=crsById(cid);if(!c)return;const f0=lid?crsFindL(cid,mid,lid):null,x=f0&&f0.l,p=Object.assign({t:'',url:'',kind:'video',min:'',focoIds:[],skillIds:[],parts:[],flash:false},x||{});
@@ -17873,7 +17914,7 @@ function crsLessonDlg(cid,mid,lid,opt){
     '<div class="f"><span>Link (Google Drive, YouTube, documento… o título é puxado sozinho)</span><div class="frow" style="flex-wrap:nowrap"><input name="url" value="'+esc(p.url)+'" placeholder="https://" autocomplete="off" style="flex:1"><button type="button" class="btn sm" data-a="les-title">Puxar título</button></div></div>'+
     '<div class="fgrid"><label class="f">Tipo<select name="kind">'+CRS_KINDS.map(k=>'<option value="'+k[0]+'" '+(p.kind===k[0]?'selected':'')+'>'+k[1]+'</option>').join('')+'</select></label><label class="f">Duração (min)<input type="number" name="min" min="0" step="1" value="'+(p.min||'')+'"></label></div>'+
     '<div class="f"><span>Partes desta aula <small class="muted">(opcional: várias partes do mesmo tema; o link acima passa a ser só de referência)</small></span><div id="lesParts">'+p.parts.map(crsPartRow).join('')+'</div><div class="frow"><button type="button" class="btn sm ghost" data-a="part-add">'+ic('plus',13)+' Parte</button></div></div>'+
-    '<label class="chip cb" style="margin:4px 0"><input type="checkbox" name="flash" '+(p.flash?'checked':'')+'><span>Aula Flash: revisão rápida quando eu errar muitas questões do foco</span></label>'+(x&&others.length?'<div class="f"><span>Juntar outras aulas como partes desta</span>'+pickerHTML('lmerge',others,[],'Escolher aulas')+'</div>':'')+
+    '<label class="chip cb" style="margin:4px 0"><input type="checkbox" name="flash" '+(p.flash?'checked':'')+'><span>Toda a aula é Flash (resumo rápido para quando eu errar muito o foco; partes Flash ficam em cada parte)</span></label>'+(x&&others.length?'<div class="f"><span>Juntar outras aulas como partes desta</span>'+pickerHTML('lmerge',others,[],'Escolher aulas')+'</div>':'')+
     (c.id==='__avulsas'?'':'<label class="f">Módulo<select name="mod">'+crsMods(c).map(z=>'<option value="'+z.m.id+'" '+((mid||c.mods[0].id)===z.m.id?'selected':'')+'>'+' '.repeat(z.d)+esc(z.m.t||'Aulas')+'</option>').join('')+'</select></label>')+
     '<div class="f"><span>Focos desta aula</span>'+focoPickHTML('lfoco',p.focoIds)+'</div><div class="f"><span>Habilidades</span>'+pickerHTML('lsk',crsSkItems(),p.skillIds,'Habilidades')+'</div>'+
     '<div class="ff"><span class="sp"></span><button type="button" class="btn" data-a="cancel">Cancelar</button><button class="btn primary">Salvar</button></div></form>',true);
@@ -17884,7 +17925,8 @@ function crsLessonDlg(cid,mid,lid,opt){
   f.addEventListener('submit',e=>{
     e.preventDefault();const E=f.elements,d={t:E.t.value.trim(),url:E.url.value.trim()?normUrl(E.url.value.trim()):'',kind:E.kind.value,min:Math.max(0,Number(E.min.value)||0),focoIds:pickedValues(f,'lfoco'),skillIds:pickedValues(f,'lsk'),flash:!!E.flash.checked};if(!d.t)return;
     const old=x?x.parts:[],parts=$$('#lesParts .partrow',f).map(r=>{const t=r.querySelector('[name=pt]').value.trim(),u=r.querySelector('[name=pu]').value.trim(),o=old.find(z=>z.id===r.dataset.pid),url=u?normUrl(u):'';
-      return o?Object.assign(o,{t:t,url:url,min:Math.max(0,Number(r.querySelector('[name=pm]').value)||0),kind:o.url===url?o.kind:crsGuessKind(url,t)}):normPart({t:t,url:url,min:Math.max(0,Number(r.querySelector('[name=pm]').value)||0),kind:crsGuessKind(url,t)});}).filter(z=>z.t||z.url);
+      const pk=r.querySelector('[name=pk]').value,pf=!!r.querySelector('[name=pf]').checked,pm=Math.max(0,Number(r.querySelector('[name=pm]').value)||0),kd=pk||(o&&!o.kindSet&&o.url===url?o.kind:crsGuessKind(url,t));
+      return o?Object.assign(o,{t:t,url:url,min:pm,kind:kd,kindSet:!!pk,flash:pf}):normPart({t:t,url:url,min:pm,kind:kd,kindSet:!!pk,flash:pf});}).filter(z=>z.t||z.url);
     const tm=c.id==='__avulsas'?c.mods[0]:(crsFindM(c,E.mod.value)||{m:c.mods[0]}).m;
     let L=x;
     if(x){Object.assign(x,d,{parts:parts});if(f0.m!==tm){f0.m.lessons=f0.m.lessons.filter(l=>l!==x);tm.lessons.push(x);}}else{L=normLesson(Object.assign(d,{parts:parts}));tm.lessons.push(L);}
@@ -17937,12 +17979,23 @@ Object.assign(ACT,{
   'les-done'(el){const f=crsFindL(el.dataset.c,el.dataset.m,el.dataset.l);if(!f)return;const nv=!crsLDone(f.l);f.l.done=nv;f.l.doneAt=nv?Date.now():0;f.l.parts.forEach(p=>{p.done=nv;});save();renderMain();},
   'crs-pg'(el){crsPingado(el.dataset.id);},
   'crs-pg-apply'(){crsPgApply();},
+  'les-pflash'(el){const f=crsFindL(el.dataset.c,el.dataset.m,el.dataset.l);if(!f)return;const p=f.l.parts.find(z=>z.id===el.dataset.p);if(!p)return;p.flash=!p.flash;save();renderMain();toast(p.flash?'Esta parte é Flash (resumo rápido).':'Parte tirada de Flash.');},
+  'crs-rowopen'(el){const r=el.closest('.crsl');if(r)r.classList.toggle('open');},
+  'crs-eye'(){S.prefs.crsRead=!S.prefs.crsRead;save();renderMain();},
+  'crs-mv'(el){const d=Number(el.dataset.d),t=el.dataset.t,mv=(arr,it)=>{const i=arr.indexOf(it),j=i+d;if(i<0||j<0||j>=arr.length)return false;arr.splice(i,1);arr.splice(j,0,it);return true;};let ok=false;
+    if(t==='crs'){const c=(S.courses||[]).find(x=>x.id===el.dataset.c);ok=!!c&&mv(S.courses,c);}
+    else{const c=crsById(el.dataset.c);if(!c)return;
+      if(t==='mod'){const fx=crsFindM(c,el.dataset.m);ok=!!fx&&mv(fx.parent?fx.parent.subs:c.mods,fx.m);}
+      else if(t==='les'){const f=crsFindL(el.dataset.c,el.dataset.m,el.dataset.l);ok=!!f&&mv(f.m.lessons,f.l);}}
+    if(ok){save();renderMain();}},
   'les-flash'(el){const f=crsFindL(el.dataset.c,el.dataset.m,el.dataset.l);if(!f)return;f.l.flash=!f.l.flash;save();renderMain();toast(f.l.flash?'Aula Flash: aparece quando você errar muito o foco.':'Aula tirada de Flash.');},
   'les-pdone'(el){const f=crsFindL(el.dataset.c,el.dataset.m,el.dataset.l);if(!f)return;const p=f.l.parts.find(z=>z.id===el.dataset.p);if(!p)return;p.done=!p.done;f.l.done=f.l.parts.every(z=>z.done);f.l.doneAt=f.l.done?Date.now():0;save();renderMain();},
   'les-part'(el){UI.aul=Object.assign({},UI.aul,{pid:el.dataset.p});renderMain();},
   'les-part-add'(el){crsLessonDlg(el.dataset.c,el.dataset.m,el.dataset.l,{addPart:true});},
   'part-add'(){const w=$('#lesParts');if(!w)return;w.insertAdjacentHTML('beforeend',crsPartRow({}));const i=w.querySelector('.partrow:last-child input');if(i)i.focus();},
   'part-del'(el){const r=el.closest('.partrow');if(r)r.remove();},
+  'part-up'(el){const r=el.closest('.partrow'),pv=r&&r.previousElementSibling;if(pv)r.parentNode.insertBefore(r,pv);},
+  'part-dn'(el){const r=el.closest('.partrow'),nx=r&&r.nextElementSibling;if(nx)r.parentNode.insertBefore(nx,r);},
   'les-play'(el){UI.aul={v:'play',cid:el.dataset.c,mid:el.dataset.m,lid:el.dataset.l,pid:el.dataset.p||''};closeModal();UI.tab='docs';UI.docSub='aulas';renderTabs();renderMain();window.scrollTo(0,0);},
   'les-go'(el){const A=UI.aul,f=crsFindL(A.cid,A.mid,A.lid);if(!f)return;const tg=crsTgOf(f,A.pid),St=crsSteps(f.c),i=St.findIndex(x=>x.l.id===f.l.id&&(!tg.part||x.p===tg.part))+Number(el.dataset.d),t=St[i];if(t){UI.aul=Object.assign({},A,{v:'play',cid:f.c.id,mid:t.m.id,lid:t.l.id,pid:t.p?t.p.id:''});renderMain();window.scrollTo(0,0);}},
   'les-title'(){const f=$('#fLes');if(!f)return;const u=f.elements.url.value.trim();if(!u){toast('Cole o link primeiro.');return;}linkInfo(u).then(i=>{if(i.title&&!f.elements.t.value.trim())f.elements.t.value=i.title.slice(0,140);else if(!i.title)toast('Não consegui ler o título desse link.');});},
@@ -18007,10 +18060,15 @@ function crsPgApply(){
   }
   c.updated=Date.now();UI.crsPg=null;save();closeModal();renderMain();toast('Curso organizado pelo Pingado.');
 }
-function crsFlashFor(ids){const out=[];crsList().forEach(c=>crsLessons(c).forEach(x=>{if(x.l.flash&&crsFocos(c,x.m,x.l).some(i=>ids.indexOf(i)>=0))out.push(x);}));return out;}
+function crsFlashFor(ids){
+  const out=[];crsList().forEach(c=>crsLessons(c).forEach(x=>{
+    if(!crsFocos(c,x.m,x.l).some(i=>ids.indexOf(i)>=0))return;
+    if(x.l.flash)out.push({c:c,m:x.m,l:x.l,p:null});else x.l.parts.filter(p=>p.flash).forEach(p=>out.push({c:c,m:x.m,l:x.l,p:p}));
+  }));return out;
+}
 function crsFlashBox(ids,why){
   const L=crsFlashFor(ids);if(!L.length)return '';
-  return '<div class="crsfbox"><b>'+ic('zap',14)+' Aulas Flash para este foco</b>'+(why?'<div class="muted small">'+esc(why)+'</div>':'')+L.map(x=>'<div class="crsl" style="padding-left:0"><span class="crsk">'+ic(crsKindIc(x.l.kind),15)+'</span><span class="crst" data-a="les-play" '+crsAttr(x.c.id,x.m.id,x.l.id)+'>'+esc(x.l.t)+'</span><span class="muted small">'+esc(x.c.title)+'</span></div>').join('')+'</div>';
+  return '<div class="crsfbox"><b>'+ic('zap',14)+' Aulas Flash para este foco</b>'+(why?'<div class="muted small">'+esc(why)+'</div>':'')+L.map(x=>'<div class="crsl" style="padding-left:0"><span class="crsk">'+ic(crsKindIc(x.p?x.p.kind:x.l.kind),15)+'</span><span class="crst" data-a="les-play" '+crsAttr(x.c.id,x.m.id,x.l.id)+(x.p?' data-p="'+x.p.id+'"':'')+'>'+esc(x.l.t+(x.p?' | '+crsPartT(x.l,x.p):''))+'</span><span class="muted small">'+esc(x.c.title)+'</span></div>').join('')+'</div>';
 }
 function focoWeakNames(names){const E=mfR();let ok=0,er=0;const nn=names.map(norm);(MFD.idx||[]).forEach(q=>{if(nn.indexOf(norm(q.foco))<0)return;const r=E[q.id];if(r&&r[1]===1)ok++;else if(r&&r[1]===0)er++;});const t=ok+er;return {ok:ok,er:er,weak:(er>=3&&er/t>=.4)||(t>=5&&ok/t<.6)};}
 function crsFlashForNames(names){const ids=(S.focos||[]).filter(f=>names.some(n=>norm(n)===norm(f.name))).map(f=>f.id),w=focoWeakNames(names);return w.weak?crsFlashBox(ids,'Você está errando bastante este foco ('+w.er+' erradas). Veja estas aulas rápidas.'):'';}
